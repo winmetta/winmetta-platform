@@ -1,6 +1,6 @@
 # Technical Architecture
 
-**Status:** Phase 0 and Phase 1 are specified in detail. Everything under "Future" is a *tentative direction* recorded so ideas aren't lost — it is **not** a source of truth and will be redesigned when that phase is actually planned.
+**Status:** Phases 0–2 (foundation code, five bilingual pages, infrastructure & deployment) are specified in detail in [implementation-plan.md](implementation-plan.md). Everything under "Future" is a *tentative direction* recorded so ideas aren't lost — it is **not** a source of truth and will be redesigned when that phase is actually planned.
 
 **Guiding principle:** pick popular, well-documented tools with large communities, easy learning curves for volunteers, and good long-term support. Prefer free programs offered to nonprofits, but paying for tooling is fine when it saves volunteer time or reduces risk — donations may fund tech development and maintenance (see [prd.md](prd.md) §5).
 
@@ -8,7 +8,7 @@
 
 ## 0. Scope: v1 Is a Static Web App
 
-Per [prd.md](prd.md) §4.7 and §7, v1 is **one responsive web app designed for mobile and desktop, built with Astro** (static-first, React islands for interactive pieces). Most content — LLB curriculum, Dhamma Library metadata, class directory — is static and lives in the repo as content collections. That means **no backend server and no database in Phase 0/1**: fewer moving parts for a volunteer team to run, cheaper, and easier to move.
+Per [prd.md](prd.md) §4.7 and §7, v1 is **one responsive web app designed for mobile and desktop, built with Astro** (static-first, React islands for interactive pieces). Most content — LLB curriculum, Dhamma Library metadata, class directory — is static and lives in the repo as content collections. That means **no backend server and no database in Phases 0–2**: fewer moving parts for a volunteer team to run, cheaper, and easier to move.
 
 A backend (Fastify + PostgreSQL), accounts, offline support and native apps are all documented as [future work](#10-future-directions-tentative), added only when a real need appears.
 
@@ -30,10 +30,10 @@ A backend (Fastify + PostgreSQL), accounts, offline support and native apps are 
 +-----------------------------------+
         | Browser fetches public media URLs
         v
-Bunny CDN (proposed: cdn.app.winmetta.org)
-        | Authenticated origin fetch on cache miss
+bunny.net CDN (proposed: cdn.app.winmetta.org, DNS on Cloudflare)
+        | Origin fetch on cache miss
         v
-Private Cloudflare R2 (audio, video, PDF, images)
+AWS S3 bucket (audio, video, PDF, images)
 
 Future (tentative, see §10): Fastify API + PostgreSQL on Azure Container Apps,
 accounts (Google sign-in, email link via SendGrid), offline/PWA, native shells.
@@ -45,7 +45,7 @@ Core content must always work with **no account and no login** (PRD §4.6).
 
 ## 2. Technology Choices (v1)
 
-Versions are a baseline as of September 2026 — re-check before Phase 0 kickoff.
+Versions are a baseline as of September 2026 — re-check before kickoff.
 
 | Layer | Selection | Version baseline | Why |
 | --- | --- | --- | --- |
@@ -57,7 +57,8 @@ Versions are a baseline as of September 2026 — re-check before Phase 0 kickoff
 | Content & schemas | **Astro content collections** with **Zod** | — | Zod is Astro's built-in schema layer and the most popular TypeScript validator. Content lives in the repo as Markdown/JSON. |
 | Styling / UI | **Tailwind CSS + shadcn/ui** | Tailwind ^4.3 | Widely used; components are copied into the repo, so no dependency abandonment risk. |
 | Static hosting | **Azure Static Web Apps** | Free tier; Standard if needed | Free SSL, CDN, custom domain, PR preview environments. Covered by the Azure for Nonprofits grant. |
-| Media | **Cloudflare R2 + Bunny CDN** | — | Private S3-compatible storage, public CDN delivery. R2 has $0 egress; Bunny delivery is billed separately (§6). |
+| Media | **AWS S3** + **bunny.net CDN** | — | S3 is the most widely used, best-documented object store, with an S3-compatible API that keeps media portable; bunny.net serves and caches media cheaply so most reads never hit S3 egress (§6). |
+| DNS | **Cloudflare DNS** | Free plan | Hosts the `winmetta.org` zone; records for Bunny hostnames stay DNS-only (not proxied). |
 | Analytics | **Deferred beyond v1** | — | No analytics service or learner-event collection in Phase 0–2; see §4.4. |
 | Infra as code | **Terraform** | — | Portable across clouds; see §8. |
 | CI/CD | **GitHub Actions** | — | Free for public repos. |
@@ -73,23 +74,23 @@ Design for both mobile and desktop: touch-friendly controls, keyboard access, re
 ```
 winmetta-platform/
 ├── .github/workflows/
-│   ├── ci.yml                 # lint, typecheck, build on every PR
-│   └── deploy-web.yml         # Azure Static Web Apps deploy (prod + PR previews)
+│   ├── ci.yml                 # lint, typecheck, test, build on every PR (Phase 0)
+│   └── deploy-web.yml         # Azure Static Web Apps deploy: PR previews and review app (Phase 1); staging + production promotion (Phase 2)
 ├── apps/
 │   └── web/                   # Astro app (the only v1 app)
 │       ├── src/
-│       │   ├── pages/         # file-based routes (library, classes, curricula, about)
+│       │   ├── pages/         # locale-prefixed routes; five starter pages in Phase 1, curricula later
 │       │   ├── components/    # Astro components + React islands
-│       │   └── content/       # content collections: curricula, library index, class schedule
+│       │   └── content/       # localized pages, resources, library categories, classes; curricula later
 │       ├── astro.config.mjs
 │       └── package.json
 ├── packages/                  # created when first needed, not up front
-│   ├── tsconfig/              # shared base tsconfig (Phase 0)
+│   ├── tsconfig/              # shared base tsconfig
 │   ├── ui/                    # shared components, once a second consumer exists
 │   └── shared-types/          # shared Zod schemas, once code is shared
-├── infra/                     # Terraform (see §8)
+├── infra/                     # Terraform (Phase 2, see §8)
 │   ├── modules/platform/
-│   └── environments/production/
+│   └── environments/{staging,production}/
 ├── scripts/
 │   └── bootstrap-macos.sh
 ├── .nvmrc                     # 24
@@ -100,6 +101,14 @@ winmetta-platform/
 ```
 
 Start simple: with a single app, keep shared code inside `apps/web` and extract a package only when a second consumer needs it.
+
+### Library model and discovery (Phase 1)
+
+Classes and Dhamma Library are the two main navigation groups; resource discovery lives under `/[locale]/dhamma-library/`. Use one shared resource collection with stable IDs, localized titles/descriptions, source language(s), category IDs, resource type, tags, author/teacher attribution, source URL and verification date. Access links carry format, platform (for apps), MIME type and file size where known. A book with a PDF and a slide deck with a PDF remain distinct resource types; avoid duplicate entries for alternate formats.
+
+Search is **basic**: generate a small metadata list from published records at build time, load it on library pages only, and filter in the browser with a case-insensitive substring match over title, description, author/teacher and tags. Substring matching works for Burmese without word segmentation. No backend, ranking, fuzzy matching or full-text search. Match English and Unicode Burmese metadata regardless of UI locale. Translate category/type labels using stable keys, and visibly label source-language fallback in results.
+
+Represent the query and category/type/language filters in URL parameters so deep links, history and locale switching preserve discovery state. Provide category browsing, result counts, reset and empty states; keep the curated listing accessible before search hydration. Search queries are not sent to an analytics service. Full-featured search (ranking, fuzzy matching, a dedicated library such as Pagefind or MiniSearch), file-body indexing, OCR, transcription and external-site crawling are deferred to Phase 4.
 
 ### Curriculum naming
 
@@ -121,7 +130,7 @@ The word "lesson" is fine as a generic content-unit term in code (e.g. `lesson.t
 
 ### 4.1. Content delivery
 
-Pages (library, class directory, curriculum pages) are pre-rendered at build time from repo content. Audio/video/PDF/images use public Bunny CDN URLs (proposed hostname: `cdn.app.winmetta.org`). The browser fetches from Bunny; Bunny fetches cache misses from the private R2 origin using server-side credentials (§6). No API call is needed to read or learn anything.
+Pages (library, class directory, curriculum pages) are pre-rendered at build time from repo content. Audio/video/PDF/images are served from a bunny.net pull zone on a custom domain (proposed `cdn.app.winmetta.org`), which fetches cache misses from a private AWS S3 bucket (§6). Application code only ever references the public CDN URL. No API call is needed to read or learn anything.
 
 ### Class schedule timezones
 
@@ -151,17 +160,25 @@ The measures in [prd.md](prd.md) §6 are future candidates only. Revisit measure
 
 ---
 
-## 5. Burmese Text Encoding: Unicode-Only (v1)
+## 5. Internationalization & Burmese Text
+
+Phase 0 builds the English (`en`) and Burmese (`my`) foundation; Phase 1 ships five public page types in both languages, serving online class students and independent learners worldwide. See implementation-plan.md §2–§3 for scope and acceptance criteria. Use `/en/…` and `/my/…` routes generated from stable page IDs; `/` is a language entry page. Locale-aware links and the switcher preserve the page identity. Explicit URL locale wins over optional browser-stored preference, and navigation works when storage is unavailable.
+
+Keep a central extensible locale registry, keyed UI dictionaries, and localized page records inside `apps/web`. Page layouts are shared across locales. Shared class/resource records use stable IDs with localized display fields and independent source-language metadata. Use locale-aware formatting, document language/direction, canonical and alternate-language URLs, and text layouts that tolerate translation expansion. Avoid two-language conditionals throughout components so new locales need only registry, dictionary and content additions.
+
+Validate all English/Burmese translations and UI keys at build time. For future content without a translation, show the source language with an explicit label. Never fabricate translations of teachings. UI locale does not determine content language, learner intent, or schedule timezone.
+
+### Unicode-only Burmese (v1)
 
 All Burmese-script content — UI strings, digitized curriculum, library metadata — uses **Unicode (Myanmar block, U+1000–U+109F)**. **Zawgyi**, the legacy non-Unicode encoding still found on older devices, older PDFs and much pre-2019 Myanmar web content, is **out of scope for v1**.
 
-Zawgyi and Unicode look similar but are byte-incompatible; mixing them garbles text. If Phase 2 library digitization or user-contributed content turns out to include Zawgyi, add a detection/conversion step (e.g. Google's open-source `myanmar-tools`). Noted so it isn't a surprise mid-migration. Ship a Unicode Burmese web font (e.g. Noto Sans Myanmar) so pages render consistently on older devices.
+Zawgyi and Unicode look similar but are byte-incompatible; mixing them garbles text. If Phase 4 library expansion or user-contributed content turns out to include Zawgyi, add a detection/conversion step (e.g. Google's open-source `myanmar-tools`). Noted so it isn't a surprise mid-migration. Ship a Unicode Burmese web font (e.g. Noto Sans Myanmar) so pages render consistently on older devices.
 
 ---
 
 ## 6. Hosting & Domains
 
-Win Metta has an Azure for Nonprofits grant ($2,000/year). It covers only first-party Azure services, doesn't roll over, and must be reactivated annually — a lapse year should be planned for, not a surprise.
+Win Metta has an Azure for Nonprofits grant ($2,000/year). It covers only first-party Azure services (the static hosting here), doesn't roll over, and must be reactivated annually — a lapse year should be planned for, not a surprise. Media storage on AWS S3 and delivery on bunny.net are outside the grant and paid separately.
 
 **Cost policy:** prefer free tiers and nonprofit programs, but spending money on the tech stack is acceptable. Donation funds may pay for development and maintenance.
 
@@ -170,57 +187,67 @@ Win Metta has an Azure for Nonprofits grant ($2,000/year). It covers only first-
 | Host | Points to | Purpose |
 | --- | --- | --- |
 | `winmetta.org` (+ `www`) | Existing WordPress hosting | Blog/news, About, existing pages — untouched. |
-| `app.winmetta.org` | Azure Static Web Apps | This platform's frontend. `app.` chosen as the most understandable label for less tech-fluent users. |
-| `cdn.app.winmetta.org` (proposed) | Bunny CDN Pull Zone | Public platform media, backed by private R2 storage. |
+| `app.winmetta.org` | Azure Static Web Apps (production) | This platform's frontend. `app.` chosen as the most understandable label for less tech-fluent users. |
+| `staging.app.winmetta.org` | Azure Static Web Apps (staging) | Pre-release verification, `noindex`. |
+| `cdn.app.winmetta.org` (proposed) | bunny.net pull zone (CNAME) | Public platform media, backed by AWS S3. Staging uses its own hostname and bucket. |
 
-Add the custom domain via CNAME. WordPress navigation can link to `app.winmetta.org`, and the app can link back for blog/news.
+`winmetta.org` DNS is managed in **Cloudflare** (DNS only, free plan); add the app and CDN hostnames as CNAME records there. Keep records that point to Bunny **DNS-only (unproxied)** so Bunny serves the traffic directly. Existing WordPress records stay intact. WordPress navigation can link to `app.winmetta.org`, and the app can link back for blog/news.
 
 | Component | Where | Why |
 | --- | --- | --- |
-| Astro build output | **Azure Static Web Apps** | SSL, CDN, custom domain, PR previews. Free tier caps at 100 GB/month bandwidth; heavy media goes to R2, not this path. |
-| Audio, video, PDF, images | **Cloudflare R2 + Bunny CDN** | R2 provides private S3-compatible storage with $0 egress. Bunny handles public delivery and caching; its delivery charges and R2 storage/operation charges still apply. |
+| Astro build output | **Azure Static Web Apps** | SSL, CDN, custom domain, PR previews. Free tier caps at 100 GB/month bandwidth; heavy media goes through the CDN below, not this path. |
+| Audio, video, PDF, images | **AWS S3** origin + **bunny.net** CDN | S3 is outside the Azure grant, so it is a paid service, but storage is cheap. S3 charges internet egress (about $0.09/GB beyond a small free allowance), so all public traffic goes through bunny.net, which caches media and pulls from S3 only on cache misses. Bunny delivery is billed separately; both costs are small at low traffic and acceptable per the cost policy. Check whether AWS nonprofit credit programs apply. |
 
 ### Media delivery setup
 
-Use `cdn.app.winmetta.org` as the proposed app-scoped media hostname. Add it to the Bunny Pull Zone, point its DNS CNAME at the assigned Bunny hostname, and enable a certificate for this exact hostname. Keep the DNS record unproxied if DNS is managed through Cloudflare so Bunny serves the requests directly.
+* **Storage:** separate S3 buckets for staging and production (e.g. `winmetta-media-staging`, `winmetta-media`) so test uploads never mix with the real library. Block all public access on the buckets.
+* **CDN:** a bunny.net pull zone per environment with the S3 bucket as the origin, on the custom hostname `cdn.app.winmetta.org` (staging: its own hostname) with a certificate for that exact hostname.
+* **Origin access:** keep the bucket private and use Bunny's S3 origin authentication with a dedicated IAM user whose policy is read-only (`s3:GetObject`) on that bucket only. Set the pull zone's origin region to match the bucket. This means the raw S3 URL cannot bypass the CDN. **Verify Bunny's S3 authentication against your bucket's region during Phase 2 before relying on it.**
+* **Credentials:** AWS access keys and Bunny API keys live in secret configuration only, never in client code or committed files. Use separate IAM credentials for the read-only Bunny origin user and for maintainer uploads (write access, e.g. via the AWS CLI `aws s3 sync`).
+* Use versioned object paths for replaced media. Public access requires no learner account or token.
 
-Plan for a private R2 bucket with Bunny S3 origin authentication and bucket-scoped read-only credentials. R2 public access (`r2.dev` and public R2 custom domains) stays disabled. Keep credentials in provider/secret configuration, never client code or committed files. Validate Bunny's signing against R2's endpoint and region during provisioning before relying on this integration; S3-compatible origin authentication is documented for [Bunny with Backblaze B2](https://help.backblaze.com/hc/en-us/articles/4902581962395-Bunny-Integration-Quick-Start-Guide), and [R2 documents its S3 endpoint](https://developers.cloudflare.com/r2/get-started/s3/).
+Release checks: anonymous fetches succeed on cache misses and hits; audio/video seeking (range requests) works; MIME types, cache headers and CORS for browser fetches are correct.
 
-Release checks: anonymous CDN fetches succeed on cache misses and hits; unsigned origin access fails; audio/video seeking works; MIME types, cache headers, and CORS for browser fetches are correct. Use versioned object paths for replaced media. CDN access is public and requires no learner account or token.
-
-**Portability:** avoid Azure-specific SDKs in application code; use an S3-compatible client for media; keep static output host-agnostic. Moving hosts later is a DNS change plus a new deploy target.
+**Portability:** S3's API is the de facto standard, so media can move to another S3-compatible store (Backblaze B2, Cloudflare R2, MinIO) by re-pointing the CDN origin. Pages reference only the public CDN URL, and bucket access is limited to the upload script and the Bunny origin. Avoid cloud-specific SDKs in application code; keep the static output host-agnostic.
 
 ---
 
 ## 7. Environments & CI/CD
 
-Deliberately small, for a volunteer team.
+Deliberately small, for a volunteer team. Rollout by phase:
+
+* **Phase 0:** local development plus `ci.yml` (lint, typecheck, tests, build). No deploy.
+* **Phase 1:** add the deploy workflow (`deploy-web.yml`) to a single, non-public Azure Static Web App reachable at its default Azure hostname, with PR previews. It is `noindex` and not linked publicly, so pages can be reviewed in a real environment. The site is **not public** yet.
+* **Phase 2:** formalize with Terraform, custom domains, media storage/CDN, and separate staging and production environments with a promotion step.
 
 | Environment | Where | Purpose |
 | --- | --- | --- |
-| **Production** | `app.winmetta.org` | Live site. |
-| **PR previews** | Azure Static Web Apps' auto-generated ephemeral URL | Per-pull-request check; torn down when the PR closes. |
 | **Local** | `npm run dev` | Development. No Docker, no database. |
+| **PR previews** | Azure Static Web Apps' auto-generated ephemeral URL (from Phase 1) | Per-pull-request check; torn down when the PR closes. |
+| **Staging** | `staging.app.winmetta.org` (its own Static Web App) + separate media storage and CDN hostname (Phase 2) | Pre-release verification with the real build. Synthetic or scrubbed data only where content isn't public. |
+| **Production** | `app.winmetta.org` (Phase 2) | Live site. |
 
-A separate long-lived staging environment isn't needed while the site is static — PR previews serve that purpose. Preview URLs should not be indexed: send `noindex` on non-production environments. Restricting preview access to maintainers may require the Static Web Apps **Standard** plan (paid, ~$9/month) — acceptable if unfinished content needs to be hidden; verify current plan features before relying on it.
+Staging and PR previews must not be indexed: send `noindex` and, if unfinished content needs hiding, restrict access. Access restriction on Static Web Apps may require the **Standard** plan (paid, ~$9/month per app) — acceptable, but verify current plan features before relying on it.
 
-**Flow:**
+**Flow (complete by Phase 2):**
 
-1. **PR opened** → `ci.yml` runs lint, typecheck, build → Static Web Apps deploys a preview.
-2. **Merge to `main`** → deploy to production (`deploy-web.yml`). For a static content site this is low-risk and easy to roll back by reverting the commit. Add a manual approval gate later if it becomes worthwhile.
+1. **PR opened** → `ci.yml` runs lint, typecheck, tests, build → Static Web Apps deploys a preview (from Phase 1).
+2. **Merge to `main`** → automatic deploy to **staging** (the single review app in Phase 1).
+3. **Promotion to production** (Phase 2) is a deliberate step — a tagged release or a GitHub Actions environment with manual approval. For a small team, a conscious approval is a sufficient safety net; canary or blue/green rollouts aren't worth the overhead. Rollback is redeploying the previous tag.
 
-Enable GitHub secret scanning and push protection on the repo (free for public repos).
+Enable GitHub secret scanning and push protection on the repo (free for public repos) in Phase 0.
 
 ---
 
 ## 8. Infrastructure Provisioning
 
-**Terraform**, not manual Portal clicks — the same tool works across Azure, Cloudflare and other clouds, so a future host move changes provider blocks, not workflow. Terraform has a learning curve; for Phase 0 the footprint is small (Static Web App, custom domains, R2 bucket, Bunny Pull Zone), so a first pass can be done by hand and codified right after. Confirm the team is comfortable before committing to it.
+**Terraform**, not manual Portal clicks — the same tool works across Azure, AWS, Cloudflare, bunny.net and other providers, so a future host move changes provider blocks, not workflow. Terraform has a learning curve; the Phase 2 footprint is small (two Static Web Apps, S3 buckets with IAM, Bunny pull zones, Cloudflare DNS records), so a first pass can be done by hand and codified right after. Use the Bunny Terraform provider if it covers the needed resources; otherwise document the manual Bunny steps. Confirm the team is comfortable before committing to it. (The single Phase 1 review app may be created by hand.)
 
 ```
 infra/
-├── modules/platform/         # Static Web App, R2 bucket, Bunny Pull Zone, DNS
-└── environments/production/  # Calls the module
+├── modules/platform/         # Static Web App, S3 bucket + IAM, Bunny pull zone, Cloudflare DNS records
+├── environments/staging/     # Calls the module with staging names
+└── environments/production/  # Calls the module with production names
 ```
 
 * **State:** Terraform Cloud free tier (remote state and locking, nothing in git).
@@ -240,7 +267,7 @@ Not needed for v1. If a concrete learning-outcome question arises (e.g. does one
 
 *Everything here is a starting idea, not a design. Revisit and rewrite when the relevant phase begins.*
 
-### Backend & database (likely Phase 3)
+### Backend & database (likely Phase 5)
 
 When a feature needs server state (accounts, progress sync, dynamic content), add:
 
@@ -249,7 +276,7 @@ When a feature needs server state (accounts, progress sync, dynamic content), ad
 * `api.winmetta.org` as a sibling subdomain; a staging environment with its own separate database at that point.
 * Local dev against a native Postgres at `localhost:5432/winmetta_dev`.
 
-### Accounts & progress sync (likely Phase 3)
+### Accounts & progress sync (likely Phase 5)
 
 * Core content stays fully usable with no login; accounts are optional and only for syncing progress/bookmarks across devices. Existing IndexedDB data migrates into the account on first sign-in.
 * Passwordless. Candidate implementation: **Better Auth** inside the Fastify app, storing users in the same Postgres.
@@ -260,6 +287,6 @@ When a feature needs server state (accounts, progress sync, dynamic content), ad
 
 Offline use (downloaded curriculum content, audio and library files) is desirable but not a v1 requirement. When taken up, a PWA (service worker + cache) is the lowest-friction starting point. Don't design v1 pages around it beyond keeping assets cacheable.
 
-### Native apps (Phase 4)
+### Native apps (Phase 6)
 
 Electron desktop and Capacitor mobile builds may wrap the web app later. Notes for then: Google and Apple block OAuth in embedded webviews, so native apps must hand sign-in off to the system browser and catch the redirect via a custom URI scheme (`app.setAsDefaultProtocolClient` in Electron; `@capacitor/app` `appUrlOpen` in Capacitor). Desktop auto-update can use `electron-builder` + `electron-updater` against GitHub Releases.

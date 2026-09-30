@@ -4,21 +4,23 @@ Full detail and reasoning for everything below lives in [docs/prd.md](docs/prd.m
 
 ## 1. Project Mission & Identity
 
-Win Metta is a California 501(c)(3) nonprofit continuing an existing Burmese Theravāda Buddhist teaching community online. The flagship v1 product digitizes a proven, already-taught Burmese-literacy curriculum into an interactive self-paced app, and reorganizes an existing Dhamma Library and weekly Zoom class archive — serving both Myanmar-based and diaspora learners of any age (docs/prd.md §1–§2).
+Win Metta is a California 501(c)(3) nonprofit continuing an existing Burmese Theravāda Buddhist teaching community online. The platform first gives online class students and independent learners worldwide one bilingual place to find classes and Dhamma resources (Phases 0–2), then digitizes the proven Let's Learn Burmese curriculum into an interactive self-paced app and grows the Dhamma Library and class archive (Phases 3–4) (docs/prd.md §1–§2, §7).
 
 - Core visual principle: high legibility, tranquil aesthetic, zero vanity metrics (no streaks/leaderboards/badges), zero algorithmic distraction.
 - Core technical principle: popular, well-supported tools that volunteers can learn easily; native execution without Docker locally; strictly typed TypeScript; Unicode-only Burmese text. Offline support is a future goal, not a v1 requirement.
 - Cost principle: prefer free nonprofit programs, but paid tools are fine when they save volunteer time or reduce risk.
-- Core scope principle: v1 is a single web app. Do not scaffold `apps/desktop` or `apps/mobile` — those are Future Phase 4 (prd.md §4.7, §7).
+- Phases (docs/implementation-plan.md): **0** foundation code (basic app, libraries, `en`/`my` support, lint/typecheck/test/build CI; no real pages, no deploy), **1** five bilingual pages plus the CI deploy workflow to one non-public review app, **2** infrastructure & deployment (Terraform, domains, Azure, AWS S3 + bunny.net, staging + production promotion; the site becomes public), then LLB (3), library expansion (4), accounts (5), future (6).
+- Core scope principle: Phase 1 delivers Home, About, Privacy, Classes and Dhamma Library with concise curated public content and an original app design. Curated blog-post links belong in the library; no copied WordPress UI or bulk migration. Serve online Zoom students and anonymous independent learners worldwide. v1 is a single web app. Do not scaffold `apps/desktop` or `apps/mobile` — those are Future Phase 6 (prd.md §4.7, §7).
 
 ## 2. This Repo Is Public — Secrets & Privacy Discipline
 
 This repo is **public** (org default per the workspace-root AGENTS.md §3, since it's product code, not an internal-ops/credentials repo). That makes the following non-optional, and it applies equally to AI agents and human contributors:
 
-- **Never commit secrets.** Database connection strings, R2/S3 access keys, the Better Auth secret, OAuth client secrets (Google/Facebook/Apple), Azure Service Principal credentials, SendGrid API keys — these come from environment variables or GitHub Actions/Azure secrets only, never hardcoded or checked in "temporarily to test."
+- **Never commit secrets.** Database connection strings, AWS access keys, Bunny API keys, the Better Auth secret, OAuth client secrets (Google/Facebook/Apple), Azure Service Principal credentials, SendGrid API keys — these come from environment variables or GitHub Actions/Azure secrets only, never hardcoded or checked in "temporarily to test."
 - **`.gitignore` must cover env files** (`.env`, `.env.local`, etc.) *before* such a file is ever created, not added after the fact.
 - **Terraform:** only commit `.tfvars.example` files with placeholder values. Real `.tfvars`, or anything containing actual subscription/tenant IDs or connection strings, must stay untracked. State itself lives in Terraform Cloud, never in git (tech-architecture.md §8).
 - **No real personal data, ever — including in fixtures or seed data.** No real student/teacher names tied to emails, phone numbers, enrollment/roster exports (e.g. from the "Let's Learn Burmese" signup form), or private Zoom credentials. Use synthetic placeholder data for anything checked into the repo. A real name or email address in public commit history is effectively permanent, even if later deleted from the working tree.
+- **Public editorial content:** verified public teacher names, class descriptions, organizational facts and resource links may be used on starter pages. This does not permit private student data or real personal records in fixtures.
 - **Exception — public class Zoom links and passcodes:** the weekly class Zoom meeting links and passcodes are already published on winmetta.org, so they may appear in class-schedule content. Anything *not* already public (private meeting IDs, host keys, retreat or one-off session credentials) stays out.
 - **Check the actual diff before staging or committing anything** — don't rely on `.gitignore` alone (a file can still be force-added), and git history is very hard to truly scrub after a push. If something sensitive looks like it's about to be committed, stop and ask rather than proceeding.
 - **Enable GitHub secret scanning + push protection** on this repo (free for public repos) as a backstop — not a substitute for the discipline above.
@@ -40,7 +42,7 @@ Don't group content by subject (e.g. a generic "Pāḷi" bucket), and always qua
 - Package manager: npm workspaces. Orchestration: Turborepo.
 - `apps/web`: Astro static web app — pages (Dhamma Library, class directory, curricula) + React islands for interactive LLB practice. Content lives in the repo as Astro content collections (Zod schemas). The only v1 app, with responsive layouts designed for both mobile and desktop. **No backend or database in v1.**
 - `packages/*` (`tsconfig`, `ui`, `shared-types`, `audio-core`) are created only when first needed — start with code inside `apps/web`. This product has no "playlists" feature, don't reintroduce that naming.
-- Deferred, do not scaffold yet: `apps/server` (Fastify + PostgreSQL, likely Phase 3), `apps/desktop` (Electron), `apps/mobile` (Capacitor).
+- Deferred, do not scaffold yet: `apps/server` (Fastify + PostgreSQL, likely Phase 5), `apps/desktop` (Electron), `apps/mobile` (Capacitor).
 
 ## 5. Tech Stack & Versions
 
@@ -54,7 +56,8 @@ Baseline as of September 2026 — re-verify current versions before using if sig
 | Web app | Astro ^7.3, React ^19.3 for islands, Tailwind ^4.3, shadcn/ui |
 | Content & schemas | Astro content collections, Zod |
 | Local progress | IndexedDB (browser), no account |
-| Media storage / delivery | Private Cloudflare R2 + public Bunny CDN (see §7 below) |
+| Media storage / delivery | AWS S3 origin (private) + bunny.net CDN (see §7 below) |
+| DNS | Cloudflare (DNS-only records for Bunny hostnames) |
 | Analytics | Deferred beyond v1; no product metric collection |
 | License | MIT |
 | Future (tentative, not v1) | Fastify ^5, PostgreSQL 18, Azure Container Apps, Better Auth (Google sign-in, SendGrid email link) |
@@ -63,25 +66,25 @@ Baseline as of September 2026 — re-verify current versions before using if sig
 
 - **TypeScript:** strict mode, no `any` — use `unknown` with type guards.
 - **Text encoding:** all Burmese text is Unicode (Myanmar block, U+1000–U+109F). No Zawgyi handling in v1 (tech-architecture.md §5).
-- **Access:** core content (LLB lessons, Dhamma Library, class directory) must work with no login, ever. Accounts are optional and only needed for cross-device progress sync (Future Phase 3).
+- **Access:** core content (LLB lessons, Dhamma Library, class directory) must work with no login, ever. Accounts are optional and only needed for cross-device progress sync (Future Phase 5).
 - **No vanity metrics:** no streaks, leaderboards, badges, or engagement-optimized UI patterns anywhere.
-- **Adaptive UI:** support both Burmese-first and English-first UI copy, and a simplified/standard density mode, per the onboarding profile (prd.md §4.1) — don't hardcode one language or one information density.
+- **Internationalization:** build support for English (`en`) and Burmese (`my`) in Phase 0 and launch all five starter pages in both in Phase 1, with a central extensible locale registry, keyed messages, localized content, locale-prefixed routes and a same-page language switcher. Keep interface locale, resource language and timezone separate. Phases 0–2 require no onboarding; optional learning-intent/density preferences come with the LLB phase (prd.md §4.1).
 - **Styling:** Tailwind utility patterns + Radix/shadcn primitives (extract to `packages/ui` only once shared).
 - **Local dev:** `npm run dev` runs natively — no Docker, no database needed in v1.
-- **Analytics:** deferred beyond v1 (Phase 0–2). No analytics SDK or learner-event collection; progress remains local.
+- **Analytics:** deferred beyond v1 (Phases 0–2). No analytics SDK or learner-event collection; progress remains local.
 - **Devices:** design for mobile and desktop; modern-browser baseline per tech-architecture.md §2. Legacy browsers below that baseline are not required.
 - **Class schedules:** show Pacific (`America/Los_Angeles`) and Myanmar (`Asia/Yangon`) by default with correct dated occurrences and daylight-saving handling. Profile timezone preferences are future work.
 
 ## 7. Hosting, Domains & Environments
 
-- `winmetta.org` (WordPress) is untouched by this repo. This platform lives at `app.winmetta.org` (Astro static site, Azure Static Web Apps). PR previews serve as staging and are `noindex`'d (tech-architecture.md §6–§7). A future `api.winmetta.org` is tentative (tech-architecture.md §10).
-- Media (audio/video/PDF) is stored privately in **Cloudflare R2** and delivered publicly through **Bunny CDN** (proposed hostname: `cdn.app.winmetta.org`). R2 has zero egress cost; Bunny delivery is billed separately. R2 retains S3-compatible portability, and media storage/delivery is outside the scope of Win Metta's Azure for Nonprofits grant anyway (which only covers first-party Azure services and doesn't roll over annually).
-- Portability principle: avoid Azure-specific SDKs in application code; secrets from env vars; S3-compatible storage client. The stack should be movable to another host without a rewrite if the grant situation changes.
+- `winmetta.org` (WordPress) is untouched by this repo. This platform lives at `app.winmetta.org` (Astro static site, Azure Static Web Apps) with a `staging.app.winmetta.org` staging environment and PR previews, all non-production `noindex`'d. A single non-public review app arrives in Phase 1; staging/production and the public domain arrive in Phase 2 (tech-architecture.md §6–§7). A future `api.winmetta.org` is tentative (tech-architecture.md §10).
+- Media (audio/video/PDF) is stored in private **AWS S3** buckets (paid; outside the Azure for Nonprofits grant, which only covers first-party Azure services and doesn't roll over annually) and served through a **bunny.net** CDN using S3 origin authentication with a read-only IAM user, on a custom hostname (proposed `cdn.app.winmetta.org`), so most reads avoid S3 egress. Separate buckets/CDN for staging and production. DNS is managed in Cloudflare with unproxied (DNS-only) records for Bunny hostnames.
+- Portability principle: avoid cloud-specific SDKs in application code; secrets from env vars. App code references only public CDN URLs; bucket access is limited to the upload script and the Bunny origin, and S3's API keeps media movable to other S3-compatible stores. The stack should be movable to another host without a rewrite if the grant situation changes.
 - Infrastructure provisioning: Terraform (`infra/`), not manual Portal clicks — same portability reasoning as above (tech-architecture.md §8).
 
 ## 8. Deferred / Future Plan — do not build these in v1
 
-See prd.md §4.7 for full reasoning. Summary: product analytics/metric collection, profile timezone preferences, monastic-facing content upload tooling, backend/database and cross-device account sync (Future Phase 3 — tentative notes in tech-architecture.md §10), offline/PWA support, community submissions/moderation, native mobile apps, Zawgyi legacy encoding support, and A/B testing (tech-architecture.md §9 — only for learning-outcome questions, never engagement optimization). Future-phase notes are tentative directions, not source of truth.
+See prd.md §4.7 for full reasoning. Summary: product analytics/metric collection, profile timezone preferences, monastic-facing content upload tooling, backend/database and cross-device account sync (Future Phase 5 — tentative notes in tech-architecture.md §10), offline/PWA support, community submissions/moderation, native mobile apps, Zawgyi legacy encoding support, and A/B testing (tech-architecture.md §9 — only for learning-outcome questions, never engagement optimization). Future-phase notes are tentative directions, not source of truth.
 
 ## 9. Key CLI Commands
 
@@ -96,4 +99,4 @@ See prd.md §4.7 for full reasoning. Summary: product analytics/metric collectio
 | --- | --- |
 | Product scope, personas, feature specs, funding, success metrics | [docs/prd.md](docs/prd.md) |
 | Architecture, hosting, environments, provisioning, auth, experimentation | [docs/tech-architecture.md](docs/tech-architecture.md) |
-| Phase 0 checklist, local macOS dev setup, bootstrap script | [docs/phase-0-plan.md](docs/phase-0-plan.md) |
+| Phases 0–2 plan and checklists, local macOS dev setup, bootstrap script | [docs/implementation-plan.md](docs/implementation-plan.md) |
