@@ -13,13 +13,14 @@ This public repo currently contains **planning documentation only** — decision
 | Doc | Covers |
 | --- | --- |
 | [docs/prd.md](docs/prd.md) | Product scope, target audience, feature specs, funding plan, success metrics, phased roadmap |
-| [docs/tech-architecture.md](docs/tech-architecture.md) | Stack, hosting/domains, environments & CI/CD, infrastructure provisioning, analytics; tentative future directions (backend, accounts, offline) |
+| [docs/tech-architecture.md](docs/tech-architecture.md) | Stack, hosting/domains, environments & CI/CD, infrastructure provisioning; deferred analytics and tentative future directions (backend, accounts, offline) |
 | [docs/phase-0-plan.md](docs/phase-0-plan.md) | Phase 0 checklist, local macOS dev setup and bootstrap script |
 | [AGENTS.md](AGENTS.md) | Quick-reference conventions for contributors and AI coding agents working in this repo — **read this before making changes**, especially §2 on this repo being public |
 
 ## Core Principles
 
 - **Free and open access** — teaching content and the literacy curriculum are never paywalled or gated behind a required login.
+- **Mobile and desktop** — responsive layouts for both, targeting modern browsers and lightweight pages for slow connections.
 - **Calm by default** — no streaks, leaderboards, badges, ads, or engagement-optimized patterns.
 - **Bilingual** — Burmese (Unicode only) and English, with users choosing their interface language rather than one being hardcoded.
 - **Low cost, low maintenance** — this is a volunteer-run nonprofit; v1 is a static site with no server to run. We prefer free nonprofit programs but will pay for tools when worthwhile.
@@ -27,7 +28,7 @@ This public repo currently contains **planning documentation only** — decision
 
 ## Tech Stack (planned)
 
-Astro (with React islands) · TypeScript · Tailwind · Turborepo/npm workspaces · Azure Static Web Apps · Cloudflare R2. A Fastify/PostgreSQL backend is a possible future addition. See [docs/tech-architecture.md](docs/tech-architecture.md) for versions and the reasoning behind each choice.
+Astro (with React islands) · TypeScript · Tailwind · Turborepo/npm workspaces · Azure Static Web Apps · Cloudflare R2 + Bunny CDN. A Fastify/PostgreSQL backend is a possible future addition. See [docs/tech-architecture.md](docs/tech-architecture.md) for versions and the reasoning behind each choice.
 
 ## Contributing
 

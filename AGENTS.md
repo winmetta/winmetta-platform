@@ -38,7 +38,7 @@ Don't group content by subject (e.g. a generic "Pāḷi" bucket), and always qua
 ## 4. Monorepo Architecture & Structure (v1)
 
 - Package manager: npm workspaces. Orchestration: Turborepo.
-- `apps/web`: Astro static web app — pages (Dhamma Library, class directory, curricula) + React islands for interactive LLB practice. Content lives in the repo as Astro content collections (Zod schemas). The only v1 app, mobile-responsive. **No backend or database in v1.**
+- `apps/web`: Astro static web app — pages (Dhamma Library, class directory, curricula) + React islands for interactive LLB practice. Content lives in the repo as Astro content collections (Zod schemas). The only v1 app, with responsive layouts designed for both mobile and desktop. **No backend or database in v1.**
 - `packages/*` (`tsconfig`, `ui`, `shared-types`, `audio-core`) are created only when first needed — start with code inside `apps/web`. This product has no "playlists" feature, don't reintroduce that naming.
 - Deferred, do not scaffold yet: `apps/server` (Fastify + PostgreSQL, likely Phase 3), `apps/desktop` (Electron), `apps/mobile` (Capacitor).
 
@@ -54,8 +54,8 @@ Baseline as of September 2026 — re-verify current versions before using if sig
 | Web app | Astro ^7.3, React ^19.3 for islands, Tailwind ^4.3, shadcn/ui |
 | Content & schemas | Astro content collections, Zod |
 | Local progress | IndexedDB (browser), no account |
-| Media storage | Cloudflare R2 (not Azure Blob — see §7 below) |
-| Analytics | Plausible (cookieless, anonymous) |
+| Media storage / delivery | Private Cloudflare R2 + public Bunny CDN (see §7 below) |
+| Analytics | Deferred beyond v1; no product metric collection |
 | License | MIT |
 | Future (tentative, not v1) | Fastify ^5, PostgreSQL 18, Azure Container Apps, Better Auth (Google sign-in, SendGrid email link) |
 
@@ -68,18 +68,20 @@ Baseline as of September 2026 — re-verify current versions before using if sig
 - **Adaptive UI:** support both Burmese-first and English-first UI copy, and a simplified/standard density mode, per the onboarding profile (prd.md §4.1) — don't hardcode one language or one information density.
 - **Styling:** Tailwind utility patterns + Radix/shadcn primitives (extract to `packages/ui` only once shared).
 - **Local dev:** `npm run dev` runs natively — no Docker, no database needed in v1.
-- **Analytics:** collect anonymous, aggregate events from all users (no cookies, no user IDs, no personal data in event properties).
+- **Analytics:** deferred beyond v1 (Phase 0–2). No analytics SDK or learner-event collection; progress remains local.
+- **Devices:** design for mobile and desktop; modern-browser baseline per tech-architecture.md §2. Legacy browsers below that baseline are not required.
+- **Class schedules:** show Pacific (`America/Los_Angeles`) and Myanmar (`Asia/Yangon`) by default with correct dated occurrences and daylight-saving handling. Profile timezone preferences are future work.
 
 ## 7. Hosting, Domains & Environments
 
 - `winmetta.org` (WordPress) is untouched by this repo. This platform lives at `app.winmetta.org` (Astro static site, Azure Static Web Apps). PR previews serve as staging and are `noindex`'d (tech-architecture.md §6–§7). A future `api.winmetta.org` is tentative (tech-architecture.md §10).
-- Media (audio/video/PDF) is deliberately on **Cloudflare R2, not Azure Blob Storage** — zero egress cost and S3-compatible portability, and it's outside the scope of Win Metta's Azure for Nonprofits grant anyway (which only covers first-party Azure services and doesn't roll over annually).
+- Media (audio/video/PDF) is stored privately in **Cloudflare R2** and delivered publicly through **Bunny CDN** (proposed hostname: `cdn.app.winmetta.org`). R2 has zero egress cost; Bunny delivery is billed separately. R2 retains S3-compatible portability, and media storage/delivery is outside the scope of Win Metta's Azure for Nonprofits grant anyway (which only covers first-party Azure services and doesn't roll over annually).
 - Portability principle: avoid Azure-specific SDKs in application code; secrets from env vars; S3-compatible storage client. The stack should be movable to another host without a rewrite if the grant situation changes.
 - Infrastructure provisioning: Terraform (`infra/`), not manual Portal clicks — same portability reasoning as above (tech-architecture.md §8).
 
 ## 8. Deferred / Future Plan — do not build these in v1
 
-See prd.md §4.7 for full reasoning. Summary: monastic-facing content upload tooling, backend/database and cross-device account sync (Future Phase 3 — tentative notes in tech-architecture.md §10), offline/PWA support, community submissions/moderation, native mobile apps, Zawgyi legacy encoding support, and A/B testing (tech-architecture.md §9 — only for learning-outcome questions, never engagement optimization). Future-phase notes are tentative directions, not source of truth.
+See prd.md §4.7 for full reasoning. Summary: product analytics/metric collection, profile timezone preferences, monastic-facing content upload tooling, backend/database and cross-device account sync (Future Phase 3 — tentative notes in tech-architecture.md §10), offline/PWA support, community submissions/moderation, native mobile apps, Zawgyi legacy encoding support, and A/B testing (tech-architecture.md §9 — only for learning-outcome questions, never engagement optimization). Future-phase notes are tentative directions, not source of truth.
 
 ## 9. Key CLI Commands
 

@@ -32,8 +32,9 @@ The target audience is **anyone who wants to learn Burmese, Pāḷi, or Buddhist
 * **Calm by Default:** No pushy notifications, streaks, leaderboards, badges, or infinite scroll.
 * **Dāna & Open Access:** Core teachings, the Dhamma Library, and the literacy curriculum remain free and unpaywalled.
 * **Mindful Engagement:** Replace likes/follower counts with mindful gestures (*Sādhu / Anumodanā*) and quiet progress tracking, not competitive metrics.
-* **Works on Weak Connections:** Pages are lightweight and load fast on older devices and slow networks. Full offline use (downloaded lessons, audio, library files) is a future goal, not a v1 requirement.
+* **Works on Weak Connections:** Pages are lightweight and load fast on slow networks and lower-powered devices within the supported modern-browser baseline (tech-architecture.md §2). Full offline use (downloaded lessons, audio, library files) is a future goal, not a v1 requirement.
 * **Meet Learners Where They Are:** The same platform must serve a tech-fluent diaspora teenager and a non-tech-fluent elder in Myanmar equally well — via adaptive onboarding, not a one-size-fits-all interface.
+* **Mobile and Desktop:** Design and validate responsive layouts for both mobile and desktop, with touch-friendly controls, keyboard navigation, and readable content at each size. Mobile is the expected majority of usage; desktop remains a first-class experience.
 * **Two Audiences, Two Geographies:** Myanmar-based users and diaspora users have different starting points and different needs. The product should serve both without collapsing them into identical experiences.
 
 ---
@@ -79,6 +80,8 @@ No account is required to set or use these preferences — they are stored local
 ### 4.4. Live Class Directory
 
 * A clean, structured schedule view of current weekly Zoom classes (day/time, teacher bio, Zoom link/passcode) — digitizing what's already on the homepage today. Class Zoom links and passcodes are already public on winmetta.org, so they may appear in this repo's class-schedule content.
+* Show each upcoming class in both Pacific time (`America/Los_Angeles`) and Myanmar time (`Asia/Yangon`) by default, including the date/day in each zone. Store the recurring class’s source IANA timezone and local day/time; derive each dated occurrence so Pacific daylight-saving changes and Myanmar day rollovers remain correct. Do not hardcode PST or a fixed offset year-round.
+* A profile preference for the displayed timezone is future work; v1 always shows Pacific and Myanmar.
 * Plain chronological/day-of-week listing. No feed, no algorithmic ordering.
 
 ### 4.5. Content Language & Script Handling
@@ -88,7 +91,7 @@ No account is required to set or use these preferences — they are stored local
 ### 4.6. Geographic & Access Considerations
 
 * **Different value emphasis, same platform:** Myanmar-based users (typically already Burmese-literate) get the most value from the Dhamma Library and class archive; diaspora users get the most value from the literacy pipeline first. The onboarding profile (§4.1) routes each toward what's most relevant without hiding the rest.
-* **Low-bandwidth, older-device support:** required for both elderly diaspora users and Myanmar's variable connectivity — not a nice-to-have. Offline use is a future enhancement (see tech-architecture.md §10).
+* **Low-bandwidth support:** required for both elderly diaspora users and Myanmar's variable connectivity. Target modern browsers on mobile and desktop; legacy browsers below the documented baseline are not a v1 requirement. Offline use is a future enhancement (see tech-architecture.md §10).
 * **No login required for core content.** Browsing the library, class directory, and LLB lessons never requires an account. Optional accounts (for saving progress across devices, a future phase) should collect only the minimum data needed and clearly state its purpose. Sign-in through a familiar provider (Google first) is acceptable.
 
 ### 4.7. Non-Goals for v1 (Future Plan)
@@ -98,8 +101,9 @@ Explicitly deferred, not abandoned:
 * **Monastic-facing content management tooling** (self-serve upload/tagging for teachers). v1 content is loaded by a small admin/volunteer team on teachers' behalf. A teacher-facing tool is a future phase once the learner-facing product is validated.
 * **Cross-device account sync of LLB lesson progress and library bookmarks** (not "playlists" — that was a feature of an earlier, pre-pivot version of this product). A tentative auth approach is sketched in tech-architecture.md §10 for when Phase 3 arrives.
 * **Community submissions & moderated reflections queue.**
-* **Native mobile apps** (Electron/Capacitor builds). v1 targets a single mobile-responsive web app; native wrappers are evaluated only after the web app validates real usage.
+* **Native mobile apps** (Electron/Capacitor builds). v1 targets a single responsive web app designed for mobile and desktop; native wrappers are evaluated only after the web app validates real usage.
 * **Zawgyi legacy encoding support** — see §4.5 and tech-architecture.md.
+* **Product analytics and metric collection** — deferred beyond v1; no analytics scripts or learner-event collection in Phase 0–2. Local progress remains available for the learner.
 * **A/B testing / experimentation tooling** — deferred until there's a concrete, mission-aligned question worth testing (not for engagement optimization, which conflicts with Calm by Default). Tentative notes in tech-architecture.md §9 for when it's needed.
 
 ---
@@ -119,9 +123,9 @@ Explicitly deferred, not abandoned:
 
 ---
 
-## 6. Mission-Appropriate Success Metrics
+## 6. Mission-Appropriate Success Metrics (Future)
 
-Deliberately not DAU, session count, or streaks — those conflict with the Calm by Default principle. Instead, measure mission outcomes using **anonymous, aggregate analytics collected from all users** (no cookies, no user identifiers, no personal data; see tech-architecture.md §4.4). We want to know what learners do, not who they are. Metrics:
+Metric collection is deferred beyond v1. Do not instrument these outcomes or add an analytics service in Phase 0–2. The following are candidate future measures, not release requirements. Before introducing collection, define feasible measurements, privacy constraints, and denominators; cross-session outcomes cannot be inferred from unrelated aggregate event counts. DAU, session counts, and streaks are not product goals. See tech-architecture.md §4.4. Candidate measures:
 
 * **Literacy progress:** % of learners completing Grade 1 / Grade 2 equivalent LLB lessons; number of learners who reach "can read a short Pāḷi passage in Burmese script unaided."
 * **Bridge-to-community rate:** number of self-paced learners who go on to join a live Zoom class (opt-in, self-reported or signup-linked).

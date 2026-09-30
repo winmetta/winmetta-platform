@@ -1,6 +1,6 @@
 # Phase 0 Plan: Foundations & Local macOS Development Environment
 
-Scope: per [prd.md](prd.md) (§4.7, §7) and [tech-architecture.md](tech-architecture.md) (§0), v1 is a **single static, mobile-responsive Astro web app**. Phase 0 scaffolds only `apps/web` plus the tooling around it — no backend, no database, no desktop/mobile apps. Those are future work and intentionally not part of this plan.
+Scope: per [prd.md](prd.md) (§4.7, §7) and [tech-architecture.md](tech-architecture.md) (§0), v1 is a **single static Astro web app designed for mobile and desktop**. Phase 0 scaffolds only `apps/web` plus the tooling around it — no backend, no database, no desktop/mobile apps. Those are future work and intentionally not part of this plan.
 
 ## 1. Objectives
 
@@ -8,7 +8,7 @@ Scope: per [prd.md](prd.md) (§4.7, §7) and [tech-architecture.md](tech-archite
 * Build a reproducible native macOS development environment (no Docker, no database needed).
 * Initialize the Turborepo/npm workspace with `apps/web` (Astro + React islands + Tailwind).
 * Set up CI (lint, typecheck, build) and agent docs (`AGENTS.md`, `CLAUDE.md` symlink).
-* Deploy an empty-but-real site to `app.winmetta.org` via Azure Static Web Apps, and create a Cloudflare R2 bucket for media — see [tech-architecture.md](tech-architecture.md) §6.
+* Deploy an empty-but-real site to `app.winmetta.org` via Azure Static Web Apps, and create private Cloudflare R2 media storage with public delivery through Bunny CDN — see [tech-architecture.md](tech-architecture.md) §6.
 
 ### Baseline toolchain (as of September 2026 — verify before kickoff)
 
@@ -34,6 +34,7 @@ PostgreSQL and Fastify are **not** part of Phase 0 (see [tech-architecture.md](t
 {
   "name": "winmetta-platform",
   "private": true,
+  "packageManager": "npm@11.20.0",
   "license": "MIT",
   "workspaces": [
     "apps/*",
@@ -57,6 +58,8 @@ PostgreSQL and Fastify are **not** part of Phase 0 (see [tech-architecture.md](t
   }
 }
 ```
+
+Pin npm consistently in local setup and CI using the root `packageManager` declaration; `engines.npm` alone is not the Turborepo package-manager declaration. The example uses npm 11.20.0; re-verify at kickoff. Commit the generated lockfile and use `npm ci` for repeat installs.
 
 ### `.nvmrc`
 
@@ -147,7 +150,13 @@ nvm install "$NODE_VERSION"
 nvm use "$NODE_VERSION"
 
 echo "==> [5/5] Installing npm dependencies..."
-npm install
+NPM_VERSION="$(node -p "require('./package.json').packageManager.split('@')[1]")"
+npm install --global "npm@$NPM_VERSION"
+if [ -f package-lock.json ]; then
+  npm ci
+else
+  npm install
+fi
 
 echo "=========================================================="
 echo " Win Metta development environment is ready."
@@ -180,14 +189,15 @@ Tooling
 
 Web app
 * [ ] Initialize `apps/web` with Astro (`npm create astro@latest`), add React, Tailwind and shadcn/ui.
-* [ ] Mobile-responsive baseline layout, Unicode Burmese font loading (e.g. Noto Sans Myanmar), and both Burmese-first and English-first UI copy scaffolding.
+* [ ] Responsive mobile and desktop layouts with touch and keyboard support, supported-browser checks, Unicode Burmese font loading (e.g. Noto Sans Myanmar), and both Burmese-first and English-first UI copy scaffolding.
 * [ ] Content collections (Zod schemas) for curricula, library index and class schedule, seeded with **synthetic** placeholder data only.
-* [ ] Anonymous analytics wired in (cookieless, no personal data; see [tech-architecture.md](tech-architecture.md) §4.4).
+* [ ] Class schedule schema stores source IANA timezone and local recurrence; display dated occurrences in Pacific and Myanmar time, including daylight-saving and day-rollover checks.
 
 CI/CD & hosting
 * [ ] `.github/workflows/ci.yml`: lint, typecheck, build on every PR.
 * [ ] Provision Azure Static Web App and connect `app.winmetta.org` (CNAME); `deploy-web.yml` for production and PR previews; `noindex` on non-production.
-* [ ] Create the Cloudflare R2 bucket for media.
+* [ ] Create a private Cloudflare R2 bucket and Bunny CDN Pull Zone; validate S3 origin authentication with bucket-scoped read-only credentials.
+* [ ] Configure the proposed `cdn.app.winmetta.org` hostname, DNS CNAME and TLS. Verify public CDN access, denied unsigned origin access, cache hits/misses, CORS, MIME types and media seeking (tech-architecture.md §6).
 * [ ] Set up Terraform for the above (or record manual steps, then codify) — see [tech-architecture.md](tech-architecture.md) §8.
 
-Out of scope for Phase 0 (future work): backend API, database, accounts, offline/PWA, `apps/desktop`, `apps/mobile`.
+Out of scope for Phase 0 (future work): product analytics/metric collection, profile timezone preferences, backend API, database, accounts, offline/PWA, `apps/desktop`, `apps/mobile`.

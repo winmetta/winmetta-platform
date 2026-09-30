@@ -8,7 +8,7 @@
 
 ## 0. Scope: v1 Is a Static Web App
 
-Per [prd.md](prd.md) §4.7 and §7, v1 is **one mobile-responsive web app built with Astro** (static-first, React islands for interactive pieces). Most content — LLB curriculum, Dhamma Library metadata, class directory — is static and lives in the repo as content collections. That means **no backend server and no database in Phase 0/1**: fewer moving parts for a volunteer team to run, cheaper, and easier to move.
+Per [prd.md](prd.md) §4.7 and §7, v1 is **one responsive web app designed for mobile and desktop, built with Astro** (static-first, React islands for interactive pieces). Most content — LLB curriculum, Dhamma Library metadata, class directory — is static and lives in the repo as content collections. That means **no backend server and no database in Phase 0/1**: fewer moving parts for a volunteer team to run, cheaper, and easier to move.
 
 A backend (Fastify + PostgreSQL), accounts, offline support and native apps are all documented as [future work](#10-future-directions-tentative), added only when a real need appears.
 
@@ -17,19 +17,23 @@ A backend (Fastify + PostgreSQL), accounts, offline support and native apps are 
 ## 1. Overview
 
 ```
-   Visitors (browser, mobile-responsive)
+   Visitors (mobile and desktop browsers)
         |
         v
-+----------------------------------+        +------------------------+
-| Astro static site                |        | Cloudflare R2          |
-| app.winmetta.org                 |------->| audio, video, PDF,     |
-| (Azure Static Web Apps)          | media  | images (S3-compatible) |
-|  - pre-rendered pages            | URLs   +------------------------+
-|  - React islands (lesson practice)|
-|  - progress stored in IndexedDB  |        +------------------------+
-|                                  |------->| Anonymous analytics    |
-+----------------------------------+ events | (Plausible, cookieless)|
-                                            +------------------------+
++-----------------------------------+
+| Astro static site                 |
+| app.winmetta.org                  |
+| (Azure Static Web Apps)           |
+|  - pre-rendered pages             |
+|  - React islands (practice)       |
+|  - progress stored in IndexedDB   |
++-----------------------------------+
+        | Browser fetches public media URLs
+        v
+Bunny CDN (proposed: cdn.app.winmetta.org)
+        | Authenticated origin fetch on cache miss
+        v
+Private Cloudflare R2 (audio, video, PDF, images)
 
 Future (tentative, see §10): Fastify API + PostgreSQL on Azure Container Apps,
 accounts (Google sign-in, email link via SendGrid), offline/PWA, native shells.
@@ -49,14 +53,18 @@ Versions are a baseline as of September 2026 — re-check before Phase 0 kickoff
 | Package manager | **npm** | 11.x (bundled) | No extra tool for contributors to learn. |
 | Monorepo | **Turborepo + npm workspaces** | ^2.11 | Lightweight, standard Node tooling. |
 | Language | **TypeScript** (strict) | ^6.0 | TS 7 (native rewrite) is in beta — track it, don't build on it yet. |
-| Web app | **Astro** + **React** islands | Astro ^7.3, React ^19.3 | Ships almost no JS by default; pre-renders content for SEO and low-bandwidth/older devices; React only where interactivity is needed. |
+| Web app | **Astro** + **React** islands | Astro ^7.3, React ^19.3 | Ships almost no JS by default; pre-renders content for SEO and low-bandwidth connections and supported devices; React only where interactivity is needed. |
 | Content & schemas | **Astro content collections** with **Zod** | — | Zod is Astro's built-in schema layer and the most popular TypeScript validator. Content lives in the repo as Markdown/JSON. |
 | Styling / UI | **Tailwind CSS + shadcn/ui** | Tailwind ^4.3 | Widely used; components are copied into the repo, so no dependency abandonment risk. |
 | Static hosting | **Azure Static Web Apps** | Free tier; Standard if needed | Free SSL, CDN, custom domain, PR preview environments. Covered by the Azure for Nonprofits grant. |
-| Media | **Cloudflare R2** | — | S3-compatible, $0 egress. Kept off Azure deliberately (§6). |
-| Analytics | **Plausible** (hosted) | — | Cookieless, no personal data, custom events; see §4.4. Swappable. |
+| Media | **Cloudflare R2 + Bunny CDN** | — | Private S3-compatible storage, public CDN delivery. R2 has $0 egress; Bunny delivery is billed separately (§6). |
+| Analytics | **Deferred beyond v1** | — | No analytics service or learner-event collection in Phase 0–2; see §4.4. |
 | Infra as code | **Terraform** | — | Portable across clouds; see §8. |
 | CI/CD | **GitHub Actions** | — | Free for public repos. |
+
+### Browser and layout baseline
+
+Design for both mobile and desktop: touch-friendly controls, keyboard access, readable line lengths, and responsive navigation. Expect most learners to use mobile devices. Keep pages lightweight, but legacy-browser compatibility below the Tailwind 4 baseline is not required: Chrome 111+, Safari 16.4+, Firefox 128+ ([Tailwind compatibility](https://tailwindcss.com/docs/compatibility)). Validate core flows on mobile Safari/Chrome and desktop browsers during implementation.
 
 ---
 
@@ -113,7 +121,11 @@ The word "lesson" is fine as a generic content-unit term in code (e.g. `lesson.t
 
 ### 4.1. Content delivery
 
-Pages (library, class directory, curriculum pages) are pre-rendered at build time from repo content. Audio/PDF/images are referenced by R2 URLs and fetched directly by the browser. No API call is needed to read or learn anything.
+Pages (library, class directory, curriculum pages) are pre-rendered at build time from repo content. Audio/video/PDF/images use public Bunny CDN URLs (proposed hostname: `cdn.app.winmetta.org`). The browser fetches from Bunny; Bunny fetches cache misses from the private R2 origin using server-side credentials (§6). No API call is needed to read or learn anything.
+
+### Class schedule timezones
+
+Store a recurring class's local day/time and source IANA timezone. Calculate dated occurrences and show both `America/Los_Angeles` (Pacific, with daylight saving) and `Asia/Yangon` (Myanmar), including each zone's date/day. A fixed pair of clock times becomes stale when Pacific daylight saving changes. Profile-based display timezone selection is deferred.
 
 ### 4.2. Content refresh
 
@@ -131,14 +143,11 @@ Volunteers edit Markdown/JSON in the repo via pull request. If a non-technical e
 
 LLB practice progress, spaced-repetition state, and library bookmarks are stored in the browser with **IndexedDB** (via a small wrapper library such as `idb`). No account needed, nothing leaves the device. Cross-device sync is a future feature (§10).
 
-### 4.4. Anonymous analytics
+### 4.4. Analytics and metrics (deferred)
 
-We want to understand what learners do (which curricula and pages are used, where practice sessions end, which library texts are read) so success metrics in [prd.md](prd.md) §6 are measurable — without tracking individuals.
+Product analytics and metric collection are deferred beyond v1 (Phase 0–2). Do not install an analytics SDK, send learner events, or add a collection service. IndexedDB progress and review state remain local features for learners, not telemetry.
 
-* Collect events for **all users** (no opt-out by segment), but **anonymized**: no cookies, no user IDs, no IP storage, no cross-session or cross-device identity.
-* Use a cookieless analytics service with custom events (Plausible to start; swappable, e.g. self-hosted Umami, later). Events are aggregate counts tagged with things like `curriculum`, `lesson id`, `event type`.
-* Do not put personal data (names, emails) in event properties.
-* Metrics that need per-learner continuity (e.g. return-to-learn) are approximated from aggregate/anonymous data, or derived from opt-in accounts later.
+The measures in [prd.md](prd.md) §6 are future candidates only. Revisit measurement feasibility, privacy, and service selection when collection is explicitly in scope; no vendor is selected now. In particular, aggregate counts alone cannot measure the same learner returning across days. Hosting/CDN operational logs are separate from product analytics and are not a promise of zero provider-side logging.
 
 ---
 
@@ -162,13 +171,22 @@ Win Metta has an Azure for Nonprofits grant ($2,000/year). It covers only first-
 | --- | --- | --- |
 | `winmetta.org` (+ `www`) | Existing WordPress hosting | Blog/news, About, existing pages — untouched. |
 | `app.winmetta.org` | Azure Static Web Apps | This platform's frontend. `app.` chosen as the most understandable label for less tech-fluent users. |
+| `cdn.app.winmetta.org` (proposed) | Bunny CDN Pull Zone | Public platform media, backed by private R2 storage. |
 
 Add the custom domain via CNAME. WordPress navigation can link to `app.winmetta.org`, and the app can link back for blog/news.
 
 | Component | Where | Why |
 | --- | --- | --- |
 | Astro build output | **Azure Static Web Apps** | SSL, CDN, custom domain, PR previews. Free tier caps at 100 GB/month bandwidth; heavy media goes to R2, not this path. |
-| Audio, video, PDF, images | **Cloudflare R2** (not Azure Blob) | $0 egress vs. Azure's ~$0.087/GB beyond a shared free allowance; media is the cost most likely to grow as the mission succeeds. S3-compatible, so it moves to S3/Backblaze/MinIO without code changes. |
+| Audio, video, PDF, images | **Cloudflare R2 + Bunny CDN** | R2 provides private S3-compatible storage with $0 egress. Bunny handles public delivery and caching; its delivery charges and R2 storage/operation charges still apply. |
+
+### Media delivery setup
+
+Use `cdn.app.winmetta.org` as the proposed app-scoped media hostname. Add it to the Bunny Pull Zone, point its DNS CNAME at the assigned Bunny hostname, and enable a certificate for this exact hostname. Keep the DNS record unproxied if DNS is managed through Cloudflare so Bunny serves the requests directly.
+
+Plan for a private R2 bucket with Bunny S3 origin authentication and bucket-scoped read-only credentials. R2 public access (`r2.dev` and public R2 custom domains) stays disabled. Keep credentials in provider/secret configuration, never client code or committed files. Validate Bunny's signing against R2's endpoint and region during provisioning before relying on this integration; S3-compatible origin authentication is documented for [Bunny with Backblaze B2](https://help.backblaze.com/hc/en-us/articles/4902581962395-Bunny-Integration-Quick-Start-Guide), and [R2 documents its S3 endpoint](https://developers.cloudflare.com/r2/get-started/s3/).
+
+Release checks: anonymous CDN fetches succeed on cache misses and hits; unsigned origin access fails; audio/video seeking works; MIME types, cache headers, and CORS for browser fetches are correct. Use versioned object paths for replaced media. CDN access is public and requires no learner account or token.
 
 **Portability:** avoid Azure-specific SDKs in application code; use an S3-compatible client for media; keep static output host-agnostic. Moving hosts later is a DNS change plus a new deploy target.
 
@@ -197,11 +215,11 @@ Enable GitHub secret scanning and push protection on the repo (free for public r
 
 ## 8. Infrastructure Provisioning
 
-**Terraform**, not manual Portal clicks — the same tool works across Azure, Cloudflare and other clouds, so a future host move changes provider blocks, not workflow. Terraform has a learning curve; for Phase 0 the footprint is small (Static Web App, custom domain, R2 bucket), so a first pass can be done by hand and codified right after. Confirm the team is comfortable before committing to it.
+**Terraform**, not manual Portal clicks — the same tool works across Azure, Cloudflare and other clouds, so a future host move changes provider blocks, not workflow. Terraform has a learning curve; for Phase 0 the footprint is small (Static Web App, custom domains, R2 bucket, Bunny Pull Zone), so a first pass can be done by hand and codified right after. Confirm the team is comfortable before committing to it.
 
 ```
 infra/
-├── modules/platform/         # Static Web App, R2 bucket, DNS records
+├── modules/platform/         # Static Web App, R2 bucket, Bunny Pull Zone, DNS
 └── environments/production/  # Calls the module
 ```
 
@@ -214,7 +232,7 @@ infra/
 
 ## 9. Experimentation (Future)
 
-Not needed for v1. If a concrete learning-outcome question arises (e.g. does one practice-pacing approach improve return-to-learn?), evaluate lightweight options at that time (self-hosted GrowthBook is one candidate). Experiments should measure learning outcomes, not engagement — see the Calm by Default principle in [prd.md](prd.md) §3 — and should use the same anonymous approach as §4.4.
+Not needed for v1. If a concrete learning-outcome question arises (e.g. does one practice-pacing approach improve return-to-learn?), evaluate lightweight options at that time (self-hosted GrowthBook is one candidate). Experiments should measure learning outcomes, not engagement — see the Calm by Default principle in [prd.md](prd.md) §3 — and must establish an appropriate privacy and measurement design when analytics is introduced (§4.4).
 
 ---
 
