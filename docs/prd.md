@@ -32,7 +32,7 @@ The target audience is **anyone who wants to learn Burmese, Pāḷi, or Buddhist
 * **Calm by Default:** No pushy notifications, streaks, leaderboards, badges, or infinite scroll.
 * **Dāna & Open Access:** Core teachings, the Dhamma Library, and the literacy curriculum remain free and unpaywalled.
 * **Mindful Engagement:** Replace likes/follower counts with mindful gestures (*Sādhu / Anumodanā*) and quiet progress tracking, not competitive metrics.
-* **Reliability Offline:** Downloaded lessons, audio, and library materials work without a live connection.
+* **Works on Weak Connections:** Pages are lightweight and load fast on older devices and slow networks. Full offline use (downloaded lessons, audio, library files) is a future goal, not a v1 requirement.
 * **Meet Learners Where They Are:** The same platform must serve a tech-fluent diaspora teenager and a non-tech-fluent elder in Myanmar equally well — via adaptive onboarding, not a one-size-fits-all interface.
 * **Two Audiences, Two Geographies:** Myanmar-based users and diaspora users have different starting points and different needs. The product should serve both without collapsing them into identical experiences.
 
@@ -64,6 +64,7 @@ No account is required to set or use these preferences — they are stored local
   * **PGTP — "Pāḷi Saddā & Tipiṭaka Pāḷi"** (ပါဠိသဒ္ဒါ နှင့် တိပိဋကပါဠိ သင်တန်း): Pāḷi grammar and Tipiṭaka Pāḷi, currently taught by Ven. U Garudhamma — the natural next step after LLB, and the first candidate for digitization once LLB is validated.
   * **Sutta Piṭaka Study** (မူရင်းသုတ္တန်ပိဋကတ်ပါဠိတော်ကို လေ့လာခြင်း သင်တန်း): studying the original Sutta Piṭaka Pāḷi text, currently taught by Ven. Kelāsa — a distinct, more advanced curriculum from PGTP; gets its own short name (not yet assigned) if/when it's digitized, rather than being merged with PGTP just because both involve Pāḷi.
   * As with LLB, each of these is a course identity independent of its current teacher — see the naming note in tech-architecture.md §3.
+* Learner progress and review state are kept on the learner's own device (browser storage) in v1; no account needed.
 * Each LLB lesson can note when a learner may be ready to join the live Zoom class — for v1 this is a simple in-app suggestion, not a data pipeline back to teachers (see §4.7 on deferred monastic tooling).
 
 **Naming note:** "LLB" identifies the **course**, not a teacher — LLB lessons are attributed to whichever teacher currently teaches them (Ven. U Garudhamma today; possibly additional or different teachers later), so the data model should keep "curriculum" (`llb`) and "teacher" as separate fields rather than binding the course name to one person. Avoid the bare generic term "lesson" when referring to this content — as more curricula are added (e.g., the Pāḷi track above, or a distinct course from another teacher), each should get its own short name/prefix the same way, so content from different curricula stays unambiguous.
@@ -77,7 +78,7 @@ No account is required to set or use these preferences — they are stored local
 
 ### 4.4. Live Class Directory
 
-* A clean, structured schedule view of current weekly Zoom classes (day/time, teacher bio, Zoom link/passcode) — digitizing what's already on the homepage today.
+* A clean, structured schedule view of current weekly Zoom classes (day/time, teacher bio, Zoom link/passcode) — digitizing what's already on the homepage today. Class Zoom links and passcodes are already public on winmetta.org, so they may appear in this repo's class-schedule content.
 * Plain chronological/day-of-week listing. No feed, no algorithmic ordering.
 
 ### 4.5. Content Language & Script Handling
@@ -87,19 +88,19 @@ No account is required to set or use these preferences — they are stored local
 ### 4.6. Geographic & Access Considerations
 
 * **Different value emphasis, same platform:** Myanmar-based users (typically already Burmese-literate) get the most value from the Dhamma Library and class archive; diaspora users get the most value from the literacy pipeline first. The onboarding profile (§4.1) routes each toward what's most relevant without hiding the rest.
-* **Low-bandwidth, older-device support:** required for both elderly diaspora users and Myanmar's variable connectivity — not a nice-to-have.
-* **No login required for core content.** Given Myanmar's post-2021 political and surveillance environment, browsing the library, class directory, and LLB lessons must not require an identity-linked account. Optional accounts (for saving progress across devices) should collect the minimum data necessary and clearly state its purpose and storage location.
+* **Low-bandwidth, older-device support:** required for both elderly diaspora users and Myanmar's variable connectivity — not a nice-to-have. Offline use is a future enhancement (see tech-architecture.md §10).
+* **No login required for core content.** Browsing the library, class directory, and LLB lessons never requires an account. Optional accounts (for saving progress across devices, a future phase) should collect only the minimum data needed and clearly state its purpose. Sign-in through a familiar provider (Google first) is acceptable.
 
 ### 4.7. Non-Goals for v1 (Future Plan)
 
 Explicitly deferred, not abandoned:
 
 * **Monastic-facing content management tooling** (self-serve upload/tagging for teachers). v1 content is loaded by a small admin/volunteer team on teachers' behalf. A teacher-facing tool is a future phase once the learner-facing product is validated.
-* **Cross-device account sync of LLB lesson progress and library bookmarks** (not "playlists" — that was a feature of an earlier, pre-pivot version of this product). Auth approach (Better Auth, self-hosted, passwordless-first with optional OAuth) documented in tech-architecture.md §10 for when Phase 3 arrives.
+* **Cross-device account sync of LLB lesson progress and library bookmarks** (not "playlists" — that was a feature of an earlier, pre-pivot version of this product). A tentative auth approach is sketched in tech-architecture.md §10 for when Phase 3 arrives.
 * **Community submissions & moderated reflections queue.**
 * **Native mobile apps** (Electron/Capacitor builds). v1 targets a single mobile-responsive web app; native wrappers are evaluated only after the web app validates real usage.
 * **Zawgyi legacy encoding support** — see §4.5 and tech-architecture.md.
-* **A/B testing / experimentation tooling** — deferred until there's a concrete, mission-aligned question worth testing (not for engagement optimization, which conflicts with Calm by Default). Planned approach (GrowthBook, self-hosted) documented in tech-architecture.md §9 for when it's needed.
+* **A/B testing / experimentation tooling** — deferred until there's a concrete, mission-aligned question worth testing (not for engagement optimization, which conflicts with Calm by Default). Tentative notes in tech-architecture.md §9 for when it's needed.
 
 ---
 
@@ -111,14 +112,16 @@ Explicitly deferred, not abandoned:
   * Buddhist and Asian-American cultural preservation foundation grants.
   * International precedent exists for this kind of funding outside the US (e.g., EU Erasmus+-funded minority/heritage-language projects like IndyLan) — worth researching comparable programs in the UK, Australia, and Singapore rather than assuming grants are US-only.
 * **Volunteer-driven delivery model:** curriculum digitization, translation/transcription, and much of the initial build will likely rely on volunteer labor from the congregation and diaspora rather than paid staff. Project scope (see Phased Roadmap) should be sized to realistic volunteer capacity, not to a full commercial engineering team's output.
-* **Low fixed-cost infrastructure by design:** favor low/no-cost hosting (a single web app, lightweight backend) over a large multi-platform build, so the project remains sustainable without earned revenue.
+* **Low fixed-cost infrastructure by design:** v1 is a static web app with no server or database to run, so hosting stays cheap and maintenance stays light without earned revenue.
+* **Free nonprofit programs first, paid tools when worthwhile:** prefer free services and nonprofit grants (e.g. the Azure for Nonprofits grant). Paying for tooling is fine when it saves volunteer time or reduces risk; donations may fund tech development and maintenance.
+* **Popular, well-supported tools:** choose widely used stacks with large communities and good documentation so volunteers can learn them easily and the project stays maintainable for years.
 * **Explicitly not pursued:** ads, data-selling, or paywalls on core Dhamma or language content. A possible future option (not part of v1) is earned revenue from physical book publishing/compilations or in-person retreat logistics, noted here only as a future possibility.
 
 ---
 
 ## 6. Mission-Appropriate Success Metrics
 
-Deliberately not DAU, session count, or streaks — those conflict with the Calm by Default principle. Instead:
+Deliberately not DAU, session count, or streaks — those conflict with the Calm by Default principle. Instead, measure mission outcomes using **anonymous, aggregate analytics collected from all users** (no cookies, no user identifiers, no personal data; see tech-architecture.md §4.4). We want to know what learners do, not who they are. Metrics:
 
 * **Literacy progress:** % of learners completing Grade 1 / Grade 2 equivalent LLB lessons; number of learners who reach "can read a short Pāḷi passage in Burmese script unaided."
 * **Bridge-to-community rate:** number of self-paced learners who go on to join a live Zoom class (opt-in, self-reported or signup-linked).
@@ -138,7 +141,7 @@ Deliberately not DAU, session count, or streaks — those conflict with the Calm
                                            |
                                            v
 +---------------------------------------------------------------------------------------+
-| Phase 1: Burmese & Pali Literacy Pilot (Flagship)                                      |
+| Phase 1: Let's Learn Burmese (LLB) Pilot (Flagship)                                    |
 | Digitize the LLB curriculum (currently Ven. U Garudhamma), adaptive onboarding, Unicode-only web app |
 +---------------------------------------------------------------------------------------+
                                            |
@@ -157,12 +160,12 @@ Deliberately not DAU, session count, or streaks — those conflict with the Calm
                                            v
 +---------------------------------------------------------------------------------------+
 | Phase 4: Future Plan                                                                    |
-| Monastic content tooling, community reflections, native mobile apps, expanded Pali     |
+| Monastic content tooling, community reflections, native mobile apps, more curricula   |
 +---------------------------------------------------------------------------------------+
 ```
 
-* **Phase 0 — Foundations:** Minimal monorepo/tooling scoped to a single mobile-responsive web app, not a simultaneous multi-platform build.
-* **Phase 1 — Burmese & Pāḷi Literacy Pilot:** The flagship deliverable. Digitizes the LLB curriculum, proven and already-tested; piloted directly with the existing "Let's Learn Burmese" class roster (currently taught by Ven. U Garudhamma) before wider release.
+* **Phase 0 — Foundations:** Public MIT-licensed repo, monorepo tooling, CI, and a deployed static Astro site at `app.winmetta.org`. Detailed in phase-0-plan.md. No backend or database.
+* **Phase 1 — LLB Pilot:** The flagship deliverable. Digitizes the LLB curriculum, proven and already-tested; piloted directly with the existing "Let's Learn Burmese" class roster (currently taught by Ven. U Garudhamma) before wider release.
 * **Phase 2 — Dhamma Library & Class Archive:** Reorganizes existing content into a searchable, structured library and class timeline.
-* **Phase 3 — Optional Accounts & Progress Sync:** Cross-device sync for learners who want it, opt-in only.
-* **Phase 4 — Future Plan:** Monastic-facing content tools, community submissions/moderation, native mobile apps, and expanded Pāḷi/Abhidhamma curriculum beyond foundational literacy.
+* **Phase 3 — Optional Accounts & Progress Sync:** Cross-device sync for learners who want it, opt-in only. This is likely where a backend and database are first introduced (tentative; see tech-architecture.md §10).
+* **Phase 4 — Future Plan:** Monastic-facing content tools, community submissions/moderation, native mobile apps, and further curricula beyond LLB (e.g. PGTP, the natural next step, may be pulled forward once LLB is validated — plans can change).
