@@ -10,7 +10,9 @@ How to set up, change and submit code for `winmetta-platform`. [CONTRIBUTING.md]
 
 ## 2. Setup
 
-**macOS:** from the repo root run `./scripts/bootstrap-macos.sh`. It installs missing tooling, nvm, Node 24, the npm version pinned in `package.json`, and locked dependencies. If it asks you to finish the Command Line Tools installer, do that and rerun it.
+Start with the org-wide [developer setup](https://github.com/winmetta/.github#developer-setup) (workspace layout, required tools, `bootstrap-dev-env.sh`).
+
+**macOS:** run `../.github/bootstrap-dev-env.sh` once for shared tooling (Homebrew, git, gh, shellcheck, shfmt, nvm, VS Code, Claude Code, Codex CLI). If it asks you to finish the Command Line Tools installer, do that and rerun it. Then run `./scripts/setup-local-dev.sh` from the repo root. It installs Node 24, the npm version pinned in `package.json`, locked dependencies and the Playwright Chromium browser. Both scripts are safe to re-run.
 
 **Other systems:** install Node 24 (see `.nvmrc`), install the npm version in the `packageManager` field of `package.json`, then run `npm ci`.
 
@@ -25,7 +27,7 @@ No Docker, database or env file is needed. Run `npm run dev` and open <http://lo
 | `apps/web/src/lib` | Zod schemas, schedule helper, library filter, site config. |
 | `apps/web/src/fixtures` | Synthetic content used by the content collections in Phase 0. |
 | `apps/web/tests` | Playwright smoke tests. |
-| `scripts/` | Developer tooling. |
+| `scripts/setup-local-dev.sh` | Repo setup: Node, npm, dependencies, Playwright browser. |
 | `infra/terraform/` | Phase 2 and later; not present yet. |
 
 Keep code in `apps/web` until a second consumer needs it. Only then extract a package under `packages/`.

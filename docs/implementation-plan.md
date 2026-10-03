@@ -68,7 +68,7 @@ Repository & governance
 
 Tooling
 * [x] Commit `.nvmrc`, root `package.json` (with `packageManager`), `turbo.json`, base `tsconfig`, Prettier and ESLint config, and the npm lockfile.
-* [x] Add `scripts/bootstrap-macos.sh` (`chmod +x`).
+* [x] Add `scripts/setup-local-dev.sh` (`chmod +x`) for repo setup; shared tooling comes from the org `.github` repo (`bootstrap-dev-env.sh`, see its [README](https://github.com/winmetta/.github#developer-setup)).
 * [x] `.github/workflows/ci.yml`: lint, typecheck, unit tests and build on every PR (no deploy).
 
 Web app
@@ -231,80 +231,9 @@ Pin npm consistently in local setup and CI using the root `packageManager` decla
 
 ---
 
-## 6. Reference: macOS Setup Script (`scripts/bootstrap-macos.sh`)
+## 6. Reference: macOS Setup Script
 
-Installs Homebrew, shell tooling and Node (via nvm), then project dependencies. Run it from the repo root.
-
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-# ==============================================================================
-# Win Metta Platform: macOS native development bootstrap
-# Installs: Homebrew, shellcheck, shfmt, Node via nvm, npm dependencies.
-# Run from the repository root.
-# ==============================================================================
-
-if [ ! -f .nvmrc ]; then
-  echo "Run this script from the repository root (where .nvmrc lives)." >&2
-  exit 1
-fi
-
-echo "==> [1/5] Checking for Xcode Command Line Tools..."
-if ! xcode-select -p >/dev/null 2>&1; then
-  echo "Installing Xcode Command Line Tools..."
-  xcode-select --install
-  echo "Complete the GUI prompt, then re-run this script."
-  exit 1
-fi
-
-echo "==> [2/5] Checking for Homebrew..."
-if ! command -v brew >/dev/null 2>&1; then
-  echo "Installing Homebrew..."
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  if [[ -x /opt/homebrew/bin/brew ]]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-  elif [[ -x /usr/local/bin/brew ]]; then
-    eval "$(/usr/local/bin/brew shellenv)"
-  fi
-else
-  echo "Homebrew already installed. Updating..."
-  brew update
-fi
-
-echo "==> [3/5] Installing shell tooling (shellcheck, shfmt, git, curl)..."
-brew install shellcheck shfmt git curl
-
-echo "==> [4/5] Ensuring nvm and Node.js are installed..."
-export NVM_DIR="$HOME/.nvm"
-if [ ! -d "$NVM_DIR" ]; then
-  echo "Installing nvm..."
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-fi
-# shellcheck disable=SC1091
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-
-NODE_VERSION="$(cat .nvmrc)"
-echo "Installing Node.js $NODE_VERSION via nvm..."
-nvm install "$NODE_VERSION"
-nvm use "$NODE_VERSION"
-
-echo "==> [5/5] Installing npm dependencies..."
-NPM_VERSION="$(node -p "require('./package.json').packageManager.split('@')[1]")"
-npm install --global "npm@$NPM_VERSION"
-if [ -f package-lock.json ]; then
-  npm ci
-else
-  npm install
-fi
-
-echo "=========================================================="
-echo " Win Metta development environment is ready."
-echo " Run 'npm run dev' to start the local dev server."
-echo "=========================================================="
-```
-
-Optional, personal choices (not part of the script): install an AI coding tool of your choice; `AGENTS.md` and the `CLAUDE.md` symlink are already committed in the repo.
+Shared developer tooling (Homebrew, git, gh, shellcheck, shfmt, nvm, editor, AI CLIs) is installed by `bootstrap-dev-env.sh` in the org [`.github` repo](https://github.com/winmetta/.github#developer-setup). This repo's own `scripts/setup-local-dev.sh` then installs Node from `.nvmrc`, the pinned npm, locked dependencies and the Playwright browser.
 
 ---
 

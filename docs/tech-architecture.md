@@ -104,7 +104,7 @@ winmetta-platform/
 ├── content/                   # optional future independent curated content
 ├── docs/
 ├── scripts/
-│   └── bootstrap-macos.sh
+│   └── setup-local-dev.sh
 ├── .env.example               # committed configuration documentation
 ├── .env.local                 # ignored developer-machine overrides
 ├── .nvmrc                     # 24
