@@ -1,6 +1,7 @@
 # Contributing
 
-Read [AGENTS.md](AGENTS.md) and the [implementation plan](docs/implementation-plan.md).
+Read [AGENTS.md](AGENTS.md), the [developer guide](docs/developer-guide.md) and the
+[implementation plan](docs/implementation-plan.md).
 Phase 0 contains only synthetic smoke pages; real content and deployments come later.
 
 ## Setup
