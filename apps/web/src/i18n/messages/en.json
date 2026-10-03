@@ -1,0 +1,15 @@
+{
+  "brand": "Win Metta",
+  "language": "Language",
+  "skip": "Skip to content",
+  "smoke": "Foundation smoke test",
+  "synthetic": "Synthetic preview only — not a real class or resource.",
+  "footer": "Local foundation preview · Phase 0",
+  "choose": "Choose a language",
+  "preview": "Preview",
+  "showDetails": "Show sample details",
+  "hideDetails": "Hide sample details",
+  "details": "React and the shared button are working.",
+  "fallback": "Source language",
+  "switch": "Change language"
+}

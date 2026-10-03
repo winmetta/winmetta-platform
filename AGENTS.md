@@ -41,8 +41,9 @@ Don't group content by subject (e.g. a generic "Pāḷi" bucket), and always qua
 
 - Package manager: npm workspaces. Orchestration: Turborepo.
 - `apps/web`: Astro static web app — pages (Dhamma Library, class directory, curricula) + React islands for interactive LLB practice. Content lives in the repo as Astro content collections (Zod schemas). The only v1 app, with responsive layouts designed for both mobile and desktop. **No backend or database in v1.**
-- `packages/*` (`tsconfig`, `ui`, `shared-types`, `audio-core`) are created only when first needed — start with code inside `apps/web`. This product has no "playlists" feature, don't reintroduce that naming.
-- Deferred, do not scaffold yet: `apps/server` (Fastify + PostgreSQL, likely Phase 5), `apps/desktop` (Electron), `apps/mobile` (Capacitor).
+- `apps/` contains deployable applications. `infra/` contains deployment/infrastructure definitions, with Terraform under `infra/terraform/`. A top-level `content/` is optional future work if curated content becomes independent; keep Astro collections in `apps/web` for now.
+- `packages/*` (for example `domain`, `i18n`, `ui`) are created only when sharing becomes real — start with code inside `apps/web`. This product has no "playlists" feature, don't reintroduce that naming.
+- Deferred, do not scaffold yet: `apps/api` (Fastify + PostgreSQL, likely Phase 5), `apps/desktop` (Electron), `apps/mobile` (Capacitor).
 
 ## 5. Tech Stack & Versions
 
@@ -68,7 +69,7 @@ Baseline as of September 2026 — re-verify current versions before using if sig
 - **Text encoding:** all Burmese text is Unicode (Myanmar block, U+1000–U+109F). No Zawgyi handling in v1 (tech-architecture.md §5).
 - **Access:** core content (LLB lessons, Dhamma Library, class directory) must work with no login, ever. Accounts are optional and only needed for cross-device progress sync (Future Phase 5).
 - **No vanity metrics:** no streaks, leaderboards, badges, or engagement-optimized UI patterns anywhere.
-- **Internationalization:** build support for English (`en`) and Burmese (`my`) in Phase 0 and launch all five starter pages in both in Phase 1, with a central extensible locale registry, keyed messages, localized content, locale-prefixed routes and a same-page language switcher. Keep interface locale, resource language and timezone separate. Phases 0–2 require no onboarding; optional learning-intent/density preferences come with the LLB phase (prd.md §4.1).
+- **Internationalization:** build support for English (`en`) and Burmese (`my`) in Phase 0 and launch all five starter pages in both in Phase 1, with a central extensible locale registry, keyed messages, localized content, locale-prefixed routes and a same-page language switcher. Keep interface locale, resource language and timezone separate. **Switching language changes only the locale segment of the URL** — page, search terms, filters, query parameters and fragment must stay intact, derived from the current URL when the link is activated, never cached at load. Phases 0–2 require no onboarding; optional learning-intent/density preferences come with the LLB phase (prd.md §4.1).
 - **Styling:** Tailwind utility patterns + Radix/shadcn primitives (extract to `packages/ui` only once shared).
 - **Local dev:** `npm run dev` runs natively — no Docker, no database needed in v1.
 - **Analytics:** deferred beyond v1 (Phases 0–2). No analytics SDK or learner-event collection; progress remains local.
@@ -76,6 +77,8 @@ Baseline as of September 2026 — re-verify current versions before using if sig
 - **Class schedules:** show Pacific (`America/Los_Angeles`) and Myanmar (`Asia/Yangon`) by default with correct dated occurrences and daylight-saving handling. Profile timezone preferences are future work.
 
 ## 7. Hosting, Domains & Environments
+
+- Environment configuration: committed `.env.example`, ignored root `.env.local` for developer machines, and GitHub `staging`/`production` environment variables and secrets for CI. No per-deployment env files; `.env.test` only if needed later.
 
 - `winmetta.org` (WordPress) is untouched by this repo. This platform lives at `app.winmetta.org` (Astro static site, Azure Static Web Apps) with a `staging.app.winmetta.org` staging environment and PR previews, all non-production `noindex`'d. A single non-public review app arrives in Phase 1; staging/production and the public domain arrive in Phase 2 (tech-architecture.md §6–§7). A future `api.winmetta.org` is tentative (tech-architecture.md §10).
 - Media (audio/video/PDF) is stored in private **AWS S3** buckets (paid; outside the Azure for Nonprofits grant, which only covers first-party Azure services and doesn't roll over annually) and served through a **bunny.net** CDN using S3 origin authentication with a read-only IAM user, on a custom hostname (proposed `cdn.app.winmetta.org`), so most reads avoid S3 egress. Separate buckets/CDN for staging and production. DNS is managed in Cloudflare with unproxied (DNS-only) records for Bunny hostnames.
@@ -91,7 +94,10 @@ See prd.md §4.7 for full reasoning. Summary: product analytics/metric collectio
 - `npm run dev` — starts the local dev server.
 - `npm run build` — builds all apps and shared packages.
 - `npm run typecheck` — validates TypeScript across all projects.
-- `npm run lint` — runs the linter across all packages.
+- `npm run lint` — runs ESLint and checks Prettier formatting.
+- `npm run format` — formats the repo with Prettier.
+- `npm test` — runs unit tests (Vitest).
+- `npm run test:smoke` — runs Playwright browser smoke tests; run `npm run build` first (CI does this after the build).
 
 ## 10. Where to Find More Detail
 

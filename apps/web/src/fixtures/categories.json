@@ -1,0 +1,14 @@
+[
+  {
+    "sourceLanguage": "en",
+    "translations": {
+      "en": {
+        "title": "Synthetic sample",
+        "description": "For schema validation only."
+      }
+    },
+    "sourceUrl": "https://example.invalid/sample",
+    "verifiedAt": "2026-09-30",
+    "id": "sample-category"
+  }
+]

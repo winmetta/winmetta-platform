@@ -1,0 +1,55 @@
+---
+import '../styles/global.css';
+import LanguageSwitcher from '../components/LanguageSwitcher.astro';
+import { locales, localeCodes, type Locale } from '../i18n/locales';
+import { route } from '../i18n/routes';
+import { t } from '../i18n/messages';
+import { allowIndexing } from '../lib/site';
+interface Props {
+  locale: Locale;
+  title: string;
+}
+const { locale, title } = Astro.props;
+const canonical = new URL(route(locale), Astro.site);
+---
+
+<!doctype html>
+<html lang={locale} dir={locales[locale].direction}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {!allowIndexing && <meta name="robots" content="noindex" />}
+    <title>{title} · {t(locale, 'brand')}</title>
+    <link rel="canonical" href={canonical} />
+    {
+      localeCodes.map((code) => (
+        <link
+          rel="alternate"
+          hreflang={code}
+          href={new URL(route(code), Astro.site)}
+        />
+      ))
+    }
+    <link rel="alternate" hreflang="x-default" href={Astro.site} />
+  </head>
+  <body>
+    <a href="#main" class="sr-only focus:not-sr-only focus:block focus:p-4"
+      >{t(locale, 'skip')}</a
+    >
+    <header
+      class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-5 py-5"
+    >
+      <a href={route(locale)} class="font-bold">{t(locale, 'brand')}</a>
+      <LanguageSwitcher locale={locale} />
+    </header>
+    <main
+      id="main"
+      class="mx-auto min-h-64 max-w-5xl space-y-6 px-5 py-8 sm:py-12"
+    >
+      <slot />
+    </main>
+    <footer class="mx-auto max-w-5xl px-5 py-6 text-sm">
+      {t(locale, 'footer')}
+    </footer>
+  </body>
+</html>

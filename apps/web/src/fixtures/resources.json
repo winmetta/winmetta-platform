@@ -1,0 +1,26 @@
+[
+  {
+    "sourceLanguage": "en",
+    "translations": {
+      "en": {
+        "title": "Synthetic sample",
+        "description": "For schema validation only."
+      }
+    },
+    "sourceUrl": "https://example.invalid/sample",
+    "verifiedAt": "2026-09-30",
+    "id": "sample-resource",
+    "type": "book",
+    "categories": ["sample-category"],
+    "languages": ["en"],
+    "authors": ["Example Teacher"],
+    "tags": ["sample"],
+    "links": [
+      {
+        "url": "https://example.invalid/sample.pdf",
+        "label": "Sample PDF",
+        "format": "pdf"
+      }
+    ]
+  }
+]

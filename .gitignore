@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.astro/
+.turbo/
+coverage/
+playwright-report/
+test-results/
+.env*
+!.env.example
+*.tfvars
+!*.tfvars.example
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tsbuildinfo
+.DS_Store
+*.log

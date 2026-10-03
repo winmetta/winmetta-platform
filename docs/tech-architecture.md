@@ -71,28 +71,42 @@ Design for both mobile and desktop: touch-friendly controls, keyboard access, re
 
 ## 3. Monorepo Layout & Content Model
 
+The directory names describe responsibilities: `apps/` contains deployable applications, `infra/` contains deployment and infrastructure definitions, and a top-level `content/` may be introduced if curated content becomes independent of the web app. `packages/` is for code with actual shared consumers.
+
+This is the intended structure over time; future directories are not scaffolded in Phase 0:
+
 ```
 winmetta-platform/
 ├── .github/workflows/
 │   ├── ci.yml                 # lint, typecheck, test, build on every PR (Phase 0)
 │   └── deploy-web.yml         # Azure Static Web Apps deploy: PR previews and review app (Phase 1); staging + production promotion (Phase 2)
 ├── apps/
-│   └── web/                   # Astro app (the only v1 app)
-│       ├── src/
-│       │   ├── pages/         # locale-prefixed routes; five starter pages in Phase 1, curricula later
-│       │   ├── components/    # Astro components + React islands
-│       │   └── content/       # localized pages, resources, library categories, classes; curricula later
-│       ├── astro.config.mjs
-│       └── package.json
+│   ├── web/                   # Astro app (the only v1 app)
+│   │   ├── src/
+│   │   │   ├── pages/         # locale-prefixed routes; five starter pages in Phase 1, curricula later
+│   │   │   ├── components/    # Astro components + React islands
+│   │   │   └── content/       # localized pages, resources, library categories, classes; curricula later
+│   │   ├── astro.config.mjs
+│   │   └── package.json
+│   ├── mobile/                # future
+│   ├── desktop/               # future
+│   └── api/                   # future, only if needed
 ├── packages/                  # created when first needed, not up front
 │   ├── tsconfig/              # shared base tsconfig
+│   ├── domain/
+│   ├── i18n/
 │   ├── ui/                    # shared components, once a second consumer exists
 │   └── shared-types/          # shared Zod schemas, once code is shared
-├── infra/                     # Terraform (Phase 2, see §8)
-│   ├── modules/platform/
-│   └── environments/{staging,production}/
+├── infra/                     # deployment/infrastructure definitions (Phase 2)
+│   └── terraform/
+│       ├── modules/platform/
+│       └── environments/{staging,production}/
+├── content/                   # optional future independent curated content
+├── docs/
 ├── scripts/
 │   └── bootstrap-macos.sh
+├── .env.example               # committed configuration documentation
+├── .env.local                 # ignored developer-machine overrides
 ├── .nvmrc                     # 24
 ├── AGENTS.md / CLAUDE.md -> AGENTS.md
 ├── LICENSE                    # MIT
@@ -100,7 +114,13 @@ winmetta-platform/
 └── turbo.json
 ```
 
-Start simple: with a single app, keep shared code inside `apps/web` and extract a package only when a second consumer needs it.
+Start simple: keep code and Astro content collections inside `apps/web`, and extract a package only when a second consumer needs it. Phase 0 uses synthetic fixtures; real curated content arrives in Phase 1.
+
+### Environment configuration
+
+Keep one committed `.env.example` and one optional, ignored root `.env.local` for developer-machine overrides. The web config loads `.env.local`, with injected process variables taking precedence. Turbo includes this file in its cache dependencies. `SITE_URL` controls canonical/alternate URLs; `PUBLIC_ALLOW_INDEXING` is enabled only for public production builds. Public variables must never contain secrets.
+
+Deployment workflows use GitHub `staging` and `production` environments, mapping their variables and secrets explicitly into build/deploy jobs. Do not maintain `.env.staging` or `.env.production` files. Phase 1's review build supplies its origin through CI with indexing disabled. Add `.env.test` later only if tests need it.
 
 ### Library model and discovery (Phase 1)
 
@@ -162,7 +182,7 @@ The measures in [prd.md](prd.md) §6 are future candidates only. Revisit measure
 
 ## 5. Internationalization & Burmese Text
 
-Phase 0 builds the English (`en`) and Burmese (`my`) foundation; Phase 1 ships five public page types in both languages, serving online class students and independent learners worldwide. See implementation-plan.md §2–§3 for scope and acceptance criteria. Use `/en/…` and `/my/…` routes generated from stable page IDs; `/` is a language entry page. Locale-aware links and the switcher preserve the page identity. Explicit URL locale wins over optional browser-stored preference, and navigation works when storage is unavailable.
+Phase 0 builds the English (`en`) and Burmese (`my`) foundation; Phase 1 ships five public page types in both languages, serving online class students and independent learners worldwide. See implementation-plan.md §2–§3 for scope and acceptance criteria. Use `/en/…` and `/my/…` routes generated from stable page IDs; `/` is a language entry page. Switching language changes only the locale segment: the page, search terms, filters, query parameters and fragment are preserved, computed from the current URL at activation time. Locale-aware links and the switcher preserve the page identity. Explicit URL locale wins over optional browser-stored preference, and navigation works when storage is unavailable.
 
 Keep a central extensible locale registry, keyed UI dictionaries, and localized page records inside `apps/web`. Page layouts are shared across locales. Shared class/resource records use stable IDs with localized display fields and independent source-language metadata. Use locale-aware formatting, document language/direction, canonical and alternate-language URLs, and text layouts that tolerate translation expansion. Avoid two-language conditionals throughout components so new locales need only registry, dictionary and content additions.
 
@@ -244,7 +264,7 @@ Enable GitHub secret scanning and push protection on the repo (free for public r
 **Terraform**, not manual Portal clicks — the same tool works across Azure, AWS, Cloudflare, bunny.net and other providers, so a future host move changes provider blocks, not workflow. Terraform has a learning curve; the Phase 2 footprint is small (two Static Web Apps, S3 buckets with IAM, Bunny pull zones, Cloudflare DNS records), so a first pass can be done by hand and codified right after. Use the Bunny Terraform provider if it covers the needed resources; otherwise document the manual Bunny steps. Confirm the team is comfortable before committing to it. (The single Phase 1 review app may be created by hand.)
 
 ```
-infra/
+infra/terraform/
 ├── modules/platform/         # Static Web App, S3 bucket + IAM, Bunny pull zone, Cloudflare DNS records
 ├── environments/staging/     # Calls the module with staging names
 └── environments/production/  # Calls the module with production names
@@ -271,7 +291,7 @@ Not needed for v1. If a concrete learning-outcome question arises (e.g. does one
 
 When a feature needs server state (accounts, progress sync, dynamic content), add:
 
-* **Fastify + TypeScript** API in `apps/server`, run as a plain Docker container on **Azure Container Apps** (Consumption plan scales to zero).
+* **Fastify + TypeScript** API in `apps/api`, run as a plain Docker container on **Azure Container Apps** (Consumption plan scales to zero).
 * **PostgreSQL 18** on Azure Database for PostgreSQL – Flexible Server (Burstable). Vanilla Postgres only, so it stays portable. Note this is a real fixed cost; stopped Flexible Servers restart automatically after ~7 days.
 * `api.winmetta.org` as a sibling subdomain; a staging environment with its own separate database at that point.
 * Local dev against a native Postgres at `localhost:5432/winmetta_dev`.

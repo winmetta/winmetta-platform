@@ -1,0 +1,39 @@
+@import '@fontsource/noto-sans-myanmar/400.css';
+@import '@fontsource/noto-sans-myanmar/700.css';
+@import 'tailwindcss';
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: system-ui, 'Noto Sans Myanmar', sans-serif;
+}
+:root {
+  --background: #faf9f6;
+  --foreground: #242b28;
+  --primary: #315b4b;
+  --primary-foreground: #fff;
+  --muted: #eaece6;
+  --input: #9aaca2;
+  --ring: #315b4b;
+}
+@layer base {
+  body {
+    @apply m-0 bg-background font-sans text-base text-foreground;
+    line-height: 1.8;
+  }
+  :lang(my) {
+    font-family: 'Noto Sans Myanmar', system-ui, sans-serif;
+    line-height: 2;
+  }
+  a {
+    text-underline-offset: 0.25em;
+  }
+  a:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 4px;
+  }
+}

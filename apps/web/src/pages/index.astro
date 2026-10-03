@@ -1,0 +1,47 @@
+---
+import '../styles/global.css';
+import { localeCodes, locales } from '../i18n/locales';
+import { route } from '../i18n/routes';
+import { t } from '../i18n/messages';
+import { allowIndexing } from '../lib/site';
+---
+
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {!allowIndexing && <meta name="robots" content="noindex" />}
+    <title>{t('en', 'choose')} · {t('en', 'brand')}</title>
+    <link rel="canonical" href={Astro.site} />
+    {
+      localeCodes.map((code) => (
+        <link
+          rel="alternate"
+          hreflang={code}
+          href={new URL(route(code), Astro.site)}
+        />
+      ))
+    }
+    <link rel="alternate" hreflang="x-default" href={Astro.site} />
+  </head>
+  <body>
+    <main class="mx-auto max-w-xl space-y-6 px-5 py-12">
+      <h1 class="text-2xl font-bold">{t('en', 'brand')}</h1>
+      {
+        localeCodes.map((code) => (
+          <section lang={code}>
+            <h2>{t(code, 'choose')}</h2>
+            <a
+              class="inline-flex min-h-11 items-center underline"
+              href={route(code)}
+              hreflang={code}
+            >
+              {locales[code].name}
+            </a>
+          </section>
+        ))
+      }
+    </main>
+  </body>
+</html>

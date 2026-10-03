@@ -1,0 +1,52 @@
+---
+import { locales, localeCodes, type Locale } from '../i18n/locales';
+import { switchLocale } from '../i18n/routes';
+import { t } from '../i18n/messages';
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+---
+
+<nav aria-label={t(locale, 'language')} class="flex flex-wrap gap-2">
+  {
+    localeCodes.map((code) => (
+      <a
+        href={switchLocale(Astro.url, code)}
+        lang={code}
+        hreflang={code}
+        aria-current={code === locale ? 'page' : undefined}
+        data-locale={code}
+        class:list={[
+          'inline-flex min-h-11 items-center rounded-md px-3 py-2 underline',
+          { 'bg-muted': code === locale },
+        ]}
+      >
+        {locales[code].name}
+      </a>
+    ))
+  }
+</nav>
+<script>
+  import { isLocale } from '../i18n/locales';
+  import { switchLocale, saveLocalePreference } from '../i18n/routes';
+  // Only the locale segment may change; path, query and fragment come from the
+  // current URL, which can change after load (hash links, history.replaceState).
+  const links = document.querySelectorAll<HTMLAnchorElement>('a[data-locale]');
+  function refresh(link: HTMLAnchorElement, code: string) {
+    if (isLocale(code))
+      link.href = switchLocale(new URL(window.location.href), code);
+  }
+  links.forEach((link) => {
+    const code = link.dataset.locale;
+    if (!code || !isLocale(code)) return;
+    const update = () => refresh(link, code);
+    update();
+    window.addEventListener('hashchange', update);
+    window.addEventListener('popstate', update);
+    // Refresh at activation time, including keyboard and modified clicks.
+    for (const type of ['pointerdown', 'focus', 'mouseenter', 'click'])
+      link.addEventListener(type, update);
+    link.addEventListener('click', () => saveLocalePreference(code));
+  });
+</script>

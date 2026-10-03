@@ -47,7 +47,7 @@ PostgreSQL and Fastify are **not** part of these phases (see [tech-architecture.
 * Support **English (`en`) and Burmese (`my`)**. Use a central locale registry with BCP 47 language tags, display names, text direction and formatting defaults; new locales must be addable without redesigning page components.
 * Generate locale-prefixed routes (e.g. `/en/classes/`, `/my/classes/`) from stable page identifiers via a shared route helper. The root `/` is a lightweight language choice linking to both homepages; deep links render their URL's language with no automatic geographic redirects.
 * Keep UI messages in keyed locale dictionaries and page text in localized content records, separate from layout code. Share stable class/resource IDs, URLs and schedule data across translations. Avoid hardcoded user-facing strings, binary language conditionals and sentence concatenation.
-* The language switcher preserves the current page and saves an optional device-local preference with no profile. Explicit locale URLs take precedence; blocked browser storage must not prevent switching or navigation.
+* **Locale-switch rule:** switching language changes only the locale segment of the URL. Page, search terms, filters, query parameters and fragment stay intact, computed from the URL at the moment the link is activated (not at page load). Any new stateful navigation (Classes, Dhamma Library) must keep this true. The language switcher saves an optional device-local preference with no profile. Explicit locale URLs take precedence; blocked browser storage must not prevent switching or navigation.
 * Distinguish **interface locale**, **resource/teaching language** and **timezone**. Switching language does not translate a linked book or recording, or change the default schedule zones.
 * Use locale-aware date/number formatting with explicit timezones. Set document `lang` and direction from the registry; retain Pāḷi diacritics; use Unicode Burmese fonts with generous line height. Allow text expansion and prefer logical layout properties.
 * For partially translated future content, fall back to the source language with a visible language label; never present a fallback as a translation. A build-time check fails on missing translation keys.
@@ -62,22 +62,22 @@ Pick and install these now so Phase 1 is content work rather than tooling work: 
 Repository & governance
 * [x] Public GitHub repo `winmetta/winmetta-platform` created.
 * [x] Add `LICENSE` (MIT License).
-* [ ] Add `.gitignore` covering `node_modules`, build output, `.env*`, `*.tfvars` (but not `*.tfvars.example`) **before** any such file exists.
+* [x] Add `.gitignore` covering `node_modules`, build output, `.env*`, `*.tfvars` (but not `*.tfvars.example`) **before** any such file exists.
 * [ ] Enable GitHub secret scanning and push protection.
-* [ ] Add a short `CONTRIBUTING.md` (how to propose content or code changes; contact@winmetta.org).
+* [x] Add a short `CONTRIBUTING.md` (how to propose content or code changes; contact@winmetta.org).
 
 Tooling
-* [ ] Commit `.nvmrc`, root `package.json` (with `packageManager`), `turbo.json`, base `tsconfig`, Prettier and ESLint config, and the npm lockfile.
-* [ ] Add `scripts/bootstrap-macos.sh` (`chmod +x`).
-* [ ] `.github/workflows/ci.yml`: lint, typecheck, unit tests and build on every PR (no deploy).
+* [x] Commit `.nvmrc`, root `package.json` (with `packageManager`), `turbo.json`, base `tsconfig`, Prettier and ESLint config, and the npm lockfile.
+* [x] Add `scripts/bootstrap-macos.sh` (`chmod +x`).
+* [x] `.github/workflows/ci.yml`: lint, typecheck, unit tests and build on every PR (no deploy).
 
 Web app
-* [ ] Initialize `apps/web` with Astro (`npm create astro@latest`), add React, Tailwind and shadcn/ui.
-* [ ] Responsive layout shell with touch and keyboard support, supported-browser checks and Unicode Burmese font loading.
-* [ ] Implement the locale registry, keyed messages, locale-prefixed routes, language switcher, formatting helpers and translation-coverage check.
-* [ ] Zod content-collection schemas for localized pages, resources, library categories and class schedules (stable IDs, source language, source URLs, verification dates). Keep synthetic fixtures separate from future published content.
-* [ ] Class schedule schema stores source IANA timezone and local recurrence; helper produces dated Pacific and Myanmar occurrences with daylight-saving and day-rollover unit tests.
-* [ ] Basic library filter helper (see Phase 1 search rules) with unit tests, including Burmese text.
+* [x] Initialize `apps/web` with Astro (`npm create astro@latest`), add React, Tailwind and shadcn/ui.
+* [x] Responsive layout shell with touch and keyboard support, supported-browser checks and Unicode Burmese font loading.
+* [x] Implement the locale registry, keyed messages, locale-prefixed routes, language switcher, formatting helpers and translation-coverage check.
+* [x] Zod content-collection schemas for localized pages, resources, library categories and class schedules (stable IDs, source language, source URLs, verification dates). Keep synthetic fixtures separate from future published content.
+* [x] Class schedule schema stores source IANA timezone and local recurrence; helper produces dated Pacific and Myanmar occurrences with daylight-saving and day-rollover unit tests.
+* [x] Basic library filter helper (see Phase 1 search rules) with unit tests, including Burmese text.
 
 ### Phase 0 acceptance
 
@@ -154,7 +154,7 @@ Use shared mobile/desktop navigation for Home, Classes and Dhamma Library; keep 
 
 **Goal:** deploy the Phase 1 site to **staging** and **production** with infrastructure defined as code. Details in [tech-architecture.md](tech-architecture.md) §6–§8.
 
-* [ ] Terraform in `infra/` (Static Web Apps, S3 buckets and IAM, Bunny pull zones, Cloudflare DNS records), remote state in Terraform Cloud; `.tfvars.example` only. `terraform plan` on PRs touching `infra/`; `terraform apply` is a manual maintainer action. Import or replace the hand-made Phase 1 review app.
+* [ ] Terraform in `infra/terraform/` (Static Web Apps, S3 buckets and IAM, Bunny pull zones, Cloudflare DNS records), remote state in Terraform Cloud; `.tfvars.example` only. `terraform plan` on PRs touching `infra/`; `terraform apply` is a manual maintainer action. Import or replace the hand-made Phase 1 review app.
 * [ ] Azure: subscription/resource group under the nonprofit grant, a scoped Service Principal for CI (secret stored in GitHub Actions), and two Azure Static Web Apps — production and staging.
 * [ ] Domains and DNS (Cloudflare, DNS-only records): `app.winmetta.org` (production) and `staging.app.winmetta.org` (staging) via CNAME; `winmetta.org` itself and existing WordPress records are unchanged.
 * [ ] Media: private AWS S3 buckets for production and staging (separate, public access blocked), served through bunny.net pull zones on `cdn.app.winmetta.org` (proposed) and a staging hostname, with unproxied Cloudflare CNAME records. Bunny reads via S3 origin authentication using a read-only IAM user; verify per tech-architecture.md §6. Verify public fetches, cache hits, CORS, MIME types and audio/video seeking.

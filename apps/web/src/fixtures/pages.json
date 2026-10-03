@@ -1,0 +1,28 @@
+[
+  {
+    "id": "smoke-en",
+    "pageId": "smoke",
+    "sourceLanguage": "en",
+    "translations": {
+      "en": {
+        "title": "Foundation smoke test",
+        "description": "Synthetic preview only — not a real class or resource."
+      }
+    },
+    "sourceUrl": "https://example.invalid/synthetic",
+    "verifiedAt": "2026-09-30"
+  },
+  {
+    "id": "smoke-my",
+    "pageId": "smoke",
+    "sourceLanguage": "my",
+    "translations": {
+      "my": {
+        "title": "အခြေခံ စမ်းသပ်စာမျက်နှာ",
+        "description": "စမ်းသပ်ရန်သာ ဖြစ်သည်။ သင်တန်း သို့မဟုတ် အရင်းအမြစ် အစစ် မဟုတ်ပါ။"
+      }
+    },
+    "sourceUrl": "https://example.invalid/synthetic",
+    "verifiedAt": "2026-09-30"
+  }
+]

@@ -1,0 +1,12 @@
+package-lock.json
+node_modules
+dist
+.astro
+.turbo
+playwright-report
+test-results
+# Planning prose is maintained independently of code formatting.
+AGENTS.md
+CLAUDE.md
+README.md
+docs
