@@ -63,7 +63,7 @@ Repository & governance
 * [x] Public GitHub repo `winmetta/winmetta-platform` created.
 * [x] Add `LICENSE` (MIT License).
 * [x] Add `.gitignore` covering `node_modules`, build output, `.env*`, `*.tfvars` (but not `*.tfvars.example`) **before** any such file exists.
-* [ ] Enable GitHub secret scanning and push protection.
+* [x] Enable GitHub secret scanning and push protection (repo **Settings → Advanced Security**; free for public repos). Secret scanning detects known credential formats (cloud keys, tokens) in the repo and its history and alerts maintainers. Push protection blocks a `git push` containing a recognized secret before it lands, unless the pusher bypasses it with a stated reason. Both are a backstop; never rely on them instead of keeping secrets out of commits (see [AGENTS.md](../AGENTS.md) §2).
 * [x] Add a short `CONTRIBUTING.md` (how to propose content or code changes; contact@winmetta.org).
 
 Tooling
