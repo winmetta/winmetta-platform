@@ -21,7 +21,7 @@ for (const l of locales) {
       await page.goto(`/${l.code}/`);
       await expect(page.locator('h1')).toHaveText(l.home);
       const start = page.locator('section[aria-labelledby="start"]');
-      await expect(start.getByRole('link')).toHaveCount(3);
+      await expect(start.getByRole('link')).toHaveCount(5);
       await start.locator(`a[href="/${l.code}/dhamma-library/"]`).click();
       await expect(page).toHaveURL(new RegExp(`/${l.code}/dhamma-library/$`));
     });

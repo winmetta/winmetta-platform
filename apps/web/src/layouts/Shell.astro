@@ -15,6 +15,14 @@ interface Props {
 const { locale, title, page = 'home', path } = Astro.props;
 const href = (code: Locale) => (path ? `/${code}/${path}` : route(code, page));
 const canonical = new URL(href(locale), Astro.site);
+// Only built pages are listed here; add Classes, Study groups, Retreats and Teachers as they land.
+const navItems = [
+  { page: 'classes', label: 'navClasses' },
+  { page: 'studyGroups', label: 'navStudyGroups' },
+  { page: 'retreats', label: 'navRetreats' },
+  { page: 'teachers', label: 'navTeachers' },
+  { page: 'library', label: 'navLibrary' },
+] as const;
 const inLibrary =
   page === 'library' || Boolean(path?.startsWith('dhamma-library/'));
 ---
@@ -40,6 +48,9 @@ const inLibrary =
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#ffffff" />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
   </head>
   <body class="flex min-h-screen flex-col">
     <a href="#main" class="skip-link">{t(locale, 'skip')}</a>
@@ -49,16 +60,33 @@ const inLibrary =
           <img src="/logo-96.png" width="44" height="44" alt="" />
           <span>{t(locale, 'brand')}</span>
         </a>
-        <nav aria-label={t(locale, 'navMain')}>
-          <a
-            href={route(locale, 'library')}
-            class="nav-link"
-            aria-current={page === 'library'
-              ? 'page'
-              : inLibrary
-                ? 'true'
-                : undefined}>{t(locale, 'navLibrary')}</a
-          >
+        <button
+          type="button"
+          class="menu-button"
+          aria-expanded="false"
+          aria-controls="site-nav"
+          data-menu
+        >
+          {t(locale, 'menu')}
+        </button>
+        <nav id="site-nav" class="site-nav" aria-label={t(locale, 'navMain')}>
+          {
+            navItems.map((item) => (
+              <a
+                href={route(locale, item.page)}
+                class="nav-link"
+                aria-current={
+                  page === item.page
+                    ? 'page'
+                    : item.page === 'library' && inLibrary
+                      ? 'true'
+                      : undefined
+                }
+              >
+                {t(locale, item.label)}
+              </a>
+            ))
+          }
         </nav>
         <LanguageSwitcher locale={locale} />
       </div>
@@ -84,6 +112,12 @@ const inLibrary =
             aria-current={page === 'privacy' ? 'page' : undefined}
             >{t(locale, 'navPrivacy')}</a
           >
+          <a
+            href={route(locale, 'zoomHelp')}
+            class="footer-link"
+            aria-current={page === 'zoomHelp' ? 'page' : undefined}
+            >{t(locale, 'navZoomHelp')}</a
+          >
           <a href="https://winmetta.org/" class="footer-link" rel="noopener"
             >winmetta.org</a
           >
@@ -91,5 +125,25 @@ const inLibrary =
         <p class="muted">{t(locale, 'footerNote')}</p>
       </div>
     </footer>
+    <script>
+      // Phones: the menu button shows and hides the navigation. Without JavaScript the links stay visible.
+      const button = document.querySelector<HTMLButtonElement>('[data-menu]');
+      const nav = document.getElementById('site-nav');
+      if (button && nav) {
+        const set = (open: boolean) => {
+          button.setAttribute('aria-expanded', String(open));
+          nav.toggleAttribute('data-open', open);
+        };
+        button.addEventListener('click', () =>
+          set(button.getAttribute('aria-expanded') !== 'true'),
+        );
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape' && nav.hasAttribute('data-open')) {
+            set(false);
+            button.focus();
+          }
+        });
+      }
+    </script>
   </body>
 </html>

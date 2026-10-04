@@ -16,6 +16,8 @@ const { locale } = Astro.props;
 const text = (key: Parameters<typeof t>[1]) => t(locale, key);
 // Add Classes here when its page is built; never link to an unbuilt page.
 const paths = [
+  { page: 'classes', title: 'classesTitle', text: 'classesIntro' },
+  { page: 'retreats', title: 'retreatsTitle', text: 'retreatsIntro' },
   { page: 'library', title: 'libraryTitle', text: 'homeLibraryText' },
   { page: 'about', title: 'aboutTitle', text: 'homeAboutText' },
   { page: 'privacy', title: 'privacyTitle', text: 'homePrivacyText' },
@@ -46,7 +48,7 @@ const paths = [
   </section>
   <section class="space-y-4" aria-labelledby="start">
     <h2 id="start" class="text-2xl font-bold">{text('homeExplore')}</h2>
-    <ul class="grid gap-4 sm:grid-cols-3">
+    <ul class="grid gap-4 sm:grid-cols-2">
       {
         paths.map((item) => (
           <li class="card card-link space-y-2">
