@@ -17,34 +17,31 @@ const { tree, nodes, locale, nested = false } = Astro.props;
 const formatLocale = locales[locale].formatLocale;
 ---
 
-<ul class="space-y-1">
+<ul class="tree">
   {
     nodes.map((node) => (
       <li>
         <a
-          class="inline-flex min-h-11 items-center underline"
+          class="tree-row"
           href={folderRoute(locale, node.id)}
           lang={languageOf(node.name)}
         >
-          {node.name}
+          <span class="font-medium">{node.name}</span>
+          <span class="badge" lang={locale}>
+            {formatCount(node.total, formatLocale)}{' '}
+            {t(
+              locale,
+              isSingular(node.total, formatLocale) ? 'bookOne' : 'bookOther',
+            )}
+          </span>
         </a>
-        <span class="ms-2 text-sm">
-          ({formatCount(node.total, formatLocale)}{' '}
-          {t(
-            locale,
-            isSingular(node.total, formatLocale) ? 'bookOne' : 'bookOther',
-          )}
-          )
-        </span>
         {nested && node.childIds.length > 0 && (
-          <div class="ps-4">
-            <FolderTreeSelf
-              tree={tree}
-              locale={locale}
-              nodes={node.childIds.flatMap((id) => tree.nodes.get(id) ?? [])}
-              nested
-            />
-          </div>
+          <FolderTreeSelf
+            tree={tree}
+            locale={locale}
+            nodes={node.childIds.flatMap((id) => tree.nodes.get(id) ?? [])}
+            nested
+          />
         )}
       </li>
     ))

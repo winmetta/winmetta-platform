@@ -38,9 +38,11 @@ const labels = {
 ---
 
 <Shell locale={locale} title={text('libraryTitle')} page="library">
-  <h1 class="text-2xl font-bold sm:text-3xl">{text('libraryTitle')}</h1>
-  <p class="max-w-prose">{text('libraryIntro')}</p>
-  <noscript><p>{text('searchNeedsJs')}</p></noscript>
+  <header class="space-y-4">
+    <h1 class="text-3xl font-bold sm:text-4xl">{text('libraryTitle')}</h1>
+    <p class="lead">{text('libraryIntro')}</p>
+  </header>
+  <noscript><p class="card">{text('searchNeedsJs')}</p></noscript>
   <LibrarySearchIsland
     client:load
     labels={labels}
@@ -49,8 +51,10 @@ const labels = {
     cdnBase={libraryCdnBase}
     formatLocale={locales[locale].formatLocale}
   />
-  <section class="space-y-2" aria-labelledby="folders">
-    <h2 id="folders" class="text-xl font-bold">{text('browseFolders')}</h2>
-    <FolderTree tree={tree} nodes={tree.roots} locale={locale} nested />
+  <section class="space-y-3" aria-labelledby="folders">
+    <h2 id="folders" class="text-2xl font-bold">{text('browseFolders')}</h2>
+    <div class="card">
+      <FolderTree tree={tree} nodes={tree.roots} locale={locale} nested />
+    </div>
   </section>
 </Shell>

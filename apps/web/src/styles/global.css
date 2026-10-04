@@ -1,39 +1,255 @@
 @import '@fontsource/noto-sans-myanmar/400.css';
+@import '@fontsource/noto-sans-myanmar/600.css';
 @import '@fontsource/noto-sans-myanmar/700.css';
 @import 'tailwindcss';
+
+/*
+ * Win Metta design tokens. The first block is the Win Metta Brand Kit palette (Canva); the second
+ * block is derived from it where the palette has no accessible equivalent:
+ *   --brand        link and button color from the hue of --mist, at 3:1 against body ink and 4.7:1+
+ *                  on white, sand and sky, so links need no underline
+ *   --text-muted   darkened --grey for secondary text (6.5:1 on white; --grey itself is only 2.9:1)
+ *   --border-strong darkened --grey for input borders (3.8:1 on white, the 3:1 minimum for controls)
+ */
+:root {
+  --ink: #121210;
+  --paper: #ffffff;
+  --sand: #ede7df;
+  --sand-2: #e9dfd7;
+  --sky: #d9e8f1;
+  --mist: #bdd2dc;
+  --stone: #cdcecc;
+  --grey: #959897;
+
+  --brand: #356a82;
+  --brand-strong: #264f63;
+  --text-muted: #55595a;
+  --border-strong: #7f8381;
+
+  --radius: 1rem;
+  --shadow:
+    0 1px 2px rgb(18 18 16 / 0.05), 0 6px 20px -8px rgb(18 18 16 / 0.12);
+}
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-muted: var(--muted);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --color-primary: var(--brand);
+  --color-primary-foreground: var(--paper);
+  --color-muted: var(--sand);
+  --color-input: var(--border-strong);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-sand: var(--sand);
+  --color-sky: var(--sky);
+  --color-mist: var(--mist);
+  --color-stone: var(--stone);
+  --color-ring: var(--brand);
   --font-sans: system-ui, 'Noto Sans Myanmar', sans-serif;
 }
-:root {
-  --background: #faf9f6;
-  --foreground: #242b28;
-  --primary: #315b4b;
-  --primary-foreground: #fff;
-  --muted: #eaece6;
-  --input: #6b7f74;
-  --ring: #315b4b;
-}
+
 @layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 6rem;
+  }
   body {
-    @apply m-0 bg-background font-sans text-base text-foreground;
-    line-height: 1.8;
+    @apply m-0 bg-background font-sans text-base text-foreground antialiased;
+    line-height: 1.7;
   }
   :lang(my) {
     font-family: 'Noto Sans Myanmar', system-ui, sans-serif;
     line-height: 2;
   }
-  a {
-    text-underline-offset: 0.25em;
+  h1,
+  h2,
+  h3 {
+    line-height: 1.25;
+    letter-spacing: -0.01em;
   }
-  a:focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 4px;
+  :lang(my) :is(h1, h2, h3) {
+    line-height: 1.6;
+    letter-spacing: 0;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  ::selection {
+    background: var(--mist);
+  }
+  :focus-visible {
+    outline: 3px solid var(--brand);
+    outline-offset: 3px;
+    border-radius: 0.5rem;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition: none !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .skip-link {
+    @apply sr-only;
+  }
+  .skip-link:focus {
+    @apply not-sr-only fixed start-4 top-4 z-50 rounded-full bg-foreground px-5 py-3 text-primary-foreground;
+  }
+
+  /* Header and footer */
+  .site-header {
+    @apply sticky top-0 z-40 border-b border-stone/70 bg-white/85 backdrop-blur;
+  }
+  .site-header__inner {
+    @apply mx-auto flex w-full max-w-5xl flex-wrap items-center gap-x-4 gap-y-1 px-5 py-2;
+  }
+  .brand {
+    @apply me-auto inline-flex min-h-11 items-center gap-3 rounded-full pe-3 text-lg font-bold;
+  }
+  .brand img {
+    @apply size-11 shrink-0;
+  }
+  .nav-link {
+    @apply inline-flex min-h-11 items-center rounded-full px-4 font-medium transition-colors hover:bg-sky;
+  }
+  .nav-link[aria-current] {
+    @apply bg-sky font-semibold;
+  }
+  .segmented {
+    @apply inline-flex items-center gap-1 rounded-full bg-sand p-1;
+  }
+  .segmented a {
+    @apply inline-flex min-h-11 items-center rounded-full px-4 font-medium transition-colors hover:bg-white/70;
+  }
+  .segmented a[aria-current] {
+    @apply bg-white font-semibold shadow-sm;
+  }
+  .site-footer {
+    @apply mt-16 bg-sand;
+  }
+  .site-footer__inner {
+    @apply mx-auto w-full max-w-5xl space-y-3 px-5 py-8 text-sm;
+  }
+  .footer-link {
+    @apply inline-flex min-h-11 items-center rounded-full px-3 font-medium text-brand transition-colors hover:bg-white/70 hover:text-brand-strong;
+  }
+  .footer-link[aria-current] {
+    @apply bg-white font-semibold;
+  }
+
+  /* Layout */
+  .page {
+    @apply mx-auto w-full max-w-5xl flex-1 space-y-10 px-5 pb-4 pt-8 sm:pt-12;
+  }
+  .lead {
+    @apply max-w-prose text-lg;
+    color: var(--text-muted);
+  }
+  .eyebrow {
+    @apply text-sm font-semibold uppercase tracking-wide text-brand;
+  }
+  .hero {
+    @apply grid items-center gap-8 rounded-3xl p-6 sm:p-10 md:grid-cols-[1fr_auto];
+    background: linear-gradient(135deg, var(--sand) 0%, var(--sky) 100%);
+  }
+  .hero img {
+    @apply mx-auto size-32 max-md:order-first sm:size-44 md:order-last md:size-52;
+  }
+
+  /* Links, buttons, chips */
+  .link {
+    @apply font-semibold text-brand transition-colors hover:text-brand-strong hover:underline;
+    text-underline-offset: 0.2em;
+  }
+  .btn {
+    @apply inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-full px-6 py-2 font-semibold transition hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply bg-brand text-primary-foreground shadow-sm hover:bg-brand-strong;
+  }
+  .btn-outline {
+    @apply border border-brand bg-white text-brand hover:bg-sky hover:text-brand-strong;
+  }
+  .chip {
+    @apply inline-flex min-h-11 cursor-pointer items-center rounded-full bg-sky px-4 py-1 text-sm font-medium transition-colors hover:bg-mist;
+  }
+  .badge {
+    @apply inline-flex items-center rounded-full bg-sand px-3 py-0.5 text-sm font-medium;
+    color: var(--text-muted);
+  }
+
+  /* Cards */
+  .card {
+    @apply relative rounded-2xl border border-stone bg-white p-5 transition;
+    box-shadow: var(--shadow);
+  }
+  .card-link {
+    @apply hover:-translate-y-0.5 hover:border-mist;
+  }
+  .card-link a::after {
+    content: '';
+    @apply absolute inset-0 rounded-2xl;
+  }
+  .card-link a:focus-visible {
+    outline: none;
+  }
+  .card-link:has(a:focus-visible) {
+    outline: 3px solid var(--brand);
+    outline-offset: 3px;
+  }
+  .muted {
+    color: var(--text-muted);
+  }
+
+  /* Forms */
+  .field {
+    @apply min-h-12 w-full rounded-xl border bg-white px-4 text-base transition;
+    border-color: var(--border-strong);
+  }
+  .field:focus-visible {
+    outline: 3px solid var(--brand);
+    outline-offset: 1px;
+    border-color: var(--brand);
+  }
+  .field-wrap {
+    @apply relative;
+  }
+  .field-wrap svg {
+    @apply pointer-events-none absolute start-4 top-1/2 size-5 -translate-y-1/2;
+    color: var(--text-muted);
+  }
+  .field-wrap .field {
+    @apply ps-12;
+  }
+
+  /* Folder tree and breadcrumbs */
+  .tree {
+    @apply space-y-1;
+  }
+  .tree .tree {
+    @apply ms-3 mt-1 border-s-2 border-sky ps-3;
+  }
+  .tree-row {
+    @apply flex min-h-11 items-center justify-between gap-3 rounded-xl px-3 py-1 transition-colors hover:bg-sand;
+  }
+  .crumbs {
+    @apply flex flex-wrap items-center gap-x-1 gap-y-1 text-sm;
+  }
+  .crumbs a {
+    @apply inline-flex min-h-11 items-center rounded-full px-3 font-medium text-brand transition-colors hover:bg-sky;
+  }
+  .crumbs [aria-current] {
+    @apply inline-flex min-h-11 items-center rounded-full bg-sand px-3 font-semibold;
+  }
+  .pager {
+    @apply flex flex-wrap items-center gap-2;
+  }
+  .pager a {
+    @apply inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-4 font-medium text-brand transition-colors hover:bg-sky;
+  }
+  .pager a[aria-current] {
+    @apply bg-foreground text-primary-foreground hover:bg-foreground;
   }
 }

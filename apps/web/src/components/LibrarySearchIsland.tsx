@@ -62,11 +62,11 @@ function Card({
   onTag: (tag: string) => void;
 }) {
   return (
-    <li className="space-y-2 rounded-md border border-input bg-background p-4">
-      <h3 className="font-medium" lang={record.language}>
+    <li className="card space-y-3">
+      <h3 className="text-lg font-semibold" lang={record.language}>
         {record.title}
         {record.titleNote ? (
-          <span className="font-normal"> ({record.titleNote})</span>
+          <span className="muted font-normal"> ({record.titleNote})</span>
         ) : null}
       </h3>
       <ul className="flex flex-wrap gap-2" aria-label={labels.folder}>
@@ -75,7 +75,7 @@ function Card({
             <button
               type="button"
               lang={languageOf(tag)}
-              className="min-h-11 rounded-md bg-muted px-3 py-1 text-sm underline"
+              className="chip"
               onClick={() => onTag(tag)}
             >
               {tag}
@@ -83,16 +83,18 @@ function Card({
           </li>
         ))}
       </ul>
-      <p className="flex flex-wrap items-center gap-4 text-sm">
+      <p className="flex flex-wrap items-center gap-3 text-sm">
         <a
-          className="inline-flex min-h-11 items-center underline"
+          className="btn btn-outline"
           href={fileUrl(cdnBase, record.key)}
           aria-label={`${labels.download}: ${record.title}`}
           rel="noopener"
         >
           {labels.download}
         </a>
-        <span>{formatSize(record.sizeBytes, formatLocale)}</span>
+        <span className="badge">
+          {formatSize(record.sizeBytes, formatLocale)}
+        </span>
       </p>
     </li>
   );
@@ -208,19 +210,32 @@ export default function LibrarySearchIsland({
       <div className="flex flex-wrap items-end gap-3">
         <label className="grow space-y-1">
           <span className="block font-medium">{labels.searchLabel}</span>
-          <input
-            ref={input}
-            type="search"
-            className="min-h-11 w-full rounded-md border border-input bg-background px-3"
-            value={query}
-            placeholder={labels.searchPlaceholder}
-            autoComplete="off"
-            onFocus={() => void load()}
-            onChange={(event) => {
-              void load();
-              update({ q: event.target.value });
-            }}
-          />
+          <span className="field-wrap block">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
+            <input
+              ref={input}
+              type="search"
+              className="field"
+              value={query}
+              placeholder={labels.searchPlaceholder}
+              autoComplete="off"
+              onFocus={() => void load()}
+              onChange={(event) => {
+                void load();
+                update({ q: event.target.value });
+              }}
+            />
+          </span>
         </label>
         {active ? (
           <Button
@@ -239,10 +254,7 @@ export default function LibrarySearchIsland({
       {tag ? (
         <p className="flex flex-wrap items-center gap-2">
           <span>{labels.folder}:</span>
-          <span
-            lang={languageOf(tag)}
-            className="rounded-md bg-muted px-3 py-1"
-          >
+          <span lang={languageOf(tag)} className="chip">
             {tag}
           </span>
           <Button
@@ -279,7 +291,7 @@ export default function LibrarySearchIsland({
 
       {exact.length > 0 ? (
         <>
-          <h2 className="text-xl font-bold">{labels.results}</h2>
+          <h2 className="text-2xl font-bold">{labels.results}</h2>
           <ul className="space-y-3">{exact.slice(0, visible).map(card)}</ul>
           {exact.length > visible ? (
             <Button
@@ -295,21 +307,21 @@ export default function LibrarySearchIsland({
 
       {similar.length > 0 ? (
         <>
-          <h2 className="text-xl font-bold">{labels.similarBooks}</h2>
+          <h2 className="text-2xl font-bold">{labels.similarBooks}</h2>
           <ul className="space-y-3">{similar.map(card)}</ul>
         </>
       ) : null}
 
       {exact.length === 0 && suggestions.length > 0 ? (
         <div className="space-y-2">
-          <h2 className="text-xl font-bold">{labels.tryFolders}</h2>
+          <h2 className="text-2xl font-bold">{labels.tryFolders}</h2>
           <ul className="flex flex-wrap gap-2">
             {suggestions.map((suggestion) => (
               <li key={suggestion}>
                 <button
                   type="button"
                   lang={languageOf(suggestion)}
-                  className="min-h-11 rounded-md bg-muted px-3 py-1 underline"
+                  className="chip"
                   onClick={() => update({ tag: suggestion })}
                 >
                   {suggestion}
