@@ -132,6 +132,7 @@ console.error(
 for (const key of skipped.notPdf) console.error(`non-PDF: ${key}`);
 for (const [dropped, keptKey] of duplicates)
   console.error(`duplicate: ${dropped}\n   kept: ${keptKey}`);
+zawgyi.suspicious = zawgyi.suspicious.filter((key) => !overrides[key]); // already corrected by a person
 console.error(
   `Zawgyi: ${zawgyi.converted.length} converted (review zawgyi-review.json),` +
     ` ${zawgyi.suspicious.length} suspicious, ${zawgyi.ambiguous.length} ambiguous (left unchanged)`,

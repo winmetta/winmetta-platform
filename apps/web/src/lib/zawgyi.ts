@@ -41,37 +41,60 @@ export interface TitleFix {
   titleNote?: string;
 }
 
+interface TextFix {
+  verdict: ZawgyiVerdict;
+  probability: number;
+  text: string;
+}
+
+/** Classifies one piece of text on its own; only this text is ever converted. */
+function fixText(
+  text: string,
+  detector: ZawgyiDetector,
+  converter: ZawgyiConverter,
+): TextFix {
+  if (!myanmar.test(text)) return { verdict: 'unicode', probability: 0, text };
+  const probability = detector.getZawgyiProbability(text);
+  const marker = hasZawgyiMarker(text);
+  if (marker && probability >= CONVERT_THRESHOLD)
+    return {
+      verdict: 'converted',
+      probability,
+      text: converter.zawgyiToUnicode(text),
+    };
+  if (marker) return { verdict: 'suspicious', probability, text };
+  if (probability > AMBIGUOUS_THRESHOLD)
+    return { verdict: 'ambiguous', probability, text };
+  return { verdict: 'unicode', probability, text };
+}
+
+const severity: Record<ZawgyiVerdict, number> = {
+  unicode: 0,
+  ambiguous: 1,
+  suspicious: 2,
+  converted: 3,
+};
+
+/**
+ * The title and its parenthetical note are classified and converted independently: a
+ * filename can mix a Unicode title with a Zawgyi note (or the reverse), and converting
+ * already-Unicode text corrupts it. The verdict reports the most notable part.
+ */
 export function fixZawgyiTitle(
   parts: { title: string; titleNote?: string },
   detector: ZawgyiDetector,
   converter: ZawgyiConverter,
 ): TitleFix {
-  const whole = [parts.title, parts.titleNote].filter(Boolean).join(' ');
-  const unchanged = (
-    verdict: ZawgyiVerdict,
-    probability: number,
-  ): TitleFix => ({
-    verdict,
-    probability,
-    title: parts.title,
-    ...(parts.titleNote ? { titleNote: parts.titleNote } : {}),
-  });
-  if (!myanmar.test(whole)) return unchanged('unicode', 0);
-  const probability = detector.getZawgyiProbability(whole);
-  const marker = hasZawgyiMarker(whole);
-  if (marker && probability >= CONVERT_THRESHOLD) {
-    const note = parts.titleNote
-      ? { titleNote: converter.zawgyiToUnicode(parts.titleNote) }
-      : {};
-    return {
-      verdict: 'converted',
-      probability,
-      title: converter.zawgyiToUnicode(parts.title),
-      ...note,
-    };
-  }
-  if (marker) return unchanged('suspicious', probability);
-  if (probability > AMBIGUOUS_THRESHOLD)
-    return unchanged('ambiguous', probability);
-  return unchanged('unicode', probability);
+  const title = fixText(parts.title, detector, converter);
+  const note = parts.titleNote
+    ? fixText(parts.titleNote, detector, converter)
+    : undefined;
+  const notable =
+    note && severity[note.verdict] > severity[title.verdict] ? note : title;
+  return {
+    verdict: notable.verdict,
+    probability: Math.max(title.probability, note?.probability ?? 0),
+    title: title.text,
+    ...(note ? { titleNote: note.text } : {}),
+  };
 }

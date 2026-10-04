@@ -44,6 +44,32 @@ describe('fixZawgyiTitle', () => {
       titleNote: 'converted:စူဠဗုဒၶေဃာသ',
     });
   });
+  it('converts only the part that is Zawgyi, not a Unicode title with a Zawgyi note', () => {
+    // Reported in PR review: the title has no Zawgyi marker of its own.
+    const byText: ZawgyiDetector = {
+      getZawgyiProbability: (text) => (text.includes('ေတာ္') ? 1 : 0),
+    };
+    const fix = fixZawgyiTitle(
+      { title: 'ဥပါသေကာပဒေသကထာ', titleNote: '၀ိသုဒၶါ႐ုံဆရာေတာ္' },
+      byText,
+      converter,
+    );
+    expect(fix.verdict).toBe('converted');
+    expect(fix.title).toBe('ဥပါသေကာပဒေသကထာ');
+    expect(fix.titleNote).toBe('converted:၀ိသုဒၶါ႐ုံဆရာေတာ္');
+  });
+  it('converts only the title when the note is Unicode', () => {
+    const byText: ZawgyiDetector = {
+      getZawgyiProbability: (text) => (text.includes('ေတာ္') ? 1 : 0),
+    };
+    const fix = fixZawgyiTitle(
+      { title: 'ရခိုင္ မဟာရာဇဝင္ေတာ္ႀကီး', titleNote: 'ဆရာတော်' },
+      byText,
+      converter,
+    );
+    expect(fix.title).toBe('converted:ရခိုင္ မဟာရာဇဝင္ေတာ္ႀကီး');
+    expect(fix.titleNote).toBe('ဆရာတော်');
+  });
   it('leaves Pāḷi that only trips the detector unchanged', () => {
     const fix = fixZawgyiTitle({ title: 'ဓမ္မပဒ' }, detector(0.99), converter);
     expect(fix).toEqual({
