@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { readFileSync, writeFileSync } from 'node:fs';
 import {
+  compareLibraryOrder,
   duplicateIdentity,
   fileUrl,
   recordFromObject,
@@ -110,7 +111,8 @@ for (const group of groups.values()) {
   for (const dropped of group.slice(1))
     duplicates.push([dropped.key, group[0].key]);
 }
-kept.sort((a, b) => compare(a.key, b.key));
+// Folder sequence (1-12 Burmese, then 13-18), then title; raw key order would not keep it.
+kept.sort(compareLibraryOrder);
 
 // Every automatic conversion is listed for review by a Burmese speaker. Wrong ones are fixed
 // by setting title/titleNote for that key in overrides.json (overrides win on the next run).

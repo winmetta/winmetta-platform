@@ -133,6 +133,7 @@ export class LibrarySearch {
     });
   }
 
+  /** `records` must be in library order (`compareLibraryOrder`): it is the final tie-breaker. */
   static build(records: readonly LibraryFile[]): LibrarySearch {
     const index = new MiniSearch<Doc>(options);
     index.addAll(

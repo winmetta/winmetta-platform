@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  compareLibraryOrder,
   duplicateIdentity,
   fileUrl,
   partsFromKey,
@@ -110,5 +111,54 @@ describe('recordFromObject', () => {
     expect(duplicateIdentity(a)).not.toBe(
       duplicateIdentity({ ...b, sizeBytes: 5 }),
     );
+  });
+});
+describe('compareLibraryOrder', () => {
+  const record = (key: string, title = 'x') => ({
+    ...recordFromObject(
+      { Key: key, Size: 1, LastModified: '2023-01-01T00:00:00Z' },
+      'id',
+    ),
+    title,
+  });
+  const folders = (keys: string[]) =>
+    keys
+      .map((key) => record(key))
+      .sort(compareLibraryOrder)
+      .map((r) => r.key.split('/')[0]);
+  it('orders folders by their number, Burmese and English alike', () => {
+    expect(
+      folders([
+        '13. Rare-Buddhist-Books-1/a.pdf',
+        '၁၀။ မြန်မာရှား (၁)/a.pdf',
+        '၁။ ပါဠိတော်/a.pdf',
+        '၁၂။ ပိဋကလမ်းညွှန်/a.pdf',
+        '၂။ အဋ္ဌကထာ/a.pdf',
+        '18. Ashin-Kelasa/a.pdf',
+        '၉။ ပေမူများ/a.pdf',
+      ]),
+    ).toEqual([
+      '၁။ ပါဠိတော်',
+      '၂။ အဋ္ဌကထာ',
+      '၉။ ပေမူများ',
+      '၁၀။ မြန်မာရှား (၁)',
+      '၁၂။ ပိဋကလမ်းညွှန်',
+      '13. Rare-Buddhist-Books-1',
+      '18. Ashin-Kelasa',
+    ]);
+  });
+  it('orders subfolders and then titles by number value', () => {
+    const ordered = [
+      record('၁၀။ မ/၂။ က/a.pdf', 'စာ ၁၀'),
+      record('၁၀။ မ/၂။ က/b.pdf', 'စာ ၂'),
+      record('၁၀။ မ/၁၀။ ခ/c.pdf', 'စာ'),
+      record('၁၀။ မ/၁။ ဂ/d.pdf', 'စာ'),
+    ].sort(compareLibraryOrder);
+    expect(ordered.map((r) => r.key.split('/').slice(1).join('/'))).toEqual([
+      '၁။ ဂ/d.pdf',
+      '၂။ က/b.pdf',
+      '၂။ က/a.pdf',
+      '၁၀။ ခ/c.pdf',
+    ]);
   });
 });
