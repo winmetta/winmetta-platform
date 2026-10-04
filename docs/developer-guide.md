@@ -4,7 +4,7 @@ How to set up, change and submit code for `winmetta-platform`. [CONTRIBUTING.md]
 
 ## 1. Before you start
 
-- This is a volunteer-run nonprofit teaching Theravāda Buddhism in the Pa-Auk tradition. Treat teachings, teachers and Pāḷi/Burmese text with care: use correct titles (Sayadaw, Ven., U) and diacritics (Theravāda, Pāḷi, Tipiṭaka), and never paraphrase or "improve" doctrinal content.
+- This is a volunteer-run nonprofit teaching Theravāda Buddhism, and supports any Theravāda tradition. Treat teachings, teachers and Pāḷi/Burmese text with care: use correct titles (Sayadaw, Ven., U) and diacritics (Theravāda, Pāḷi, Tipiṭaka), and never paraphrase or "improve" doctrinal content.
 - **This repo is public.** Git history is effectively permanent. Read [AGENTS.md](../AGENTS.md) §2 before your first commit.
 - Check the current phase in the implementation plan. Don't build deferred features (analytics, backend or database, accounts, offline/PWA, `apps/desktop`, `apps/mobile`).
 
@@ -43,7 +43,7 @@ Keep code in `apps/web` until a second consumer needs it. Only then extract a pa
 | `npm run typecheck` | `astro check` (strict TypeScript). |
 | `npm test` | Vitest unit tests. |
 | `npm run build` | Static production build. |
-| `npm run test:smoke` | Playwright tests against the built site. Run `npm run build` first. The first time, run `npx playwright install chromium`. |
+| `npm run test:smoke` | Playwright tests against the built site (served on port 4331, so a running dev server on 4321 is never reused). Run `npm run build` first. The first time, run `npx playwright install chromium`. |
 
 CI runs all of these on every pull request and does not deploy. Run lint, typecheck, test and build locally before pushing.
 
@@ -60,6 +60,7 @@ Never put secrets in `PUBLIC_*` variables, because they can appear in the genera
 
 - TypeScript strict mode. No `any`; use `unknown` and type guards.
 - Styling with Tailwind utilities and shadcn/Radix primitives. Prefer logical properties (`ps-*`, `ms-*`) so layouts survive text expansion.
+- **Look and feel:** use the design tokens and component classes in `apps/web/src/styles/global.css` (palette from the Win Metta Brand Kit in Canva; derived colors are documented there with their contrast ratios). Interactive elements keep a 44 px target and a visible focus ring. Links are not underlined (see AGENTS.md §6 for the rule and why inline links are semibold brand color). Check new colors for contrast before adding them.
 - Design for mobile and desktop. Interactive elements need touch targets (`min-h-11`) and keyboard access, with visible focus. UI components need accessible names; the ESLint a11y rules run on `.tsx`.
 - No vanity metrics (streaks, leaderboards, badges) or engagement-optimized patterns. No analytics SDKs.
 - Core content must work without login.
