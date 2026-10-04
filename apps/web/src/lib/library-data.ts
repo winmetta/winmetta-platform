@@ -1,11 +1,9 @@
 // Build-time only (imports node:crypto): turns the committed manifest into the two static
 // files the browser downloads lazily on first search, and a content hash for their URLs.
 import { createHash } from 'node:crypto';
-import manifest from '../library/manifest.json';
+import { files } from './library-catalog';
 import { LibrarySearch, type SearchRecord } from './library-search';
-import { libraryFileSchema } from './schemas';
 
-const files = libraryFileSchema.array().parse(manifest);
 // Records stay in library order (the manifest order): it is the search tie-breaker.
 const records: SearchRecord[] = files.map((file) => ({
   id: file.id,

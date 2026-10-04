@@ -9,6 +9,9 @@ export const cleanDisplay = (value: string): string =>
     .replace(/[\u200B-\u200D]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
+/** Display name of one folder segment: number prefix and zero-width characters removed. */
+export const folderName = (segment: string): string =>
+  cleanDisplay(cleanDisplay(segment).replace(numberPrefix, ''));
 export interface KeyParts {
   tagPath: string[];
   tags: string[];
@@ -19,9 +22,7 @@ export interface KeyParts {
 export function partsFromKey(key: string): KeyParts {
   const segments = key.split('/');
   const filename = segments.pop() ?? '';
-  const tagPath = segments.map((segment) =>
-    cleanDisplay(cleanDisplay(segment).replace(numberPrefix, '')),
-  );
+  const tagPath = segments.map(folderName);
   const seen = new Set<string>();
   const tags = tagPath.filter((tag) => {
     const identity = normalizeSearch(tag);
@@ -112,6 +113,18 @@ const naturalText = (text: string): string =>
   normalizeSearch(text).replace(/\d+/g, (digits) => digits.padStart(10, '0'));
 const compareText = (a: string, b: string): number =>
   a < b ? -1 : a > b ? 1 : 0;
+/** Folder paths ("a/b") in folder sequence: numeric prefixes compare by value, per segment. */
+export function compareFolderPath(a: string, b: string): number {
+  const [sa, sb] = [
+    a.split('/').map(naturalText),
+    b.split('/').map(naturalText),
+  ];
+  for (let i = 0; i < Math.min(sa.length, sb.length); i++) {
+    const order = compareText(sa[i] ?? '', sb[i] ?? '');
+    if (order) return order;
+  }
+  return sa.length - sb.length;
+}
 /**
  * Library order: folder sequence (the numeric prefix of each folder, 1-12 Burmese then 13-18
  * English), then title, then note, then the raw key. Raw key order would put folders 13-18

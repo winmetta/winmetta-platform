@@ -109,6 +109,13 @@ export const libraryFileSchema = z.object({
   format: z.literal('pdf'),
   lastModified: z.iso.datetime(),
 });
+// One folder of the S3 bucket. The id is assigned once by the generator and then kept, so folder
+// page URLs survive a folder being renamed (update `path` by hand). `path` is the exact key prefix.
+export const folderEntrySchema = z.object({
+  id: z.string().regex(/^f[0-9]{3,}$/),
+  path: text,
+});
+export type FolderEntry = z.infer<typeof folderEntrySchema>;
 export type LibraryFile = z.infer<typeof libraryFileSchema>;
 export type Resource = z.infer<typeof resourceSchema>;
 export type Recurrence = z.infer<typeof recurrenceSchema>;

@@ -6,14 +6,18 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import {
+  compareFolderPath,
   compareLibraryOrder,
   duplicateIdentity,
   fileUrl,
   recordFromObject,
 } from '../apps/web/src/lib/library-index.ts';
-import { libraryFileSchema } from '../apps/web/src/lib/schemas.ts';
+import {
+  folderEntrySchema,
+  libraryFileSchema,
+} from '../apps/web/src/lib/schemas.ts';
 import { fixZawgyiTitle, hasZawgyiMarker } from '../apps/web/src/lib/zawgyi.ts';
 
 // myanmar-tools is pinned to 1.1.3: 1.2.0 on npm ships unbuilt sources and cannot be required.
@@ -114,6 +118,31 @@ for (const group of groups.values()) {
 // Folder sequence (1-12 Burmese, then 13-18), then title; raw key order would not keep it.
 kept.sort(compareLibraryOrder);
 
+// folders.json gives every folder a stable ASCII id (used in folder page URLs). Existing ids are
+// kept; new folders get the next number. A folder renamed in S3 needs its `path` edited by hand
+// to keep its id; entries for paths that no longer exist are kept (ids are never reused) and
+// reported.
+const foldersFile = new URL('folders.json', dir);
+const known = existsSync(foldersFile)
+  ? folderEntrySchema
+      .array()
+      .parse(JSON.parse(readFileSync(foldersFile, 'utf8')))
+  : [];
+const idByPath = new Map(known.map((entry) => [entry.path, entry.id]));
+const livePaths = new Set();
+for (const record of kept) {
+  const segments = record.key.split('/').slice(0, -1);
+  segments.forEach((_, i) => livePaths.add(segments.slice(0, i + 1).join('/')));
+}
+let nextId =
+  Math.max(0, ...known.map((entry) => Number(entry.id.slice(1)))) + 1;
+const live = [...livePaths].sort(compareFolderPath).map((path) => ({
+  id: idByPath.get(path) ?? `f${String(nextId++).padStart(3, '0')}`,
+  path,
+}));
+const stale = known.filter((entry) => !livePaths.has(entry.path));
+writeFileSync(foldersFile, `${JSON.stringify([...live, ...stale], null, 2)}\n`);
+
 // Every automatic conversion is listed for review by a Burmese speaker. Wrong ones are fixed
 // by setting title/titleNote for that key in overrides.json (overrides win on the next run).
 zawgyi.converted.sort((a, b) => compare(a.key, b.key));
@@ -141,3 +170,7 @@ console.error(
 );
 for (const key of zawgyi.suspicious) console.error(`zawgyi-suspicious: ${key}`);
 for (const line of zawgyi.tags) console.error(`zawgyi-folder-name: ${line}`);
+const added = live.filter((entry) => !idByPath.has(entry.path)).length;
+console.error(`Folders: ${live.length} (${added} new), ${stale.length} stale`);
+for (const entry of stale)
+  console.error(`stale-folder: ${entry.id} ${entry.path}`);
