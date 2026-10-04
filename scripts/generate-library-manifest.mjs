@@ -5,12 +5,22 @@
 // Overrides (title, titleNote, language, extra tags, hide) live in overrides.json by S3 key.
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { createRequire } from 'node:module';
 import { readFileSync, writeFileSync } from 'node:fs';
 import {
   duplicateIdentity,
+  fileUrl,
   recordFromObject,
 } from '../apps/web/src/lib/library-index.ts';
 import { libraryFileSchema } from '../apps/web/src/lib/schemas.ts';
+import { fixZawgyiTitle, hasZawgyiMarker } from '../apps/web/src/lib/zawgyi.ts';
+
+// myanmar-tools is pinned to 1.1.3: 1.2.0 on npm ships unbuilt sources and cannot be required.
+const { ZawgyiDetector, ZawgyiConverter } = createRequire(import.meta.url)(
+  'myanmar-tools',
+);
+const detector = new ZawgyiDetector();
+const converter = new ZawgyiConverter();
 
 const bucket = process.env.LIBRARY_BUCKET ?? 'dhamma-library';
 const dir = new URL('../apps/web/src/library/', import.meta.url);
@@ -27,6 +37,7 @@ const objects = listing.Contents ?? [];
 const overrides = JSON.parse(readFileSync(new URL('overrides.json', dir)));
 
 const skipped = { empty: 0, notPdf: [] };
+const zawgyi = { converted: [], suspicious: [], ambiguous: [], tags: [] };
 const records = [];
 for (const object of objects) {
   if (object.Size === 0) {
@@ -39,6 +50,23 @@ for (const object of objects) {
   }
   const id = createHash('sha256').update(object.Key).digest('hex').slice(0, 12);
   const record = recordFromObject(object, id);
+  // Legacy Zawgyi filenames: convert only when a marker and the detector agree (see zawgyi.ts).
+  const original = { title: record.title, titleNote: record.titleNote };
+  const zg = fixZawgyiTitle(record, detector, converter);
+  if (zg.verdict === 'converted') {
+    record.title = zg.title;
+    if (zg.titleNote) record.titleNote = zg.titleNote;
+    zawgyi.converted.push({
+      key: object.Key,
+      probability: Number(zg.probability.toFixed(3)),
+      original,
+      converted: { title: record.title, titleNote: record.titleNote },
+    });
+  } else if (zg.verdict !== 'unicode') {
+    zawgyi[zg.verdict].push(object.Key);
+  }
+  for (const tag of record.tagPath)
+    if (hasZawgyiMarker(tag)) zawgyi.tags.push(`${object.Key}: ${tag}`);
   const fix = overrides[object.Key];
   if (fix?.hide) continue;
   if (fix) {
@@ -53,6 +81,7 @@ for (const object of objects) {
     );
     if (tags) record.tags = [...new Set([...record.tags, ...tags])];
   }
+  fileUrl('https://example.invalid', record.key); // throws if the key does not round-trip
   records.push(libraryFileSchema.parse(record));
 }
 
@@ -83,6 +112,15 @@ for (const group of groups.values()) {
 }
 kept.sort((a, b) => compare(a.key, b.key));
 
+// Every automatic conversion is listed for review by a Burmese speaker. Wrong ones are fixed
+// by setting title/titleNote for that key in overrides.json (overrides win on the next run).
+zawgyi.converted.sort((a, b) => compare(a.key, b.key));
+for (const entry of zawgyi.converted)
+  entry.overridden = Boolean(overrides[entry.key]?.title);
+writeFileSync(
+  new URL('zawgyi-review.json', dir),
+  `${JSON.stringify(zawgyi.converted, null, 2)}\n`,
+);
 writeFileSync(
   new URL('manifest.json', dir),
   `${JSON.stringify(kept, null, 2)}\n`,
@@ -94,3 +132,9 @@ console.error(
 for (const key of skipped.notPdf) console.error(`non-PDF: ${key}`);
 for (const [dropped, keptKey] of duplicates)
   console.error(`duplicate: ${dropped}\n   kept: ${keptKey}`);
+console.error(
+  `Zawgyi: ${zawgyi.converted.length} converted (review zawgyi-review.json),` +
+    ` ${zawgyi.suspicious.length} suspicious, ${zawgyi.ambiguous.length} ambiguous (left unchanged)`,
+);
+for (const key of zawgyi.suspicious) console.error(`zawgyi-suspicious: ${key}`);
+for (const line of zawgyi.tags) console.error(`zawgyi-folder-name: ${line}`);
