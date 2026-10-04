@@ -17,7 +17,8 @@
     "format": "prettier --write .",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "test:smoke": "npm run test:smoke --workspace @winmetta/web"
+    "test:smoke": "npm run test:smoke --workspace @winmetta/web",
+    "library:manifest": "node scripts/generate-library-manifest.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",

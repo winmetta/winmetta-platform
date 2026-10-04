@@ -139,7 +139,7 @@ Phase 1 indexes **every PDF in the existing S3 bucket `dhamma-library`** (audite
 
 * [ ] Home, About, Privacy, Classes and Dhamma Library built in both locales (10 localized page routes plus the root language entry page), with original layouts.
 * [ ] Curated, verified public content: About text and class summaries with Pacific/Myanmar schedules, with source URLs and verification dates.
-* [ ] Library manifest generator (`scripts/`): lists the S3 bucket with a read-only AWS profile and writes the committed manifest plus an overrides file; skips `done.txt` and zero-byte objects, reports non-PDF files, detects duplicates by normalized path/name/size (for example the 9 under `၉။ ပေမူများ`), fails on keys that do not round-trip through URL encoding, and sorts output deterministically.
+* [ ] Library manifest generator (`scripts/`): lists the S3 bucket with a read-only AWS profile and writes the committed manifest plus an overrides file; skips zero-byte objects, reports non-PDF files, detects duplicates by normalized path/name/size (for example the 9 under `၉။ ပေမူများ`), fails on keys that do not round-trip through URL encoding, and sorts output deterministically.
 * [ ] `libraryFileSchema` and manifest validation in CI; the build needs no AWS credentials.
 * [ ] Shared search normalization (NFC, zero-width removal, ဥ/ဉ, Burmese/ASCII digits, Latin diacritics) and a Myanmar syllable segmentation helper, both unit-tested with real Burmese titles.
 * [ ] MiniSearch index built at build time and lazily loaded: Burmese n-gram tokenizer, AND of space-separated chunks, syllable-start matching, tiered ranking, labelled "Similar books" fuzzy group, tag suggestions on empty results.

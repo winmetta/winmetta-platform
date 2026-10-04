@@ -96,5 +96,19 @@ export const classSchema = editorial
     resourceIds: z.array(id).default([]),
   })
   .refine(hasSource, 'Source translation required');
+// Generated from the S3 bucket by scripts/generate-library-manifest.mjs.
+export const libraryFileSchema = z.object({
+  id,
+  key: text,
+  title: text,
+  titleNote: text.optional(),
+  tags: z.array(text),
+  tagPath: z.array(text),
+  language,
+  sizeBytes: z.number().int().nonnegative(),
+  format: z.literal('pdf'),
+  lastModified: z.iso.datetime(),
+});
+export type LibraryFile = z.infer<typeof libraryFileSchema>;
 export type Resource = z.infer<typeof resourceSchema>;
 export type Recurrence = z.infer<typeof recurrenceSchema>;
