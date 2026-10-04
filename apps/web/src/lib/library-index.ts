@@ -31,13 +31,32 @@ export function partsFromKey(key: string): KeyParts {
   });
   return { tagPath, tags, sortPath: segments, filename };
 }
-/** "Name (Note).pdf" becomes title "Name" and titleNote "Note". */
+/**
+ * Filenames often have a doubled "))" or a ")" with no "(" (both unreadable in a title), or a
+ * dangling "(" at the end. Drops every ")" that has no opening "(" and a trailing "(".
+ */
+function dropStrayParentheses(text: string): string {
+  let depth = 0;
+  let result = '';
+  for (const char of text) {
+    if (char === ')') {
+      if (depth === 0) continue;
+      depth--;
+    } else if (char === '(') depth++;
+    result += char;
+  }
+  return result.replace(/\s*\(\s*$/, '');
+}
+/** "Name (Note).pdf" becomes title "Name" and titleNote "Note"; an unclosed "(" is handled too. */
 export function titleFromFilename(filename: string): {
   title: string;
   titleNote?: string;
 } {
-  const base = cleanDisplay(filename.replace(/\.pdf$/i, ''));
-  const match = /^(.*\S)\s*\(([^()]+)\)$/.exec(base);
+  const base = cleanDisplay(
+    dropStrayParentheses(filename.replace(/\.pdf$/i, '')),
+  );
+  // The closing ")" is sometimes missing from the filename: "Name (Note.pdf" is Name + Note.
+  const match = /^(.*\S)\s*\(([^()]+)\)?$/.exec(base);
   if (match?.[1] && match[2]) {
     return { title: match[1], titleNote: cleanDisplay(match[2]) };
   }

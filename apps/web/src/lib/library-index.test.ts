@@ -40,6 +40,36 @@ describe('titleFromFilename', () => {
       title: 'BuddhavamsaAth Tran.',
     });
   });
+  it('treats an unclosed parenthesis as a title and note', () => {
+    expect(
+      titleFromFilename('Digha Nikaya I,II,III (Maurice Walshe.pdf'),
+    ).toEqual({ title: 'Digha Nikaya I,II,III', titleNote: 'Maurice Walshe' });
+  });
+  it('drops a doubled closing parenthesis', () => {
+    expect(
+      titleFromFilename('History of Buddhism in Ceylon (W. Rahula)).pdf'),
+    ).toEqual({
+      title: 'History of Buddhism in Ceylon',
+      titleNote: 'W. Rahula',
+    });
+  });
+  it('drops a closing parenthesis that has no opening one', () => {
+    expect(titleFromFilename('မြန်န်မာသမိုင်းပုံ Dr. သန်းထွန်း).pdf')).toEqual({
+      title: 'မြန်န်မာသမိုင်းပုံ Dr. သန်းထွန်း',
+    });
+  });
+  it('drops a dangling opening parenthesis at the end', () => {
+    expect(titleFromFilename('အဖြေ (ပခုက္ကူအရှင်ကေလသ(.pdf')).toEqual({
+      title: 'အဖြေ',
+      titleNote: 'ပခုက္ကူအရှင်ကေလသ',
+    });
+  });
+  it('keeps balanced parentheses untouched', () => {
+    expect(titleFromFilename('Name (A) (B).pdf')).toEqual({
+      title: 'Name (A)',
+      titleNote: 'B',
+    });
+  });
   it('keeps titles that are only a parenthetical', () => {
     expect(titleFromFilename('(စာ).pdf')).toEqual({ title: '(စာ)' });
   });
