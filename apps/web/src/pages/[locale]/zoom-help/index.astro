@@ -1,0 +1,102 @@
+---
+import Shell from '../../../layouts/Shell.astro';
+import { localeCodes, type Locale } from '../../../i18n/locales';
+import { t, type MessageKey } from '../../../i18n/messages';
+import { route } from '../../../i18n/routes';
+import BrandIcon from '../../../components/BrandIcon.astro';
+import guide from '../../../content/zoom-help.json';
+export function getStaticPaths() {
+  return localeCodes.map((locale) => ({
+    params: { locale },
+    props: { locale },
+  }));
+}
+interface Props {
+  locale: Locale;
+}
+interface Section {
+  id: string;
+  heading: string;
+  paragraphs?: string[];
+  steps?: string[];
+  links?: { label: string; url: string }[];
+}
+const { locale } = Astro.props;
+const text = (key: MessageKey) => t(locale, key);
+const sections = (guide as Record<string, Section[]>)[locale] ?? [];
+const more = [
+  ['Zoom app download', 'https://winmetta.org/2021/10/13/zoom-download/'],
+  [
+    'Zoom user guide (video)',
+    'https://winmetta.org/2021/10/15/zoom-user-guide/',
+  ],
+  [
+    'How to raise hand',
+    'https://winmetta.org/2021/10/15/how-to-raise-hand-in-zoom-meeting/',
+  ],
+  [
+    'How to change your name',
+    'https://winmetta.org/2021/10/23/zoom-how-to-change-name/',
+  ],
+] as const;
+---
+
+<Shell locale={locale} title={text('zoomHelpTitle')} page="zoomHelp">
+  <header class="space-y-4">
+    <h1 class="icon-link text-3xl font-bold sm:text-4xl">
+      <BrandIcon name="zoom" />{text('zoomHelpTitle')}
+    </h1>
+    <p class="lead">{text('zoomHelpIntro')}</p>
+  </header>
+  <div class="max-w-3xl space-y-8">
+    {
+      sections.map((section) => (
+        <section class="space-y-3" aria-labelledby={section.id}>
+          <h2 id={section.id} class="text-2xl font-bold">
+            {section.heading}
+          </h2>
+          {section.paragraphs?.map((paragraph) => (
+            <p>{paragraph}</p>
+          ))}
+          {section.steps && (
+            <ol class="list-decimal space-y-1 ps-6">
+              {section.steps.map((step) => (
+                <li>{step}</li>
+              ))}
+            </ol>
+          )}
+          {section.links && (
+            <ul class="space-y-1">
+              {section.links.map((link) => (
+                <li>
+                  <a class="link" href={link.url} rel="noopener">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      ))
+    }
+    <section class="space-y-2">
+      <p>{text('zoomHelpSource')}</p>
+      <ul class="space-y-1">
+        {
+          more.map(([label, url]) => (
+            <li>
+              <a class="link" href={url} rel="noopener">
+                {label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <p>
+        <a class="link" href={route(locale, 'classes')}
+          >{text('classesTitle')}</a
+        >
+      </p>
+    </section>
+  </div>
+</Shell>
