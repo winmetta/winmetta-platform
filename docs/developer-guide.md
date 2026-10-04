@@ -36,7 +36,8 @@ Keep code in `apps/web` until a second consumer needs it. Only then extract a pa
 
 | Command | What it does |
 | --- | --- |
-| `npm run dev` | Dev server on 127.0.0.1:4321. |
+| `npm run dev` | Dev server on 127.0.0.1:4321. Only one can run per project; a second start prints the URL and PID of the running one. `npm run dev -- --force` replaces it. |
+| `npm run dev:stop` | Stop the running dev server. |
 | `npm run lint` | ESLint plus a Prettier check. |
 | `npm run format` | Format the repo with Prettier. |
 | `npm run typecheck` | `astro check` (strict TypeScript). |
@@ -81,7 +82,7 @@ All user-facing text supports English (`en`) and Burmese (`my`).
 - Schemas are in `src/lib/schemas.ts`. Every record has a stable kebab-case `id`, a `sourceLanguage`, `translations` that include the source language, a `sourceUrl` and a `verifiedAt` date.
 - Organize classes by the real class name, with a `curriculum` code and `teacher` as a separate field (see [AGENTS.md](../AGENTS.md) §3). Add a new curriculum to that table before adding its content.
 - **Schedules** store the source IANA timezone and a local weekday/time (ISO weekday, Monday=1 to Sunday=7). Compute occurrences with `occurrenceOn` and show Pacific (`America/Los_Angeles`) and Myanmar (`Asia/Yangon`) by default. Don't compute with the browser's local zone. Nonexistent daylight-saving times are rejected and repeated times resolve to the earlier instant.
-- **Library files** come from a generated manifest of the S3 bucket, not hand-written records (see [tech-architecture.md](tech-architecture.md) §3). Fix a title, author, language or tags in the overrides file, never by renaming S3 objects, and never edit the manifest by hand. Every folder in a file's path is a tag with its number prefix removed. Search normalization treats ဥ/ဉ and Burmese/ASCII digits as equal; change it only with the golden-query tests. The generator command will be listed here when Phase 1 adds it.
+- **Library files** come from a generated manifest of the S3 bucket, not hand-written records (see [tech-architecture.md](tech-architecture.md) §3). Fix a title, author, language or tags in the overrides file, never by renaming S3 objects, and never edit the manifest by hand. Every folder in a file's path is a tag with its number prefix removed, and has a stable id in `folders.json` that its static page URL uses; never change or reuse an id. Search normalization treats ဥ/ဉ and Burmese/ASCII digits as equal; change it only with the golden-query tests. The generator command will be listed here when Phase 1 adds it.
 - **Phase 0 fixtures** are synthetic and use reserved domains (`example.invalid`). Keep them separate from real published content, which arrives in Phase 1.
 
 ## 9. Secrets and personal data
