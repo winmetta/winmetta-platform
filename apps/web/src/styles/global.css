@@ -111,6 +111,27 @@
   .brand img {
     @apply size-11 shrink-0;
   }
+  .menu-button {
+    @apply hidden min-h-11 cursor-pointer items-center rounded-full bg-sand px-5 font-semibold transition-colors hover:bg-sky;
+  }
+  /* The navigation always sits on its own row, so the language switcher stays top right. */
+  .site-nav {
+    @apply order-last flex w-full flex-wrap items-center gap-1 pb-1;
+  }
+  @media (width < 48rem) {
+    html.js .menu-button {
+      @apply inline-flex;
+    }
+    .site-nav {
+      @apply flex-col items-stretch pb-2;
+    }
+    html.js .site-nav:not([data-open]) {
+      @apply hidden;
+    }
+    .site-nav .nav-link {
+      @apply justify-start;
+    }
+  }
   .nav-link {
     @apply inline-flex min-h-11 items-center rounded-full px-4 font-medium transition-colors hover:bg-sky;
   }
@@ -169,11 +190,55 @@
   .btn-primary {
     @apply bg-brand text-primary-foreground shadow-sm hover:bg-brand-strong;
   }
+  /* Zoom's brand blue (#0B5CFF): white text is 5.6:1 */
+  .btn-zoom {
+    @apply text-white shadow-sm;
+    background: #0b5cff;
+  }
+  .btn-zoom:hover {
+    background: #0847c4;
+  }
+  .join-panel {
+    @apply mt-6! flex flex-wrap items-center gap-x-5 gap-y-3 rounded-xl bg-sky/40 p-4;
+  }
+  .join-details {
+    @apply grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm;
+  }
+  .join-details dt {
+    color: var(--text-muted);
+  }
+  .join-details dd {
+    @apply font-semibold;
+  }
   .btn-outline {
     @apply border border-brand bg-white text-brand hover:bg-sky hover:text-brand-strong;
   }
   .chip {
     @apply inline-flex min-h-11 cursor-pointer items-center rounded-full bg-sky px-4 py-1 text-sm font-medium transition-colors hover:bg-mist;
+  }
+  /* Always the top-right of a card: never wraps below the title */
+  .badge-pinned {
+    @apply shrink-0 gap-1.5 whitespace-nowrap;
+  }
+  /* Live-stream marker: icon only, label appears on hover, keyboard focus or tap */
+  .live-icon {
+    @apply relative inline-flex size-9 shrink-0 cursor-help items-center justify-center rounded-full bg-sand;
+    color: var(--text-muted);
+  }
+  .live-icon:focus-visible {
+    outline: 3px solid var(--brand);
+    outline-offset: 2px;
+  }
+  .live-icon::after {
+    content: attr(data-label);
+    @apply pointer-events-none absolute end-0 top-full z-10 mt-1 hidden rounded-lg bg-foreground px-3 py-1 text-sm font-medium whitespace-nowrap text-white;
+  }
+  .live-icon:hover::after,
+  .live-icon:focus::after {
+    @apply block;
+  }
+  .badge .link-icon {
+    @apply size-4;
   }
   .badge {
     @apply inline-flex items-center rounded-full bg-sand px-3 py-0.5 text-sm font-medium;
@@ -199,8 +264,64 @@
     outline: 3px solid var(--brand);
     outline-offset: 3px;
   }
+  .avatar {
+    @apply size-[4.5rem] shrink-0 rounded-full bg-sand object-cover;
+  }
+  .avatar-lg {
+    @apply size-32 sm:size-40;
+  }
   .muted {
     color: var(--text-muted);
+  }
+
+  /* Official service marks next to links (components/BrandIcon.astro) */
+  .brand-icon {
+    @apply inline-flex shrink-0 align-middle;
+  }
+  .brand-icon svg {
+    @apply size-5;
+    fill: currentColor;
+  }
+  .brand-icon--youtube svg {
+    fill: #ff0000;
+  }
+  .brand-icon--facebook svg {
+    fill: #0866ff;
+  }
+  .brand-icon--zoom svg {
+    @apply h-5 w-7;
+    fill: #0b5cff;
+  }
+  .btn-primary .brand-icon svg {
+    fill: #fff;
+  }
+  .link-icon {
+    @apply size-5 shrink-0;
+  }
+  .icon-link {
+    @apply inline-flex items-center gap-2;
+  }
+
+  /* Weekly schedule table: scrolls inside its own box on narrow screens */
+  .schedule-scroll {
+    @apply overflow-x-auto rounded-2xl border border-stone bg-white;
+  }
+  .schedule {
+    @apply w-full min-w-[48rem] border-collapse text-start;
+  }
+  .schedule th,
+  .schedule td {
+    @apply px-4 py-3 text-start align-top;
+  }
+  .schedule thead th {
+    @apply text-sm font-semibold;
+    background: var(--sand);
+  }
+  .schedule tbody tr + tr > * {
+    border-top: 1px solid var(--stone);
+  }
+  .schedule tbody th {
+    @apply font-semibold whitespace-nowrap;
   }
 
   /* Forms */

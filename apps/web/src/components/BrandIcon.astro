@@ -1,0 +1,16 @@
+---
+// Official YouTube, Facebook and Zoom marks (see assets/brand/SOURCES.md). Decorative: the
+// link text next to the icon names the service, so the icon is hidden from screen readers.
+import youtube from '../assets/brand/youtube.svg?raw';
+import facebook from '../assets/brand/facebook.svg?raw';
+import zoom from '../assets/brand/zoom.svg?raw';
+interface Props {
+  name: 'youtube' | 'facebook' | 'zoom';
+}
+const { name } = Astro.props;
+const svg = { youtube, facebook, zoom }[name]
+  .replace(/<title>.*?<\/title>/, '')
+  .replace('role="img"', 'aria-hidden="true" focusable="false"');
+---
+
+<span class={`brand-icon brand-icon--${name}`} set:html={svg} />

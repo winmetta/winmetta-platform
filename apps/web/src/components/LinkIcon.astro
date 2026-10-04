@@ -1,0 +1,63 @@
+---
+// Small line icons for plain links (recordings, course details, book). Decorative: the link
+// text beside the icon names the destination.
+interface Props {
+  name: 'recordings' | 'course' | 'book' | 'live' | 'language' | 'teacher';
+}
+const { name } = Astro.props;
+---
+
+<svg
+  class="link-icon"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  {
+    name === 'teacher' && (
+      <>
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 21a8 8 0 0 1 16 0" />
+      </>
+    )
+  }
+  {
+    name === 'language' && (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" />
+      </>
+    )
+  }
+  {
+    name === 'live' && (
+      <>
+        <circle cx="12" cy="12" r="2" />
+        <path d="M16.2 7.8a6 6 0 0 1 0 8.4M7.8 16.2a6 6 0 0 1 0-8.4" />
+        <path d="M19 5a10 10 0 0 1 0 14M5 19A10 10 0 0 1 5 5" />
+      </>
+    )
+  }
+  {
+    name === 'recordings' && (
+      <>
+        <rect x="2" y="5" width="20" height="14" rx="3" />
+        <path d="m10 9 5 3-5 3z" />
+      </>
+    )
+  }
+  {
+    (name === 'course' || name === 'book') && (
+      <>
+        <path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" />
+        <path d="M4 21a2 2 0 0 0 2 2h13v-4" />
+        <path d="M9 7h6" />
+      </>
+    )
+  }
+</svg>

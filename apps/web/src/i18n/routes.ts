@@ -4,6 +4,11 @@ export const pagePaths = {
   home: '',
   about: 'about/',
   privacy: 'privacy/',
+  classes: 'classes/',
+  studyGroups: 'study-groups/',
+  retreats: 'retreats/',
+  teachers: 'teachers/',
+  zoomHelp: 'zoom-help/',
   library: 'dhamma-library/',
 } as const;
 export type PageId = keyof typeof pagePaths;
@@ -13,6 +18,14 @@ export function route(locale: Locale, page: PageId = 'home'): string {
 /** Static folder page; page 1 has no page segment, later pages are .../2/, .../3/. */
 export function folderRoute(locale: Locale, id: string, page = 1): string {
   return `/${locale}/dhamma-library/folders/${id}/${page > 1 ? `${page}/` : ''}`;
+}
+/** Retreat detail page. */
+export function retreatRoute(locale: Locale, id: string): string {
+  return `/${locale}/retreats/${id}/`;
+}
+/** Teacher bio page. */
+export function teacherRoute(locale: Locale, id: string): string {
+  return `/${locale}/teachers/${id}/`;
 }
 export function switchLocale(url: URL, locale: Locale): string {
   const parts = url.pathname.split('/');
