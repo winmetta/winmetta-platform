@@ -6,7 +6,12 @@ import type {
 } from '../lib/library-search';
 import { fileUrl, languageOf } from '../lib/library-index';
 import { normalizeSearch } from '../lib/normalize';
-import { formatSize, readState, writeState } from '../lib/library-url';
+import {
+  formatCount,
+  formatSize,
+  readState,
+  writeState,
+} from '../lib/library-url';
 import { Button } from './ui/button';
 
 export interface Labels {
@@ -138,17 +143,27 @@ export default function LibrarySearchIsland({
     }
   }, [indexUrl, recordsUrl]);
 
-  // Restore the state from the URL after hydration (a shared link, back/forward).
+  // Restore the state from the URL after hydration (a shared link, back/forward). Text typed
+  // before hydration finished is kept, not wiped by the empty server-rendered state.
   useEffect(() => {
-    const apply = () => {
+    const apply = (adoptTyped: boolean) => {
       const state = readState(window.location.search);
-      setQuery(state.q);
+      const typed = adoptTyped ? (input.current?.value ?? '') : '';
+      const q = state.q || typed;
+      setQuery(q);
       setTag(state.tag);
-      if (state.q || state.tag) void load();
+      if (q !== state.q)
+        window.history.replaceState(
+          null,
+          '',
+          writeState({ q, tag: state.tag }, window.location),
+        );
+      if (q || state.tag) void load();
     };
-    apply();
-    window.addEventListener('popstate', apply);
-    return () => window.removeEventListener('popstate', apply);
+    apply(true);
+    const onPopState = () => apply(false);
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
   }, [load]);
 
   const update = (next: { q?: string; tag?: string }) => {
@@ -244,8 +259,7 @@ export default function LibrarySearchIsland({
         {status === 'loading' ? <p>{labels.searchLoading}</p> : null}
         {status === 'ready' && active ? (
           <p>
-            {labels.results}:{' '}
-            {new Intl.NumberFormat(formatLocale).format(exact.length)}
+            {labels.results}: {formatCount(exact.length, formatLocale)}
           </p>
         ) : null}
       </div>

@@ -93,7 +93,7 @@ test('empty results explain what to do', async ({ page }) => {
 test('language switch keeps the query', async ({ page }) => {
   await page.goto('/my/dhamma-library/?q=' + encodeURIComponent(book));
   await expect(page.locator('h3', { hasText: book }).first()).toBeVisible();
-  await page.getByRole('link', { name: 'English', exact: true }).click();
+  await page.locator('a[data-locale="en"]').click();
   await expect(page).toHaveURL(/\/en\/dhamma-library\/\?q=%E1%80%93/);
   await expect(search(page)).toHaveValue(book);
   await expect(page.locator('h3', { hasText: book }).first()).toBeVisible();

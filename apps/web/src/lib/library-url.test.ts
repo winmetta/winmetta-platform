@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { formatSize, readState, writeState } from './library-url';
+import {
+  formatCount,
+  formatSize,
+  isSingular,
+  readState,
+  writeState,
+} from './library-url';
 
 describe('library URL state', () => {
   it('reads q and tag, defaulting to empty', () => {
@@ -29,5 +35,20 @@ describe('formatSize', () => {
   });
   it('formats in Burmese without throwing', () => {
     expect(formatSize(15631937, 'my-MM').length).toBeGreaterThan(0);
+  });
+});
+describe('formatCount', () => {
+  it('uses Latin digits in every interface locale', () => {
+    expect(formatCount(1012, 'en-US')).toBe('1,012');
+    expect(formatCount(1012, 'my-MM')).toMatch(/^[0-9,.\s]+$/);
+    expect(formatSize(11800000, 'my-MM')).toMatch(/^[0-9]/);
+  });
+});
+describe('isSingular', () => {
+  it('follows the locale plural rules', () => {
+    expect(isSingular(1, 'en-US')).toBe(true);
+    expect(isSingular(2, 'en-US')).toBe(false);
+    expect(isSingular(0, 'en-US')).toBe(false);
+    expect(isSingular(1, 'my-MM')).toBe(false);
   });
 });

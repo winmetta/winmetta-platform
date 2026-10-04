@@ -22,6 +22,16 @@ export function writeState(
   return `${location.pathname}${query ? `?${query}` : ''}${location.hash}`;
 }
 
+/** Whether the locale's plural rules call this count "one" (English: 1 book, 2 books). */
+export const isSingular = (value: number, formatLocale: string): boolean =>
+  new Intl.PluralRules(formatLocale).select(value) === 'one';
+
+/** Whole numbers (counts, page numbers) in Latin digits, whatever the interface locale. */
+export const formatCount = (value: number, formatLocale: string): string =>
+  new Intl.NumberFormat(formatLocale, { numberingSystem: 'latn' }).format(
+    value,
+  );
+
 /** File size in the interface locale's number format, decimal units (1 MB = 1,000,000 bytes). */
 export function formatSize(bytes: number, formatLocale: string): string {
   const [unit, divisor] =
@@ -34,6 +44,7 @@ export function formatSize(bytes: number, formatLocale: string): string {
     style: 'unit',
     unit,
     unitDisplay: 'short',
+    numberingSystem: 'latn',
     maximumFractionDigits: unit === 'kilobyte' ? 0 : 1,
   }).format(bytes / divisor);
 }
