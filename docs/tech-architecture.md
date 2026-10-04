@@ -145,10 +145,10 @@ Represent the query, tag and page in URL parameters so deep links, history and l
 
 **Phase 4: adding new PDFs.**
 
-1. A maintainer uploads PDFs with the AWS CLI (`aws s3 cp` or `sync`) into the correct numbered folder using a write-capable profile. An upload helper refuses names that need fixing (zero-width characters, non-NFC text, duplicate names).
+1. A maintainer uploads PDFs with the AWS CLI (`aws s3 cp` or `sync`) into the correct numbered folder using a write-capable profile. An upload helper refuses names that need fixing (zero-width characters, non-NFC text, Zawgyi filenames, duplicates of an indexed file).
 2. Replacing an existing file relies on S3 versioning for recovery and a Bunny cache purge for the changed paths.
 3. The maintainer, or a manually triggered or scheduled GitHub Actions job using an OIDC role with read-only S3 access, re-runs the generator and opens a PR containing the manifest diff: added, changed and removed files, a duplicate report and new tags.
-4. CI validates the schemas, the golden queries and the index size budget. A reviewer checks titles, tags and Burmese text in `overrides.json`; merging to `main` deploys.
+4. CI validates the schemas, the golden queries and the index size budget. A Burmese-speaking reviewer checks titles, tags, new folders and every Zawgyi conversion in `zawgyi-review.json`, recording corrections in `overrides.json`. Golden search tests that name a book removed or renamed in S3 are updated to a title that still exists, never loosened. Merging to `main` deploys.
 5. The generator is the only way new files appear on the site; there is no hand-edited listing HTML. Full-text and OCR indexing, transcripts and the class archive are separate Phase 4 work.
 
 ### Curriculum naming
@@ -211,9 +211,9 @@ Validate all English/Burmese translations and UI keys at build time. For future 
 
 ### Unicode-only Burmese (v1)
 
-All Burmese-script content — UI strings, digitized curriculum, library metadata — uses **Unicode (Myanmar block, U+1000–U+109F)**. **Zawgyi**, the legacy non-Unicode encoding still found on older devices, older PDFs and much pre-2019 Myanmar web content, is **out of scope for v1**.
+All Burmese-script content — UI strings, digitized curriculum, library metadata — uses **Unicode (Myanmar block, U+1000–U+109F)**. **Zawgyi**, the legacy non-Unicode encoding still found on older devices, older PDFs and much pre-2019 Myanmar web content, is **out of scope for v1** for UI text and curated content. The one exception is legacy Zawgyi filenames in the S3 library, handled by the manifest generator (below).
 
-Zawgyi and Unicode look similar but are byte-incompatible; mixing them garbles text. If Phase 4 library expansion or user-contributed content turns out to include Zawgyi, add a detection/conversion step (e.g. Google's open-source `myanmar-tools`). Noted so it isn't a surprise mid-migration. Ship a Unicode Burmese web font (e.g. Noto Sans Myanmar) so pages render consistently on older devices.
+Zawgyi and Unicode look similar but are byte-incompatible; mixing them garbles text. The S3 library does include Zawgyi filenames (found in the 2026-10 audit: about 11 of 3,010), so the generator in the Library content pipeline detects and converts them with Google's open-source `myanmar-tools`, pinned to **1.1.3** because 1.2.0 on npm ships unbuilt sources and cannot be required. The detector alone is not safe for this corpus: Pāḷi titles full of stacked consonants (ဓမ္မ, ပတ္တိ) often score as Zawgyi and the converter would corrupt them (about 140 such titles). A title is converted only when the detector says at least 0.9 **and** it contains a marker impossible in valid Unicode (glyph-only code points U+1060–U+1097, ေ before its consonant, or a virama not followed by a consonant). Titles with a marker but a low score (usually typos) are reported as suspicious and left unchanged; high scores without a marker are reported as ambiguous and left unchanged. Every conversion is written to `apps/web/src/library/zawgyi-review.json` for a Burmese speaker to review; wrong ones are corrected with a `title`/`titleNote` override in `overrides.json`, which wins on the next run. S3 keys are never renamed. Folder names and curated content must be Unicode (the generator warns on Zawgyi folder names). Ship a Unicode Burmese web font (e.g. Noto Sans Myanmar) so pages render consistently on older devices.
 
 ---
 

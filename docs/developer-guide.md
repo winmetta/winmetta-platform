@@ -69,7 +69,7 @@ Never put secrets in `PUBLIC_*` variables, because they can appear in the genera
 All user-facing text supports English (`en`) and Burmese (`my`).
 
 - **Messages:** add each key to `en.json` and `my.json`, and use `t(locale, key)`. The build fails on missing, empty or extra keys. Don't hardcode strings, branch on `locale === 'en'`, or concatenate sentences.
-- **Burmese text** must be Unicode (U+1000–U+109F), never Zawgyi. Have a Burmese speaker review wording.
+- **Burmese text** must be Unicode (U+1000–U+109F), never Zawgyi (the library generator converts legacy Zawgyi filenames and lists them in `zawgyi-review.json`). Have a Burmese speaker review wording.
 - **New locale:** add it to the registry in `i18n/locales.ts` and add its message file.
 - **Routes:** add a page ID to `pagePaths` in `i18n/routes.ts` and build links with `route(locale, page)`. Never link to a page that isn't built.
 - **Locale switch rule:** switching language changes only the locale segment of the URL. Path, query, filters and fragment must stay intact, computed from the URL when the link is activated. Any new stateful navigation (search, filters) must keep this true and needs a Playwright test.
@@ -96,6 +96,7 @@ All user-facing text supports English (`en`) and Burmese (`my`).
 
 - **Unit tests** (Vitest) sit beside the code as `*.test.ts`. Add them for helpers, especially schedule logic (daylight-saving and day-rollover cases) and library filtering (include Burmese text).
 - **Smoke tests** (Playwright) cover routing, the language switcher, fonts and the React island on desktop and mobile viewports. Add a case when you change navigation or layout.
+- The golden search tests in `library-search.test.ts` run against the real manifest. After regenerating it, a test can fail because a book it names was renamed or removed in S3 (for example `ဓမ္မပဒ`); update the test to a title that still exists, but never weaken an assertion to make it pass.
 - A bug fix should come with a test that fails without it.
 
 ## 11. Git workflow

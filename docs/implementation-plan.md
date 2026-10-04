@@ -1,4 +1,4 @@
-# Implementation Plan: Phases 0–2
+# Implementation Plan: Phases 0–2 (plus the Phase 4 library pipeline outline)
 
 The first three phases take the project from an empty repo to a public, bilingual site running in staging and production. Each phase has one purpose so a small volunteer team can finish and review it before starting the next.
 
@@ -8,7 +8,7 @@ The first three phases take the project from an empty repo to a public, bilingua
 | **1 — Five bilingual pages** | Home, About, Privacy, Classes and Dhamma Library (the whole S3 PDF library, tag browsing and fuzzy Burmese search), in English and Burmese, with curated public content. Adds the CI deploy workflow to a single non-public review app. | Review app only (not public) |
 | **2 — Infrastructure & deployment** | Terraform, domains, Azure, AWS S3 + bunny.net media delivery, Cloudflare DNS, and staging and production environments with promotion. | Yes (public) |
 
-Later phases (LLB lessons, library expansion, accounts, native apps) are in [prd.md](prd.md) §7. Scope per [prd.md](prd.md) (§4.7, §7) and [tech-architecture.md](tech-architecture.md) (§0): one static Astro web app designed for mobile and desktop — no backend, no database, no desktop/mobile apps.
+Later phases (LLB lessons, the library upload pipeline in §5, accounts, native apps) are in [prd.md](prd.md) §7. Scope per [prd.md](prd.md) (§4.7, §7) and [tech-architecture.md](tech-architecture.md) (§0): one static Astro web app designed for mobile and desktop — no backend, no database, no desktop/mobile apps.
 
 ## 1. Baseline Toolchain
 
@@ -34,7 +34,7 @@ PostgreSQL and Fastify are **not** part of these phases (see [tech-architecture.
 
 ### Scope
 
-* Repo governance, tooling and dev environment (checklist below; config in §5–§7).
+* Repo governance, tooling and dev environment (checklist below; config in §6–§8).
 * `apps/web` scaffolded with Astro, React, Tailwind, shadcn/ui, and Zod content-collection schemas.
 * Internationalization machinery (below).
 * Responsive layout shell (header, footer, language switcher) for mobile and desktop with touch and keyboard support and Unicode Burmese font loading.
@@ -126,6 +126,18 @@ Phase 1 indexes **every PDF in the existing S3 bucket `dhamma-library`** (audite
 * **Performance budget** (confirmed in a prototype before building the UI): serialized index at most about 400 KB gzipped, a query in well under 50 ms on a mid-range phone, results rendered in pages and never all 3,000 at once. If Burmese relevance or the budget fails, reduce n-gram size or fall back to a substring-plus-tiers matcher.
 * **Not Phase 1:** audio, video and app resources (curated links only), file-body text search, OCR and transcription (Phase 4), and uploading new files (the Phase 4 pipeline). Curated blog-post links may still be added as library resources through the curated `resources` collection; there is no blog feed.
 
+### Phase 1 library status and decisions (as of 2026-10-03)
+
+* **Built and committed or in review:** normalization, syllable segmentation, record and tag helpers, `libraryFileSchema`, the generator, the manifest (3,009 records from 3,013 S3 objects), Zawgyi detection and conversion, and the MiniSearch prototype with golden tests. **Not started:** the library pages (tag tree, folder pages, search UI), the other four pages, the deploy workflow.
+* **Measured on the real manifest:** serialized index about 1.1 MB raw and 217 KB gzipped (budget 400 KB), build about 60 ms, load about 20 ms, queries about 0.1 to 3 ms in Node. Not yet measured on a phone.
+* **Search decisions made while prototyping:**
+  * Only the last term of the last chunk accepts a prefix. An earlier version let every term match as a prefix, so a finished word could extend into a different word.
+  * Exact results are ordered by tier, then MiniSearch score, then folder order (a small change from "ties by folder order": score gave better results for broad queries).
+  * The "Similar books" group is re-ranked by character-pair (Dice) similarity of query and title, and results below 0.2 are dropped, because MiniSearch's raw score favored long titles that merely contained a fuzzy-matched fragment.
+  * A multi-word query typed with no space (for example `ဝိနယပိဋက`) has no exact match when no title contains the whole sequence; it falls back to similar books.
+* **Zawgyi filenames (found in the audit):** the legacy encoding appears in about 11 titles. The detector alone is unsafe here (about 140 valid Pāḷi titles score as Zawgyi), so the generator converts only on detector score of at least 0.9 plus an impossible-in-Unicode marker, writes every conversion to `zawgyi-review.json`, and reports suspicious and ambiguous titles without changing them. `myanmar-tools` is pinned to 1.1.3 (1.2.0 on npm ships unbuilt sources). Conversion can be wrong on mixed text, so a Burmese speaker reviews it and corrections go in `overrides.json`.
+* **Data cleanup done in S3:** the misspelled `Rear-Buddhist-Books` folders were removed in favor of `Rare-…` (with redirects on the old web pages), the zero-byte `done.txt` markers were deleted, 9 duplicate files were removed, and versioning with a 90-day noncurrent-version expiry was enabled. Two same-size name variants and one Zawgyi-named copy remain and are indexed once.
+
 ### Content and design boundaries
 
 * Use [winmetta.org](https://winmetta.org/) as a factual reference with a deliberately small selection of high-level content for About, Classes and Home. The library is the exception: it indexes the whole S3 bucket through the generated manifest. Reference pages include [About](https://winmetta.org/about/), [Burmese classes](https://winmetta.org/sayadaw-u-garudhamma-burmese-class/), [Dhamma resources](https://winmetta.org/dhamma-download/) and the [library directory](https://winmetta.org/dhamma-library/). The homepage, resource directory and library were inspected during planning; About could not be fetched and needs verification during content preparation.
@@ -139,12 +151,13 @@ Phase 1 indexes **every PDF in the existing S3 bucket `dhamma-library`** (audite
 
 * [ ] Home, About, Privacy, Classes and Dhamma Library built in both locales (10 localized page routes plus the root language entry page), with original layouts.
 * [ ] Curated, verified public content: About text and class summaries with Pacific/Myanmar schedules, with source URLs and verification dates.
-* [ ] Library manifest generator (`scripts/`): lists the S3 bucket with a read-only AWS profile and writes the committed manifest plus an overrides file; skips zero-byte objects, reports non-PDF files, detects duplicates by normalized path/name/size (for example the 9 under `၉။ ပေမူများ`), fails on keys that do not round-trip through URL encoding, and sorts output deterministically.
-* [ ] `libraryFileSchema` and manifest validation in CI; the build needs no AWS credentials.
-* [ ] Shared search normalization (NFC, zero-width removal, ဥ/ဉ, Burmese/ASCII digits, Latin diacritics) and a Myanmar syllable segmentation helper, both unit-tested with real Burmese titles.
-* [ ] MiniSearch index built at build time and lazily loaded: Burmese n-gram tokenizer, AND of space-separated chunks, syllable-start matching, tiered ranking, labelled "Similar books" fuzzy group, tag suggestions on empty results.
+* [x] Library manifest generator (`scripts/generate-library-manifest.mjs`, `npm run library:manifest`): lists the S3 bucket with a read-only AWS profile and writes the committed manifest plus an overrides file; skips zero-byte objects, reports non-PDF files, detects duplicates by normalized path/name/size (for example the 9 under `၉။ ပေမူများ`, now removed from S3), fails on keys that do not round-trip through URL encoding, and sorts output deterministically.
+* [x] `libraryFileSchema` and manifest validation in CI (a Vitest test validates the committed manifest: unique ids and keys, every key round-trips into a URL); the build needs no AWS credentials.
+* [ ] Zawgyi filenames detected and converted by the generator (`myanmar-tools@1.1.3`, converts only on detector score ≥ 0.9 plus an impossible-in-Unicode marker), every conversion listed in `zawgyi-review.json` and reviewed by a Burmese speaker; suspicious and ambiguous titles reported, not changed. **Code done; Burmese-speaker review of the 11 conversions and 3 suspicious titles is pending.**
+* [x] Shared search normalization (NFC, zero-width removal, ဥ/ဉ, Burmese/ASCII digits, Latin diacritics) and a Myanmar syllable segmentation helper, both unit-tested with real Burmese titles.
+* [ ] MiniSearch index built at build time and lazily loaded: Burmese n-gram tokenizer, AND of space-separated chunks, syllable-start matching, tiered ranking, labelled "Similar books" fuzzy group, tag suggestions on empty results. **Prototype done** (`lib/library-search.ts`: index, tokenizer, tiered ranking, similar group, tag filter, serialization); still to do: build-time index file, lazy loading in the page, tag suggestions.
 * [ ] Tag tree and static folder pages with breadcrumbs, pagination, tag filter chips, URL state, counts, reset and empty state.
-* [ ] Golden-query suite (Burmese partial words, typos, spaced and unspaced queries, digits, ဥ/ဉ variants) reviewed by a Burmese speaker and run in Vitest against the real manifest; index size and query-time budgets recorded.
+* [ ] Golden-query suite (Burmese partial words, typos, spaced and unspaced queries, digits, ဥ/ဉ variants) reviewed by a Burmese speaker and run in Vitest against the real manifest; index size and query-time budgets recorded. **Golden tests exist (written by the developer, not yet reviewed by a Burmese speaker).** They name real titles, so regenerating the manifest after a rename or removal in S3 can break one; update the test to a title that still exists and never weaken an assertion (see AGENTS.md).
 * [ ] Replace or remove the Phase 0 smoke page and synthetic fixtures from published content.
 * [ ] CI deploy: `.github/workflows/deploy-web.yml` deploys PR previews and `main` to one non-public Azure Static Web App (created by hand under the nonprofit grant; deploy token stored as a GitHub Actions secret). `noindex` on all deployed pages; not linked from winmetta.org.
 
@@ -170,11 +183,26 @@ Phase 1 indexes **every PDF in the existing S3 bucket `dhamma-library`** (audite
 * [ ] `noindex` and access restriction on staging and PR previews.
 * [ ] Smoke-test both environments end to end, document the rollback procedure, and record the runbook for editing content and redeploying.
 
-Out of scope for Phases 0–2 (future work): interactive LLB lessons, bulk library ingestion, full-featured/full-text/OCR/transcript search, unified class archive, additional locales beyond English/Burmese, product analytics/metric collection, profile timezone preferences, backend API, database, accounts, offline/PWA, `apps/desktop`, `apps/mobile`. Excluded entirely: standalone blog publishing/automatic feeds, copying the existing site UI, bulk website migration.
+Out of scope for Phases 0–2 (future work): interactive LLB lessons, the repeatable upload-and-reindex pipeline for new library files (outlined in §5), full-text/OCR/transcript search inside PDFs, unified class archive, additional locales beyond English/Burmese, product analytics/metric collection, profile timezone preferences, backend API, database, accounts, offline/PWA, `apps/desktop`, `apps/mobile`. Excluded entirely: standalone blog publishing/automatic feeds, copying the existing site UI, bulk website migration.
 
 ---
 
-## 5. Reference: Monorepo Configuration
+## 5. Phase 4 outline — Library content pipeline
+
+**Goal:** make adding books repeatable. Phase 1 indexes everything already in the S3 bucket; Phase 4 defines how new PDFs get into S3 and into the index and pages without hand-editing HTML. Not started and not scheduled; the detailed workflow and rationale are in [tech-architecture.md](tech-architecture.md) §3 ("Library content pipeline").
+
+* [ ] **Upload helper** (script, write-capable AWS profile, never in CI): uploads into the correct numbered folder and refuses names that need fixing: zero-width characters, non-NFC text, a name that duplicates an indexed file, or a Zawgyi filename (detected with the same two-gate rule the generator uses).
+* [ ] **Documented procedure** for maintainers: set up the AWS profile, upload, regenerate, review, open a PR. Versioning (enabled, 90-day noncurrent expiry) is the recovery path for a bad sync; replacing a file also needs a Bunny cache purge for its path.
+* [ ] **Regeneration PR:** a manually triggered or scheduled GitHub Actions job using an OIDC role with read-only S3 access (no stored AWS keys) runs `npm run library:manifest` and opens a PR with the manifest diff: added, changed and removed files, the duplicate report, new tags and folders, and `zawgyi-review.json`.
+* [ ] **Review checklist in the PR:** Burmese speaker checks new titles, tags and any Zawgyi conversions and records corrections in `overrides.json`; new folders get ids and names in `folders.json`; golden search tests are updated only when a title they name was legitimately removed or renamed.
+* [ ] **CI gates:** schema validation, golden queries, and the index size and query-time budgets; merging to `main` deploys.
+* [ ] **Separate Phase 4 work:** full-text search inside PDFs, OCR, transcripts, and the unified class archive.
+
+Acceptance: a maintainer who has never touched the repo adds one new PDF following the written procedure, and it is searchable and downloadable after the PR is merged, with no hand edits to listing files.
+
+---
+
+## 6. Reference: Monorepo Configuration
 
 ### Root `package.json`
 
@@ -239,12 +267,12 @@ Pin npm consistently in local setup and CI using the root `packageManager` decla
 
 ---
 
-## 6. Reference: macOS Setup Script
+## 7. Reference: macOS Setup Script
 
 Shared developer tooling (Homebrew, git, gh, shellcheck, shfmt, nvm, editor, AI CLIs) is installed by `bootstrap-dev-env.sh` in the org [`.github` repo](https://github.com/winmetta/.github#developer-setup). This repo's own `scripts/setup-local-dev.sh` then installs Node from `.nvmrc`, the pinned npm, locked dependencies and the Playwright browser.
 
 ---
 
-## 7. Agent & Contributor Docs
+## 8. Agent & Contributor Docs
 
 [AGENTS.md](../AGENTS.md) is the single source of truth for conventions used by contributors and AI coding agents. It is not duplicated here — read that file rather than a copy in this plan. `CLAUDE.md` is a symlink to it (`ln -s AGENTS.md CLAUDE.md`).

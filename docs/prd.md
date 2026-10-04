@@ -86,7 +86,7 @@ No account is required to set or use these preferences — they are stored local
 * English (`en`) and Burmese (`my`) are the launch interface languages. Phase 0 builds the localization foundation; Phase 1 delivers translated versions of all five starter pages and shared navigation, with locale-prefixed routes and a same-page language switcher.
 * Design for additional languages/locales through a central locale registry, keyed UI messages, localized content records and locale-aware formatting. Interface language, source material language and timezone are separate fields; linked teachings need not exist in every UI language. See implementation-plan.md §2 and tech-architecture.md §5 for fallback and validation rules.
 
-* All Burmese-script content in v1 is **Unicode-only**. Legacy Zawgyi encoding is explicitly out of scope for now (full rationale and the reason Zawgyi support may be needed later is documented in [tech-architecture.md](tech-architecture.md)).
+* All Burmese-script content in v1 is **Unicode-only**. Legacy Zawgyi encoding is out of scope for UI text and curated content, except that the library manifest generator converts Zawgyi filenames in the S3 bucket to Unicode for review (see [tech-architecture.md](tech-architecture.md) §5).
 
 ### 4.6. Geographic & Access Considerations
 
