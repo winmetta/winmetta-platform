@@ -11,7 +11,8 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "node scripts/dev.mjs",
+    "dev:stop": "npm run dev:stop --workspace @winmetta/web",
     "build": "turbo run build",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
