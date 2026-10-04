@@ -1,0 +1,218 @@
+---
+import Shell from '../../../layouts/Shell.astro';
+import { localeCodes, type Locale } from '../../../i18n/locales';
+import { format, t, type MessageKey } from '../../../i18n/messages';
+import { retreatRoute, route, teacherRoute } from '../../../i18n/routes';
+import { languageOf } from '../../../lib/library-index';
+import { allRetreats, retreatDates, retreatText } from '../../../lib/retreats';
+import { teacherById, teacherName } from '../../../lib/teachers';
+export function getStaticPaths() {
+  return localeCodes.flatMap((locale) =>
+    allRetreats.map((retreat) => ({
+      params: { locale, id: retreat.id },
+      props: { locale, id: retreat.id },
+    })),
+  );
+}
+interface Props {
+  locale: Locale;
+  id: string;
+}
+const { locale, id } = Astro.props;
+const retreat = allRetreats.find((entry) => entry.id === id);
+if (!retreat) throw new Error(`Unknown retreat ${id}`);
+const text = (key: MessageKey) => t(locale, key);
+const { value, language } = retreatText(retreat, locale);
+const formatKey = {
+  online: 'formatOnline',
+  onsite: 'formatOnsite',
+  hybrid: 'formatHybrid',
+} as const;
+const teachers = retreat.teacherIds.flatMap((teacherId) => {
+  const teacher = teacherById(teacherId);
+  return teacher ? [{ id: teacherId, name: teacherName(teacher, locale) }] : [];
+});
+const languages = retreat.languages
+  .map((code) =>
+    code === 'my' ? text('langMy') : code === 'en' ? text('langEn') : code,
+  )
+  .join(', ');
+const partKey = {
+  morning: 'partMorning',
+  evening: 'partEvening',
+  closing: 'partClosing',
+  opening: 'partOther',
+  other: 'partOther',
+} as const;
+---
+
+<Shell
+  locale={locale}
+  title={value.title}
+  path={retreatRoute(locale, id).slice(`/${locale}/`.length)}
+>
+  <nav aria-label={text('breadcrumb')}>
+    <ol class="crumbs">
+      <li><a href={route(locale, 'retreats')}>{text('retreatsTitle')}</a></li>
+      <li class="flex items-center gap-x-1">
+        <span aria-hidden="true" class="muted">›</span>
+        <span aria-current="page" lang={language}>{value.title}</span>
+      </li>
+    </ol>
+  </nav>
+  <header class="space-y-3">
+    <h1 class="text-3xl font-bold sm:text-4xl" lang={language}>
+      {value.title}
+    </h1>
+    <p class="lead" lang={language}>{value.description}</p>
+  </header>
+  <dl class="card grid gap-x-6 gap-y-3 sm:grid-cols-2">
+    <div>
+      <dt class="font-semibold">{text('retreatDates')}</dt>
+      <dd>{retreatDates(retreat, locale)}</dd>
+    </div>
+    <div>
+      <dt class="font-semibold">{text('retreatLength')}</dt>
+      <dd>{format(text('daysCount'), { n: retreat.days })}</dd>
+    </div>
+    <div>
+      <dt class="font-semibold">{text('retreatFormat')}</dt>
+      <dd>{text(formatKey[retreat.format])}</dd>
+    </div>
+    <div>
+      <dt class="font-semibold">{text('retreatLanguages')}</dt>
+      <dd>{languages}</dd>
+    </div>
+    <div>
+      <dt class="font-semibold">{text('retreatTeacher')}</dt>
+      <dd>
+        {
+          teachers.map((teacher, index) => (
+            <>
+              {index > 0 && ', '}
+              <a
+                class="link"
+                href={teacherRoute(locale, teacher.id)}
+                lang={languageOf(teacher.name)}
+              >
+                {teacher.name}
+              </a>
+            </>
+          ))
+        }
+      </dd>
+    </div>
+    {
+      retreat.venue && (
+        <div>
+          <dt class="font-semibold">{text('retreatVenue')}</dt>
+          <dd>
+            <span
+              lang={languageOf(
+                retreat.venue.name[locale] ?? retreat.venue.name.en ?? '',
+              )}
+            >
+              {retreat.venue.name[locale] ?? retreat.venue.name.en}
+            </span>
+            , {retreat.venue.address ?? retreat.venue.city}
+            {retreat.venue.mapUrl && (
+              <>
+                {' '}
+                <a class="link" href={retreat.venue.mapUrl} rel="noopener">
+                  {text('retreatMap')}
+                </a>
+              </>
+            )}
+          </dd>
+        </div>
+      )
+    }
+  </dl>
+  <section class="space-y-2" aria-labelledby="ran">
+    <h2 id="ran" class="text-2xl font-bold">
+      {text(retreat.status === 'upcoming' ? 'retreatHowRuns' : 'retreatHowRan')}
+    </h2>
+    <p>{text('retreatsHowOnline')}</p>
+    {retreat.format !== 'online' && <p>{text('retreatsHowOnsite')}</p>}
+  </section>
+  {
+    retreat.timetables.length + retreat.notes.length > 0 && (
+      <section class="space-y-2" aria-labelledby="docs">
+        <h2 id="docs" class="text-2xl font-bold">
+          {text('retreatTimetables')}
+        </h2>
+        <ul class="space-y-1">
+          {retreat.timetables.map((doc) => (
+            <li>
+              <a
+                class="link"
+                href={doc.url}
+                rel="noopener"
+                lang={languageOf(doc.label)}
+              >
+                {doc.label}
+              </a>
+            </li>
+          ))}
+          {retreat.notes.map((doc) => (
+            <li>
+              {text('retreatNotes')}:{' '}
+              <a
+                class="link"
+                href={doc.url}
+                rel="noopener"
+                lang={languageOf(doc.label)}
+              >
+                {doc.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+  {
+    retreat.sessions.length > 0 && (
+      <section class="space-y-2" aria-labelledby="sessions">
+        <h2 id="sessions" class="text-2xl font-bold">
+          {text('retreatSessions')}
+        </h2>
+        <p class="muted">{text('retreatSessionsNote')}</p>
+        <ol class="space-y-1">
+          {retreat.sessions.map((session) => (
+            <li>
+              <span class="font-semibold">
+                {format(text('dayN'), { n: session.day })} ·{' '}
+                {text(partKey[session.part])}:
+              </span>{' '}
+              {session.postUrl ? (
+                <a
+                  class="link"
+                  href={session.postUrl}
+                  rel="noopener"
+                  lang={languageOf(session.title)}
+                >
+                  {session.title}
+                </a>
+              ) : (
+                <span lang={languageOf(session.title)}>{session.title}</span>
+              )}
+            </li>
+          ))}
+        </ol>
+      </section>
+    )
+  }
+  <p>
+    <a class="btn btn-outline" href={retreat.sourceUrl} rel="noopener"
+      >{
+        text(
+          retreat.status === 'upcoming' ? 'retreatRegister' : 'retreatSource',
+        )
+      }</a
+    >
+    <a class="link ms-4" href={route(locale, 'retreats')}
+      >{text('retreatBack')}</a
+    >
+  </p>
+</Shell>

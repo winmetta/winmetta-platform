@@ -1,0 +1,89 @@
+---
+// Upcoming retreats, or the "none scheduled" notice when there are none.
+import BrandIcon from './BrandIcon.astro';
+import { format, t, type MessageKey } from '../i18n/messages';
+import { retreatRoute } from '../i18n/routes';
+import { channelLinks } from '../lib/classes';
+import { languageOf } from '../lib/library-index';
+import { retreatDates, retreatText } from '../lib/retreats';
+import { teacherById, teacherName } from '../lib/teachers';
+import type { Locale } from '../i18n/locales';
+import type { Retreat } from '../lib/schemas';
+interface Props {
+  locale: Locale;
+  retreats: Retreat[];
+}
+const { locale, retreats } = Astro.props;
+const text = (key: MessageKey) => t(locale, key);
+const formatKey = {
+  online: 'formatOnline',
+  onsite: 'formatOnsite',
+  hybrid: 'formatHybrid',
+} as const;
+const upcoming = retreats
+  .filter((retreat) => retreat.status === 'upcoming')
+  .sort((a, b) => a.startDate.localeCompare(b.startDate));
+---
+
+{
+  upcoming.length === 0 ? (
+    <section class="card space-y-2" role="note">
+      <h2 class="text-xl font-bold">{text('retreatsNone')}</h2>
+      <p>{text('retreatsNoneText')}</p>
+      <p class="flex flex-wrap gap-x-4 gap-y-1">
+        <a class="link" href="https://winmetta.org/" rel="noopener">
+          winmetta.org
+        </a>
+        <a class="link icon-link" href={channelLinks.facebook} rel="noopener">
+          <BrandIcon name="facebook" />
+          Facebook
+        </a>
+      </p>
+    </section>
+  ) : (
+    <section class="space-y-4" aria-labelledby="upcoming">
+      <h2 id="upcoming" class="text-2xl font-bold">
+        {text('upcomingTitle')}
+      </h2>
+      <ul class="grid gap-4 lg:grid-cols-2" data-upcoming>
+        {upcoming.map((retreat) => {
+          const { value, language } = retreatText(retreat, locale);
+          const teachers = retreat.teacherIds.flatMap((id) => {
+            const teacher = teacherById(id);
+            return teacher ? [teacherName(teacher, locale)] : [];
+          });
+          return (
+            <li class="card card-link space-y-2">
+              <a
+                class="link text-lg"
+                href={retreatRoute(locale, retreat.id)}
+                lang={language}
+              >
+                {value.title}
+              </a>
+              <p class="text-sm">
+                {retreatDates(retreat, locale)}
+                <span class="muted">
+                  {' · '}
+                  {format(text('daysCount'), { n: retreat.days })}
+                  {' · '}
+                  {text(formatKey[retreat.format])}
+                </span>
+              </p>
+              <p class="muted text-sm">
+                {teachers.map((name, index) => (
+                  <>
+                    {index > 0 && ', '}
+                    <span lang={languageOf(name)}>{name}</span>
+                  </>
+                ))}
+                {retreat.venue &&
+                  ` · ${retreat.venue.name[locale] ?? retreat.venue.name.en ?? ''}, ${retreat.venue.city}`}
+              </p>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  )
+}

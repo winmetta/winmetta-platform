@@ -1,0 +1,57 @@
+---
+import Shell from '../../../layouts/Shell.astro';
+import RetreatsUpcoming from '../../../components/RetreatsUpcoming.astro';
+import RetreatArchive from '../../../components/RetreatArchive';
+import { localeCodes, type Locale } from '../../../i18n/locales';
+import { t, type MessageKey } from '../../../i18n/messages';
+import { allRetreats, retreatItem } from '../../../lib/retreats';
+export function getStaticPaths() {
+  return localeCodes.map((locale) => ({
+    params: { locale },
+    props: { locale },
+  }));
+}
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const text = (key: MessageKey) => t(locale, key);
+const items = allRetreats
+  .filter((retreat) => retreat.status === 'past')
+  .map((retreat) => retreatItem(retreat, locale));
+const labels = {
+  searchLabel: text('retreatsSearchLabel'),
+  searchPlaceholder: text('retreatsSearchPlaceholder'),
+  year: text('filterYear'),
+  format: text('filterFormat'),
+  days: text('filterDays'),
+  teacher: text('filterTeacher'),
+  all: text('filterAll'),
+  reset: text('retreatReset'),
+  noResults: text('retreatNoResults'),
+  count: text('retreatCount'),
+  daysCount: text('daysCount'),
+  formats: {
+    online: text('formatOnline'),
+    onsite: text('formatOnsite'),
+    hybrid: text('formatHybrid'),
+  },
+};
+---
+
+<Shell locale={locale} title={text('retreatsTitle')} page="retreats">
+  <header class="space-y-4">
+    <h1 class="text-3xl font-bold sm:text-4xl">{text('retreatsTitle')}</h1>
+    <p class="lead">{text('retreatsIntro')}</p>
+  </header>
+  <RetreatsUpcoming locale={locale} retreats={allRetreats} />
+  <section class="space-y-3" aria-labelledby="how">
+    <h2 id="how" class="text-2xl font-bold">{text('retreatsHowTitle')}</h2>
+    <p>{text('retreatsHowOnline')}</p>
+    <p>{text('retreatsHowOnsite')}</p>
+  </section>
+  <section class="space-y-4" aria-labelledby="archive">
+    <h2 id="archive" class="text-2xl font-bold">{text('retreatsArchive')}</h2>
+    <RetreatArchive client:load items={items} labels={labels} />
+  </section>
+</Shell>
