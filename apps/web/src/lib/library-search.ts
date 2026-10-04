@@ -3,6 +3,12 @@ import { burmeseSyllables, splitScripts } from './burmese.ts';
 import { normalizeSearch } from './normalize.ts';
 import type { LibraryFile } from './schemas.ts';
 
+/** The fields search and result cards need; the browser downloads only these. */
+export type SearchRecord = Pick<
+  LibraryFile,
+  'id' | 'key' | 'title' | 'titleNote' | 'tags' | 'language' | 'sizeBytes'
+>;
+
 // Burmese is indexed as 1-3 syllable n-grams, so unspaced and half-typed queries
 // match at syllable starts. Latin text is indexed as whole words.
 const MAX_GRAM = 3;
@@ -101,7 +107,7 @@ const options: Options<Doc> = {
 };
 
 export interface SearchHit {
-  record: LibraryFile;
+  record: SearchRecord;
   /** 0 exact title, 1 title starts with query, 2 title contains query, 3 other fields only. */
   tier: number;
   score: number;
@@ -119,12 +125,15 @@ export interface SearchOptions {
 
 export class LibrarySearch {
   private readonly order = new Map<string, number>();
-  private readonly byId = new Map<string, LibraryFile>();
+  private readonly byId = new Map<string, SearchRecord>();
   private readonly tagsOf = new Map<string, Set<string>>();
 
   private readonly index: MiniSearch<Doc>;
 
-  private constructor(records: readonly LibraryFile[], index: MiniSearch<Doc>) {
+  private constructor(
+    records: readonly SearchRecord[],
+    index: MiniSearch<Doc>,
+  ) {
     this.index = index;
     records.forEach((record, position) => {
       this.order.set(record.id, position);
@@ -134,7 +143,7 @@ export class LibrarySearch {
   }
 
   /** `records` must be in library order (`compareLibraryOrder`): it is the final tie-breaker. */
-  static build(records: readonly LibraryFile[]): LibrarySearch {
+  static build(records: readonly SearchRecord[]): LibrarySearch {
     const index = new MiniSearch<Doc>(options);
     index.addAll(
       records.map((r) => ({
@@ -148,7 +157,7 @@ export class LibrarySearch {
   }
 
   static load(
-    records: readonly LibraryFile[],
+    records: readonly SearchRecord[],
     serialized: string,
   ): LibrarySearch {
     return new LibrarySearch(
