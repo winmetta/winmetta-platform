@@ -2,15 +2,16 @@
 import '../styles/global.css';
 import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 import { locales, localeCodes, type Locale } from '../i18n/locales';
-import { route } from '../i18n/routes';
+import { route, type PageId } from '../i18n/routes';
 import { t } from '../i18n/messages';
 import { allowIndexing } from '../lib/site';
 interface Props {
   locale: Locale;
   title: string;
+  page?: PageId;
 }
-const { locale, title } = Astro.props;
-const canonical = new URL(route(locale), Astro.site);
+const { locale, title, page = 'smoke' } = Astro.props;
+const canonical = new URL(route(locale, page), Astro.site);
 ---
 
 <!doctype html>
@@ -26,7 +27,7 @@ const canonical = new URL(route(locale), Astro.site);
         <link
           rel="alternate"
           hreflang={code}
-          href={new URL(route(code), Astro.site)}
+          href={new URL(route(code, page), Astro.site)}
         />
       ))
     }
@@ -40,6 +41,14 @@ const canonical = new URL(route(locale), Astro.site);
       class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-5 py-5"
     >
       <a href={route(locale)} class="font-bold">{t(locale, 'brand')}</a>
+      <nav aria-label={t(locale, 'navMain')}>
+        <a
+          href={route(locale, 'library')}
+          class="inline-flex min-h-11 items-center underline"
+          aria-current={page === 'library' ? 'page' : undefined}
+          >{t(locale, 'navLibrary')}</a
+        >
+      </nav>
       <LanguageSwitcher locale={locale} />
     </header>
     <main

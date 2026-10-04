@@ -1,6 +1,6 @@
 import { isLocale, type Locale } from './locales';
 // Add Phase 1 page IDs here when their routes exist; never link to unbuilt pages.
-export const pagePaths = { smoke: '' } as const;
+export const pagePaths = { smoke: '', library: 'dhamma-library/' } as const;
 export type PageId = keyof typeof pagePaths;
 export function route(locale: Locale, page: PageId = 'smoke'): string {
   return `/${locale}/${pagePaths[page]}`;
