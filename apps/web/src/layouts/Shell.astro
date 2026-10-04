@@ -9,9 +9,14 @@ interface Props {
   locale: Locale;
   title: string;
   page?: PageId;
+  /** Path after the locale for pages that are not in pagePaths, e.g. dhamma-library/folders/f001/. */
+  path?: string;
 }
-const { locale, title, page = 'smoke' } = Astro.props;
-const canonical = new URL(route(locale, page), Astro.site);
+const { locale, title, page = 'smoke', path } = Astro.props;
+const href = (code: Locale) => (path ? `/${code}/${path}` : route(code, page));
+const canonical = new URL(href(locale), Astro.site);
+const inLibrary =
+  page === 'library' || Boolean(path?.startsWith('dhamma-library/'));
 ---
 
 <!doctype html>
@@ -27,7 +32,7 @@ const canonical = new URL(route(locale, page), Astro.site);
         <link
           rel="alternate"
           hreflang={code}
-          href={new URL(route(code, page), Astro.site)}
+          href={new URL(href(code), Astro.site)}
         />
       ))
     }
@@ -45,8 +50,11 @@ const canonical = new URL(route(locale, page), Astro.site);
         <a
           href={route(locale, 'library')}
           class="inline-flex min-h-11 items-center underline"
-          aria-current={page === 'library' ? 'page' : undefined}
-          >{t(locale, 'navLibrary')}</a
+          aria-current={page === 'library'
+            ? 'page'
+            : inLibrary
+              ? 'true'
+              : undefined}>{t(locale, 'navLibrary')}</a
         >
       </nav>
       <LanguageSwitcher locale={locale} />

@@ -5,6 +5,8 @@ import { locales, localeCodes, type Locale } from '../../../i18n/locales';
 import { t } from '../../../i18n/messages';
 import { libraryData } from '../../../lib/library-data';
 import { libraryCdnBase } from '../../../lib/site';
+import FolderTree from '../../../components/FolderTree.astro';
+import { tree } from '../../../lib/library-catalog';
 export function getStaticPaths() {
   return localeCodes.map((locale) => ({
     params: { locale },
@@ -47,4 +49,8 @@ const labels = {
     cdnBase={libraryCdnBase}
     formatLocale={locales[locale].formatLocale}
   />
+  <section class="space-y-2" aria-labelledby="folders">
+    <h2 id="folders" class="text-xl font-bold">{text('browseFolders')}</h2>
+    <FolderTree tree={tree} nodes={tree.roots} locale={locale} nested />
+  </section>
 </Shell>

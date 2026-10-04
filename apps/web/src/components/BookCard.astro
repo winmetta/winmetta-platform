@@ -1,0 +1,29 @@
+---
+import type { LibraryFile } from '../lib/schemas';
+import { fileUrl } from '../lib/library-index';
+import { formatSize } from '../lib/library-url';
+import { t } from '../i18n/messages';
+import { locales, type Locale } from '../i18n/locales';
+import { libraryCdnBase } from '../lib/site';
+interface Props {
+  record: LibraryFile;
+  locale: Locale;
+}
+const { record, locale } = Astro.props;
+---
+
+<li class="space-y-2 rounded-md border border-input bg-background p-4">
+  <h3 class="font-medium" lang={record.language}>
+    {record.title}
+    {record.titleNote && <span class="font-normal"> ({record.titleNote})</span>}
+  </h3>
+  <p class="flex flex-wrap items-center gap-4 text-sm">
+    <a
+      class="inline-flex min-h-11 items-center underline"
+      href={fileUrl(libraryCdnBase, record.key)}
+      aria-label={`${t(locale, 'download')}: ${record.title}`}
+      rel="noopener">{t(locale, 'download')}</a
+    >
+    <span>{formatSize(record.sizeBytes, locales[locale].formatLocale)}</span>
+  </p>
+</li>

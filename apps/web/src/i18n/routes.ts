@@ -5,6 +5,10 @@ export type PageId = keyof typeof pagePaths;
 export function route(locale: Locale, page: PageId = 'smoke'): string {
   return `/${locale}/${pagePaths[page]}`;
 }
+/** Static folder page; page 1 has no page segment, later pages are .../2/, .../3/. */
+export function folderRoute(locale: Locale, id: string, page = 1): string {
+  return `/${locale}/dhamma-library/folders/${id}/${page > 1 ? `${page}/` : ''}`;
+}
 export function switchLocale(url: URL, locale: Locale): string {
   const parts = url.pathname.split('/');
   if (parts[1] && isLocale(parts[1])) parts[1] = locale;

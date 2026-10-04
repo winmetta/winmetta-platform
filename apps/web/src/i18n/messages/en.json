@@ -31,5 +31,16 @@
   "removeFolder": "Remove folder filter",
   "download": "Download PDF",
   "showMore": "Show more",
-  "navMain": "Main"
+  "navMain": "Main",
+  "browseFolders": "Browse by folder",
+  "subfolders": "Subfolders",
+  "booksInFolder": "Books in this folder",
+  "breadcrumb": "You are here",
+  "pagination": "Pages",
+  "previousPage": "Previous page",
+  "nextPage": "Next page",
+  "pageWord": "Page",
+  "emptyFolder": "This folder has no books of its own. Open a subfolder.",
+  "bookOne": "book",
+  "bookOther": "books"
 }
