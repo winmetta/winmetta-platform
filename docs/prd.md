@@ -102,7 +102,7 @@ Explicitly deferred, not abandoned:
 * **Cross-device account sync of LLB lesson progress and library bookmarks** (not "playlists" — that was a feature of an earlier, pre-pivot version of this product). A tentative auth approach is sketched in tech-architecture.md §10 for when Phase 5 arrives.
 * **Community submissions & moderated reflections queue.**
 * **Native mobile apps** (Electron/Capacitor builds). v1 targets a single responsive web app designed for mobile and desktop; native wrappers are evaluated only after the web app validates real usage.
-* **Zawgyi legacy encoding support** — see §4.5 and tech-architecture.md.
+* **Zawgyi legacy encoding support** — see §4.5 and tech-architecture.md. This includes searching the library with Zawgyi-typed queries: v1 search assumes Unicode input, and supporting Zawgyi input is a future improvement with no scheduled phase or date (tech-architecture.md §10).
 * **Product analytics and metric collection** — deferred beyond v1; no analytics scripts or learner-event collection in Phase 0–2. Local progress remains available for the learner.
 * **A/B testing / experimentation tooling** — deferred until there's a concrete, mission-aligned question worth testing (not for engagement optimization, which conflicts with Calm by Default). Tentative notes in tech-architecture.md §9 for when it's needed.
 

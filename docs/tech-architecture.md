@@ -139,6 +139,8 @@ Classes and Dhamma Library are the two main navigation groups; discovery lives u
 
 Represent the query, tag and page in URL parameters so deep links, history and locale switching preserve discovery state. Provide counts, active filters, reset and empty states. Translate UI labels using stable keys. Full-text search inside PDFs, OCR and transcription remain Phase 4.
 
+**Known limitation: search queries must be typed in Unicode.** The index holds Unicode text (Zawgyi filenames are converted by the generator), so a query typed on a Zawgyi keyboard or font finds nothing, even for a book that is listed. Supporting Zawgyi-typed queries is a possible future improvement with no scheduled phase or date (see §10).
+
 ### Library content pipeline
 
 **Phase 1: generate, don't hand-edit.** A script in `scripts/` lists the bucket with `aws s3api list-objects-v2` using a read-only profile (for example an IAM Identity Center profile) and writes the manifest, so builds and CI never need AWS credentials. It skips zero-byte objects, reports non-PDF files, detects duplicates by normalized path, name and size (for example the nine files that exist both with and without U+200B under `၉။ ပေမူများ`) and indexes each work once, fails on keys that do not round-trip through URL encoding, and sorts its output deterministically so PR diffs stay small. Files are served from the existing CDN base URL (`LIBRARY_CDN_BASE`, currently `https://dhamma-library.b-cdn.net`). The bucket has versioning enabled with a lifecycle rule that expires noncurrent versions after 90 days.
@@ -324,6 +326,10 @@ When a feature needs server state (accounts, progress sync, dynamic content), ad
 * Passwordless. Candidate implementation: **Better Auth** inside the Fastify app, storing users in the same Postgres.
 * Sign-in methods: **Google** first, plus **email magic link sent via SendGrid**. Facebook and Apple can be added later if learners ask. Avoid SMS OTP.
 * Collect the minimum data needed and state its purpose clearly.
+
+### Zawgyi-typed search queries (no scheduled phase)
+
+Library search assumes Unicode input (see "Known limitation" in §3). Learners on older phones may still type Zawgyi. Options when this is taken up: detect Zawgyi in the query in the browser and convert it before searching (the detector and converter in `myanmar-tools` are small and run client-side), or index the original Zawgyi filename text as an extra searchable field. Either needs a Burmese-speaker review of the golden queries and the 0.9 detector threshold, and an acceptance test with real Zawgyi input. No date is set; it is not part of Phases 0–2.
 
 ### Offline support
 

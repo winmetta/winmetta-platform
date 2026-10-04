@@ -88,7 +88,7 @@ Baseline as of September 2026 — re-verify current versions before using if sig
 
 ## 8. Deferred / Future Plan — do not build these in v1
 
-See prd.md §4.7 for full reasoning. Summary: product analytics/metric collection, profile timezone preferences, monastic-facing content upload tooling, backend/database and cross-device account sync (Future Phase 5 — tentative notes in tech-architecture.md §10), offline/PWA support, community submissions/moderation, native mobile apps, Zawgyi legacy encoding support, and A/B testing (tech-architecture.md §9 — only for learning-outcome questions, never engagement optimization). Future-phase notes are tentative directions, not source of truth.
+See prd.md §4.7 for full reasoning. Summary: product analytics/metric collection, profile timezone preferences, monastic-facing content upload tooling, backend/database and cross-device account sync (Future Phase 5 — tentative notes in tech-architecture.md §10), offline/PWA support, community submissions/moderation, native mobile apps, Zawgyi legacy encoding support (including Zawgyi-typed search queries: v1 search assumes Unicode input, no date set), and A/B testing (tech-architecture.md §9 — only for learning-outcome questions, never engagement optimization). Future-phase notes are tentative directions, not source of truth.
 
 ## 9. Key CLI Commands
 
