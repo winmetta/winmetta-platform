@@ -1,0 +1,134 @@
+{
+  "en": [
+    {
+      "id": "install",
+      "heading": "Install Zoom",
+      "paragraphs": [
+        "You can join from a phone, tablet or computer. Install the free Zoom app first. You do not need a Zoom account to join."
+      ],
+      "links": [
+        {
+          "label": "iPhone and iPad (App Store)",
+          "url": "https://apps.apple.com/us/app/id546505307"
+        },
+        {
+          "label": "Android (Google Play)",
+          "url": "https://play.google.com/store/apps/details?id=us.zoom.videomeetings"
+        },
+        {
+          "label": "Windows and Mac (Zoom download center)",
+          "url": "https://zoom.us/download"
+        }
+      ]
+    },
+    {
+      "id": "join",
+      "heading": "Join a class",
+      "steps": [
+        "Open the Join on Zoom link on the Classes or Study groups page at class time. The Zoom app opens.",
+        "Or open the Zoom app, tap Join, and type the meeting ID shown on the class card.",
+        "Type your name. For retreats, put your yogi number before your name if the organizers gave you one.",
+        "If Zoom asks for a passcode, type it as shown on the class card.",
+        "Wait to be admitted if you are asked to, then choose to join with computer or device audio."
+      ]
+    },
+    {
+      "id": "audio",
+      "heading": "Microphone and camera",
+      "paragraphs": [
+        "Keep your microphone muted while the teacher speaks, so the room stays quiet. The buttons are at the bottom left on a computer, and at the bottom of the screen on a phone (tap the screen if they are hidden). Tap Unmute to speak and Mute when you finish. Start Video and Stop Video turn your camera on and off."
+      ]
+    },
+    {
+      "id": "raise-hand",
+      "heading": "Raise your hand",
+      "steps": [
+        "On a phone or tablet: tap the screen, tap More, then tap Raise Hand.",
+        "On a computer: choose Reactions, then Raise Hand.",
+        "Lower your hand the same way after you have spoken."
+      ]
+    },
+    {
+      "id": "rename",
+      "heading": "Change your name",
+      "steps": [
+        "Open Participants.",
+        "On a computer, move over your name, choose More, then Rename. On a phone, tap your name, then Rename.",
+        "Type your new name and confirm."
+      ]
+    },
+    {
+      "id": "breakout",
+      "heading": "Breakout rooms",
+      "paragraphs": [
+        "During online retreats the host may invite you to a breakout room to ask the teacher an individual question. When the invitation appears, choose Join. You can choose Leave Room to return to the main meeting."
+      ]
+    }
+  ],
+  "my": [
+    {
+      "id": "install",
+      "heading": "Zoom ထည့်သွင်းရန်",
+      "paragraphs": [
+        "ဖုန်း၊ တက်ဘလက် သို့မဟုတ် ကွန်ပျူတာဖြင့် တက်ရောက်နိုင်ပါသည်။ အရင်ဆုံး အခမဲ့ Zoom app ကို ထည့်သွင်းပါ။ တက်ရောက်ရန် Zoom account မလိုပါ။"
+      ],
+      "links": [
+        {
+          "label": "iPhone နှင့် iPad (App Store)",
+          "url": "https://apps.apple.com/us/app/id546505307"
+        },
+        {
+          "label": "Android (Google Play)",
+          "url": "https://play.google.com/store/apps/details?id=us.zoom.videomeetings"
+        },
+        {
+          "label": "Windows နှင့် Mac (Zoom download center)",
+          "url": "https://zoom.us/download"
+        }
+      ]
+    },
+    {
+      "id": "join",
+      "heading": "သင်တန်းသို့ ဝင်ရန်",
+      "steps": [
+        "သင်တန်းချိန်တွင် သင်တန်းများ သို့မဟုတ် လေ့လာရေးအဖွဲ့များ စာမျက်နှာရှိ Zoom တွင် ဝင်ရန် လင့်ခ်ကို ဖွင့်ပါ။ Zoom app ပွင့်လာပါမည်။",
+        "သို့မဟုတ် Zoom app ကိုဖွင့်ပြီး Join ကိုနှိပ်ကာ သင်တန်းကတ်တွင် ပြထားသော အစည်းအဝေးနံပါတ်ကို ရိုက်ထည့်ပါ။",
+        "မိမိအမည်ကို ရိုက်ထည့်ပါ။ တရားစခန်းများတွင် ယောဂီနံပါတ် ရထားပါက အမည်ရှေ့တွင် ထည့်ပါ။",
+        "Zoom က စကားဝှက် တောင်းပါက သင်တန်းကတ်တွင် ပြထားသည့်အတိုင်း ရိုက်ထည့်ပါ။",
+        "ဝင်ခွင့်ပေးသည်အထိ စောင့်ရန် ပြောပါက စောင့်ပြီး ကွန်ပျူတာ သို့မဟုတ် စက်၏ အသံဖြင့် ဝင်ရန် ရွေးပါ။"
+      ]
+    },
+    {
+      "id": "audio",
+      "heading": "မိုက်ခရိုဖုန်းနှင့် ကင်မရာ",
+      "paragraphs": [
+        "သင်ကြားသူ သင်ကြားနေစဉ် ငြိမ်သက်စေရန် မိမိ၏ မိုက်ခရိုဖုန်းကို ပိတ်ထားပါ။ ခလုတ်များသည် ကွန်ပျူတာတွင် အောက်ဘက်ဘယ်ဘက်၌လည်းကောင်း၊ ဖုန်းတွင် မျက်နှာပြင်အောက်ခြေ၌လည်းကောင်း ရှိပါသည် (မမြင်ပါက မျက်နှာပြင်ကို တို့ပါ)။ စကားပြောရန် Unmute ကိုနှိပ်ပြီး ပြီးလျှင် Mute ပြန်နှိပ်ပါ။ Start Video နှင့် Stop Video ဖြင့် ကင်မရာကို ဖွင့်ပိတ်နိုင်ပါသည်။"
+      ]
+    },
+    {
+      "id": "raise-hand",
+      "heading": "လက်ထောင်ရန်",
+      "steps": [
+        "ဖုန်း သို့မဟုတ် တက်ဘလက်တွင် မျက်နှာပြင်ကို တို့ပြီး More ကိုနှိပ်ကာ Raise Hand ကိုနှိပ်ပါ။",
+        "ကွန်ပျူတာတွင် Reactions ကိုရွေးပြီး Raise Hand ကိုရွေးပါ။",
+        "ပြောပြီးလျှင် လက်ကို ထိုနည်းတူပြန်ချပါ။"
+      ]
+    },
+    {
+      "id": "rename",
+      "heading": "အမည်ပြောင်းရန်",
+      "steps": [
+        "Participants ကိုဖွင့်ပါ။",
+        "ကွန်ပျူတာတွင် မိမိအမည်ပေါ်သို့ မောက်စ်ရွှေ့ကာ More ပြီး Rename ကိုရွေးပါ။ ဖုန်းတွင် မိမိအမည်ကို တို့ပြီး Rename ကိုနှိပ်ပါ။",
+        "အမည်အသစ်ကို ရိုက်ထည့်ပြီး အတည်ပြုပါ။"
+      ]
+    },
+    {
+      "id": "breakout",
+      "heading": "Breakout room များ",
+      "paragraphs": [
+        "အွန်လိုင်းတရားစခန်းများအတွင်း သင်ကြားသူထံ တစ်ဦးချင်း မေးမြန်းနိုင်ရန် host က breakout room သို့ ဖိတ်ခေါ်နိုင်ပါသည်။ ဖိတ်ခေါ်ချက်ပေါ်လာလျှင် Join ကိုရွေးပါ။ ပင်မအစည်းအဝေးသို့ ပြန်လိုပါက Leave Room ကိုရွေးပါ။"
+      ]
+    }
+  ]
+}

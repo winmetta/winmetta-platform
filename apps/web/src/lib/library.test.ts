@@ -90,17 +90,44 @@ describe('content contracts', () => {
       true,
     );
     const sample = {
-      ...book,
-      teacher: 'Example Teacher',
+      id: 'sample-class',
+      sourceLanguage: 'en',
+      translations: { en: { title: 'Sample class', description: 'Synthetic' } },
+      sourceUrl: 'https://example.invalid/class',
+      verifiedAt: '2026-09-30',
+      languages: ['en'],
+      kind: 'class',
       status: 'active',
-      recurrence: { timezone: 'Asia/Yangon', weekday: 1, time: '09:00' },
+      recurrences: [
+        {
+          timezone: 'Asia/Yangon',
+          weekday: 1,
+          time: '09:00',
+          endTime: '10:00',
+        },
+      ],
     };
     expect(classSchema.safeParse(sample).success).toBe(true);
     expect(
       classSchema.safeParse({
         ...sample,
-        recurrence: { ...sample.recurrence, time: '24:00' },
+        recurrences: [{ ...sample.recurrences[0], time: '24:00' }],
       }).success,
+    ).toBe(false);
+    // Active classes need a slot; archived classes must not carry schedule details.
+    expect(classSchema.safeParse({ ...sample, recurrences: [] }).success).toBe(
+      false,
+    );
+    expect(
+      classSchema.safeParse({ ...sample, status: 'archived' }).success,
+    ).toBe(false);
+    expect(
+      classSchema.safeParse({ ...sample, status: 'archived', recurrences: [] })
+        .success,
+    ).toBe(true);
+    expect(
+      classSchema.safeParse({ ...sample, kind: 'study-group', streamed: true })
+        .success,
     ).toBe(false);
   });
 });
