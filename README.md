@@ -17,7 +17,7 @@ This public repo currently contains **planning documentation only** — decision
 | [docs/implementation-plan.md](docs/implementation-plan.md) | Phases 0–2: foundation code, five bilingual pages, infrastructure & deployment; checklists and macOS setup |
 | [AGENTS.md](AGENTS.md) | Quick-reference conventions for contributors and AI coding agents working in this repo — **read this before making changes**, especially §2 on this repo being public |
 
-Phase 1 will introduce Home, About, Privacy, Classes and Dhamma Library for online Zoom students and anonymous independent learners worldwide. Content will be concise and curated from the existing site, with an original mobile/desktop design. Classes and Dhamma Library are the two main page groups; the library includes curated resources across media types, including blog-post links, with basic search.
+Phase 1 will introduce Home, About, Privacy, Classes and Dhamma Library for online Zoom students and anonymous independent learners worldwide. Content will be concise and curated from the existing site, with an original mobile/desktop design. Classes and Dhamma Library are the two main page groups; the library indexes every PDF in the project's S3 bucket (about 3,000 mostly Burmese books) with folder-style tag browsing and fuzzy, Burmese-aware search, plus curated links such as blog posts and apps.
 
 ## Core Principles
 

@@ -68,8 +68,8 @@ No account is required to set or use these preferences — they are stored local
 
 * **Classes and Dhamma Library are the two main page groups**, primarily serving online students and independent learners respectively, with access open to both. Class pages link to relevant library resources.
 * **Dhamma Resources is part of Dhamma Library**, not a separate top-level page. The unified library supports books, PDF files, mobile/desktop app URLs, audio, video, images, slides, blog posts and other curated links.
-* Phase 1 provides **basic** search (case-insensitive substring match over English/Burmese titles, descriptions, author/teacher names and tags) plus category, content-type and language filters over a small curated collection, with browse navigation, clear filters, empty states and shareable query/filter URLs. Full-featured search is Phase 4.
-* Keep subject categories, resource types, file formats and app platforms distinct. A book can have a PDF download, and an app can have mobile/desktop links within one entry. Preserve source language and attribution. Full-text indexing, OCR, transcripts and ranked/fuzzy search are future work (Phase 4).
+* Phase 1 **indexes every PDF in the existing S3 bucket** (about 3,000 files, mostly Burmese books; already public via winmetta.org). Most visitors type Burmese words and do not know a title or author, so search is **fuzzy** and surfaces similar books, built on MiniSearch with Burmese-aware normalization (ဥ/ဉ and Burmese/ASCII digits treated as equal). Folders become **tags** (number prefix removed; each path segment is a tag) used for folder-style browsing and filtering, with clear filters, empty states and shareable query/tag URLs. Apps, blog links and other non-S3 items stay curated. Details: tech-architecture.md §3.
+* Keep subject categories, resource types, file formats and app platforms distinct. A book can have a PDF download, and an app can have mobile/desktop links within one entry. Preserve source language and attribution. Full-text indexing inside PDFs, OCR and transcripts are future work (Phase 4).
 * A unified class archive: recordings and descriptions per teacher/series pulled together from YouTube and Facebook into one browsable, searchable timeline (e.g., "Paṭṭhāna course episode 115") so students aren't hunting across three platforms.
 * **Link out to, rather than rebuild, existing best-in-class Tipiṭaka reader apps** (e.g., Tipitaka.app, tipitakapali.org) for full canonical-text search — that problem is already well solved.
 * **Rights check required before republishing:** confirm copyright/attribution status of JPTS (Journal of the Pali Text Society) material and other rare-book scans; only host what Win Metta has the right to redistribute.
@@ -146,7 +146,7 @@ Metric collection is deferred beyond v1. Do not instrument these outcomes or add
                                            v
 +---------------------------------------------------------------------------------------+
 | Phase 1: Five Bilingual Pages                                                          |
-| Home, About, Privacy, Classes, Dhamma Library (basic search) in English and Burmese    |
+| Home, About, Privacy, Classes, Dhamma Library (S3 index, fuzzy search); en + my        |
 +---------------------------------------------------------------------------------------+
                                            |
                                            v
@@ -164,7 +164,7 @@ Metric collection is deferred beyond v1. Do not instrument these outcomes or add
                                            v
 +---------------------------------------------------------------------------------------+
 | Phase 4: Library & Class Archive Expansion                                             |
-| More curated content, unified class archive, full-featured search                      |
+| S3 upload and index pipeline, class archive, full-text/OCR search, more content        |
 +---------------------------------------------------------------------------------------+
                                            |
                                            v
@@ -181,10 +181,10 @@ Metric collection is deferred beyond v1. Do not instrument these outcomes or add
 ```
 
 * **Phase 0 — Foundation Code:** Public MIT-licensed repo, tooling, basic CI, and an Astro app with all needed libraries and English/Burmese localization support. No real pages or content and no deployment. See implementation-plan.md §2.
-* **Phase 1 — Five Bilingual Pages:** Home, About, Privacy, Classes and Dhamma Library (basic search) in English and Burmese, with an original mobile/desktop design, serving online class students and independent learners worldwide. Adds the CI deploy workflow to a single non-public review app. See implementation-plan.md §3.
+* **Phase 1 — Five Bilingual Pages:** Home, About, Privacy, Classes and Dhamma Library (the whole S3 PDF library with tag browsing and fuzzy Burmese search) in English and Burmese, with an original mobile/desktop design, serving online class students and independent learners worldwide. Adds the CI deploy workflow to a single non-public review app. See implementation-plan.md §3.
 * **Phase 2 — Infrastructure & Deployment:** Terraform, domains (`app.winmetta.org`), Azure, AWS S3 media storage with bunny.net CDN, Cloudflare DNS, and staging and production environments with promotion. The site becomes public here. See implementation-plan.md §4. No backend or database.
 * **Phase 3 — LLB Pilot:** The flagship learning deliverable. Digitizes the LLB curriculum, proven and already-tested; piloted directly with the existing "Let's Learn Burmese" class roster (currently taught by Ven. U Garudhamma) before wider release.
-* **Phase 4 — Library & Class Archive Expansion:** Expands the Phase 1 library with more curated content, a unified class timeline, and full-featured search; evaluate deeper content indexing when needed.
+* **Phase 4 — Library & Class Archive Expansion:** Defines the repeatable pipeline for adding PDFs to S3 and refreshing the index and pages (generator, review PR, CI checks, deploy; see tech-architecture.md §3), plus a unified class timeline and deeper content indexing (full-text, OCR, transcripts) when needed.
 * **Phase 5 — Optional Accounts & Progress Sync:** Cross-device sync for learners who want it, opt-in only. This is likely where a backend and database are first introduced (tentative; see tech-architecture.md §10).
 * **Phase 6 — Future Plan:** Monastic-facing content tools, community submissions/moderation, native mobile apps, and further curricula beyond LLB (e.g. PGTP, the natural next step, may be pulled forward once LLB is validated — plans can change).
 

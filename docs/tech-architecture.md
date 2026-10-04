@@ -85,7 +85,7 @@ winmetta-platform/
 │   │   ├── src/
 │   │   │   ├── pages/         # locale-prefixed routes; five starter pages in Phase 1, curricula later
 │   │   │   ├── components/    # Astro components + React islands
-│   │   │   └── content/       # localized pages, resources, library categories, classes; curricula later
+│   │   │   └── content/       # localized pages, curated resources, library manifest and folder tags, classes; curricula later
 │   │   ├── astro.config.mjs
 │   │   └── package.json
 │   ├── mobile/                # future
@@ -124,11 +124,32 @@ Deployment workflows use GitHub `staging` and `production` environments, mapping
 
 ### Library model and discovery (Phase 1)
 
-Classes and Dhamma Library are the two main navigation groups; resource discovery lives under `/[locale]/dhamma-library/`. Use one shared resource collection with stable IDs, localized titles/descriptions, source language(s), category IDs, resource type, tags, author/teacher attribution, source URL and verification date. Access links carry format, platform (for apps), MIME type and file size where known. A book with a PDF and a slide deck with a PDF remain distinct resource types; avoid duplicate entries for alternate formats.
+Classes and Dhamma Library are the two main navigation groups; discovery lives under `/[locale]/dhamma-library/`. The library has two sources that feed one search index:
 
-Search is **basic**: generate a small metadata list from published records at build time, load it on library pages only, and filter in the browser with a case-insensitive substring match over title, description, author/teacher and tags. Substring matching works for Burmese without word segmentation. No backend, ranking, fuzzy matching or full-text search. Match English and Unicode Burmese metadata regardless of UI locale. Translate category/type labels using stable keys, and visibly label source-language fallback in results.
+* **S3 files (the bulk):** every PDF in the bucket `dhamma-library`, represented by generated records in a committed manifest (`apps/web/src/library/manifest.json`). Each record has a stable id, the exact S3 `key` (used only to build the CDN URL, URL-encoded), a display `title`, an optional `titleNote` (trailing parenthetical text), `tags` and `tagPath`, an inferred `language`, `sizeBytes`, `format` and `lastModified`. A lean `libraryFileSchema` in `lib/schemas.ts` validates it, separate from the curated `resourceSchema`. Human corrections (title, author, language, extra tags, hide, "same work as") live in `overrides.json`, keyed by S3 key. Never rename S3 objects to fix a title: it breaks public URLs.
+* **Curated resources:** apps, blog-post links and other non-S3 items stay in the curated `resources` collection with source URLs and verification dates.
 
-Represent the query and category/type/language filters in URL parameters so deep links, history and locale switching preserve discovery state. Provide category browsing, result counts, reset and empty states; keep the curated listing accessible before search hydration. Search queries are not sent to an analytics service. Full-featured search (ranking, fuzzy matching, a dedicated library such as Pagefind or MiniSearch), file-body indexing, OCR, transcription and external-site crawling are deferred to Phase 4.
+**Tags, not categories.** Every segment of an S3 key's folder path is a tag, with the leading number removed (`^[0-9၀-၉]+[။.]\s*`) and zero-width characters dropped, so `၁၀။ မြန်မာရှား (၁)/၁။ ဝိနိစ္ဆယများ/x.pdf` carries `မြန်မာရှား (၁)` and `ဝိနိစ္ဆယများ`. Display text keeps the original spelling; identity and matching use the normalized form. Folder-style navigation is built from `tagPath`: one pre-rendered static page per folder with breadcrumbs and pagination (folder 10 alone holds about 1,000 files), working without JavaScript. Stable ASCII folder ids come from a committed `folders.json` (Burmese and English display names, sort order from the original number prefix), so URLs survive renames.
+
+**Normalization** is one shared function used at build time and for queries: NFC; remove U+200B, U+200C and U+200D; lowercase; fold ဥ (U+1025) and ဉ (U+1009) to one letter; map Burmese digits ၀–၉ to ASCII 0–9; for Latin text only, fold diacritics (`pali` finds `Pāḷi`). Combining marks on Burmese characters are never stripped. The digit ၀ and the letter ဝ are not folded (open question for Burmese review). Keys and URLs always use the exact stored key.
+
+**Search uses MiniSearch.** The index is built at build time, shipped as serialized JSON and loaded lazily on library pages only; folder pages stay static HTML, so browsing works before and without search hydration. Tokenization: Latin words split on whitespace and punctuation; Burmese runs are segmented into syllables by a deterministic syllable regex (a port of the Myanmar syllable-break rule, unit-tested; not `Intl.Segmenter`, whose Burmese segmentation differs across browsers) and indexed as 1–3 syllable n-grams, so unspaced and half-typed Burmese queries work. Indexed text: title, title note, tags and folder-path names. Queries split on spaces and every chunk must match (AND); matches start at syllable boundaries (`က` does not match inside `ကျ`) and may end mid-syllable. Ranking uses field boosts (title above tags and path, above title note), then tiers: exact title, title starts with the query, title contains it, match only in tags, path or note; ties by folder order, then title. A fuzzy pass (small edit distance, terms of sufficient length) fills a labelled **"Similar books"** group below the exact matches, and zero-result searches show fuzzy matches plus "more in <tag>" suggestions. Match English and Unicode Burmese metadata regardless of UI locale. No backend; no query logging or analytics.
+
+**Budgets** (verified in a prototype before the UI is built, recorded here): serialized index at most about 400 KB gzipped, a query in well under 50 ms on a mid-range phone, results rendered in pages and never all at once. If Burmese relevance or the budget fails, reduce n-gram size or fall back to a substring-plus-tiers matcher behind a flag. A Burmese-speaker-reviewed golden-query suite (partial words, typos, spaced and unspaced queries, digits, ဥ/ဉ variants) runs in CI against the real manifest.
+
+Represent the query, tag and page in URL parameters so deep links, history and locale switching preserve discovery state. Provide counts, active filters, reset and empty states. Translate UI labels using stable keys. Full-text search inside PDFs, OCR and transcription remain Phase 4.
+
+### Library content pipeline
+
+**Phase 1: generate, don't hand-edit.** A script in `scripts/` lists the bucket with `aws s3api list-objects-v2` using a read-only profile (for example an IAM Identity Center profile) and writes the manifest, so builds and CI never need AWS credentials. It skips `done.txt` and zero-byte objects, reports non-PDF files, detects duplicates by normalized path, name and size (for example the nine files that exist both with and without U+200B under `၉။ ပေမူများ`) and indexes each work once, fails on keys that do not round-trip through URL encoding, and sorts its output deterministically so PR diffs stay small. Files are served from the existing CDN base URL (`LIBRARY_CDN_BASE`, currently `https://dhamma-library.b-cdn.net`). The bucket has versioning enabled with a lifecycle rule that expires noncurrent versions after 90 days.
+
+**Phase 4: adding new PDFs.**
+
+1. A maintainer uploads PDFs with the AWS CLI (`aws s3 cp` or `sync`) into the correct numbered folder using a write-capable profile. An upload helper refuses names that need fixing (zero-width characters, non-NFC text, duplicate names).
+2. Replacing an existing file relies on S3 versioning for recovery and a Bunny cache purge for the changed paths.
+3. The maintainer, or a manually triggered or scheduled GitHub Actions job using an OIDC role with read-only S3 access, re-runs the generator and opens a PR containing the manifest diff: added, changed and removed files, a duplicate report and new tags.
+4. CI validates the schemas, the golden queries and the index size budget. A reviewer checks titles, tags and Burmese text in `overrides.json`; merging to `main` deploys.
+5. The generator is the only way new files appear on the site; there is no hand-edited listing HTML. Full-text and OCR indexing, transcripts and the class archive are separate Phase 4 work.
 
 ### Curriculum naming
 
@@ -225,6 +246,7 @@ Win Metta has an Azure for Nonprofits grant ($2,000/year). It covers only first-
 * **Origin access:** keep the bucket private and use Bunny's S3 origin authentication with a dedicated IAM user whose policy is read-only (`s3:GetObject`) on that bucket only. Set the pull zone's origin region to match the bucket. This means the raw S3 URL cannot bypass the CDN. **Verify Bunny's S3 authentication against your bucket's region during Phase 2 before relying on it.**
 * **Credentials:** AWS access keys and Bunny API keys live in secret configuration only, never in client code or committed files. Use separate IAM credentials for the read-only Bunny origin user and for maintainer uploads (write access, e.g. via the AWS CLI `aws s3 sync`).
 * Use versioned object paths for replaced media. Public access requires no learner account or token.
+* **Current state (Phase 1 source):** the existing bucket `dhamma-library` (us-east-2) and the Bunny pull zone `dhamma-library.b-cdn.net` already serve the library. Phase 1 reads and links to them as they are; Phase 2 decides whether to keep them or migrate to `cdn.app.winmetta.org`. Do not record the AWS account number in this public repo.
 
 Release checks: anonymous fetches succeed on cache misses and hits; audio/video seeking (range requests) works; MIME types, cache headers and CORS for browser fetches are correct.
 
