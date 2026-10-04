@@ -35,8 +35,11 @@ export function formatOccurrence(
     hour: 'numeric',
     minute: '2-digit',
     timeZoneName: 'short',
+    numberingSystem: 'latn',
   }).format(instant);
 }
 export function formatNumber(value: number, locale: Locale): string {
-  return new Intl.NumberFormat(locales[locale].formatLocale).format(value);
+  return new Intl.NumberFormat(locales[locale].formatLocale, {
+    numberingSystem: 'latn',
+  }).format(value);
 }
