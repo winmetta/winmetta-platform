@@ -118,7 +118,7 @@ Start simple: keep code and Astro content collections inside `apps/web`, and ext
 
 ### Environment configuration
 
-Keep one committed `.env.example` and one optional, ignored root `.env.local` for developer-machine overrides. The web config loads `.env.local`, with injected process variables taking precedence. Turbo includes this file in its cache dependencies. `SITE_URL` controls canonical/alternate URLs; `PUBLIC_ALLOW_INDEXING` is enabled only for public production builds. Public variables must never contain secrets.
+Keep one committed `.env.example` and one optional, ignored root `.env.local` for developer-machine overrides. The web config loads `.env.local`, with injected process variables taking precedence. Turbo includes this file in its cache dependencies. `SITE_URL` controls canonical/alternate URLs; `PUBLIC_ALLOW_INDEXING` is enabled only for public production builds. `PUBLIC_LIBRARY_CDN_BASE` is the public origin that serves library PDFs (default: the existing bunny.net pull zone). Public variables must never contain secrets.
 
 Deployment workflows use GitHub `staging` and `production` environments, mapping their variables and secrets explicitly into build/deploy jobs. Do not maintain `.env.staging` or `.env.production` files. Phase 1's review build supplies its origin through CI with indexing disabled. Add `.env.test` later only if tests need it.
 
