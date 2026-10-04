@@ -1,0 +1,161 @@
+---
+import { Image } from 'astro:assets';
+import Shell from '../../../layouts/Shell.astro';
+import { localeCodes, type Locale } from '../../../i18n/locales';
+import { route, teacherRoute } from '../../../i18n/routes';
+import { t } from '../../../i18n/messages';
+import { languageOf } from '../../../lib/library-index';
+import { portrait } from '../../../lib/people-images';
+import { allClasses, classText } from '../../../lib/classes';
+import { retreatsOf, retreatText } from '../../../lib/retreats';
+import { retreatRoute, route as pageRoute } from '../../../i18n/routes';
+import {
+  allTeachers,
+  teacherBio,
+  teacherName,
+  teacherPlace,
+} from '../../../lib/teachers';
+export function getStaticPaths() {
+  return localeCodes.flatMap((locale) =>
+    allTeachers.map((teacher) => ({
+      params: { locale, id: teacher.id },
+      props: { locale, id: teacher.id },
+    })),
+  );
+}
+interface Props {
+  locale: Locale;
+  id: string;
+}
+const { locale, id } = Astro.props;
+const teacher = allTeachers.find((entry) => entry.id === id);
+if (!teacher) throw new Error(`Unknown teacher ${id}`);
+const name = teacherName(teacher, locale);
+const place = teacherPlace(teacher, locale);
+const image = portrait(teacher.photo);
+const bio = teacherBio(teacher, locale);
+const classes = allClasses.filter((entry) => entry.teacherId === id);
+const retreats = retreatsOf(id);
+const text = (key: Parameters<typeof t>[1]) => t(locale, key);
+---
+
+<Shell
+  locale={locale}
+  title={name}
+  path={teacherRoute(locale, id).slice(`/${locale}/`.length)}
+>
+  <nav aria-label={text('breadcrumb')}>
+    <ol class="crumbs">
+      <li>
+        <a href={route(locale, 'teachers')}>{text('teachersTitle')}</a>
+      </li>
+      <li class="flex items-center gap-x-1">
+        <span aria-hidden="true" class="muted">›</span>
+        <span aria-current="page" lang={languageOf(name)}>{name}</span>
+      </li>
+    </ol>
+  </nav>
+
+  <header class="flex flex-wrap items-center gap-6">
+    {
+      image && (
+        <Image
+          src={image}
+          width={160}
+          height={160}
+          class="avatar avatar-lg"
+          alt=""
+        />
+      )
+    }
+    <div class="space-y-2">
+      <h1 class="text-3xl font-bold sm:text-4xl" lang={languageOf(name)}>
+        {name}
+      </h1>
+      {
+        place && (
+          <p class="muted">
+            {text('teacherPlaceLabel')}:{' '}
+            <span lang={languageOf(place)}>{place}</span>
+          </p>
+        )
+      }
+    </div>
+  </header>
+
+  {
+    (bio.isDraft || bio.isFallback) && (
+      <p class="card" role="note">
+        {bio.isDraft ? text('bioDraftNote') : text('bioFallbackNote')}
+      </p>
+    )
+  }
+
+  <article class="max-w-3xl space-y-8" lang={bio.language}>
+    {
+      bio.sections.map((section) => (
+        <section class="space-y-3">
+          {section.heading && (
+            <h2 class="text-xl font-bold">{section.heading}</h2>
+          )}
+          {section.paragraphs.map((paragraph) => (
+            <p>{paragraph}</p>
+          ))}
+        </section>
+      ))
+    }
+  </article>
+
+  {
+    classes.length > 0 && (
+      <section class="space-y-2" aria-labelledby="t-classes">
+        <h2 id="t-classes" class="text-2xl font-bold">
+          {text('teacherClasses')}
+        </h2>
+        <ul class="space-y-1">
+          {classes.map((entry) => (
+            <li>
+              <a
+                class="link"
+                href={`${pageRoute(locale, entry.kind === 'class' ? 'classes' : 'studyGroups')}#${entry.id}`}
+                lang={classText(entry, locale).language}
+              >
+                {classText(entry, locale).value.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+  {
+    retreats.length > 0 && (
+      <section class="space-y-2" aria-labelledby="t-retreats">
+        <h2 id="t-retreats" class="text-2xl font-bold">
+          {text('teacherRetreats')}
+        </h2>
+        <ul class="space-y-1">
+          {retreats.map((entry) => (
+            <li>
+              <a
+                class="link"
+                href={retreatRoute(locale, entry.id)}
+                lang={retreatText(entry, locale).language}
+              >
+                {retreatText(entry, locale).value.title}
+              </a>{' '}
+              <span class="muted">({entry.startDate.slice(0, 4)})</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+  <p class="flex flex-wrap items-center gap-3">
+    <a class="btn btn-outline" href={teacher.bioSourceUrl} rel="noopener"
+      >{text('bioSource')}</a
+    >
+    <a class="link" href={route(locale, 'teachers')}>{text('backToTeachers')}</a
+    >
+  </p>
+</Shell>
