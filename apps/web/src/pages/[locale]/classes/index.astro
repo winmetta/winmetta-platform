@@ -1,0 +1,22 @@
+---
+import ClassesPage from '../../../components/ClassesPage.astro';
+import { localeCodes, type Locale } from '../../../i18n/locales';
+export function getStaticPaths() {
+  return localeCodes.map((locale) => ({
+    params: { locale },
+    props: { locale },
+  }));
+}
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+---
+
+<ClassesPage
+  locale={locale}
+  kind="class"
+  page="classes"
+  title="classesTitle"
+  intro="classesIntro"
+/>

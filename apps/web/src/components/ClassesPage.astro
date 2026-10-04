@@ -1,0 +1,134 @@
+---
+import Shell from '../layouts/Shell.astro';
+import BrandIcon from './BrandIcon.astro';
+import ClassCard from './ClassCard.astro';
+import WeeklySchedule from './WeeklySchedule';
+import { classText } from '../lib/classes';
+import { scheduleZones, type ZoneId } from '../lib/schedule-zones';
+import { languageList } from '../lib/languages';
+import { teacherById, teacherName } from '../lib/teachers';
+import { languageOf } from '../lib/library-index';
+import { format, t, type MessageKey } from '../i18n/messages';
+import { route, type PageId } from '../i18n/routes';
+import { byKind } from '../lib/classes';
+import type { Locale } from '../i18n/locales';
+interface Props {
+  locale: Locale;
+  kind: 'class' | 'study-group';
+  page: PageId;
+  title: MessageKey;
+  intro: MessageKey;
+}
+const { locale, kind, page, title, intro } = Astro.props;
+const text = (key: MessageKey) => t(locale, key);
+const builtAt = new Date().toISOString();
+const records = byKind(kind);
+const active = records.filter((record) => record.status === 'active');
+const archived = records.filter((record) => record.status === 'archived');
+const verified =
+  records
+    .map((record) => record.verifiedAt)
+    .sort()
+    .at(-1) ?? '';
+const rows = active.flatMap((record) => {
+  const teacher = record.teacherId ? teacherById(record.teacherId) : undefined;
+  const name = teacher ? teacherName(teacher, locale) : '';
+  const { value, language } = classText(record, locale);
+  return record.recurrences.map((slot) => ({
+    id: `${record.id}-${slot.weekday}`,
+    title: value.title,
+    titleLang: language,
+    teacher: name,
+    teacherLang: languageOf(name),
+    language: languageList(record.languages, locale),
+    slot,
+    href: `#${record.id}`,
+  }));
+});
+const scheduleLabels = {
+  caption: text('scheduleCaption'),
+  day: text('colDay'),
+  time: text('colTime'),
+  timezone: text('timezoneLabel'),
+  zones: Object.fromEntries(
+    scheduleZones.map((entry) => [
+      entry.id,
+      text(`tz_${entry.id}` as MessageKey),
+    ]),
+  ) as Record<ZoneId, string>,
+  klass: text('colClass'),
+  language: text('colLanguage'),
+  teacher: text('colTeacher'),
+};
+const source = records[0]?.sourceUrl ?? 'https://winmetta.org/';
+---
+
+<Shell locale={locale} title={text(title)} page={page}>
+  <header class="space-y-4">
+    <h1 class="text-3xl font-bold sm:text-4xl">{text(title)}</h1>
+    <p class="lead">{text(intro)}</p>
+  </header>
+  <section class="card space-y-2" aria-labelledby="how">
+    <h2 id="how" class="text-xl font-bold">{text('classesHowTitle')}</h2>
+    <p>{text('classesHowText')}</p>
+    <p>
+      <a class="link icon-link" href={route(locale, 'zoomHelp')}
+        ><BrandIcon name="zoom" />{text('zoomHelp')}</a
+      >
+    </p>
+  </section>
+  <section class="space-y-3" aria-labelledby="schedule">
+    <h2 id="schedule" class="text-2xl font-bold">{text('scheduleTitle')}</h2>
+    <p class="muted">{text('scheduleIntro')} {text('scheduleLangNote')}</p>
+    <WeeklySchedule
+      client:load
+      rows={rows}
+      locale={locale}
+      labels={scheduleLabels}
+      builtAt={builtAt}
+    />
+  </section>
+  <ul class="grid gap-4 lg:grid-cols-2">
+    {
+      active.map((record) => (
+        <ClassCard record={record} locale={locale} builtAt={builtAt} />
+      ))
+    }
+  </ul>
+  {
+    archived.length > 0 && (
+      <section class="space-y-3" aria-labelledby="archive">
+        <h2 id="archive" class="text-2xl font-bold">
+          {text('archiveTitle')}
+        </h2>
+        <p class="muted">{text('archiveNote')}</p>
+        <ul class="grid gap-4 lg:grid-cols-2">
+          {archived.map((record) => (
+            <ClassCard record={record} locale={locale} builtAt={builtAt} />
+          ))}
+        </ul>
+      </section>
+    )
+  }
+  {
+    kind === 'class' && (
+      <section class="card space-y-2">
+        <h2 class="text-xl font-bold">{text('dawTitle')}</h2>
+        <p class="muted">{text('dawText')}</p>
+        <p>
+          <a
+            class="link"
+            href="https://winmetta.org/dhamma-byuhar-daw-khin-hla-tin-uowl/"
+            rel="noopener"
+          >
+            {text('dawLink')}
+          </a>
+        </p>
+      </section>
+    )
+  }
+  <p class="muted text-sm">
+    {format(text('classesSource'), { date: verified })}
+    <a class="link" href={source} rel="noopener">winmetta.org</a>
+  </p>
+</Shell>

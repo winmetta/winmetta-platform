@@ -1,0 +1,168 @@
+---
+import BrandIcon from './BrandIcon.astro';
+import { languageList } from '../lib/languages';
+import LinkIcon from './LinkIcon.astro';
+import ClassNext from './ClassNext';
+import { classText, channelLinks } from '../lib/classes';
+import { teacherById, teacherName } from '../lib/teachers';
+import { slotTimes, weekdayName } from '../lib/class-schedule';
+import { teacherRoute } from '../i18n/routes';
+import { format, t, type MessageKey } from '../i18n/messages';
+import { languageOf } from '../lib/library-index';
+import type { Locale } from '../i18n/locales';
+import type { ClassRecord } from '../lib/schemas';
+interface Props {
+  record: ClassRecord;
+  locale: Locale;
+  builtAt: string;
+}
+const { record, locale, builtAt } = Astro.props;
+const text = (key: MessageKey) => t(locale, key);
+const { value, language } = classText(record, locale);
+const teacher = record.teacherId ? teacherById(record.teacherId) : undefined;
+const recordings = record.links.find((link) => link.kind === 'recordings');
+const course = record.links.find((link) => link.kind === 'course');
+const reading = record.links.find((link) => link.kind === 'reading');
+const labels = {
+  next: text('nextClass'),
+  inProgress: text('inProgress'),
+  pacific: text('pacificTime'),
+  myanmar: text('myanmarTime'),
+  nextDay: text('nextDayNote'),
+};
+---
+
+<li class="card space-y-3" id={record.id}>
+  <div class="flex items-start justify-between gap-3">
+    <h3 class="min-w-0 flex-1 text-lg font-semibold" lang={language}>
+      {value.title}
+    </h3>
+    {
+      record.streamed && record.status === 'active' && (
+        // Icon only, to leave the room to the title; the label shows on hover, focus or tap.
+        <span
+          class="live-icon"
+          role="img"
+          tabindex="0"
+          aria-label={text('liveStreamed')}
+          data-label={text('liveStreamed')}
+        >
+          <LinkIcon name="live" />
+        </span>
+      )
+    }
+    {
+      record.status === 'archived' && (
+        <span class="badge badge-pinned">{text('archived')}</span>
+      )
+    }
+  </div>
+  <p class="muted" lang={language}>{value.description}</p>
+  {
+    teacher && (
+      <p class="flex items-center gap-2">
+        <LinkIcon name="teacher" />
+        <span>
+          <span class="sr-only">{text('teacherLabel')}: </span>
+          <a
+            class="link"
+            href={teacherRoute(locale, teacher.id)}
+            lang={languageOf(teacherName(teacher, locale))}
+          >
+            {teacherName(teacher, locale)}
+          </a>
+        </span>
+      </p>
+    )
+  }
+  <p class="flex items-center gap-2 text-sm">
+    <LinkIcon name="language" />
+    <span>
+      <span class="sr-only">{text('taughtIn')}: </span>
+      {languageList(record.languages, locale)}
+    </span>
+  </p>
+  {
+    record.status === 'active' && (
+      <>
+        <ul class="text-sm">
+          {record.recurrences.map((slot) => (
+            <li>
+              {format(text('everyDay'), {
+                day: weekdayName(slot.weekday, locale),
+              })}
+              , {slotTimes(slot, locale)}{' '}
+              {slot.timezone === 'America/Phoenix'
+                ? text('arizonaTime')
+                : text('pacificTime')}
+            </li>
+          ))}
+        </ul>
+        <ClassNext
+          client:visible
+          slots={record.recurrences}
+          locale={locale}
+          labels={labels}
+          builtAt={builtAt}
+        />
+        <div class="join-panel">
+          {record.joinUrl && (
+            <a class="btn btn-zoom" href={record.joinUrl} rel="noopener">
+              {text('joinZoom')}
+            </a>
+          )}
+          <dl class="join-details">
+            <dt>{text('meetingId')}</dt>
+            <dd class="font-mono">{record.meetingId}</dd>
+            {record.publicPasscode && (
+              <>
+                <dt>{text('passcode')}</dt>
+                <dd class="font-mono">{record.publicPasscode}</dd>
+              </>
+            )}
+          </dl>
+        </div>
+      </>
+    )
+  }
+  <p class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+    {
+      record.streamed && record.status === 'active' && (
+        <>
+          <a class="link icon-link" href={channelLinks.youtube} rel="noopener">
+            <BrandIcon name="youtube" />
+            {text('watchYoutube')}
+          </a>
+          <a class="link icon-link" href={channelLinks.facebook} rel="noopener">
+            <BrandIcon name="facebook" />
+            {text('watchFacebook')}
+          </a>
+        </>
+      )
+    }
+    {
+      recordings && (
+        <a class="link icon-link" href={recordings.url} rel="noopener">
+          <LinkIcon name="recordings" />
+          {text('recordings')}
+        </a>
+      )
+    }
+    {
+      course && (
+        <a class="link icon-link" href={course.url} rel="noopener">
+          <LinkIcon name="course" />
+          {text('courseDetails')}
+        </a>
+      )
+    }
+    {
+      reading && (
+        <a class="link icon-link" href={reading.url} rel="noopener">
+          <LinkIcon name="book" />
+          {text('readingLink')}
+        </a>
+      )
+    }
+  </p>
+</li>
