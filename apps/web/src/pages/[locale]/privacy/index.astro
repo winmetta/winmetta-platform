@@ -1,0 +1,59 @@
+---
+import Shell from '../../../layouts/Shell.astro';
+import { locales, localeCodes, type Locale } from '../../../i18n/locales';
+import { t } from '../../../i18n/messages';
+export function getStaticPaths() {
+  return localeCodes.map((locale) => ({
+    params: { locale },
+    props: { locale },
+  }));
+}
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const text = (key: Parameters<typeof t>[1]) => t(locale, key);
+// Update this date whenever the privacy text or what the site collects changes.
+const updated = new Intl.DateTimeFormat(locales[locale].formatLocale, {
+  dateStyle: 'long',
+  numberingSystem: 'latn',
+  timeZone: 'UTC',
+}).format(new Date('2026-10-04T00:00:00Z'));
+const sections = [
+  ['privacyNoneTitle', 'privacyNone'],
+  ['privacyStoredTitle', 'privacyStored'],
+  ['privacyHostingTitle', 'privacyHosting'],
+  ['privacyLinksTitle', 'privacyLinks'],
+] as const;
+---
+
+<Shell locale={locale} title={text('privacyTitle')} page="privacy">
+  <header class="space-y-4">
+    <h1 class="text-3xl font-bold sm:text-4xl">{text('privacyTitle')}</h1>
+    <p class="lead">{text('privacyIntro')}</p>
+  </header>
+  <div class="max-w-3xl space-y-4">
+    {
+      sections.map(([title, body]) => (
+        <section class="card space-y-2" aria-labelledby={title}>
+          <h2 id={title} class="text-xl font-bold">
+            {text(title)}
+          </h2>
+          <p>{text(body)}</p>
+        </section>
+      ))
+    }
+    <section class="card space-y-2" aria-labelledby="privacyContactTitle">
+      <h2 id="privacyContactTitle" class="text-xl font-bold">
+        {text('privacyContactTitle')}
+      </h2>
+      <p>
+        {text('contactPrompt')}{' '}
+        <a class="link" href="mailto:contact@winmetta.org"
+          >contact@winmetta.org</a
+        >
+      </p>
+    </section>
+    <p class="muted text-sm">{text('privacyUpdated')}: {updated}</p>
+  </div>
+</Shell>

@@ -1,10 +1,8 @@
 ---
-import { getCollection } from 'astro:content';
 import Shell from '../../layouts/Shell.astro';
-import SmokeIsland from '../../components/SmokeIsland';
 import { localeCodes, type Locale } from '../../i18n/locales';
+import { route } from '../../i18n/routes';
 import { t } from '../../i18n/messages';
-import { localizedContent } from '../../i18n/content';
 export function getStaticPaths() {
   return localeCodes.map((locale) => ({
     params: { locale },
@@ -15,32 +13,50 @@ interface Props {
   locale: Locale;
 }
 const { locale } = Astro.props;
-const pages = await getCollection('pages');
-const fixture = pages.find((page) => page.data.sourceLanguage === locale);
-if (!fixture) throw new Error(`Missing smoke fixture: ${locale}`);
-const content = localizedContent(
-  fixture.data.translations,
-  fixture.data.sourceLanguage,
-  locale,
-);
+const text = (key: Parameters<typeof t>[1]) => t(locale, key);
+// Add Classes here when its page is built; never link to an unbuilt page.
+const paths = [
+  { page: 'library', title: 'libraryTitle', text: 'homeLibraryText' },
+  { page: 'about', title: 'aboutTitle', text: 'homeAboutText' },
+  { page: 'privacy', title: 'privacyTitle', text: 'homePrivacyText' },
+] as const;
 ---
 
-<Shell locale={locale} title={content.value.title}>
-  <h1 class="text-2xl font-bold sm:text-3xl" lang={content.language}>
-    {content.value.title}
-  </h1>
-  <p class="max-w-prose" lang={content.language}>{content.value.description}</p>
-  {
-    content.isFallback && (
-      <p>
-        {t(locale, 'fallback')}: {content.language}
+<Shell locale={locale} title={text('homeTitle')} page="home">
+  <section class="hero">
+    <div class="space-y-5">
+      <h1 class="text-3xl font-bold sm:text-4xl">{text('homeTitle')}</h1>
+      <p class="lead">{text('homeIntro')}</p>
+      <p class="flex flex-wrap gap-3">
+        <a class="btn btn-primary" href={route(locale, 'library')}
+          >{text('libraryTitle')}</a
+        >
+        <a class="btn btn-outline" href={route(locale, 'about')}
+          >{text('aboutTitle')}</a
+        >
       </p>
-    )
-  }
-  <SmokeIsland
-    client:load
-    show={t(locale, 'showDetails')}
-    hide={t(locale, 'hideDetails')}
-    details={t(locale, 'details')}
-  />
+    </div>
+    <img
+      src="/logo-512.png"
+      width="208"
+      height="208"
+      alt={text('logoAlt')}
+      fetchpriority="high"
+    />
+  </section>
+  <section class="space-y-4" aria-labelledby="start">
+    <h2 id="start" class="text-2xl font-bold">{text('homeExplore')}</h2>
+    <ul class="grid gap-4 sm:grid-cols-3">
+      {
+        paths.map((item) => (
+          <li class="card card-link space-y-2">
+            <a class="link text-lg" href={route(locale, item.page)}>
+              {text(item.title)}
+            </a>
+            <p class="muted">{text(item.text)}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
 </Shell>

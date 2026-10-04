@@ -1,13 +1,11 @@
 import { expect, test } from '@playwright/test';
-test('locale routes, layout, local Burmese font and React island', async ({
-  page,
-}) => {
+test('locale routes, layout and local Burmese font', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
   await page.getByRole('link', { name: 'မြန်မာ' }).click();
   await expect(page.locator('html')).toHaveAttribute('lang', 'my');
-  await expect(page.locator('h1')).toContainText('စမ်းသပ်');
+  await expect(page.locator('h1')).toContainText('ဓမ္မကို');
   await page.evaluate(() => document.fonts.ready);
   expect(
     await page.evaluate(() =>
@@ -21,11 +19,11 @@ test('locale routes, layout, local Burmese font and React island', async ({
         .some((entry) => entry.name.includes('.woff2')),
     ),
   ).toBe(true);
-  await page.getByRole('button').click();
-  await expect(page.locator('#sample-details')).toBeVisible();
-  await page.getByRole('link', { name: 'English', exact: true }).click();
+  await page.locator('a[data-locale="en"]').click();
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  await expect(page.locator('h1')).toHaveText('Foundation smoke test');
+  await expect(page.locator('h1')).toHaveText(
+    'Learn the Dhamma with Win Metta',
+  );
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
     'http://localhost:4321/en/',
@@ -66,6 +64,9 @@ test('explicit locale wins over stored preference and narrow screens reflow', as
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await page.setViewportSize({ width: 320, height: 700 });
   await page.getByRole('link', { name: 'မြန်မာ', exact: true }).click();
+  // Measure the Burmese page, not the page being left.
+  await expect(page).toHaveURL(/\/my\/$/);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'my');
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,
@@ -88,6 +89,6 @@ test('language switch uses the URL at activation time, not at page load', async 
   await page.evaluate(() => {
     history.replaceState(null, '', '/my/?q=third#results');
   });
-  await page.getByRole('link', { name: 'English', exact: true }).click();
+  await page.locator('a[data-locale="en"]').click();
   await expect(page).toHaveURL(/\/en\/\?q=third#results$/);
 });

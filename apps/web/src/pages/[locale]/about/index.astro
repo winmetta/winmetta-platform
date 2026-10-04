@@ -1,0 +1,55 @@
+---
+import Shell from '../../../layouts/Shell.astro';
+import { localeCodes, type Locale } from '../../../i18n/locales';
+import { t } from '../../../i18n/messages';
+export function getStaticPaths() {
+  return localeCodes.map((locale) => ({
+    params: { locale },
+    props: { locale },
+  }));
+}
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const text = (key: Parameters<typeof t>[1]) => t(locale, key);
+---
+
+<Shell locale={locale} title={text('aboutTitle')} page="about">
+  <header class="space-y-4">
+    <h1 class="text-3xl font-bold sm:text-4xl">{text('aboutTitle')}</h1>
+    <p class="lead">{text('aboutIntro')}</p>
+  </header>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <section class="card space-y-3 md:col-span-2" aria-labelledby="work">
+      <h2 id="work" class="text-xl font-bold">{text('aboutWorkTitle')}</h2>
+      <ul class="max-w-prose list-disc space-y-2 ps-6">
+        <li>{text('aboutWork1')}</li>
+        <li>{text('aboutWork2')}</li>
+        <li>{text('aboutWork3')}</li>
+      </ul>
+    </section>
+    <section class="card space-y-3" aria-labelledby="teachers">
+      <h2 id="teachers" class="text-xl font-bold">
+        {text('aboutTeachersTitle')}
+      </h2>
+      <p>{text('aboutTeachers')}</p>
+    </section>
+    <section class="card space-y-3" aria-labelledby="free">
+      <h2 id="free" class="text-xl font-bold">{text('aboutFreeTitle')}</h2>
+      <p>{text('aboutFree')}</p>
+    </section>
+  </div>
+
+  <p class="flex flex-wrap items-center gap-x-6 gap-y-2">
+    <a class="btn btn-outline" href="https://winmetta.org/about/" rel="noopener"
+      >{text('aboutMore')}</a
+    >
+    <span>
+      {text('contactPrompt')}{' '}
+      <a class="link" href="mailto:contact@winmetta.org">contact@winmetta.org</a
+      >
+    </span>
+  </p>
+</Shell>
