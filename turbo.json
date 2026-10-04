@@ -5,7 +5,7 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**"],
-      "env": ["SITE_URL", "PUBLIC_ALLOW_INDEXING"]
+      "env": ["SITE_URL", "PUBLIC_ALLOW_INDEXING", "PUBLIC_LIBRARY_CDN_BASE"]
     },
     "dev": {
       "cache": false,
