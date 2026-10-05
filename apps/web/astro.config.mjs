@@ -16,5 +16,22 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'always',
   integrations: [react()],
-  vite: { plugins: [tailwind()] },
+  vite: {
+    plugins: [tailwind()],
+    // Pre-bundle everything the islands import, so a long-running dev server never reloads its
+    // dependencies mid-session ("Outdated Optimize Dep" 504s leave islands unhydrated).
+    optimizeDeps: {
+      include: [
+        'react',
+        'react-dom/client',
+        'luxon',
+        'minisearch',
+        'zod',
+        '@radix-ui/react-slot',
+        'class-variance-authority',
+        'clsx',
+        'tailwind-merge',
+      ],
+    },
+  },
 });
