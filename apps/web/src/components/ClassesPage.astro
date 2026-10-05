@@ -71,6 +71,10 @@ const source = records[0]?.sourceUrl ?? 'https://winmetta.org/';
   <section class="card space-y-2" aria-labelledby="how">
     <h2 id="how" class="text-xl font-bold">{text('classesHowTitle')}</h2>
     <p>{text('classesHowText')}</p>
+    <p class="flex items-start gap-2 font-medium">
+      <span aria-hidden="true">⚠️</span>
+      <span>{text('joinNameNote')}</span>
+    </p>
     <p>
       <a class="link icon-link" href={route(locale, 'zoomHelp')}
         ><BrandIcon name="zoom" />{text('zoomHelp')}</a
