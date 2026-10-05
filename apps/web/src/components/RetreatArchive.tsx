@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   emptyState,
   filterRetreats,
+  formatIcon,
   isActive,
   readState,
   writeState,
@@ -38,19 +39,26 @@ const fill = (template: string, n: number) =>
 // ?q=&year=&format=&days=&teacher= narrows it, and every change is written back to the URL.
 export default function RetreatArchive({ items, labels }: Props) {
   const [state, setState] = useState<RetreatState>(emptyState);
-  const input = useRef<HTMLInputElement>(null);
+  const form = useRef<HTMLFormElement>(null);
   useEffect(() => {
-    // Text typed before hydration finished is kept, not wiped by the empty server-rendered state.
-    const apply = (adoptTyped: boolean) => {
-      const next = readState(window.location.search);
-      const typed = adoptTyped ? (input.current?.value ?? '') : '';
-      const q = next.q || typed;
-      setState({ ...next, q });
-      if (q !== next.q)
+    // Anything chosen or typed before hydration finished is kept, not wiped by the empty
+    // server-rendered state: the URL wins, then what the controls currently show.
+    const apply = (adoptControls: boolean) => {
+      const fromUrl = readState(window.location.search);
+      const data =
+        adoptControls && form.current ? new FormData(form.current) : null;
+      const next = Object.fromEntries(
+        Object.entries(fromUrl).map(([key, value]) => [
+          key,
+          value || String(data?.get(key) ?? ''),
+        ]),
+      ) as unknown as RetreatState;
+      setState(next);
+      if (JSON.stringify(next) !== JSON.stringify(fromUrl))
         window.history.replaceState(
           null,
           '',
-          writeState({ ...next, q }, window.location),
+          writeState(next, window.location),
         );
     };
     apply(true);
@@ -89,6 +97,7 @@ export default function RetreatArchive({ items, labels }: Props) {
     <label className="space-y-1">
       <span className="block font-medium">{label}</span>
       <select
+        name={key}
         className="field"
         value={state[key]}
         onChange={(event) => update({ [key]: event.target.value })}
@@ -105,11 +114,15 @@ export default function RetreatArchive({ items, labels }: Props) {
 
   return (
     <section className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <form
+        ref={form}
+        className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+        onSubmit={(event) => event.preventDefault()}
+      >
         <label className="space-y-1 sm:col-span-2 lg:col-span-4">
           <span className="block font-medium">{labels.searchLabel}</span>
           <input
-            ref={input}
+            name="q"
             type="search"
             className="field"
             value={state.q}
@@ -128,7 +141,7 @@ export default function RetreatArchive({ items, labels }: Props) {
           labels.format,
           (['online', 'onsite', 'hybrid'] as const).map((f) => ({
             value: f,
-            label: labels.formats[f],
+            label: `${formatIcon(f)} ${labels.formats[f]}`,
           })),
         )}
         {select(
@@ -144,7 +157,7 @@ export default function RetreatArchive({ items, labels }: Props) {
           labels.teacher,
           teachers.map((t) => ({ value: t.id, label: t.name })),
         )}
-      </div>
+      </form>
       <div
         className="flex flex-wrap items-center gap-3"
         role="status"
@@ -168,9 +181,10 @@ export default function RetreatArchive({ items, labels }: Props) {
             <a className="link text-lg" href={item.href}>
               {item.title}
             </a>
-            <p className="text-sm">
-              {item.dates}
-              <span className="muted"> · {labels.formats[item.format]}</span>
+            <p className="text-sm">{item.dates}</p>
+            <p className="flex items-center gap-2 text-sm font-medium">
+              <span aria-hidden="true">{formatIcon(item.format)}</span>
+              {labels.formats[item.format]}
             </p>
             <p className="muted text-sm">
               {item.teachers.map((t) => t.name).join(', ')}

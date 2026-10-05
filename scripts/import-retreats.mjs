@@ -244,21 +244,11 @@ for (const event of events) {
     html.match(/<article[\s\S]*?<\/article>/)?.[0] ??
     html;
   const end = addDays(event.start, event.days - 1);
-  const fmtEn = {
-    online: 'online (Zoom)',
-    onsite: 'in-person',
-    hybrid: 'in-person and online',
-  }[event.format];
-  const fmtMy = {
-    online: 'အွန်လိုင်း',
-    onsite: 'ကျောင်းတွင်',
-    hybrid: 'ကျောင်းနှင့် အွန်လိုင်း',
-  }[event.format];
   const nameEn = teacherName(event.teacherId, 'en');
   const nameMy = teacherName(event.teacherId, 'my');
   const ordinal = event.ordinal;
-  const titleEn = `${ordinal ? `${ordinal[0]} ` : ''}${event.days}-day retreat (${fmtEn})`;
-  const titleMy = `${ordinal ? `${ordinal[1]}အကြိမ် ` : ''}${event.days} ရက် တရားစခန်း (${fmtMy})`;
+  const titleEn = `${ordinal ? `${ordinal[0]} ` : ''}${event.days}-day retreat`;
+  const titleMy = `${ordinal ? `${ordinal[1]}အကြိမ် ` : ''}${event.days} ရက် တရားစခန်း`;
   const record = {
     id: event.id,
     status: 'past',

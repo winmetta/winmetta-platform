@@ -128,7 +128,7 @@
   "filterDays": "ကြာချိန်",
   "filterTeacher": "သင်ကြားသူ",
   "filterAll": "အားလုံး",
-  "formatOnline": "အွန်လိုင်း (Zoom)",
+  "formatOnline": "အွန်လိုင်း",
   "formatOnsite": "ဘုန်းကြီးကျောင်းတွင်",
   "formatHybrid": "ဘုန်းကြီးကျောင်းတွင်နှင့် အွန်လိုင်း",
   "daysCount": "{n} ရက်",

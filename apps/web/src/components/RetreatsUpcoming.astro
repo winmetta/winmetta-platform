@@ -5,6 +5,7 @@ import { format, t, type MessageKey } from '../i18n/messages';
 import { retreatRoute } from '../i18n/routes';
 import { channelLinks } from '../lib/classes';
 import { languageOf } from '../lib/library-index';
+import { formatIcon } from '../lib/retreat-filter';
 import { retreatDates, retreatText } from '../lib/retreats';
 import { teacherById, teacherName } from '../lib/teachers';
 import type { Locale } from '../i18n/locales';
@@ -66,9 +67,11 @@ const upcoming = retreats
                 <span class="muted">
                   {' · '}
                   {format(text('daysCount'), { n: retreat.days })}
-                  {' · '}
-                  {text(formatKey[retreat.format])}
                 </span>
+              </p>
+              <p class="flex items-center gap-2 text-sm font-medium">
+                <span aria-hidden="true">{formatIcon(retreat.format)}</span>
+                {text(formatKey[retreat.format])}
               </p>
               <p class="muted text-sm">
                 {teachers.map((name, index) => (

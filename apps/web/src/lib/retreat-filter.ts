@@ -1,6 +1,10 @@
 // Search and filter state for the retreat archive. Pure helpers shared by the island and its tests.
 import { normalizeSearch } from './normalize';
 
+/** Emoji shown beside a retreat's format: online 💻, in person 📍, both 💻 📍. Decorative. */
+export const formatIcon = (format: RetreatItem['format']): string =>
+  ({ online: '💻', onsite: '📍', hybrid: '💻 📍' })[format];
+
 export interface RetreatItem {
   id: string;
   href: string;

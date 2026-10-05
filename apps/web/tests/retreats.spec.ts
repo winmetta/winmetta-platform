@@ -42,3 +42,19 @@ test('zoom help page has install links in both languages', async ({ page }) => {
     await expect(page.locator('main h2')).toHaveCount(6);
   }
 });
+
+test('format and length filters narrow the archive and cards show a format icon', async ({
+  page,
+}) => {
+  await page.goto('/en/retreats/');
+  const cards = page.locator('main li.card-link');
+  await expect(cards).toHaveCount(15);
+  await page.getByLabel('Format').selectOption('hybrid');
+  await expect(cards).toHaveCount(3); // 12th, 13th and the Kuṇḍadhāna 3-day retreat
+  await page.getByLabel('Length').selectOption('3');
+  await expect(cards).toHaveCount(1);
+  await expect(cards.first()).toContainText('Online and in person');
+  await expect(cards.first()).not.toContainText('Zoom)');
+  await page.getByRole('button', { name: 'Clear search and filters' }).click();
+  await expect(cards).toHaveCount(15);
+});
