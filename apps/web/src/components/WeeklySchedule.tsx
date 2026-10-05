@@ -1,9 +1,10 @@
-import { useEffect, useState, type ReactElement } from 'react';
+import { useEffect, useRef, useState, type ReactElement } from 'react';
 import { DateTime } from 'luxon';
 import { nextOccurrence, zoneView } from '../lib/class-schedule';
 import {
   defaultZone,
   ianaOf,
+  isZoneId,
   readZone,
   scheduleZones,
   writeZone,
@@ -107,9 +108,19 @@ export default function WeeklySchedule({
 }: Props) {
   const [now, setNow] = useState(() => new Date(builtAt));
   const [zoneId, setZoneId] = useState<ZoneId>(defaultZone);
+  const select = useRef<HTMLSelectElement>(null);
   useEffect(() => {
     setNow(new Date());
-    setZoneId(readZone(window.location.search));
+    // A zone picked before hydration finished is kept: the URL wins, then the select's value.
+    const fromUrl = new URLSearchParams(window.location.search).has('tz');
+    const picked = select.current?.value;
+    const id =
+      fromUrl || !picked || !isZoneId(picked)
+        ? readZone(window.location.search)
+        : picked;
+    setZoneId(id);
+    if (id !== readZone(window.location.search))
+      window.history.replaceState(null, '', writeZone(id, window.location));
   }, []);
   const choose = (id: ZoneId) => {
     setZoneId(id);
@@ -132,6 +143,7 @@ export default function WeeklySchedule({
       <label className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <span className="font-medium">{labels.timezone}</span>
         <select
+          ref={select}
           className="field w-auto max-w-full"
           value={zoneId}
           onChange={(event) => choose(event.target.value as ZoneId)}
