@@ -302,6 +302,23 @@
     @apply inline-flex items-center gap-2;
   }
 
+  /* Zoom help: numbered steps and emoji badges */
+  .guide-badge {
+    @apply inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-sky text-xl;
+  }
+  .guide-steps {
+    @apply space-y-2;
+    counter-reset: step;
+  }
+  .guide-steps li {
+    @apply flex items-start gap-3;
+    counter-increment: step;
+  }
+  .guide-steps li::before {
+    content: counter(step, decimal);
+    @apply inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-semibold text-white;
+  }
+
   /* Weekly schedule table: scrolls inside its own box on narrow screens */
   .schedule-scroll {
     @apply overflow-x-auto rounded-2xl border border-stone bg-white;
