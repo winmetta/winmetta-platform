@@ -1,12 +1,16 @@
 ---
-import Shell from '../../../layouts/Shell.astro';
-import { localeCodes, type Locale } from '../../../i18n/locales';
-import { format, t, type MessageKey } from '../../../i18n/messages';
-import { retreatRoute, route, teacherRoute } from '../../../i18n/routes';
-import { languageOf } from '../../../lib/library-index';
-import { formatIcon } from '../../../lib/retreat-filter';
-import { allRetreats, retreatDates, retreatText } from '../../../lib/retreats';
-import { teacherById, teacherName } from '../../../lib/teachers';
+import Shell from '../../../../layouts/Shell.astro';
+import { localeCodes, type Locale } from '../../../../i18n/locales';
+import { format, t, type MessageKey } from '../../../../i18n/messages';
+import { retreatRoute, route, teacherRoute } from '../../../../i18n/routes';
+import { languageOf } from '../../../../lib/library-index';
+import { formatIcon } from '../../../../lib/retreat-filter';
+import {
+  allRetreats,
+  retreatDates,
+  retreatText,
+} from '../../../../lib/retreats';
+import { teacherById, teacherName } from '../../../../lib/teachers';
 export function getStaticPaths() {
   return localeCodes.flatMap((locale) =>
     allRetreats.map((retreat) => ({

@@ -135,6 +135,37 @@
   .nav-link {
     @apply inline-flex min-h-11 items-center rounded-full px-4 font-medium transition-colors hover:bg-sky;
   }
+  /* Submenu: a dropdown on wide screens, an indented list inside the phone menu */
+  .nav-group {
+    @apply relative;
+  }
+  .nav-sub {
+    @apply absolute start-0 top-full z-50 hidden min-w-44 rounded-xl border border-stone bg-white p-1;
+    box-shadow: var(--shadow);
+  }
+  .nav-group:hover .nav-sub,
+  .nav-group:focus-within .nav-sub {
+    @apply block;
+  }
+  .nav-sublink {
+    @apply flex min-h-11 items-center rounded-lg px-4 font-medium transition-colors hover:bg-sky;
+  }
+  .nav-sublink[aria-current] {
+    @apply bg-sky font-semibold;
+  }
+  .nav-group > .nav-link::after {
+    content: '▾';
+    @apply ms-1.5 text-xs;
+    color: var(--text-muted);
+  }
+  @media (width < 48rem) {
+    .nav-sub {
+      @apply static ms-4 block min-w-0 border-0 border-s-2 border-sky bg-transparent p-0 ps-2 shadow-none;
+    }
+    .nav-group > .nav-link::after {
+      content: none;
+    }
+  }
   .nav-link[aria-current] {
     @apply bg-sky font-semibold;
   }

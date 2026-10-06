@@ -28,10 +28,10 @@ test('teacher page shows draft note in English and links from a class', async ({
   page,
 }) => {
   await page.goto('/en/classes/');
-  await page.locator('#garudhamma-llb a[href*="/teachers/"]').click();
-  await expect(page).toHaveURL(/\/en\/teachers\/garudhamma\/$/);
+  await page.locator('#garudhamma-llb a[href*="/classes/sayadaws/"]').click();
+  await expect(page).toHaveURL(/\/en\/classes\/sayadaws\/garudhamma\/$/);
   await expect(page.getByRole('note')).toContainText('draft translation');
-  await page.goto('/my/teachers/garudhamma/');
+  await page.goto('/my/classes/sayadaws/garudhamma/');
   await expect(page.getByRole('note')).toHaveCount(0);
 });
 
@@ -114,4 +114,40 @@ test('live-streamed classes show an icon with an accessible label', async ({
   await expect(
     page.locator('#garudhamma-llb').getByText('Live-streamed', { exact: true }),
   ).toHaveCount(0);
+});
+
+test('Sayadaws sit under Classes in the menu and are linked from the Classes page', async ({
+  page,
+  isMobile,
+}) => {
+  await page.goto('/en/classes/');
+  await expect(
+    page.getByRole('link', { name: 'Meet the Sayadaws' }),
+  ).toBeVisible();
+  if (isMobile) await page.getByRole('button', { name: 'Menu' }).click();
+  else await page.locator('.nav-group > .nav-link').hover();
+  await page.locator('.nav-sublink', { hasText: 'Sayadaws' }).click();
+  await expect(page).toHaveURL(/\/en\/classes\/sayadaws\/$/);
+  await expect(page.locator('.nav-link[href="/en/classes/"]')).toHaveAttribute(
+    'aria-current',
+    'true',
+  );
+});
+
+test('Retreats sit under Classes in the menu and are linked from the Classes page', async ({
+  page,
+  isMobile,
+}) => {
+  await page.goto('/en/classes/');
+  await expect(
+    page.getByRole('link', { name: /^Retreats Online and in-person/ }),
+  ).toBeVisible();
+  if (isMobile) await page.getByRole('button', { name: 'Menu' }).click();
+  else await page.locator('.nav-group > .nav-link').hover();
+  await page.locator('.nav-sublink', { hasText: 'Retreats' }).click();
+  await expect(page).toHaveURL(/\/en\/classes\/retreats\/$/);
+  await expect(page.locator('.nav-link[href="/en/classes/"]')).toHaveAttribute(
+    'aria-current',
+    'true',
+  );
 });

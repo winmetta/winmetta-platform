@@ -68,6 +68,31 @@ const source = records[0]?.sourceUrl ?? 'https://winmetta.org/';
     <h1 class="text-3xl font-bold sm:text-4xl">{text(title)}</h1>
     <p class="lead">{text(intro)}</p>
   </header>
+  {
+    kind === 'class' && (
+      <div class="grid gap-4 sm:grid-cols-2">
+        {[
+          ['teachers', '🙏', 'meetSayadawsTitle', 'meetSayadawsText'],
+          ['retreats', '🧘', 'meetRetreatsTitle', 'meetRetreatsText'],
+        ].map(([target, icon, title, body]) => (
+          <a
+            class="card card-link flex items-center gap-4"
+            href={route(locale, target as PageId)}
+          >
+            <span class="guide-badge" aria-hidden="true">
+              {icon}
+            </span>
+            <span class="space-y-1">
+              <span class="link block text-lg">
+                {text(title as MessageKey)}
+              </span>
+              <span class="muted block">{text(body as MessageKey)}</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    )
+  }
   <section class="card space-y-2" aria-labelledby="how">
     <h2 id="how" class="text-xl font-bold">{text('classesHowTitle')}</h2>
     <p>{text('classesHowText')}</p>

@@ -6,8 +6,8 @@ export const pagePaths = {
   privacy: 'privacy/',
   classes: 'classes/',
   studyGroups: 'study-groups/',
-  retreats: 'retreats/',
-  teachers: 'teachers/',
+  retreats: 'classes/retreats/',
+  teachers: 'classes/sayadaws/',
   zoomHelp: 'zoom-help/',
   library: 'dhamma-library/',
 } as const;
@@ -21,11 +21,11 @@ export function folderRoute(locale: Locale, id: string, page = 1): string {
 }
 /** Retreat detail page. */
 export function retreatRoute(locale: Locale, id: string): string {
-  return `/${locale}/retreats/${id}/`;
+  return `/${locale}/classes/retreats/${id}/`;
 }
 /** Teacher bio page. */
 export function teacherRoute(locale: Locale, id: string): string {
-  return `/${locale}/teachers/${id}/`;
+  return `/${locale}/classes/sayadaws/${id}/`;
 }
 export function switchLocale(url: URL, locale: Locale): string {
   const parts = url.pathname.split('/');

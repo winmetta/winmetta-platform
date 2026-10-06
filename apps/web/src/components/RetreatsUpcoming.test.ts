@@ -31,7 +31,7 @@ describe('RetreatsUpcoming', () => {
     const html = await render([...allRetreats, upcoming]);
     expect(html).toContain('Upcoming retreats');
     expect(html).toContain('data-upcoming');
-    expect(html).toContain('href="/en/retreats/kundadhana-2027-04/"');
+    expect(html).toContain('href="/en/classes/retreats/kundadhana-2027-04/"');
     expect(html).toContain('Apr 9');
     expect(html).toContain('2027');
     expect(html).not.toContain('No retreat is scheduled right now.');

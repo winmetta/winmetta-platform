@@ -1,10 +1,10 @@
 ---
-import Shell from '../../../layouts/Shell.astro';
-import RetreatsUpcoming from '../../../components/RetreatsUpcoming.astro';
-import RetreatArchive from '../../../components/RetreatArchive';
-import { localeCodes, type Locale } from '../../../i18n/locales';
-import { t, type MessageKey } from '../../../i18n/messages';
-import { allRetreats, retreatItem } from '../../../lib/retreats';
+import Shell from '../../../../layouts/Shell.astro';
+import RetreatsUpcoming from '../../../../components/RetreatsUpcoming.astro';
+import RetreatArchive from '../../../../components/RetreatArchive';
+import { localeCodes, type Locale } from '../../../../i18n/locales';
+import { t, type MessageKey } from '../../../../i18n/messages';
+import { allRetreats, retreatItem } from '../../../../lib/retreats';
 export function getStaticPaths() {
   return localeCodes.map((locale) => ({
     params: { locale },

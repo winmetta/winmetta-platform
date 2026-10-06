@@ -1,9 +1,9 @@
 ---
-import Shell from '../../../layouts/Shell.astro';
-import TeacherCard from '../../../components/TeacherCard.astro';
-import { localeCodes, type Locale } from '../../../i18n/locales';
-import { t } from '../../../i18n/messages';
-import { allTeachers } from '../../../lib/teachers';
+import Shell from '../../../../layouts/Shell.astro';
+import TeacherCard from '../../../../components/TeacherCard.astro';
+import { localeCodes, type Locale } from '../../../../i18n/locales';
+import { t } from '../../../../i18n/messages';
+import { allTeachers } from '../../../../lib/teachers';
 export function getStaticPaths() {
   return localeCodes.map((locale) => ({
     params: { locale },

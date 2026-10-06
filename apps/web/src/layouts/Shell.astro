@@ -2,7 +2,7 @@
 import '../styles/global.css';
 import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 import { locales, localeCodes, type Locale } from '../i18n/locales';
-import { route, type PageId } from '../i18n/routes';
+import { pagePaths, route, type PageId } from '../i18n/routes';
 import { t } from '../i18n/messages';
 import { allowIndexing } from '../lib/site';
 interface Props {
@@ -17,10 +17,15 @@ const href = (code: Locale) => (path ? `/${code}/${path}` : route(code, page));
 const canonical = new URL(href(locale), Astro.site);
 // Only built pages are listed here; add Classes, Study groups, Retreats and Teachers as they land.
 const navItems = [
-  { page: 'classes', label: 'navClasses' },
+  {
+    page: 'classes',
+    label: 'navClasses',
+    children: [
+      { page: 'teachers', label: 'navTeachers' },
+      { page: 'retreats', label: 'navRetreats' },
+    ],
+  },
   { page: 'studyGroups', label: 'navStudyGroups' },
-  { page: 'retreats', label: 'navRetreats' },
-  { page: 'teachers', label: 'navTeachers' },
   { page: 'library', label: 'navLibrary' },
 ] as const;
 const inLibrary =
@@ -71,21 +76,56 @@ const inLibrary =
         </button>
         <nav id="site-nav" class="site-nav" aria-label={t(locale, 'navMain')}>
           {
-            navItems.map((item) => (
-              <a
-                href={route(locale, item.page)}
-                class="nav-link"
-                aria-current={
-                  page === item.page
-                    ? 'page'
-                    : item.page === 'library' && inLibrary
+            navItems.map((item) => {
+              const current = (target: string) =>
+                page === target
+                  ? 'page'
+                  : target === 'library' && inLibrary
+                    ? 'true'
+                    : target === 'classes' && path?.startsWith('classes/')
                       ? 'true'
-                      : undefined
-                }
-              >
-                {t(locale, item.label)}
-              </a>
-            ))
+                      : undefined;
+              const link = (
+                <a
+                  href={route(locale, item.page)}
+                  class="nav-link"
+                  aria-current={
+                    current(item.page) ??
+                    ('children' in item &&
+                    item.children.some((child) => child.page === page)
+                      ? 'true'
+                      : undefined)
+                  }
+                >
+                  {t(locale, item.label)}
+                </a>
+              );
+              return 'children' in item ? (
+                <div class="nav-group">
+                  {link}
+                  <ul class="nav-sub">
+                    {item.children.map((child) => (
+                      <li>
+                        <a
+                          href={route(locale, child.page)}
+                          class="nav-sublink"
+                          aria-current={
+                            page === child.page ||
+                            Boolean(path?.startsWith(pagePaths[child.page]))
+                              ? 'page'
+                              : undefined
+                          }
+                        >
+                          {t(locale, child.label)}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                link
+              );
+            })
           }
         </nav>
         <LanguageSwitcher locale={locale} />
