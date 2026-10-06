@@ -1,0 +1,435 @@
+[
+  {
+    "id": "ghositabhivamsa-kammatthana",
+    "kind": "class",
+    "sourceLanguage": "my",
+    "languages": ["my"],
+    "status": "active",
+    "streamed": true,
+    "translations": {
+      "my": {
+        "title": "ထေရဝါဒ ဓမ္မကမ္မဋ္ဌာန်း လမ်းစဉ် သင်တန်း",
+        "description": "နံနက်ခင်း အလုပ်ပေးတရား"
+      },
+      "en": {
+        "title": "Theravāda Dhamma Kammaṭṭhāna Path course",
+        "description": "Morning practice Dhamma: guided meditation instruction."
+      }
+    },
+    "sourceUrl": "https://winmetta.org/dhamma-classes/",
+    "verifiedAt": "2026-10-04",
+    "links": [
+      {
+        "kind": "course",
+        "url": "https://winmetta.org/sayadaw-u-ghositabhivamsa-morning-classes-desc/"
+      }
+    ],
+    "recurrences": [
+      {
+        "timezone": "America/Los_Angeles",
+        "weekday": 5,
+        "time": "08:00",
+        "endTime": "09:00"
+      },
+      {
+        "timezone": "America/Los_Angeles",
+        "weekday": 6,
+        "time": "08:00",
+        "endTime": "09:00"
+      },
+      {
+        "timezone": "America/Los_Angeles",
+        "weekday": 7,
+        "time": "08:00",
+        "endTime": "09:00"
+      }
+    ],
+    "teacherId": "ghositabhivamsa",
+    "meetingId": "835 1514 9210",
+    "joinUrl": "https://us02web.zoom.us/j/83515149210",
+    "publicPasscode": "metta"
+  },
+  {
+    "id": "kelasa-sutta-pitaka",
+    "kind": "class",
+    "sourceLanguage": "my",
+    "languages": ["my"],
+    "status": "active",
+    "streamed": true,
+    "translations": {
+      "my": {
+        "title": "မူရင်းသုတ္တန်ပိဋကတ်ပါဠိတော်ကို လေ့လာခြင်း သင်တန်း",
+        "description": "ပါဠိတော်မူရင်းကို တိုက်ရိုက် လေ့လာသော သင်တန်း"
+      },
+      "en": {
+        "title": "Study of the original Sutta Piṭaka Pāḷi",
+        "description": "Reading the Sutta Piṭaka in its original Pāḷi."
+      }
+    },
+    "sourceUrl": "https://winmetta.org/dhamma-classes/",
+    "verifiedAt": "2026-10-04",
+    "links": [
+      {
+        "kind": "recordings",
+        "url": "https://www.youtube.com/playlist?list=PLYEMM8dR7XnbclGXcIc337COrNfJCkdbJ"
+      },
+      {
+        "kind": "course",
+        "url": "https://winmetta.org/ashin-kelasa-pali-sutta-study-class/"
+      }
+    ],
+    "recurrences": [
+      {
+        "timezone": "America/Phoenix",
+        "weekday": 7,
+        "time": "14:00",
+        "endTime": "15:00"
+      }
+    ],
+    "teacherId": "kelasa",
+    "meetingId": "835 1514 9210",
+    "joinUrl": "https://us02web.zoom.us/j/83515149210",
+    "publicPasscode": "metta"
+  },
+  {
+    "id": "garudhamma-pali",
+    "kind": "class",
+    "sourceLanguage": "my",
+    "languages": ["my"],
+    "status": "active",
+    "streamed": true,
+    "translations": {
+      "my": {
+        "title": "ပါဠိသဒ္ဒါ နှင့် တိပိဋကပါဠိကို လေ့လာခြင်း",
+        "description": "ပါဠိသဒ္ဒါ နှင့် တိပိဋကပါဠိ သင်တန်း"
+      },
+      "en": {
+        "title": "Pāḷi Saddā and Tipiṭaka Pāḷi",
+        "description": "Pāḷi grammar and reading of the Tipiṭaka."
+      }
+    },
+    "sourceUrl": "https://winmetta.org/dhamma-classes/",
+    "verifiedAt": "2026-10-04",
+    "links": [
+      {
+        "kind": "recordings",
+        "url": "https://www.youtube.com/playlist?list=PLYEMM8dR7XnbkY4E_36R-g2F3PPLNs0vm"
+      },
+      {
+        "kind": "course",
+        "url": "https://winmetta.org/sayadaw-u-garudhamma-class/"
+      }
+    ],
+    "recurrences": [
+      {
+        "timezone": "America/Los_Angeles",
+        "weekday": 6,
+        "time": "18:30",
+        "endTime": "19:30"
+      }
+    ],
+    "teacherId": "garudhamma",
+    "meetingId": "820 7930 4534",
+    "joinUrl": "https://us02web.zoom.us/j/82079304534",
+    "publicPasscode": "metta",
+    "curriculum": "pgtp"
+  },
+  {
+    "id": "garudhamma-patthana",
+    "kind": "class",
+    "sourceLanguage": "my",
+    "languages": ["my"],
+    "status": "active",
+    "streamed": true,
+    "translations": {
+      "my": {
+        "title": "အဘိဓမ္မာ၊ ပဋ္ဌာန်းပဉှာဝါရ သင်တန်း",
+        "description": "ပဋ္ဌာန်းပဉှာဝါရ သင်တန်း"
+      },
+      "en": {
+        "title": "Abhidhamma: Paṭṭhāna Pañhāvāra class",
+        "description": "Study of the Paṭṭhāna, Pañhāvāra section."
+      }
+    },
+    "sourceUrl": "https://winmetta.org/dhamma-classes/",
+    "verifiedAt": "2026-10-04",
+    "links": [
+      {
+        "kind": "recordings",
+        "url": "https://www.youtube.com/playlist?list=PLYEMM8dR7XnZcyJ154XNj4g3M89Ma3Qch"
+      },
+      {
+        "kind": "course",
+        "url": "https://winmetta.org/sayadaw-u-garudhamma-class/"
+      }
+    ],
+    "recurrences": [
+      {
+        "timezone": "America/Los_Angeles",
+        "weekday": 7,
+        "time": "17:00",
+        "endTime": "18:30"
+      }
+    ],
+    "teacherId": "garudhamma",
+    "meetingId": "820 7930 4534",
+    "joinUrl": "https://us02web.zoom.us/j/82079304534",
+    "publicPasscode": "metta"
+  },
+  {
+    "id": "garudhamma-llb",
+    "kind": "class",
+    "sourceLanguage": "my",
+    "languages": ["en"],
+    "status": "active",
+    "streamed": true,
+    "translations": {
+      "my": {
+        "title": "Let’s learn Burmese!",
+        "description": "မြန်မာစာ သင်တန်း"
+      },
+      "en": {
+        "title": "Let’s Learn Burmese",
+        "description": "Burmese language class."
+      }
+    },
+    "sourceUrl": "https://winmetta.org/dhamma-classes/",
+    "verifiedAt": "2026-10-04",
+    "links": [
+      {
+        "kind": "course",
+        "url": "https://winmetta.org/sayadaw-u-garudhamma-burmese-class/"
+      }
+    ],
+    "recurrences": [
+      {
+        "timezone": "America/Los_Angeles",
+        "weekday": 4,
+        "time": "19:00",
+        "endTime": "20:00"
+      }
+    ],
+    "teacherId": "garudhamma",
+    "meetingId": "820 7930 4534",
+    "joinUrl": "https://us02web.zoom.us/j/82079304534",
+    "publicPasscode": "metta",
+    "curriculum": "llb"
+  },
+  {
+    "id": "kovida-applied-abhidhamma",
+    "kind": "class",
+    "sourceLanguage": "my",
+    "languages": ["my"],
+    "status": "active",
+    "streamed": true,
+    "translations": {
+      "my": {
+        "title": "အသုံးချ အဘိဓမ္မာသင်တန်း",
+        "description": "အသုံးချ အဘိဓမ္မာ သင်တန်း"
+      },
+      "en": {
+        "title": "Applied Abhidhamma course",
+        "description": "Abhidhamma applied to practice."
+      }
+    },
+    "sourceUrl": "https://winmetta.org/dhamma-classes/",
+    "verifiedAt": "2026-10-04",
+    "links": [
+      {
+        "kind": "recordings",
+        "url": "https://www.youtube.com/playlist?list=PLYEMM8dR7XnbafzEUtKGw-ok1obhgiV3W"
+      },
+      {
+        "kind": "course",
+        "url": "https://winmetta.org/sayadaw-ashin-kovida-class/"
+      }
+    ],
+    "recurrences": [
+      {
+        "timezone": "America/Los_Angeles",
+        "weekday": 4,
+        "time": "05:00",
+        "endTime": "06:30"
+      }
+    ],
+    "teacherId": "kovida",
+    "meetingId": "835 1514 9210",
+    "joinUrl": "https://us02web.zoom.us/j/83515149210",
+    "publicPasscode": "metta"
+  },
+  {
+    "id": "kumarabhivamsa-kammatthana",
+    "kind": "class",
+    "sourceLanguage": "my",
+    "languages": ["my"],
+    "status": "active",
+    "streamed": true,
+    "translations": {
+      "my": {
+        "title": "ထာဝရငြိမ်းချမ်းရေးသို့ ကမ္မဋ္ဌာန်းနှင့် ကျင့်စဉ် သင်တန်း",
+        "description": "ကမ္မဋ္ဌာန်းနှင့် ကျင့်စဉ် သင်တန်း"
+      },
+      "en": {
+        "title": "Kammaṭṭhāna and practice toward lasting peace",
+        "description": "Meditation subjects and the practice that leads to peace."
+      }
+    },
+    "sourceUrl": "https://winmetta.org/dhamma-classes/",
+    "verifiedAt": "2026-10-04",
+    "links": [
+      {
+        "kind": "recordings",
+        "url": "https://www.youtube.com/playlist?list=PLYEMM8dR7XnYjK6y3DPIok9f0QIVjMesX"
+      },
+      {
+        "kind": "course",
+        "url": "https://winmetta.org/sayadaw-kumarabhivamsa-class/"
+      }
+    ],
+    "recurrences": [
+      {
+        "timezone": "America/Los_Angeles",
+        "weekday": 7,
+        "time": "18:30",
+        "endTime": "20:00"
+      }
+    ],
+    "teacherId": "kumarabhivamsa",
+    "meetingId": "835 1514 9210",
+    "joinUrl": "https://us02web.zoom.us/j/83515149210",
+    "publicPasscode": "metta"
+  },
+  {
+    "id": "janakabhivamsa-kammatthana",
+    "kind": "class",
+    "sourceLanguage": "my",
+    "languages": ["my"],
+    "status": "archived",
+    "streamed": true,
+    "translations": {
+      "my": {
+        "title": "ကမ္မဋ္ဌာန်းတရား သင်တန်း",
+        "description": "ရပ်ဆိုင်းထားပြီး မှတ်တမ်းသိမ်းအဖြစ် ထားရှိသည်"
+      },
+      "en": {
+        "title": "Kammaṭṭhāna Dhamma course",
+        "description": "Stopped. Kept here as an archive."
+      }
+    },
+    "sourceUrl": "https://winmetta.org/dhamma-classes/",
+    "verifiedAt": "2026-10-04",
+    "links": [
+      {
+        "kind": "recordings",
+        "url": "https://www.youtube.com/playlist?list=PLYEMM8dR7XnaDzEp87QuibV_RnXyJXzyQ"
+      },
+      {
+        "kind": "course",
+        "url": "https://winmetta.org/sayadaw-janakabhivamsa-class/"
+      }
+    ],
+    "recurrences": [],
+    "teacherId": "janakabhivamsa"
+  },
+  {
+    "id": "pannadhikalankara-abhidhamma",
+    "kind": "class",
+    "sourceLanguage": "en",
+    "languages": ["en"],
+    "status": "archived",
+    "streamed": true,
+    "translations": {
+      "my": {
+        "title": "အဘိဓမ္မာ လေ့လာခြင်း (အင်္ဂလိပ်ဘာသာ)",
+        "description": "ရပ်ဆိုင်းထားပြီး မှတ်တမ်းသိမ်းအဖြစ် ထားရှိသည်"
+      },
+      "en": {
+        "title": "Abhidhamma Study",
+        "description": "Taught in English. Stopped, kept here as an archive."
+      }
+    },
+    "sourceUrl": "https://winmetta.org/dhamma-classes/",
+    "verifiedAt": "2026-10-04",
+    "links": [
+      {
+        "kind": "recordings",
+        "url": "https://www.youtube.com/playlist?list=PLYEMM8dR7XnYv0oHS1wF-o4I64QxPngG5"
+      },
+      {
+        "kind": "course",
+        "url": "https://winmetta.org/venerable-pannadhikalankara-class/"
+      }
+    ],
+    "recurrences": [],
+    "teacherId": "pannadhikalankara"
+  },
+  {
+    "id": "group-reading-kamma",
+    "kind": "study-group",
+    "sourceLanguage": "my",
+    "languages": ["my"],
+    "status": "active",
+    "streamed": false,
+    "translations": {
+      "my": {
+        "title": "ဖားအောက်တောရ ဆရာတော်ဘုရားကြီး၏ ကံ၏လုပ်ဆောင်ချက် (The Workings of Kamma) စာအုပ် စုပေါင်းဖတ်ရှုလေ့လာခြင်း",
+        "description": "တနင်္လာနေ့ညများတွင် Zoom ဖြင့် စုပေါင်း ဖတ်ရှုဆွေးနွေးကြပါသည်။"
+      },
+      "en": {
+        "title": "The Workings of Kamma by the Pa-Auk Tawya Sayadaw: group reading",
+        "description": "Read and discuss together on Zoom."
+      }
+    },
+    "sourceUrl": "https://winmetta.org/dhamma-classes/",
+    "verifiedAt": "2026-10-04",
+    "links": [],
+    "recurrences": [
+      {
+        "timezone": "America/Los_Angeles",
+        "weekday": 1,
+        "time": "19:00",
+        "endTime": "21:00"
+      }
+    ],
+    "meetingId": "835 1514 9210",
+    "joinUrl": "https://us02web.zoom.us/j/83515149210",
+    "publicPasscode": "metta"
+  },
+  {
+    "id": "group-reading-cma",
+    "kind": "study-group",
+    "sourceLanguage": "my",
+    "languages": ["my"],
+    "status": "active",
+    "streamed": false,
+    "translations": {
+      "my": {
+        "title": "Comprehensive Manual of Abhidhamma စုပေါင်းဖတ်ရှုခြင်း",
+        "description": "အင်္ဂါနေ့ညများတွင် Zoom ဖြင့် စုပေါင်း ဖတ်ရှုဆွေးနွေးကြပါသည်။"
+      },
+      "en": {
+        "title": "A Comprehensive Manual of Abhidhamma (Bhikkhu Bodhi): group reading",
+        "description": "Read and discuss together on Zoom."
+      }
+    },
+    "sourceUrl": "https://winmetta.org/dhamma-classes/",
+    "verifiedAt": "2026-10-04",
+    "links": [
+      {
+        "kind": "reading",
+        "url": "https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2025/02/Bhikkhu_Bodhi-Comprehensive_Manual_of_Abhidhamma.pdf"
+      }
+    ],
+    "recurrences": [
+      {
+        "timezone": "America/Los_Angeles",
+        "weekday": 2,
+        "time": "19:00",
+        "endTime": "21:00"
+      }
+    ],
+    "meetingId": "835 1514 9210",
+    "joinUrl": "https://us02web.zoom.us/j/83515149210",
+    "publicPasscode": "metta"
+  }
+]

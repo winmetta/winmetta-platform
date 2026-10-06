@@ -1,0 +1,152 @@
+---
+import Shell from '../../../layouts/Shell.astro';
+import { localeCodes, type Locale } from '../../../i18n/locales';
+import { t, type MessageKey } from '../../../i18n/messages';
+import { route } from '../../../i18n/routes';
+import BrandIcon from '../../../components/BrandIcon.astro';
+import guide from '../../../content/zoom-help.json';
+export function getStaticPaths() {
+  return localeCodes.map((locale) => ({
+    params: { locale },
+    props: { locale },
+  }));
+}
+interface Props {
+  locale: Locale;
+}
+interface Section {
+  id: string;
+  heading: string;
+  icon: string;
+  paragraphs?: string[];
+  steps?: string[];
+  items?: { icon: string; text: string }[];
+  links?: { label: string; url: string; icon: string }[];
+}
+const { locale } = Astro.props;
+const text = (key: MessageKey) => t(locale, key);
+const sections = (guide as Record<string, Section[]>)[locale] ?? [];
+const more = [
+  ['Zoom app download', 'https://winmetta.org/2021/10/13/zoom-download/'],
+  [
+    'Zoom user guide (video)',
+    'https://winmetta.org/2021/10/15/zoom-user-guide/',
+  ],
+  [
+    'How to raise hand',
+    'https://winmetta.org/2021/10/15/how-to-raise-hand-in-zoom-meeting/',
+  ],
+  [
+    'How to change your name',
+    'https://winmetta.org/2021/10/23/zoom-how-to-change-name/',
+  ],
+] as const;
+---
+
+<Shell locale={locale} title={text('zoomHelpTitle')} page="zoomHelp">
+  <header class="space-y-4">
+    <h1
+      class="icon-link text-3xl font-bold sm:text-4xl [&_svg]:h-8 [&_svg]:w-11"
+    >
+      <BrandIcon name="zoom" />{text('zoomHelpTitle')}
+    </h1>
+    <p class="lead">{text('zoomHelpIntro')}</p>
+  </header>
+  <nav aria-label={text('zoomHelpTitle')}>
+    <ul class="flex flex-wrap gap-2">
+      {
+        sections.map((section) => (
+          <li>
+            <a
+              class="chip inline-flex items-center gap-2"
+              href={`#${section.id}`}
+            >
+              <span aria-hidden="true">{section.icon}</span>
+              {section.heading.replace(/^[\d၀-၉]+[.။]\s*/, '')}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+  <div class="grid gap-4 lg:grid-cols-2">
+    {
+      sections.map((section) => (
+        <section
+          class="card space-y-3"
+          id={section.id}
+          aria-labelledby={`${section.id}-h`}
+        >
+          <h2
+            id={`${section.id}-h`}
+            class="flex items-center gap-3 text-xl font-bold"
+          >
+            <span class="guide-badge" aria-hidden="true">
+              {section.icon}
+            </span>
+            {section.heading}
+          </h2>
+          {section.paragraphs?.map((paragraph) => (
+            <p>{paragraph}</p>
+          ))}
+          {section.steps && (
+            <ol class="guide-steps">
+              {section.steps.map((step) => (
+                <li>{step}</li>
+              ))}
+            </ol>
+          )}
+          {section.items && (
+            <ul class="space-y-2">
+              {section.items.map((item) => (
+                <li class="flex items-start gap-3">
+                  <span aria-hidden="true" class="text-xl leading-snug">
+                    {item.icon}
+                  </span>
+                  <span>{item.text}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+          {section.links && (
+            <ul class="space-y-2">
+              {section.links.map((link) => (
+                <li>
+                  <a
+                    class="btn btn-outline w-full justify-start"
+                    href={link.url}
+                    rel="noopener"
+                  >
+                    <span aria-hidden="true">{link.icon}</span>
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      ))
+    }
+  </div>
+  <div class="max-w-3xl space-y-8">
+    <section class="space-y-2">
+      <p>{text('zoomHelpSource')}</p>
+      <ul class="space-y-1">
+        {
+          more.map(([label, url]) => (
+            <li>
+              <a class="link" href={url} rel="noopener">
+                {label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <p>
+        <a class="link" href={route(locale, 'classes')}
+          >{text('classesTitle')}</a
+        >
+      </p>
+    </section>
+  </div>
+</Shell>

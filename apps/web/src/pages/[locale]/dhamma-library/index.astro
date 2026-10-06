@@ -1,0 +1,60 @@
+---
+import Shell from '../../../layouts/Shell.astro';
+import LibrarySearchIsland from '../../../components/LibrarySearchIsland';
+import { locales, localeCodes, type Locale } from '../../../i18n/locales';
+import { t } from '../../../i18n/messages';
+import { libraryData } from '../../../lib/library-data';
+import { libraryCdnBase } from '../../../lib/site';
+import FolderTree from '../../../components/FolderTree.astro';
+import { tree } from '../../../lib/library-catalog';
+export function getStaticPaths() {
+  return localeCodes.map((locale) => ({
+    params: { locale },
+    props: { locale },
+  }));
+}
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const text = (key: Parameters<typeof t>[1]) => t(locale, key);
+const labels = {
+  searchLabel: text('searchLabel'),
+  searchPlaceholder: text('searchPlaceholder'),
+  searchLoading: text('searchLoading'),
+  searchError: text('searchError'),
+  searchRetry: text('searchRetry'),
+  results: text('results'),
+  similarBooks: text('similarBooks'),
+  noExact: text('noExact'),
+  noResults: text('noResults'),
+  tryFolders: text('tryFolders'),
+  resetSearch: text('resetSearch'),
+  folder: text('folder'),
+  removeFolder: text('removeFolder'),
+  download: text('download'),
+  showMore: text('showMore'),
+};
+---
+
+<Shell locale={locale} title={text('libraryTitle')} page="library">
+  <header class="space-y-4">
+    <h1 class="text-3xl font-bold sm:text-4xl">{text('libraryTitle')}</h1>
+    <p class="lead">{text('libraryIntro')}</p>
+  </header>
+  <noscript><p class="card">{text('searchNeedsJs')}</p></noscript>
+  <LibrarySearchIsland
+    client:load
+    labels={labels}
+    indexUrl={`/library-data/index.${libraryData.version}.json`}
+    recordsUrl={`/library-data/records.${libraryData.version}.json`}
+    cdnBase={libraryCdnBase}
+    formatLocale={locales[locale].formatLocale}
+  />
+  <section class="space-y-3" aria-labelledby="folders">
+    <h2 id="folders" class="text-2xl font-bold">{text('browseFolders')}</h2>
+    <div class="card">
+      <FolderTree tree={tree} nodes={tree.roots} locale={locale} nested />
+    </div>
+  </section>
+</Shell>

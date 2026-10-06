@@ -1,0 +1,42 @@
+---
+import { Image } from 'astro:assets';
+import { teacherRoute } from '../i18n/routes';
+import { languageOf } from '../lib/library-index';
+import { portrait } from '../lib/people-images';
+import { teacherName, teacherPlace } from '../lib/teachers';
+import type { Locale } from '../i18n/locales';
+import type { Teacher } from '../lib/schemas';
+interface Props {
+  teacher: Teacher;
+  locale: Locale;
+}
+const { teacher, locale } = Astro.props;
+const image = portrait(teacher.photo);
+const name = teacherName(teacher, locale);
+const place = teacherPlace(teacher, locale);
+---
+
+<li class="card card-link flex items-center gap-4">
+  {
+    image ? (
+      <Image
+        src={image}
+        width={72}
+        height={72}
+        class="avatar"
+        alt=""
+        loading="lazy"
+      />
+    ) : (
+      <span class="avatar" aria-hidden="true" />
+    )
+  }
+  <div class="min-w-0">
+    <a
+      class="link text-lg"
+      href={teacherRoute(locale, teacher.id)}
+      lang={languageOf(name)}>{name}</a
+    >
+    {place && <p class="muted text-sm">{place}</p>}
+  </div>
+</li>

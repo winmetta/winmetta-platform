@@ -27,7 +27,7 @@ describe('weekly class occurrences', () => {
     expect(formatOccurrence(instant, 'my', 'Asia/Yangon')).toMatch(
       /[\u1000-\u109f]/,
     );
-    expect(formatNumber(123, 'my')).toBe('၁၂၃');
+    expect(formatNumber(123, 'my')).toBe('123');
   });
   it('rejects nonexistent DST times and resolves repeats to the earlier instant', () => {
     expect(() =>

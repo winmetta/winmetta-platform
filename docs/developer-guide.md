@@ -4,7 +4,7 @@ How to set up, change and submit code for `winmetta-platform`. [CONTRIBUTING.md]
 
 ## 1. Before you start
 
-- This is a volunteer-run nonprofit teaching Theravāda Buddhism in the Pa-Auk tradition. Treat teachings, teachers and Pāḷi/Burmese text with care: use correct titles (Sayadaw, Ven., U) and diacritics (Theravāda, Pāḷi, Tipiṭaka), and never paraphrase or "improve" doctrinal content.
+- This is a volunteer-run nonprofit teaching Theravāda Buddhism, and supports any Theravāda tradition. Treat teachings, teachers and Pāḷi/Burmese text with care: use correct titles (Sayadaw, Ven., U) and diacritics (Theravāda, Pāḷi, Tipiṭaka), and never paraphrase or "improve" doctrinal content.
 - **This repo is public.** Git history is effectively permanent. Read [AGENTS.md](../AGENTS.md) §2 before your first commit.
 - Check the current phase in the implementation plan. Don't build deferred features (analytics, backend or database, accounts, offline/PWA, `apps/desktop`, `apps/mobile`).
 
@@ -28,7 +28,7 @@ No Docker, database or env file is needed. Run `npm run dev` and open <http://lo
 | `apps/web/src/fixtures` | Synthetic content used by the content collections in Phase 0. |
 | `apps/web/tests` | Playwright smoke tests. |
 | `scripts/setup-local-dev.sh` | Repo setup: Node, npm, dependencies, Playwright browser. |
-| `infra/terraform/` | Phase 2 and later; not present yet. |
+| `infra/pulumi/` | Phase 2 and later (Pulumi, TypeScript); not present yet. |
 
 Keep code in `apps/web` until a second consumer needs it. Only then extract a package under `packages/`.
 
@@ -36,13 +36,14 @@ Keep code in `apps/web` until a second consumer needs it. Only then extract a pa
 
 | Command | What it does |
 | --- | --- |
-| `npm run dev` | Dev server on 127.0.0.1:4321. |
+| `npm run dev` | Dev server on 127.0.0.1:4321. Only one can run per project; a second start prints the URL and PID of the running one. `npm run dev -- --force` replaces it. |
+| `npm run dev:stop` | Stop the running dev server. |
 | `npm run lint` | ESLint plus a Prettier check. |
 | `npm run format` | Format the repo with Prettier. |
 | `npm run typecheck` | `astro check` (strict TypeScript). |
 | `npm test` | Vitest unit tests. |
 | `npm run build` | Static production build. |
-| `npm run test:smoke` | Playwright tests against the built site. Run `npm run build` first. The first time, run `npx playwright install chromium`. |
+| `npm run test:smoke` | Playwright tests against the built site (served on port 4331, so a running dev server on 4321 is never reused). Run `npm run build` first. The first time, run `npx playwright install chromium`. |
 
 CI runs all of these on every pull request and does not deploy. Run lint, typecheck, test and build locally before pushing.
 
@@ -59,6 +60,7 @@ Never put secrets in `PUBLIC_*` variables, because they can appear in the genera
 
 - TypeScript strict mode. No `any`; use `unknown` and type guards.
 - Styling with Tailwind utilities and shadcn/Radix primitives. Prefer logical properties (`ps-*`, `ms-*`) so layouts survive text expansion.
+- **Look and feel:** use the design tokens and component classes in `apps/web/src/styles/global.css` (palette from the Win Metta Brand Kit in Canva; derived colors are documented there with their contrast ratios). Interactive elements keep a 44 px target and a visible focus ring. Links are not underlined (see AGENTS.md §6 for the rule and why inline links are semibold brand color). Check new colors for contrast before adding them.
 - Design for mobile and desktop. Interactive elements need touch targets (`min-h-11`) and keyboard access, with visible focus. UI components need accessible names; the ESLint a11y rules run on `.tsx`.
 - No vanity metrics (streaks, leaderboards, badges) or engagement-optimized patterns. No analytics SDKs.
 - Core content must work without login.
@@ -68,8 +70,9 @@ Never put secrets in `PUBLIC_*` variables, because they can appear in the genera
 
 All user-facing text supports English (`en`) and Burmese (`my`).
 
+- **Burmese terms:** the Sayadaws page and menu say "ဆရာတော်" (English "Sayadaws"), and "ဆရာတော်" is reserved for monks, so a lay teacher such as Daw Khin Hla Tin must never be listed there or under that term; give lay teachers their own page and label if they are added. Everyday English technical words (for example Zoom, Web Hosting) are kept beside or instead of rarely used Burmese terms when readers know the English better. "ဘုန်းကြီးကျောင်း" means a monastery; never use plain "ကျောင်း" (it can mean a school).
 - **Messages:** add each key to `en.json` and `my.json`, and use `t(locale, key)`. The build fails on missing, empty or extra keys. Don't hardcode strings, branch on `locale === 'en'`, or concatenate sentences.
-- **Burmese text** must be Unicode (U+1000–U+109F), never Zawgyi. Have a Burmese speaker review wording.
+- **Burmese text** must be Unicode (U+1000–U+109F), never Zawgyi (the library generator converts legacy Zawgyi filenames and lists them in `zawgyi-review.json`). Have a Burmese speaker review wording.
 - **New locale:** add it to the registry in `i18n/locales.ts` and add its message file.
 - **Routes:** add a page ID to `pagePaths` in `i18n/routes.ts` and build links with `route(locale, page)`. Never link to a page that isn't built.
 - **Locale switch rule:** switching language changes only the locale segment of the URL. Path, query, filters and fragment must stay intact, computed from the URL when the link is activated. Any new stateful navigation (search, filters) must keep this true and needs a Playwright test.
@@ -81,6 +84,8 @@ All user-facing text supports English (`en`) and Burmese (`my`).
 - Schemas are in `src/lib/schemas.ts`. Every record has a stable kebab-case `id`, a `sourceLanguage`, `translations` that include the source language, a `sourceUrl` and a `verifiedAt` date.
 - Organize classes by the real class name, with a `curriculum` code and `teacher` as a separate field (see [AGENTS.md](../AGENTS.md) §3). Add a new curriculum to that table before adding its content.
 - **Schedules** store the source IANA timezone and a local weekday/time (ISO weekday, Monday=1 to Sunday=7). Compute occurrences with `occurrenceOn` and show Pacific (`America/Los_Angeles`) and Myanmar (`Asia/Yangon`) by default. Don't compute with the browser's local zone. Nonexistent daylight-saving times are rejected and repeated times resolve to the earlier instant.
+- **Library files** come from a generated manifest of the S3 bucket, not hand-written records (see [tech-architecture.md](tech-architecture.md) §3). Fix a title, author, language or tags in the overrides file, never by renaming S3 objects, and never edit the manifest by hand. Every folder in a file's path is a tag with its number prefix removed, and has a stable id in `folders.json` that its static page URL uses; never change or reuse an id. Search normalization treats ဥ/ဉ and Burmese/ASCII digits as equal; change it only with the golden-query tests. The generator command will be listed here when Phase 1 adds it.
+- **Classes, study groups, teachers and retreats** are committed JSON in `apps/web/src/content/` (`classes.json`, `teachers.json`, `retreats.json`, `channels.json`) plus `zoom-help.json` for the Zoom help page. Edit `classes.json` by hand (set `streamed` per class; archived classes carry no schedule or Zoom details). Teachers and retreats are first imported from winmetta.org, then reviewed: `node scripts/import-teachers.mjs` (bios and portraits into `src/assets/people/`, recorded in `src/assets/SOURCES.md`; it keeps the English drafts and `reviewed` flags) and `node scripts/import-retreats.mjs` (dates, format, venue and teacher are authored in the script's event list; it reads each page for timetable PDFs, per-day post links and class notes; a session's day comes from its title or its position in the page's list, never from the WordPress post date, with reviewed overrides in `sessionDayOverrides`). Both are read-only against winmetta.org. Retreat photos are deliberately not imported (they show lay participants). Never copy volunteer phone numbers or e-mail addresses, registration forms, roster spreadsheets, chat invites or flyers with contact details. Set a teacher's English `reviewed` to `true` only after a Burmese speaker has checked it.
 - **Phase 0 fixtures** are synthetic and use reserved domains (`example.invalid`). Keep them separate from real published content, which arrives in Phase 1.
 
 ## 9. Secrets and personal data
@@ -89,12 +94,13 @@ All user-facing text supports English (`en`) and Burmese (`my`).
 - No real personal data, even in fixtures: no student or roster names, emails, phone numbers or private meeting details. Use synthetic placeholders.
 - The only exception is the already-public weekly class Zoom links and passcodes, which may appear in schedule content. Retreat or one-off session credentials, meeting host keys and anything not already published stay out.
 - Review `git diff --cached` before every commit. If something sensitive was staged, stop and ask a maintainer before pushing. Don't try to hide it with a follow-up commit.
-- Terraform (later): commit only `*.tfvars.example`.
+- Pulumi (later): commit only non-secret `Pulumi.<stack>.yaml`; secrets use `pulumi config set --secret` (AWS KMS) or the environment.
 
 ## 10. Testing
 
 - **Unit tests** (Vitest) sit beside the code as `*.test.ts`. Add them for helpers, especially schedule logic (daylight-saving and day-rollover cases) and library filtering (include Burmese text).
 - **Smoke tests** (Playwright) cover routing, the language switcher, fonts and the React island on desktop and mobile viewports. Add a case when you change navigation or layout.
+- The golden search tests in `library-search.test.ts` run against the real manifest. After regenerating it, a test can fail because a book it names was renamed or removed in S3 (for example `ဓမ္မပဒ`); update the test to a title that still exists, but never weaken an assertion to make it pass.
 - A bug fix should come with a test that fails without it.
 
 ## 11. Git workflow

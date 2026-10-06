@@ -13,6 +13,9 @@ import { allowIndexing } from '../lib/site';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     {!allowIndexing && <meta name="robots" content="noindex" />}
     <title>{t('en', 'choose')} · {t('en', 'brand')}</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#ffffff" />
     <link rel="canonical" href={Astro.site} />
     {
       localeCodes.map((code) => (
@@ -25,15 +28,25 @@ import { allowIndexing } from '../lib/site';
     }
     <link rel="alternate" hreflang="x-default" href={Astro.site} />
   </head>
-  <body>
-    <main class="mx-auto max-w-xl space-y-6 px-5 py-12">
+  <body class="flex min-h-screen items-center justify-center p-5">
+    <main
+      class="card w-full max-w-md space-y-6 p-8 text-center"
+      style="background: linear-gradient(160deg, var(--sand), var(--sky));"
+    >
+      <img
+        src="/logo-512.png"
+        width="160"
+        height="160"
+        alt=""
+        class="mx-auto size-32"
+      />
       <h1 class="text-2xl font-bold">{t('en', 'brand')}</h1>
       {
         localeCodes.map((code) => (
-          <section lang={code}>
-            <h2>{t(code, 'choose')}</h2>
+          <section lang={code} class="space-y-2">
+            <h2 class="muted">{t(code, 'choose')}</h2>
             <a
-              class="inline-flex min-h-11 items-center underline"
+              class="btn btn-primary w-full"
               href={route(code)}
               hreflang={code}
             >

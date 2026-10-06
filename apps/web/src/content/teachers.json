@@ -1,0 +1,634 @@
+[
+  {
+    "id": "ghositabhivamsa",
+    "sourceLanguage": "my",
+    "names": {
+      "my": "ဆရာတော် ဦးဃောသိတာဘိဝံသ (မေတ္တာနန္ဒ)",
+      "en": "Sayadaw U Ghositābhivaṃsa (Mettānanda)"
+    },
+    "place": {
+      "en": "Oakland, California, USA",
+      "my": "Oakland, California, USA"
+    },
+    "photo": "ghositabhivamsa.jpeg",
+    "bio": {
+      "my": {
+        "sections": [
+          {
+            "heading": "မွေးဖွားခြင်း",
+            "paragraphs": [
+              "ဆရာတော်ဦးဃောသိတာဘိဝံသသည် ၁၃၂ဝခုနှစ်၊ တပေါင်းလပြည့် (၁၅) ရက်၊ ၁၉၅၉ ခုနှစ်၊ မတ်လ (၂၃) ရက်၊ တနင်္လာနေ့တွင် မြန်မာနိုင်ငံ၊ စစ်ကိုင်းတိုင်း၊ တန့်ဆည်မြို့နယ်၊ ရွှေနားဋောင်းကျကျေးရွာ၊ ခမည်းတော် ဦးထွန်းမြ + မယ်တော် ဒေါ်ခင်ပုတို့မှဖွားမြင်သော သားသမီးနှစ်ယောက်တို့တွင် ဒုတိယမြောက် သားရတနာဖြစ်သည်။"
+            ]
+          },
+          {
+            "heading": "ရှင်, ရဟန်းပြုခြင်း",
+            "paragraphs": [
+              "အသက်ကိုးနှစ်သားအရွယ်တွင် ရှင်သာမဏေပြုခဲ့ပြီး ၁၉၇၉ ခုနှစ်၊ ဖေဖော်ဝါရီလ (၁၄) ရက်၊ ဗုဒ္ဓဟူးနေ့တွင် ကန့်ဘလူမြို့နယ်၊ ပိုးစာကုန်းရွာ သစ်ရွာ၊ လက်ထုတ်ကုန်းကျောင်း၌ အဘိုးဘုန်းတော်ကြီး ဦးတေဇဝန္တကို ဥပဇ္ဈာယ် ပြုပြီး ဦးဘိုးရေ + ဒေါ်မြခဲ တို့၏ ပစ္စယာနုဂ္ဂဟ ကိုခံယူကာ ရဟန်းအဖြစ်သို့ ရောက်ရှိခဲ့သည်။"
+            ]
+          },
+          {
+            "heading": "ပညာသင်ကြားခြင်း",
+            "paragraphs": [
+              "အဘိုးဘုန်းတော်ကြီးဦးတေဇဝန္တ၊ နောင်တော် ဒေါက်တာ ဦးဓမ္မပိယ၊ ရေဦးမြို့ မင်္ဂလာရာမစာသင်တိုက်ဆရာတော် ဦးအာစာရာဘိဝံသ အမှူးရှိသော နာယကဆရာတော်များ၊ မန္တလေးမြို့ မစိုးရိမ်တိုက်သစ်ဆရာတော် ဦးနာယကာဘိဝံသ၊ ဦးသိရိန္ဒာဘိဝံသ၊ ဦးရာဇဓမ္မာဘိဝံသ၊ မစိုးရိမ်ကျောင်းတိုက်(ဟောင်း)ဆရာတော် ဦးနာရဒါဘိဝံသ၊ ဦးကောဝိဒါဘိဝံသ၊ ဦးဇယဒိသာဘိဝံသ၊ ဦးသုမနာဘိဝံသ၊ ပေါက်မြိုင်ဆရာတော်ဦးအဂ္ဂဝံသာဘိဝံသ၊ဘုရားကြီးတိုက်ဆရာတော် ဦးသြဘာသာဘိဝံသအစရှိသော ပရိယတ္တိ အကျော်အမော်ဆရာတော်များထံတွင် ပရိယတ္တိစာပေများကို လေ့လာ ဆည်းပူးခဲ့သည်။"
+            ]
+          },
+          {
+            "heading": "အောင်မြင်ခဲ့သော စာမေးပွဲများ",
+            "paragraphs": [
+              "သာသနဓဇ ဓမ္မာစရိယ (အစိုးရ)၊ စေတီယင်္ဂဏ ပရိယတ္တိ ဂဏဝါစက ဓမ္မာစရိယ၊ ဝိနယာနုဂ္ဂဟဓမ္မာစရိယ စာမေးပွဲတို့ကို အောင်မြင်ခဲ့ပါသည်။"
+            ]
+          },
+          {
+            "heading": "ပရိယတ္တိစာပေများ ပို့ချခြင်း",
+            "paragraphs": [
+              "ရေဦးမြို့၊ မင်္ဂလာရာမစာသင်တိုက်၌ သာမဏေဘဝဖြင့် စာချပေးခဲ့ခြင်း၊ မန္တလေးမြို့၊ မစိုးရိမ်တိုက်သစ်၊ မစိုးရိမ်တိုက်ဟောင်းတို့၌၎င်း၊ တောင်ကြီးမြို့ သဲကျင်းဂူ ပရိယတ္တိစာသင်တိုက်၌၎င်း၊ ရန်ကုန်မြို့၊ ရွှေတောင် ကုန်း သာသနာ့ရိပ်သာ၌၎င်း ပရိယတ္တိစာပေများကို ပို့ချပေးခဲ့သည်။"
+            ]
+          },
+          {
+            "heading": "ပဋိပတ္တိတရားများကို ကျင့်ကြံအားထုတ်ခြင်း",
+            "paragraphs": [
+              "ရဟန်းဖြစ်စမှာ ရန်ကုန်မြို့၊ မဟာစည်သာသနာ့ရိပ်သာတွင် မဟာစည်ဆရာတော်ဘုရားကြီးထံ၌၎င်း၊ ရဟန်းတစ်ဝါအရမှာ မန္တလေးမြို့၊ စိန်ပန်း ရတနာပုံမဟာစည်ရိပ်သာတွင် ဟံလင်းဆရာတော်အထံ၌၎င်း၊ ရဟန်း နှစ်ဝါအရမှာ မန္တလေးမြို့၊ မဟာဗောဓိရိပ်သာ ကမ္မဋ္ဌာန်းဆရာလုပ်ခဲ့ပြီး နောင်တွင် ရဟန်းပြုကာ မန္တလေးမြို့၊ မင်းကွန်းကျောင်းတိုက်၌ ကိုယ်တိုင် တရားအားထုတ်နေသော ဦးပဉ္ဇင်းကြီးထံ၌ လယ်တီနည်းကို၎င်း၊ ရန်ကုန်မြို့၊ ရွှေတောင်ကုန်းသာသနာ့ရိပ်သာတွင် ပဏ္ဍိတာရာမဆရာတော်ကြီးထံ၌၎င်း၊ မော်လမြိုင်မြို့၊ တောင်ဝိုင်းလေး မဟာစည်ရိပ်သာတွင် ဆရာတော် ဦးအာဒိစ္စထံ၌၎င်း၊ ဘုတလင်မြို့နယ် မောင်းထောင်မြေဇင်းတောရတွင် မြေဇင်းတောရဆရာတော်ကြီးထံ၌၎င်း၊ ဖားအောက်တောရဆရာတော် ဦးအာစိဏ္ဏထံ၌၎င်း၊ အလိုတော်ပြည့် ဆရာတော်ဦးအရိယဓမ္မထံ၌၎င်း၊ နေပြည်တော်၊ ဧလာမြို့ ဂိုဏ်းထောက်ဆရာတော်ကြီးထံ၌၎င်း၊ သမထ ဝိပဿနာတရားများကို ရက်ရှည်လများစွာ ကျင့်ကြံအားထုတ် နည်းယူခဲ့သည်။"
+            ]
+          },
+          {
+            "heading": "ဓုတင်ဆောက်တည်ခဲ့သော သုသာန်များ",
+            "paragraphs": [
+              "မော်လမြိုင်မြို့၊ ဖားအောက်ရွာ(၁) တောရသုသာန်။ (၂) ခေမိကသုသာန်။ (၃) ကျောက်ပန်းတောင်းမြို့သုသာန်။",
+              "ကျိုင်းတုံမြို့(၄) တရုတ်သုသာန်။ (၅) တိုင်းရင်းသားသုသာန်။",
+              "မတ္တရာမြို့နယ်(၆) မြို့ထင်ရွာသုသာန်။ (၇) မြစ်ကမ်းရွာသုသာန်။",
+              "သီပေါမြို့(၈) တိုင်းရင်းသားသုသာန်။ (၉) မေမြို့သုသာန်။",
+              "နောင်ချိုမြို့နယ်(၁ဝ) ရွှေညောင်ပင်ရွာ သုသာန်။ (၁၁) ဘော်ထင်ရွာ သုသာန်။",
+              "ကန့်ဘလူမြို့နယ်(၁၂) ပိုးစာကုန်းရွာသုသာန်။ (၁၃) တောင်ရွက်ကျမ်းရွာသုသာန်။",
+              "တောင်ကြီးမြို့(၁၄) တိုင်းရင်းသားသုသာန်။",
+              "တောင်ကြီးမြို့နယ်(၁၅) ရွာသစ်ကုန်းရွာသုသာန်။",
+              "ထိုင်းနိုင်ငံ(၁၆) မယ်ဆိုင်မြို့သုသာန်။",
+              "အမေရိကန်နိုင်ငံ၊ ဖရီးမောင့်မြို့(၁၇) HolySpirit ခရစ်ယာန်သုသာန်။",
+              "ညောင်ရမ်းမြို့(၁၈) ဈေးရပ်သုသာန်။",
+              "ထားဝယ်ခရိုင်၊ လောင်းလုံမြို့နယ်(၁၉) ကျောက်ဆင်ရွာသုသာန်။ (၂ဝ) သဘော့ဆိပ် + ပြင်ကြီးရွာသုသာန်။ (၂၁) ကရင်ကြီးရွာသုသာန်။ (၂၂) အောက်ကျောက်ဝတ်ရွာသုသာန်။ (၂၃) ညောပြင်ရွာသုသာန်။",
+              "ငပုတောမြို့နယ်(၂၄) သင်္ဃန်းကုန်းရွာ သုသာန်။ (၂၅) ပြည်မြို့၊ အေးငြိမ်းရာ ဘာသာပေါင်းစုံသုသာန်။ (၂၆) ကန့်ဘလူမြို့၊ ကန့်ဘလူသုသာန်။",
+              "တန့်ဆည်မြို့နယ်(၂၇) ရွှေနားဋောင်းကျသုသာန်။ (၂၈) ဗျက်ကြီးသုသာန်။ (၂၉) ကျောက်တံခါးမြို့၊ ဝေနေယျသုသာန်။ (၃ဝ) ပဲနွယ်ကုန်းမြို့၊ ငမော့တော့သုသာန်သစ်။ (၃၁) ခင်ဦးမြို့၊ အောင်သီရိသုသာန်။",
+              "ခင်ဦးမြို့နယ်(၃၂) သံဘိုသုသာန်",
+              "ကော့သောင်းမြို့(၃၃) ပုလုံးတုံတုံးသုဿန် (၃၄) ချောင်းဝသုဿန် (၃၅) (၇)မိုင် ရွှေပြည်စိုးသုဿန် (၃၆) ရွှေပြည်သာသုဿန် (၃၇) (၁၀)မိုင် သုဿန် များ၌ သုသာန်ဓုတင် ဆောက်တည်ခဲ့သည်။"
+            ]
+          },
+          {
+            "heading": "အခြားဓုတင်များဆောက်တည်ခြင်း",
+            "paragraphs": [
+              "မော်လမြိုင်မြို့၊ ဖားအောက်တောရ၌လည်းကောင်း၊ ရခိုင်ပြည်နယ် တောင်ပိုင်း၊ ဂျိတ်တောရွာအနီး ပင်လယ်ထဲတွင် ထိုးထွက်နေသော မဒေးတောင်၌လည်းကောင်း၊ မတ္တရာမြို့နယ်၊ မြို့ထင်ရွာ မနောသုခကျောင်း၌ လည်းကောင်း၊ အခြားဓုတင်များကို စွမ်းနိုင်သလောက် ဆောက်တည်ခဲ့သည်။"
+            ]
+          },
+          {
+            "heading": "တရားဟော တရားပြခြင်းနှင့် ဓမ္မသင်တန်းများ",
+            "paragraphs": [
+              "ရန်ကုန်မြို့၊ ငါးကျမ်းပြန်သာသနာ့ရိပ်သာ၊",
+              "ရွှေတောင်ကုန်း သာသနာ့ ရိပ်သာ၊",
+              "ကာလီဖိုးနီးယားပြည်နယ်၊ ဆန်ဟိုဆေးမြို့၊ တထာဂတ တရား ရိပ်သာ၊",
+              "ဖရီးမောင့်မြို့၊ မေတ္တာနန္ဒဝိဟာရဓမ္မရိပ်သာ၊",
+              "ကစရိုဘယ်ရီမြို့ မေတ္တာနန္ဒဝိဟာရ ဓမ္မရိပ်သာ၊",
+              "စင်္ကာပူနိုင်ငံ သတိပဋ္ဌာန်တရားရိပ်သာများ၌ သမထဝိပဿနာတရားများကို ဟောပြောသင်ပြပေးခြင်း၊",
+              "လူငယ်များကို ဗုဒ္ဓယဉ်ကျေးမှု သင်တန်းများ သင်ပြပေးခြင်း၊",
+              "ဆန်ဖရန်စစ္စကို ဗေးဧရိယာ တွင်ရှိသော ဒေလီစီးတီးမြို့ ထေရဝါဒဓမ္မအသင်း၌ သြဝါဒါစရိယ ဆရာတော်အဖြစ် တာဝန်ယူဆောင်ရွက်ပြီး တစ်နေ့တာ တရားစခန်းများ ပြုလုပ်ပေးခြင်း၊ တရားသင်တန်းများ၌ အလုပ်ပေးတရားများကို အဓိကထားပြီး သင်ကြားပေးခြင်း၊",
+              "ကနေဒါနိုင်ငံနှင့် အမေရိကန် အချို့ပြည်နယ်များ၌ အခါအားလျော်စွာ တရားစခန်းများ ပြုလုပ်ပေးခြင်း၊",
+              "အာရီဇိုးနားပြည်နယ်၊ အလိုတော်ပြည့်ရိပ်သာ၌၎င်း၊ ဂျမေကာနိုင်ငံ ကင်စတန်မြို့တော်၊ ဓမ္မဒီပကျောင်းနှင့် အခြားမြို့များ၌၎င်း၊ တရားစခန်းများကို နှစ်စဉ်တရား သင်ပြပေးခြင်း၊",
+              "မြန်မာနိုင်ငံတွင် သုသာန် ဓုတင်ဆောက်တည်ခဲ့သော နေရာများ၌ တရားသင်ပြပေးခြင်း၊",
+              "ထိုင်းနိုင်ငံ ဖိနပ်နိခုံမြို့၊ ပတ္တယာမြို့၊ မယ်ဆိုင်မြို့စသော နေရာများ၌၎င်း",
+              "(၁) ထိုင်ဝမ်နိုင်ငံ၊ ထိုင်ပေမြို့၊ နန္ဒာရာမကျောင်းတိုက်၊",
+              "(၂)စမ်းရှာမြို့၊ မဟာထေရကဿပ တရားရိပ်သာ၊",
+              "(၃) ရှန်ခမ်းမြို့၊ Power of Wisdom Meditation Center မှ ဦးစီးကျင်းပသောတရားစခန်း၊",
+              "(၄)မြောင်လိခရိုင်၊ စမ်ဝမ်းမြို့၊ မိတောကျောင်းတိုက်တို့၌၎င်း တရားစခန်းများကို နှစ်စဉ်ပြုလုပ်ပေးခြင်း",
+              "(၅) ထိုင်ပေမြို့၊ အဘိဓမ္မာသင်တန်းခန်းမနှင့် အခြားနေရာများ၌ မဟာသတိပဋ္ဌာနသုတ်ကို သင်ပြပေးခြင်း၊",
+              "တောင်ကိုရီးယား၊ အင်ဒိုနီးရှား၊ မလေးရှားနိုင်ငံ၊ ပီနန်မြို့၊ မေတ္တာနန္ဒဝိဟာရဓမ္မရိပ်သာ၊",
+              "ကွာလာလမ်ပူမြို့အနီး၊ KKB ဗောဓိယာရာမတရားရိပ်သာတို့၌ အခါအားလျော်စွာ တရားပြခြင်းများကို ပြုလုပ်သည်။",
+              "ဆာတိုးရီဝိဟာရ မြန်မာကျောင်း၊ ဆိုင်းတမခရိုင်၊ ဂျပန်နိုင်ငံ"
+            ]
+          },
+          {
+            "heading": "ထုတ်ဝေပြီးသော စာအုပ်များ",
+            "paragraphs": [
+              "၁။ ငြိမ်းချမ်းစွာ နေကြည့်စမ်းပါ။ ၂။ မေတ္တာရောင်ခြည် ဘုရားရှိခိုး။ ၃။ ဘဝမှတ်တိုင်များ။ ၄။ မေတ္တာရောင်ခြည် ဝတ်ရွတ်စဉ်။ ၅။ သဘောထားပြည့်သူတို့နှလုံးသား။ ၆။ ပါရမီကုသိုလ်။ ၇။ အသက်ကလေးရယ်တဲ့ရှည်စေလို။ ၈။ တရားအလုပ်မဝင်ခင် ကြိုတင်ပြင်။ ၉။ တရားကျင့်ရာ ရိုးသားပါ။",
+              "ယခုအခါ ဆရာတော်သည် နောင်တော်ဒေါက်တာ ဦးဓမ္မပိယနှင့် အတူ ပရိယတ္တိပဋိပတ္တိကိစ္စများ၊ အများအကျိုးပြုကိစ္စများကို ပြုလုပ်ဆောင် ရွက်နေပြီး မေတ္တာနန္ဒဝိဟာရဓမ္မရိပ်သာ (California, USA) ၌ သီတင်းသုံး နေထိုင်လျက်ရှိပါသည်။"
+            ]
+          }
+        ],
+        "reviewed": true
+      },
+      "en": {
+        "sections": [
+          {
+            "heading": "Birth",
+            "paragraphs": [
+              "Sayadaw U Ghositābhivaṃsa was born on Monday, the full moon day of Tabaung, Myanmar Era 1320 (23 March 1959), in Shwenartaungkya village, Tantse Township, Sagaing Region, Myanmar. He is the second of two children of his father U Tun Mya and his mother Daw Khin Pu."
+            ]
+          },
+          {
+            "heading": "Novice and monk ordination",
+            "paragraphs": [
+              "At the age of nine he was ordained a novice. On Wednesday, 14 February 1979, at Lethtokkon Monastery in Poesakon new village, Kanbalu Township, he received full ordination as a monk, with his grandfather-monk Sayadaw U Tejavanta as preceptor and with the support of U Bo Ye and Daw Mya Khe."
+            ]
+          },
+          {
+            "heading": "Studies",
+            "paragraphs": [
+              "He studied the pariyatti texts under Sayadaw U Tejavanta, his elder brother Dr. U Dhammapiya, the teaching Sayadaws led by Sayadaw U Ācārābhivaṃsa of Mingalarama Monastic Education Monastery in Yewu, and many well-known pariyatti Sayadaws in Mandalay, including Sayadaw U Nāyakābhivaṃsa, U Sirindābhivaṃsa, U Rājadhammābhivaṃsa, U Nāradābhivaṃsa, U Kovidābhivaṃsa, U Jayadisābhivaṃsa, U Sumanābhivaṃsa, U Aggavaṃsābhivaṃsa of Paukmyaing and U Obhāsābhivaṃsa of Phayagyi Monastery."
+            ]
+          },
+          {
+            "heading": "Examinations passed",
+            "paragraphs": [
+              "He passed the Sāsanadhaja Dhammācariya (government), Cetiyaṅgaṇa Pariyatti Gaṇavācaka Dhammācariya and Vinayānuggaha Dhammācariya examinations."
+            ]
+          },
+          {
+            "heading": "Teaching pariyatti",
+            "paragraphs": [
+              "He taught pariyatti texts as a novice at Mingalarama Monastic Education Monastery in Yewu, and later at Masoyein New and Old Monasteries in Mandalay, Thetgyin Gu Pariyatti Monastery in Taunggyi, and Shwetaungkon Sāsana Yeiktha in Yangon."
+            ]
+          },
+          {
+            "heading": "Practising the paṭipatti",
+            "paragraphs": [
+              "Soon after becoming a monk he practised under Mahāsi Sayadawgyi at Mahāsi Sāsana Yeiktha in Yangon. In his first rains retreat he practised under the Hanlin Sayadaw at Mahāsi Yeiktha, Ratanapura, Chanmyathazi in Mandalay. In his second rains retreat he served as a kammaṭṭhāna teacher at Mahābodhi Yeiktha in Mandalay. Later he practised the Ledi method under a monk at Mingun Monastery in Mandalay, and for long periods learned samatha and vipassanā methods under Paṇḍitārāma Sayadawgyi at Shwetaungkon Sāsana Yeiktha in Yangon; Sayadaw U Ādicca at Taungwainglay Mahāsi Yeiktha in Mawlamyine; the Myezin Forest Sayadawgyi at Myezin Forest Monastery in Butalin Township; Pa-Auk Forest Sayadaw U Ācinna; Alodawpyie Sayadaw U Ariyadhamma; and the Gaingthaut Sayadawgyi of Ela in Naypyitaw."
+            ]
+          },
+          {
+            "heading": "Cemetery practice (dhutaṅga)",
+            "paragraphs": [
+              "He undertook the cemetery dhutaṅga at 37 cemeteries in Myanmar (including Mawlamyine, Kyaingtong, Matthara, Thibaw, Taunggyi, Kanbalu, Nyaungyan, Dawei District, Kawthaung and elsewhere), in Mae Sai in Thailand, and at the Holy Spirit Christian cemetery in Fremont, USA. (The full list of sites is given in the Burmese text.)"
+            ]
+          },
+          {
+            "heading": "Other dhutaṅga practices",
+            "paragraphs": [
+              "He also undertook other dhutaṅga practices as far as he was able, at Pa-Auk Forest Monastery in Mawlamyine, on Madé Mountain, which juts into the sea near Jeitto village in southern Rakhine State, and at Manosukha Monastery in Myothit village, Matthara Township."
+            ]
+          },
+          {
+            "heading": "Teaching Dhamma and Dhamma courses",
+            "paragraphs": [
+              "He has taught samatha and vipassanā at the Ngakyampyan Sāsana Yeiktha and Shwetaungkon Sāsana Yeiktha in Yangon, at Tathāgata Dhamma Retreat in San Jose, California, at Mettānanda Vihāra Dhamma Retreat in Fremont and Cazadero, and at Satipaṭṭhāna meditation centres in Singapore. He has taught Buddhist culture courses for young people, served as an advisory teacher at the Theravāda Dhamma Association in Daly City in the San Francisco Bay Area, held one-day retreats, and emphasised practical instruction in his courses.",
+              "He holds retreats from time to time in Canada and several US states, annual retreats at Alodawpyie Retreat in Arizona and at Dhammadīpa Monastery in Kingston, Jamaica and other cities, and teaches at the places in Myanmar where he undertook the cemetery dhutaṅga. He has taught in Thailand (Phitsanulok, Pattaya, Mae Sai), and holds annual retreats in Taiwan at Nandārāma Monastery in Taipei, Mahākassapa Dhamma Retreat in Taoyuan, Power of Wisdom Meditation Center in Shenzhen, and Mitoh Monastery in Miaoli. He teaches the Mahāsatipaṭṭhāna Sutta at the Abhidhamma class hall in Taipei and elsewhere, and gives talks from time to time in South Korea, Indonesia, Penang in Malaysia (Mettānanda Vihāra Dhamma Retreat), the KKB Bodhiyārāma retreat near Kuala Lumpur, and Satoshi Vihāra Burmese Monastery in Saitama Prefecture, Japan."
+            ]
+          },
+          {
+            "heading": "Published books",
+            "paragraphs": [
+              "1. Try Living in Peace. 2. Metta Radiance: Devotional Verses. 3. Life's Milestones. 4. Metta Radiance Chanting. 5. The Hearts of the People of Good Disposition. 6. Pāramī Merit. 7. May this Little Life be Long. 8. Prepare Before Starting Meditation. 9. Be Honest in Practising the Dhamma. (Titles are translated from the Burmese.)",
+              "Today the Sayadaw, together with his elder brother Dr. U Dhammapiya, carries out pariyatti and paṭipatti work and work for the public benefit, and lives at Mettānanda Vihāra Dhamma Retreat (California, USA)."
+            ]
+          }
+        ],
+        "reviewed": false
+      }
+    },
+    "bioSourceUrl": "https://winmetta.org/sayadaw-u-ghositabhivamsa-bio/",
+    "sourceUrl": "https://winmetta.org/sayadaw-u-ghositabhivamsa-bio/",
+    "verifiedAt": "2026-10-04"
+  },
+  {
+    "id": "garudhamma",
+    "sourceLanguage": "my",
+    "names": {
+      "my": "ဆရာတော် ဦးဂရုဓမ္မ",
+      "en": "Sayadaw U Garudhamma"
+    },
+    "place": {
+      "en": "Fremont, California, USA",
+      "my": "Fremont, California, USA"
+    },
+    "photo": "garudhamma.jpeg",
+    "bio": {
+      "my": {
+        "sections": [
+          {
+            "paragraphs": [
+              "အရှင် ဂရုဓမ္မ သည် မြန်မာနှစ် ၁၃၃၃ခု ဝါခေါင် လဆန်း ၁၁ ရက် ၊ ခရစ်နှစ် ၁၉၇၁ တွင် မန္တလေးတိုင်း ဝမ်းတွင်းမြို့နယ် ကုန်းကံရွာ တွင် ခမည်းတော် ဦးထွန်းကြွယ် ၊ မယ်တော် ဒေါ်အုန်းကြွယ် တို့မှ မွေးဖွားခဲ့သည်။ ၁၃၄၄ခုနှစ် တပေါင်းလဆုတ် ၁၀ ရက်တွင် မိတ္တီလာမြို့ မဏိဇောတိကာရုံကျောင်းတိုက် ဆရာတော် ဦးအဂ္ဂဓမ္မကို ဥပဇ္စျာယ်ပြု၍ ရှင်သာမဏေ ပြုခဲ့သည်။ မြန်မာနှစ် ၁၃၅၂ခု နတ္တော် လဆုတ် ၁၂ ရက်တွင် အမရပူရ မဟာဂန္ဓာရုံ ကျောင်းတိုက်၌ ဒေါ်သီတာမော်၏ ပစ္စယာ နုဂ္ဂဟ ခံယူကာ ရဟန်းပြုခဲ့သည်။",
+              "မိတ္တီလာမြို့ မဏိ ဇောတိကာရုံ ကျောင်းတိုက်၊ မန္တလေး မဟာမြိုင် ကျောင်းတိုက်၊ ပဲခူး ကြခတ်ဝိုင်း ကျောင်းတိုက်၊ အမရပူရ မဟာ ဂန္ဓာရုံ ကျောင်းတိုက်၊ မန္တလေး ပရိယတ္တိ သာသနာ တက္ကသိုလ် တို့၌ ဗုဒ္ဓစာပေများ သင်ကြားခဲ့သည်။ ခရစ်နှစ် ၁၉၉၈ ခုနှစ်တွင် တက္ကသီလ ဓမ္မစရိယ B.A (Buddhism) ဘွဲ့ ကို ရရှိခဲ့ပါသည်။ အရှင် ဂရုဓမ္မ သည် အမေရိကန်နိုင်ငံကို ၁၉၉၉ ခုနှစ် မတ်လတွင် ကုသလ္လကာရီကျောင်းတိုက်တွင် သီတင်းသုံး နေထိုင်ကာ San Francisco Bay Area နှင့် Central Valley နေရာ များတွင် တရားဓမ္မများ ဟောကြားခြင်း၊ အဘိဓမ္မာ ၊ ပဋ္ဌာန်း နှင့် ပါဌိစာပေများကို သင်ကြား ပို့ချလျက် ရှိပါသည်။"
+            ]
+          }
+        ],
+        "reviewed": true
+      },
+      "en": {
+        "sections": [
+          {
+            "paragraphs": [
+              "Ashin Garudhamma was born on the 11th waxing day of Wagaung, Myanmar Era 1333 (1971 CE), in Kunkan village, Wundwin Township, Mandalay Region, to his father U Tun Kywe and his mother Daw Oon Kywe. On the 10th waning day of Tabaung, Myanmar Era 1344, he was ordained a novice (sāmaṇera) at Manijotikārāma Monastery in Meiktila, with Sayadaw U Aggadhamma as his preceptor. On the 12th waning day of Nadaw, Myanmar Era 1352, he received full ordination as a monk at Mahāgandhārāma Monastery in Amarapura, with Daw Thita Maw as his supporter.",
+              "He studied Buddhist literature at Manijotikārāma Monastery in Meiktila, Mahāmyaing Monastery in Mandalay, Kyakhatwine Monastery in Bago, Mahāgandhārāma Monastery in Amarapura, and the Pariyatti Sāsana University in Mandalay. In 1998 he received the Dhammācariya B.A. (Buddhism) degree. Ashin Garudhamma came to the United States in March 1999 and has lived at Kusalakārī Monastery since then, teaching Dhamma in the San Francisco Bay Area and the Central Valley, and teaching Abhidhamma, Paṭṭhāna and Pāḷi literature."
+            ]
+          }
+        ],
+        "reviewed": false
+      }
+    },
+    "bioSourceUrl": "https://winmetta.org/sayadaw-u-garudhamma-bio/",
+    "sourceUrl": "https://winmetta.org/sayadaw-u-garudhamma-bio/",
+    "verifiedAt": "2026-10-04"
+  },
+  {
+    "id": "kelasa",
+    "sourceLanguage": "my",
+    "names": {
+      "my": "အရှင်ကေလာသ",
+      "en": "Ashin Kelāsa"
+    },
+    "place": {
+      "en": "Arizona, USA",
+      "my": "Arizona, USA"
+    },
+    "photo": "kelasa.png",
+    "bio": {
+      "my": {
+        "sections": [
+          {
+            "heading": "မွေးရပ်ဇာတိ",
+            "paragraphs": [
+              "အရှင်ကေလာသ၊ ၁၉၅၉-ခုနှစ်၊ မေလ ၄ ရက် မွေးဖွား။ ဇာတိ တောင်ကုတ်မြို့နယ်၊ ရခိုင်ပြည်နယ်။"
+            ]
+          },
+          {
+            "heading": "ပညာရေး",
+            "paragraphs": [
+              "သက်တော် ၁၇ တွင် ပထမကြီး အောင်မြင်ပြီး သက်တော် ၁၉ (၁၉၇၉) တွင် သာမဏေဘဝဖြင့် သာသနဓဇဓမ္မာစရိယ ဘွဲ့ရ။ ၁၉၈၅ တွင် ဆယ်တန်းအောင်ပြီး ၁၉၉၀ တွင် ရန်ကုန်ဝိဇ္ဇာသိပ္ပံတက္ကသိုလ် (အဝေးသင်)မှ B.A. (Philo) ဘွဲ့နှင့်၁၉၉၃ တွင် နိုင်ငံတော်ပရိယတ္တိသာသနာ့တက္ကသိုလ် (ရန်ကုန်) မှ M.A. (Buddhism) ဘွဲ့ရ။ နိုင်ငံတော်ပရိယတ္တိ သာသနာ့တက္ကသိုလ် (ရန်ကုန်)တွင် ၁၉၉၀ မှ ၂၀၀၀ ထိ ၁၀ နှစ် စာပေ ပို့ချခဲ့။"
+            ]
+          },
+          {
+            "heading": "သီတင်းသုံး",
+            "paragraphs": ["အရီဇိုးနားပြည်နယ် အလိုတော်ပြည့်ဗုဒ္ဓဓမ္မရိပ်သာ"]
+          },
+          {
+            "heading": "သာသနာရေး ဆောင်ရွက်ချက်",
+            "paragraphs": [
+              "ကလေး လူငယ်များအား ထေရဝါဒ ဗုဒ္ဓဘာသာ အခြေခံများ၊ ဗုဒ္ဓဝါဒကို စိတ်ဝင်စားသူ လူကြီးများအား မူရင်း ပါဠိတော် လာ သုတ္တန်များကို သင်ကြားပေးခြင်း။ အားလပ်ချိန်တွင် စာပေရေးသားခြင်း။"
+            ]
+          },
+          {
+            "heading": "ထုတ်ဝေပြီး ကျမ်းစာများ",
+            "paragraphs": [
+              "‘သီရိလင်္ကာ ဗုဒ္ဓဘာသာသမိုင်း’နှင့် ‘ဗုဒ္ဓဖြစ်တော်စဉ် တိဗက်မှတ်တမ်းများ’ အပါအဝင် မြန်မာပြန် ကျမ်းစာ ၁၁ အုပ်နှင့် စာမျက်နှာ ၃၀၀၀ ကျော်ရှိ ဓမ္မအမေးအဖြေများ ပေါင်းချုပ် ၆ တွဲ။"
+            ]
+          },
+          {
+            "heading": "မြန်မာပြန် ၁၁- အုပ် စာရင်း",
+            "paragraphs": [
+              "၁။ မြတ်ဗုဒ္ဓပွင့်တော်မူရာ မဇ္ဈိမဒေသ (စာမျက်နှာ ၂၇၇၊ ၂၀၀၁ ခုနှစ်) (A Pilgrim’ Guide to the Buddha’s India: Middle Land Middle Way, by S. Dhammika)",
+              "၂။ နိဗ္ဗာန်အယူအဆကို ထေရဝါဒရှုထောင့်မှ လေ့လာသုံးသပ်ခြင်း (စာမျက်နှာ ၂၄၂၊ ၂၀၀၄ ခုနှစ်) (Nibbana in Theravada Perspective, by Dr. Dhammapiya)",
+              "၃။ ဗုဒ္ဓဓမ္မ အနှစ်ချုပ် (စာမျက်နှာ ၁၂၉၊ ၂၀၀၅ ခုနှစ်) (Buddhism in a Nutshell, by Narada Thera)",
+              "၄။ သီရိလင်္ကာ ဗုဒ္ဓဘာသာသမိုင်း (စာမျက်နှာ ၅၃၂၊ ၂၀၀၈ ခုနှစ်) (History of Buddhism in Ceylon, Dr. W. Rahula)",
+              "၅။ မြန်မာနိုင်ငံပါဠိစာပေသမိုင်း (စာမျက်နှာ ၁၉၄၊ ၂၀၁၀ ခုနှစ်) (The Pali Literature of Burma, by Dr. Mabel Haynes Bode)",
+              "၆။ ဗုဒ္ဓဝါဒအမေးအဖြေကျမ်း (စာမျက်နှာ ၁၃၃၊ ၂၀၁၂ ခုနှစ်) (The Buddhist Catehism, by Henry S. Olcott)",
+              "၇။ ဗုဒ္ဓဖြစ်တော်စဉ် တိဗက်မှတ်များ (စာမျက်နှာ ၄၄၅၊ ၂၀၁၄ ခုနှစ်) (The Life of the Buddha, by W. Woodville Rockhill)",
+              "၈။ အာနာပါနအဖွင့် (စာမျက်နှာ ၇၄၊ ၂၀၁၆ ခုနှစ်) (ဘိက္ခုဉာဏမောဠိ၏ The Path of Purification မှ အာနာပါသတိအဖွင့် မြန်မာပြန်)",
+              "၉။ ဗုဒ္ဓဝင်ဘာသာပြန် (စာမျက်နှာ ၁၃၁၊ ၂၀၂၂ ခုနှစ်) (Gautama, the Story of Lord Buddha by Saukntala Masani)",
+              "၁၀။ အဘိဓမ္မတ္ထသင်္ဟနိဒါန်း မြန်မာပြန် (စာမျက်နှာ ၆၅၊ ၂၀၂၂ ခုနှစ်) (A comprehensive Manual of Abhiddhama by Bhikkhu Bodhi and Dr. Revatadhamma)",
+              "၁၁။ မေတ္တသုတ်၊ ငြိမ်းချမ်းရေးသတင်းစကားနှင့် ကန့်သတ်ခြင်းမဲ့ မေတ္တာတရား (စာ-၆၆၊ ၂၀၂၂ ခုနှစ်) (Karaniya Metta Sutta: the Message of Peace and Universal Friendliness)"
+            ]
+          },
+          {
+            "heading": "ဓမ္မအမေးအဖြေများ",
+            "paragraphs": [
+              "ပေါင်းချုပ် ၁ (စာမျက်နှာ ၅၁၆၊ ၂၀၁၇ ခုနှစ်)၊",
+              "ပေါင်းချုပ် ၂ (စာမျက်နှာ ၅၀၆၊ ၂၀၁၆ ခုနှစ်)၊",
+              "ပေါင်းချုပ် ၃ (စာမျက်နှာ ၅၂၇၊ ၂၀၁၆ ခုနှစ်)၊",
+              "ပေါင်းချုပ် ၄ (စာမျက်နှာ ၅၂၀၊ ၂၀၁၇ ခုနှစ်)၊",
+              "ပေါင်းချုပ် ၅ (စာမျက်နှာ ၅၀၃၊ ၂၀၁၈ ခုနှစ်)၊",
+              "ပေါင်းချုပ် ၆ (စာမျက်နှာ ၅၁၀၊ ၂၀၂၀ ခုနှစ်)",
+              "အရှင်ကေလာသ ရေးပြီးကျမ်းများ Download"
+            ]
+          }
+        ],
+        "reviewed": true
+      },
+      "en": {
+        "sections": [
+          {
+            "heading": "Place and date of birth",
+            "paragraphs": [
+              "Ashin Kelāsa was born on 4 May 1959. His birthplace is Taungkok Township, Rakhine State."
+            ]
+          },
+          {
+            "heading": "Education",
+            "paragraphs": [
+              "At 17 he passed the Pathamagyi examination, and at 19 (1979), as a novice, he received the title Sāsanadhaja Dhammācariya. He passed Tenth Standard in 1985, received a B.A. (Philosophy) from Yangon University of Arts and Science (distance education) in 1990, and an M.A. (Buddhism) from the State Pariyatti Sāsana University (Yangon) in 1993. He taught at the State Pariyatti Sāsana University (Yangon) for ten years, from 1990 to 2000."
+            ]
+          },
+          {
+            "heading": "Residence",
+            "paragraphs": ["Alodawpyie Buddha Dhamma Retreat, Arizona."]
+          },
+          {
+            "heading": "Sāsana work",
+            "paragraphs": [
+              "He teaches the basics of Theravāda Buddhism to children and young people, and teaches suttas from the original Pāḷi canon to adults interested in the Buddha's teaching. In his free time he writes."
+            ]
+          },
+          {
+            "heading": "Published works",
+            "paragraphs": [
+              "Eleven Burmese translations, including 'History of Buddhism in Ceylon' and 'The Life of the Buddha' (Tibetan records), and six volumes of collected Dhamma questions and answers totalling over 3,000 pages."
+            ]
+          },
+          {
+            "heading": "List of the 11 Burmese translations",
+            "paragraphs": [
+              "1. A Pilgrim's Guide to the Buddha's India: Middle Land Middle Way, by S. Dhammika (277 pages, 2001)",
+              "2. Nibbana in Theravada Perspective, by Dr. Dhammapiya (242 pages, 2004)",
+              "3. Buddhism in a Nutshell, by Narada Thera (129 pages, 2005)",
+              "4. History of Buddhism in Ceylon, by Dr. W. Rahula (532 pages, 2008)",
+              "5. The Pali Literature of Burma, by Dr. Mabel Haynes Bode (194 pages, 2010)",
+              "6. The Buddhist Catechism, by Henry S. Olcott (133 pages, 2012)",
+              "7. The Life of the Buddha, by W. Woodville Rockhill (445 pages, 2014)",
+              "8. Commentary on Ānāpāna (74 pages, 2016), translated from the Ānāpānasati section of Bhikkhu Ñāṇamoli's The Path of Purification",
+              "9. Gautama, the Story of Lord Buddha, by Saukntala Masani (131 pages, 2022)",
+              "10. A Comprehensive Manual of Abhidhamma, by Bhikkhu Bodhi and Dr. Revatadhamma (65 pages, 2022)",
+              "11. Karaniya Metta Sutta: the Message of Peace and Universal Friendliness (66 pages, 2022)"
+            ]
+          },
+          {
+            "heading": "Questions and answers on the Dhamma",
+            "paragraphs": [
+              "Compilation 1 (516 pages, 2017)",
+              "Compilation 2 (506 pages, 2016)",
+              "Compilation 3 (527 pages, 2016)",
+              "Compilation 4 (520 pages, 2017)",
+              "Compilation 5 (503 pages, 2018)",
+              "Compilation 6 (510 pages, 2020)"
+            ]
+          }
+        ],
+        "reviewed": false
+      }
+    },
+    "bioSourceUrl": "https://winmetta.org/ashin-kelasa-bio/",
+    "sourceUrl": "https://winmetta.org/ashin-kelasa-bio/",
+    "verifiedAt": "2026-10-04"
+  },
+  {
+    "id": "kovida",
+    "sourceLanguage": "my",
+    "names": {
+      "my": "အရှင်ကောဝိဒ (ဆိပ်ဖြူ)",
+      "en": "Ashin Kovida (Seikphyu)"
+    },
+    "place": {
+      "en": "Pa-Auk tradition",
+      "my": "ဖားအောက်"
+    },
+    "photo": "kovida.jpg",
+    "bio": {
+      "my": {
+        "sections": [
+          {
+            "heading": "မွေးရပ်ဇာတိ",
+            "paragraphs": [
+              "အရှင်ကောဝိဒကို ၁၃၃၈-ခုနှစ်၊ ဝါဆိုလဆန်း ၁ဝ-ရက် (၅ – ၇ – ၁၉၇၆) တနင်္လာနေ့တွင် ခမည်းတော် ဦးညွန့်မောင် မယ်တော် ဒေါ်ခင်လှတို့မှ မီးရှူးသန့်စင် ဖွားမြင်ခဲ့သည်။ မကွေးတိုင်းဒေသကြီး၊ ဆိပ်ဖြူမြို့နယ်၊ သက်ကယ်ကျင်းရွာ ဇာတိဖြစ်သည်။"
+            ]
+          },
+          {
+            "heading": "ပညာရေး",
+            "paragraphs": [
+              "ခုနစ်နှစ်သားအရွယ်တွင် ရွာဦးကျောင်း ဆရာတော် ဘဒ္ဒန္တနန္ဒမာလာ အထံတော်တွင် သင်ပုန်းကြီး ဗုဒ္ဓဘာသာ အခြေခံဖြစ်သည် ပရိတ်ကြီးနှင့် ဘုရားရှိခိုးစာများကို စတင်လေ့လာသင်ယူခဲ့သည်။ ထိုနှစ်တွင်ပင် အစိုးရမူလတန်းကျောင်းတွင် စတင်တက်ရောက် သင်ယူခဲ့သည်။",
+              "၁၉၉ဝ ပြည့်နှစ်တွင် ဆင်ဖြူကျွန်းမြို့၊ မဟာဝိသုတာရာမတိုက်၊ ဆရာတော် ဘဒ္ဒန္တပညာဇောတ နှင့် ဘဒ္ဒန္တ ပဏ္ဍိစ္စ အထံတော်တွင် ပရိယတ္တိ အခြေခံကျမ်းစာများကို စတင်သင်ယူခဲ့သည်။ ထိုနှစ်တွင်ပင် (၁၃၅၂-ခုနှစ်၊ တန်ဆောင်မုန်း လဆန်း ၁၃-ရက် – ၃၀-၁၀-၁၉၉၀) ခမည်းတော် မယ်တော်တို့၏ ပစ္စယာနုဂ္ဂဟဖြင့် သာမဏေပြု၍ အခြေပြုမူလတန်း စာမေးပွဲကို စတင်ဖြေဆိုခဲ့သည်။",
+              "မြန်မာသက္ကရာဇ် ၁၃၅၇-ခုနှစ်၊ နှောင်းတန်ခူးလပြည့်ကျော် ၈-ရက်၊ ခရစ်နှစ် ၁၉၉၆-ခုနှစ် ဧပြီလ ၁ဝ ရက်နေ့တွင် ရန်ကုန်မြို့၊ ဒဂုံမြို့သစ်တောင်ပိုင်းနေ ဦးအောင်မြတ်မိုး၊ ဒေါ်နန်းခင်စုလှိုင်၊ သား – စိုင်းဗိုလ်ဗိုလ်ခွန်အောင်၊ သမီး – နန်းနန္ဒာစုစုအောင်တို့၏ ပစ္စယာနုဂ္ဂဟဖြင့် မြင့်မြတ်သော ရဟန်းအဖြစ်ကို ခံယူခဲ့သည်။",
+              "ငယ်-လတ်-ကြီး စာမေးပွဲများကို နှစ်ခြားဖြင့် အောင်မြင်၍ သက္ကရာဇ် ၂ဝဝဝ ပြည့်နှစ်တွင် မန္တလေးမြို့၊ မစိုးရိမ်တိုက်သစ်၊ ဆရာတော် ဘဒ္ဒန္တ သီရိန္ဒာဘိဝံသ အမှူးရှိသော စာချဆရာတော်များ အထံတော်တွင် စာချတန်းဆိုင်ရာ စာပေများကို လေ့လာခဲ့သည်။",
+              "၂ဝဝ၃-ခုနှစ်တွင် ဓမ္မာစရိယအောင်မြင်၍ ၂ဝဝ၄-ခုနှစ်တွင် သာသနဓဇဓမ္မာစရိယ ဘွဲ့တံဆိပ်ကို ရရှိခဲ့သည်။ ထိုနှစ်ဝါတွင်းတွင်ပင် မန္တလေးမြို့၊ ဓမ္မိကာရာမတိုက်၊ ရတနာပုံကျောင်း၊ ဆရာတော် ဘဒ္ဒန္တ ဥဂ္ဂသေန (ချင်းတွင်း) အထံတော်တွင် အင်္ဂလိပ်စာ စတင်လေ့လာခဲ့သည်။ ထို့နောက် ၃၅-လမ်းနှင့် လမ်း ၉ဝ ထောင့်ရှိ Intensity Speaking Centre ဆရာဦးအောင်သန်းထွဋ် ထံတွင် အင်္ဂလိပ်စကားပြော လေ့ကျင့်ခဲ့သည်။",
+              "အင်္ဂလိပ်စာလေ့လာရင်း မစိုးရိမ်တိုက်သစ်တွင် စာတစ်ဝါချခဲ့သည်။ ပဋိသမ္ဘိဒါမဂ် မြန်မာဂုဏ်ထူးကျမ်းကို လေ့လာဖြေဆိုခဲ့သော်လည်း အင်္ဂလိပ်စာဘက်တွင် အချိန်ပေးလွန်း၍ မအောင်မြင်ခဲ့။",
+              "၂ဝဝ၅ ခုနှစ် သက်တော် ၂၉-နှစ်ပြည့် မွေးနေ့မှ စတင်၍ ရန်ကုန်မြို့ မဟာစည်ဌာနချုပ်တွင် ဝါတွင်းသုံးလ ကမ္မဌာန်းအားထုတ်ခဲ့သည်။ ကမ္မဌာန်းနည်းပြ ဆရာတော်များမှာ ဘဒ္ဒန္တ ဇဋိလ (ပျဉ်းမနား) နှင့် ဘဒ္ဒန္တ ထေရဝံသ (မြန်အောင်) တို့ဖြစ်ကြသည်။ ဝါကျွတ်သောအခါ ရွှေမင်းဝန်ကျောင်းတိုက် ဘဒ္ဒန္တ သောဘန အထံတော်တွင် ၂၅-ရက်ခန့် ဆက်လက်အားထုတ်ခဲ့သည်။",
+              "၂ဝဝ၆ – ခုနှစ်တွင် အပြည်ပြည်ဆိုင်ရာ ထေရဝါဒသာသနာပြုတက္ကသိုလ် ဝင်ခွင့်စာမေးပွဲကို ဝင်ရောက်ဖြေဆို အောင်မြင်ခဲ့သည်။ ထိုစာမေးပွဲအပြီးတွင် သန်လျင်မြို့ ဖားအောက်တောရ ရိပ်သာခွဲတွင် စတင်ကမ္မဌာန်း အားထုတ်ခဲ့သည်။ ကမ္မဌာန်းနည်းပြ ဆရာတော်မှာ ဘဒ္ဒန္တ ဓမ္မပတိ ဖြစ်သည်။",
+              "ထိုနှစ်မတ်လပထမပတ်တွင်ပင် သန်လျင် ဖားအောက်တောရ ရိပ်သာ၏ အစီအစဉ်ဖြင့် မော်လမြိုင် ဖားအောက်တောရ (ပင်မ)သို့ရောက်ရှိခဲ့သည်။ ဖားအောက်ဆရာတော်ဘုရားကြီး အထံတော်တွင် တစ်ဝါတွင်း နည်းယူအားထုတ်ပြီးနောက် ဆရာတော်ဘုရားကြီး ဟိမဝန္တာကြွတော်မူသဖြင့် ဆရတော် ဘဒ္ဒန္တ ကောဝိဒ (ပခုက္ကူ) ဘဒ္ဒန္တ ကဉ္စန (ရေဦး) ဘဒ္ဒန္တ ရေဝတ (မော်လမြိုင်) တို့ထံတွင် ဆက်လက်နည်းယူ အားထုတ်ခဲ့သည်။",
+              "၂ဝဝ၈-ခုနှစ်မှ စတင်ကာ ဖားအောက်တောရ (ပင်မ) တွင် ပြည်တွင်း ပြည်ပယောဂီများအား ကမ္မဌာန်းပြသခဲ့သည်။ ၂ဝ၁ဝ ခုနှစ်တွင် အရှင်ရေဝတ (မော်လမြိုင်) နှင့် တွဲဖက်ကာ လပ်ဗီးယားနိုင်ငံ (ဥရောပ) သို့ ပထမဆုံးအကြိမ် ကြွရောက် တရားပြသခဲ့သည်။ ထိုနှစ်တွင်ပင် တောင်ကိုးရီးယားနိုင်ငံတွင် ဝါကပ်၍ တရားစခန်းဆက်လက် ဖွင့်လှစ်ခဲ့သည်။"
+            ]
+          }
+        ],
+        "reviewed": true
+      },
+      "en": {
+        "sections": [
+          {
+            "heading": "Place and date of birth",
+            "paragraphs": [
+              "Ashin Kovida was born on Monday, the 10th waxing day of Waso, Myanmar Era 1338 (5 July 1976), to his father U Nyunt Maung and his mother Daw Khin Hla. His birthplace is Thetkegyin village, Seikphyu Township, Magway Region."
+            ]
+          },
+          {
+            "heading": "Education",
+            "paragraphs": [
+              "At the age of seven he began to learn the basics of Buddhism, the Great Protection (Paritta) and devotional verses, on the slate under Sayadaw Bhaddanta Nandamāla, the abbot of his village monastery. In the same year he also began government primary school.",
+              "In 1990 he began studying the basic pariyatti texts under Sayadaw Bhaddanta Paññājota and Bhaddanta Paṇḍicca at Mahāvisutārāma Monastery in Hsinbyugyun. In the same year (13th waxing day of Tazaungmon, Myanmar Era 1352, 30 October 1990), with his parents' support, he was ordained a novice and sat the basic primary examination.",
+              "On 10 April 1996 (Myanmar Era 1357), in southern Dagon Myothit, Yangon, with the support of U Aung Myat Moe, Daw Nan Khin Su Hlaing, their son Sai Bo Bo Khun Aung and daughter Nan Nanda Su Su Aung, he received full ordination as a monk.",
+              "He passed the Junior, Intermediate and Senior examinations in successive years, and in 2000 studied the texts for teaching under the teaching Sayadaws led by Sayadaw Bhaddanta Sirindābhivaṃsa at Masoyein New Monastery in Mandalay.",
+              "In 2003 he passed the Dhammācariya examination, and in 2004 he received the title Sāsanadhaja Dhammācariya. During the rains retreat of the same year he began studying English at Ratanapura Monastery, Dhammikārāma, in Mandalay, under Sayadaw Bhaddanta Uggasena (Chintwin). He also practised spoken English at the Intensity Speaking Centre, at the corner of 35th Street and 90th Street, with Saya U Aung Than Htut.",
+              "While studying English he taught Pāḷi texts for one year at Masoyein New Monastery. He studied for the Paṭisambhidāmagga honours examination (Burmese), but he gave too much time to English and did not pass.",
+              "From his 29th birthday in 2005 he practised kammaṭṭhāna meditation for the three months of the rains retreat at the Mahāsi headquarters in Yangon. His kammaṭṭhāna teachers were Bhaddanta Jaṭila (Pyinmana) and Bhaddanta Theravaṃsa (Myin Aung). After the rains retreat he continued for about 25 days at Shwe Min Wun Monastery under Bhaddanta Sobhana.",
+              "In 2006 he passed the entrance examination of the International Theravāda Missionary University. After the examination he began practising kammaṭṭhāna at the Pa-Auk branch meditation centre in Thanlyin, with Bhaddanta Dhammapati as his meditation guide.",
+              "In the first week of March of that year, by arrangement of the Thanlyin Pa-Auk centre, he went to Pa-Auk Forest Monastery (main) in Mawlamyine. After one rains retreat of practice under the Pa-Auk Sayadaw, when the Sayadaw went to the Himalayas, he continued to learn the method under Sayadaw Bhaddanta Kovida (Pakokku), Bhaddanta Kañcana (Ye-U) and Bhaddanta Revata (Mawlamyine).",
+              "From 2008 he taught kammaṭṭhāna to yogis from Myanmar and abroad at Pa-Auk Forest Monastery (main). In 2010, together with Ashin Revata (Mawlamyine), he travelled to Latvia (Europe) for the first time to teach. In the same year he spent the rains retreat in South Korea and went on to open meditation retreats there."
+            ]
+          }
+        ],
+        "reviewed": false
+      }
+    },
+    "bioSourceUrl": "https://winmetta.org/ashin-kovida-bio/",
+    "sourceUrl": "https://winmetta.org/ashin-kovida-bio/",
+    "verifiedAt": "2026-10-04"
+  },
+  {
+    "id": "kumarabhivamsa",
+    "sourceLanguage": "my",
+    "names": {
+      "my": "ဘဒ္ဒန္တ ကုမာရာဘိဝံသ (ဖားအောက်)",
+      "en": "Bhaddanta Kumārābhivaṃsa (Pa-Auk)"
+    },
+    "photo": "kumarabhivamsa.jpg",
+    "bio": {
+      "my": {
+        "sections": [
+          {
+            "paragraphs": [
+              "1975 -မြန်မာနိုင်ငံ၊ စစ်ကိုင်းတိုင်း၊ ကောလင်းမြို့နယ်၊ ကိုင်းဝန်းကျေးရွာတွင် ဖွားမြင်ခဲ့သည်။ 1988 -စစ်ကိုင်းတိုင်း၊ ကောလင်းမြို့နယ်၊ကိုင်းဝန်းကျေးရွာ ဆရာတော်ဦးဥတ္တရထံတွင် ရှင်သာမဏေပြုသည်။ 1995 -၁၉၉၅ ခုနှစ်၊မတ်လ ၁၅ ရက်နေ့တွင် မြန်မာနိုင်ငံ၊ ရန်ကုန်မြို့၊ဗဟန်းမြို့နယ်၊နန္ဒဝန်လမ်းရှိ၊ မဟာဝိသုဒ္ဓါရုံ(ပါဠိတက္ကသိုလ်)ရွှေကျင်ကျောင်းတိုက်၊ခဏ္ဍသိမ်တော်မြတ်၌၊ဆရာတော်ဘဒ္ဒန္တကောဏ္ဍညကို ဥပဇ္ဈာယ်ပြု၍၊ တိပိဋကဓရ(ယော)ဆရာတော်စသော သံဃာတော်များ၏၊ချီးမြှောက်မှုဖြင့် ရဟန်းအဖြစ်သို့ ရောက်ရှိသည်။ 1988-1993– စစ်ကိုင်းတိုင်း၊ကောလင်းမြို့နယ်၊ရတနာဇေယျုံစာသင်တိုက်၌၊အခြေခံဗုဒ္ဓဘာသာစာပေများကိုလေ့လာခဲ့သည်။ 1994-1998-မြန်မာနိုင်ငံ၊ ရန်ကုန်မြို့၊ဗဟန်းမြို့နယ်၊နန္ဒဝန်လမ်းရှိ၊မဟာဝိသုဒ္ဓါရုံ(ပါဠိတက္ကသိုလ်)ရွှေကျင်ကျောင်းတိုက်၌၊အဆင့်မြင့်ဗုဒ္ဓဘာသာစာပေများကို လေ့လာခဲ့သည်။ 1998 -အစိုးရသာသနဓဇဓမ္မာစရိယဘွဲ့ရရှိခဲ့သည်။ 1999- မြန်မာနိုင်ငံ၊ရန်ကုန်မြို့၊ဗဟန်းမြို့နယ်၊နန္ဒဝန်လမ်းရှိ၊ မဟာဝိသုဒ္ဓါရုံ(ပါဠိတက္ကသိုလ်)ရွှေကျင်ကျောင်းတိုက်၌၊စာပေများ ပို့ချပေးခဲ့သည်။ 2000-2004-မန္တလေးမြို့၊စိန်ပန်းရပ်၊မစိုးရိမ်တိုက်သစ်၌၊အဘိဝံသစာမေးပွဲများအတွက်၊အဆင့်မြင့်ဗုဒ္ဓဘာသာစာပေများကိုဆက်လက် လေ့လာ၍၊ စာပေများသင်ကြားပို့ချပေးခဲ့သည်။ 2003-စေတိယင်္ဂဏအဘိဝံသဘွဲ့ကို၊ရန်ကုန်မြို့၌ ရရှိခဲ့သည်။ 2004-2005-မွန်ပြည်နယ်၊မော်လမြိုင်မြို့၊ဖားအောက်တောရရိပ်သာ(ပင်မ) ၌ ဖားအောက်တောရဆရာတော်ကြီးထံတွင် တရားအားထုတ်ခဲ့သည်။ 2005-2010-မန္တလေးမြို့၊စိန်ပန်းရပ်၊မစိုးရိမ်တိုက်သစ်၌၊အဘိဝံသစာမေးပွဲများ ဆက်ဖြေရင်း စာပေများပို့ချပေးခဲ့သည်။ မန္တလေးမြို့၊ပရိယတ္တိသာသနဟိတ(သကျသီဟ)ဓမ္မာစရိယစာမေးပွဲ၌ (၂) ကျမ်းအောင်မြင်ခဲ့သည်။ အခါအားလျော်စွာ တောရကျောင်းများစွာသို့ သွား၍ စာကြည့်, တရားအားထုတ်ခဲ့သည်။ 2010-2011-မွန်ပြည်နယ်၊မော်လမြိုင်မြို့၊ဖားအောက်တောရရိပ်သာ(ပင်မ) ၌ ဆက်လက်တရားအားထုတ်ခဲ့သည်။ 2012-အင်ဒိုနီးရှားနိုင်ငံ၊ဘာတန်ကျွန်း၊ဖားအောက်တောရရိပ်သာ၌၊ဝါဆို၍ တရားဆက်လက်အားထုတ်ခဲ့သည်။ 2013-2014-မန္တလေးတိုင်း၊ပြင်ဦးလွင်မြို့၊ဖားအောက်တောရရိပ်သာ၌ ဖားအောက်တောရဆရာတော်၏(၄)လတရားစခန်းဝယ် တရားအားထုတ်ခဲ့ပြီး၊ ထိုင်ဝမ်နိုင်ငံ၌ စာပေလေ့လာ,တရားဟော, တရားပြ, တရားအားထုတ်ရင်း(၂) ဝါ သီတင်းသုံးခဲ့သည်။ 2013- 2020 အင်ဒိုနီးရှား၊စင်ကာပူ၊မလေးရှား၊ထိုင်း၊ဗီယက်နမ်၊ကမ္ဘောဒီးယား၊သီရိလင်္ကာ၊လာအို၊တောင်ကိုရီးယား၊အိန္ဒိယ၊တရုတ်၊ထိုင်ဝမ်၊အမေရိကန်၊၊ကနေဒါ စသောနိုင်ငံများသို့ အခါအားလျော်စွာ သွားရောက်၍၊ ရက်တိုတရားစခန်းများပြုလုပ်ပေးခြင်၊ တရားဟော, တရားပြပေးခြင်းများ ပြုလုပ်လျက် သာသနာပြုခဲ့ပါသည်။ 2015-2021-မန္တလေးတိုင်း၊ပြင်ဦးလွင်မြို့၊ဖားအောက်တောရရိပ်သာ၌ ဖားအောက်တောရဆရာတော်ကြီးနှင့်အတူ တရားဟော, တရားပြ, တရားအားထုတ်၍၊ သာသနာ့အလုပ်ကို ပြုလုပ်ရင်း သီတင်းသုံးနေထိုင်လျက်ရှိပါသည်။",
+              "ဆရာတော် ကုမာရာဘိဝံသ သင်ကြားပို့ ချသည့် Zoom Online ထာဝရငြိမ်းချမ်းရေးသို့ သင်တန်း။"
+            ]
+          }
+        ],
+        "reviewed": true
+      },
+      "en": {
+        "sections": [
+          {
+            "heading": "Sayadaw U Kumarabhivamsa",
+            "paragraphs": [
+              "1975 : Born in Kaing Won Village, Kaw Lin Township, Sagaing Division, Myanmar.",
+              "1988 : Ordained as a novice in Kaw Lin Township, Sagaing Division, Myanmar.",
+              "1995 : Received Higher Ordination on 15 March 1995 in Bahan Township, Yangon, Myanmar.",
+              "1988-1993 : Studied Primary Buddhist Scriptures in Kaw Lin Township, Sagaing Division, Myanmar.",
+              "1994-1998 : Studied Advanced Buddhist Scriptures at Mahāvisuddhāyon Education Centre, Bahan Township, Yangon, Myanmar.",
+              "1998 : Obtained the government authorized Dhammācariya degree.",
+              "1999 : Became a teacher at Mahāvisuddhāyon Education Centre, Bahan Township, Yangon, Myanmar.",
+              "2000-2004 : Continued to study Advanced Buddhist Scriptures and taught senior monks at the new Masoeyein Education Centre, Mandalay, Myanmar. Obtained the Abhivaṃsa degree in Yangon in 2003.",
+              "2004-2005 : Practiced meditation at Pa-Auk Tawya Meditation Centre (Main), Mon State, Myanmar.",
+              "2005-2010 : Taught senior monks at the new Masoeyein Education Centre, Mandalay, Myanmar. Went to many forest monasteries for self-practice from time to time.",
+              "2010-2011 : Continued meditation practice at Pa-Auk Tawya Meditation Centre (Main), Mon State, Myanmar.",
+              "2012 : Spent the rains retreat and continued to practice meditation at Batam, Indonesia and visited Singapore for Dhamma sharing.",
+              "2013 : Attended the Meditation Teacher Course retreat conducted by the Ven Pa-Auk Sayadaw at Pa-Auk Tawya Meditation Centre (Pyin Oo Lwin), Mandalay, Myanmar.",
+              "2013-2014 : Practiced, taught the Buddha’s Teachings and spent the rains retreat in Taiwan.",
+              "2015-2017 : Practiced, taught the Buddha’s Teachings and spent the rains retreat at Pa-Auk Meditation Centre (Pwin Oo Lwin), Mandalay, Myanmar. Currently is the Meditation Teacher (Kammaṭṭhānācariya) at Pa-Auk Meditation Centre (Pwin Oo Lwin).",
+              "2013-2017 : From time to time went to Indonesia, Singapore, Malayisa, Thailand, Vietnam, Cambodia, India, China and Sri Lanka to conduct short meditation retreats and Dhamma sharing."
+            ]
+          }
+        ],
+        "reviewed": true
+      }
+    },
+    "bioSourceUrl": "https://winmetta.org/sayadaw-kumarabhivamsa-bio/",
+    "sourceUrl": "https://winmetta.org/sayadaw-kumarabhivamsa-bio/",
+    "verifiedAt": "2026-10-04"
+  },
+  {
+    "id": "janakabhivamsa",
+    "sourceLanguage": "my",
+    "names": {
+      "my": "ဘဒ္ဒန္တ ဇနကာဘိဝံသ (ဖားအောက်)",
+      "en": "Bhaddanta Janakābhivaṃsa (Pa-Auk)"
+    },
+    "photo": "janakabhivamsa.jpg",
+    "bio": {
+      "my": {
+        "sections": [
+          {
+            "paragraphs": [
+              "၁၉၇၆ ခုနှစ်တွင် မကွေးမြို့၌ မွေးဖွားခဲ့ပြီး ၁၉၉၁ ခုနှစ် ဇွန်လ (၁၆) ရက်နေ့တွင် မကွေးမြို့ ဖိုလေးလုံးရွာ ဇီနာလင်္ကာရကျောင်းတိုက်၌ ရှင်သာမဏေအဖြစ် တက်ရောက်ခဲ့ပြီး ၁၉၉၅ ခုနှစ် ဇွန်လ (၂၀) ရက်နေ့တွင် ရဟန်း ခံယူကာ မန္တလေးမြို့ အတုလကာရီဆင်မင်းကျောင်း၊ ဘုရားကြီးတိုက်၌ ဗုဒ္ဓပါဠိဘာသာရပ်ကို လေ့လာဆည်းပူးခဲ့သည်။",
+              "ပြည်ထောင်စု မြန်မာနိုင်ငံတော် အစိုးရ၊ သာသနာရေး ဦးစီးဌာနမှ ကျင်းပသော ဓမ္မာစရိယ စာမေးပွဲကို အောင်မြင်ပြီး ၂၀၀၂ ခုနှစ် ဇူလိုင်လ (၁၈) ရက်နေ့တွင် \"သာသနာ့ဓမ္မစရိယ\" ဘွဲ့ကို သာသနာရေး ဦးစီးဌာနမှ ချီးမြှင့်ခဲ့ပါသည်။ ထို့အပြင်ဆရာတော်သည် ၂၀၀၂ ခုနှစ်တွင် မန္တလေးမြို့၊ ပရိယတ္တိသာသနာ့ဟိတအသင်း၏ ပရိယတ္တိသာသနာ့ဟိတဓမ္မာစရိယစာမေးပွဲကို အောင်မြင်၍ ၂၀၀၂ ခုနှစ် ဇူလိုင်လ (၁၇) ရက်နေ့တွင် “ပရိယတ္တိသာသနာ့ဟိတဓမ္မာစရိယ” ဘွဲ့ကို ထိုအသင်းမှ ဆရာတော်အား ချီးမြှင့်ခဲ့သည်။ “ပရိယတ္တိသာသနာ့ဟိတဓမ္မာစရိယဘွဲ့”သည် ပါဠိဘာသာစကားနှင့် ဗုဒ္ဓ၏ အဆုံးအမများကို သင်ကြားနိုင်သော ဆရာအဖြစ်အသိအမှတ်ပြုသည်။ အဘိဝံသဘွဲ့သည် ဗုဒ္ဓဘာသာပါဠိလေ့လာရေးတွင် PH.D နှင့် ညီမျှသည်။"
+            ]
+          },
+          {
+            "heading": "စာပေသင်ကြားခြင်း",
+            "paragraphs": [
+              "၂၀၀၂ ခုနှစ်တွင် မန္တလေးမြို့ ဘုရားကြီးတိုက်၌ ပါဠိဘာသာ၊ ၂၀၀၇ ခုနှစ်မှ ၂၀၀၈ ခုနှစ်အထိ ပြည်ထောင်စု မြန်မာနိုင်ငံတော်အစိုးရ သာသနာရေး ဝန်ကြီးဌာနမှ ကျင်းပသောဓမ္မစရိယစာမေးပွဲ မေးခွန်းမေးမြန်းသူအဖြစ် ခန့်အပ်ခြင်းခံရသည့် ဗုဒ္ဓဘာသာပညာရေး ကော်မတီ၏ နိုင်ငံတော် ပင်မကော်မတီ အဖွဲ့ဝင်ဖြစ်ခဲ့သည်။"
+            ]
+          },
+          {
+            "heading": "ကမ္မဋ္ဌာန်းသင်ယူလေ့လာခြင်းနှင့်အားထုတ်ခြင်း",
+            "paragraphs": [
+              "အရှင်ဇနကဘိဝံသသည် ၂၀၀၅ ခုနှစ်တွင် ဖားအောက်တောရ တရားစခန်း (ပင်မ) သို့ ကြွရောက်ခဲ့ပြီး ဖားအောက် ဆရာတော်ဘုရားကြီး ထံတွင် သမထ နှင့် ဝိပဿနာ တရားများကို သင်ယူ လေ့လာကျင့်ကြံအားထုတ်ခဲ့သည်။",
+              "၂၀၁၀ ခုနှစ်တွင် ခြောက်လအထူးတရားစခန်း၊ ၂၀၁၃ ခုနှစ်တွင် ထပ်မံ၍ လေးလ တရားစခန်းတွင် ဖားအောက်ဆရာတော်ကြီးထံမှ ကမ္မဋ္ဌာန်းကို သင်ယူလေ့ကျင့်ခဲ့ပါသည်။ ဆရာတော်သည် ၂၀၁၅ တွင် မေမြို့၌ ဖားအောက်ဆရာတော်ကြီးမှ ကမ္မဋ္ဌာန်းဆရာတော်များအား အထူးသင်ကြားပေးသော သင်တန်းကို မေမြို့၌ ဝါဆို၍ သင်ယူလေ့ကျင့်ခဲ့သည်။ ၂၀၁၄ ခုနှစ်ကတည်းက စင်္ကာပူရှိ Pa-Auk တရားစခန်းတွင် သီတင်သုံးခဲ့သည်။",
+              "ဆရာတော်သည် မြန်မာနှင့် အင်္ဂလိပ်စကား ကျွမ်းကျင်သည်။ မြန်မာ၊ စင်္ကာပူ၊ မလေးရှား၊ အင်ဒိုနီးရှား၊ ဗီယက်နမ်နှင့် အမေရိကန်အပါအဝင် နိုင်ငံအများအပြားတွင် ကမ္မဋ္ဌာန်းပညာများကို သင်ကြားပို့ချလျက်ရှိပါသည်။",
+              "ဆရာတော် ဇနကာဘိဝံသ သင်ကြားပို့ ချသည့် Zoom Online ကမ္မဋ္ဌာန်းတရား သင်တန်း။"
+            ]
+          }
+        ],
+        "reviewed": true
+      },
+      "en": {
+        "sections": [
+          {
+            "heading": "Sayadaw U Janakābhivamsa",
+            "paragraphs": [
+              "Born in 1976 in Magway, Venerable Janaka ordained as a novice monk (Sāmaṇera) at a monastery in Magway on 16 June, 1991. He received the higher ordination as a Bhikkhu on 20 June, 1995 at Atulakari Sinmin Monastery, Phaya Gyi Taik in Mandalay, where he studied Buddhist Pali studies.",
+              "Bhante passed the Sasanadhaja Dhammacariya examination held by the Department of Religious Affairs, Ministry of Religious Affairs, Government of the Union of Myanmar, and he was awarded the title of “Sasanadhaja Dhammacariya” on 18 July, 2002. He also passed the Pariyatti Sasanahita Dhammacariya examination conducted by Pariyatti Sasanahita Association of Mandalay city in 2002, and Bhante was awarded the title of “Bhanddanta Janakabhivamsa Pariyatti Sasanahita Dhammacariya” (Abhivamsa degree) on 17 July, 2002. The Pariyatti Sasanahita Dhammacariya examination is well recognised as the highest level of teacher of Pali language and the teachings of the Buddha. The Abhivamsa degree is equivalent to PH.D in Buddhist Pali Studies.",
+              "In 2002, Bhante became an official teacher of Pali Language at Phaya Gyi Taik in Mandalay. From 2007 to 2008, Bhante was a member of the State Main Committee of the Buddhist Education, having been appointed as a questioner of the Dhammacariya examination held by Ministry of Religious Affairs, the Government of the Union of Myanmar.",
+              "Venerable Janaka came to Pa-Auk Tawya Meditation Centre (Main) in 2005 and learned and practised Samatha & Vipassana meditation under Venerable Pa-Auk Sayadaw (“Sayadawgyi”). He had further trained during the Six Month Intensive Meditation Retreat in 2010 and also during the Four Month Intensive Meditation Retreat in 2013 under Sayadawgyi. Bhante spent Vassa 2015 in Maymyo practicing where Sayadawgyi is teaching an Intensive Meditation Retreat for Advanced Meditators. Bhante is the Resident Teacher of Pa-Auk Meditation Centre in Singapore since 2014."
+            ]
+          }
+        ],
+        "reviewed": true
+      }
+    },
+    "bioSourceUrl": "https://winmetta.org/sayadaw-janakabhivamsa-bio/",
+    "sourceUrl": "https://winmetta.org/sayadaw-janakabhivamsa-bio/",
+    "verifiedAt": "2026-10-04"
+  },
+  {
+    "id": "pannadhikalankara",
+    "sourceLanguage": "en",
+    "names": {
+      "en": "Venerable Paññādhikālaṅkāra"
+    },
+    "photo": "pannadhikalankara.jpeg",
+    "bio": {
+      "en": {
+        "sections": [
+          {
+            "paragraphs": [
+              "Pariyatti-Sāsanahita Distinguished Samanera Sasanadhaja-Dhammacariya, Vinayavidū, M.A. (Buddhist Studies) Registrar, Mahāvihāra Dhamma-Vinaya University (MDVU) Head and Founder Of Pyinnyaryaungchi Buddhist Education Centre",
+              "Venerable Paññādhikālaṅkāra is the Registrar and Associated professor of Patipatti Department of Mahāvihāra Dhamma-Vinaya University (MDVU), Myanmar. He is also head and the founder of Pyinnyaryaungchi Buddhist Education Centre in Myanmar.",
+              "He studied in traditional way in educational monasteries in Mandalay. He was conferred Sasanadhaja-Dhammācariya and Vinayavidū Degrees by Ministry of Religious Affairs and Culture of Myanmar, and Sāsanālankāra Distinghished Sāmanera Degree by Pariyatti-Sasanahita Board Exam.",
+              "After graduated as Dhammacariya (Dhamma Teacher), he was appointed as teacher in Buddhist education centres. He further studied in University Of Peradeniya, Sri Lanka and graduated with M.A. Degree (Buddhist Studies) in 2012. He started the teaching of Abhidhamma and Pāli in English with the classmates from different countries during his postgraduate study in Sri Lanka.",
+              "In 2015, he followed the guidance of the Most Venerable Pa-Auk Tawya Sayadaw.",
+              "In 2017, he cooperated as a lecturer in Mahavihāra Dhamma-Vinaya University (MDVU). He was assigned as the registrar of MDVU.",
+              "In 2018, he was appointed as a member of representative in collaborative project between University of Chicago and Myanmar Buddhist scholars, and he conducted as a member of educational delegation both in United States and Myanmar.",
+              "Presently he is serving as a member of Central Examination Board in Abhidhamma & Visuddhimagga, Ministry of Religious Affairs and Culture of Myanmar (2019-2020 Exam) and Religious Spiritual Adviser & Instructor of Pāli and Abhidhamma for foreign students and meditators.",
+              "Venerable is teaching Applied Abhidhamma (in Burmese) currently. He has given Dhamma teachings especially on Abhidhamma in Myanmar, Malaysia, Taiwan, and America. He speaks Burmese and English."
+            ]
+          }
+        ],
+        "reviewed": true
+      }
+    },
+    "bioSourceUrl": "https://winmetta.org/venerable-pannadhikalankara-bio/",
+    "sourceUrl": "https://winmetta.org/venerable-pannadhikalankara-bio/",
+    "verifiedAt": "2026-10-04"
+  },
+  {
+    "id": "kundadhana",
+    "sourceLanguage": "my",
+    "names": {
+      "my": "အရှင်ကုဏ္ဍဓာန (ထားဝယ်)",
+      "en": "Ashin Kuṇḍadhāna (Dawei)"
+    },
+    "place": {
+      "en": "Dawei, Myanmar",
+      "my": "ထားဝယ်"
+    },
+    "photo": "kundadhana.jpeg",
+    "bio": {
+      "my": {
+        "sections": [
+          {
+            "paragraphs": [
+              "အင်ဒိုနီးရှားနိုင်ငံ၊ ဘိုဂေါမြို့ရှိ တမန်စာရီ ဖားအောက်တောရရိပ်သာနှင့် မြန်မာနိုင်ငံ၊ ထားဝယ်ဖားအောက်တောရကျောင်းတိုက်တို့၏ ပဓာနနာယကကျောင်းထိုင်ဆရာတော်",
+              "ဆရာတော် အရှင်ကုဏ္ဍဓာန မဟာထေရ်မြတ်အား ၁၉၆၉ ခုနှစ်၊ စက်တင်ဘာလ (၈) ရက်နေ့တွင် ထားဝယ်မြို့၊ ခုံဝင်းဒပ်ရပ်၌ မီးရှူးသန့်စင် ဖွားမြင်တော်မူခဲ့သည်။ ခမည်းတော် ဦးကျင်စွမ် (၁၉၃၈-၂၀၁၈) ၊ မယ်တော် ဒေါ်စန်းရီ (၁၉၃၆-၂၀၀၂) တို့၏ သားငါးယောက်အနက် စတုတ္ထမြောက်သားရတနာဖြစ်ပြီး ငယ်နာမည်မှာ မောင်ကျော်ကျော် ဖြစ်ပါသည်။",
+              "ထားဝယ်မြို့ အမှတ် (၂) အထက်တန်းကျောင်းတွင် သူငယ်တန်းမှ ဆယ်တန်းအထိ ပညာသင်ကြားခဲ့ရာ အတန်းတိုင်းတွင် ပထမမှ တတိယအတွင်း ရမြဲဖြစ်ကာ ဆယ်တန်းတွင် လူရည်ချွန်ဆုကိုလည်း ရရှိခဲ့သည်။",
+              "၁၉၈၆ ခုနှစ်တွင် ရန်ကုန်စက်မှုတက္ကသိုလ် (R.I.T) သို့ တက်ရောက် ပညာသင်ကြားခဲ့ပြီး ၁၉၈၈ ခုနှစ် ကျောင်းများအပိတ်ခံရသောအခါ မိဘ၏စီးပွါးရေးလုပ်ငန်းများတွင် ဝင်ရောက်ကူညီ ဆောင်ရွက်ပေးခွင့်ရရှိခဲ့ပါသည်။",
+              "၁၉၈၈ ခုနှစ်တွင် ရေးမြို့၊ မဟာစည်ရိပ်သာတွင် အမျိုးသားယောဂီအဖြစ် ၃လကြာ စတင်တရားအားထုတ်ဖြစ်ခဲ့ရာမှ တရားအားထုတ်ရန် စိတ်ဝင်စားလာခဲ့သည်။",
+              "၁၉၈၉ ခုနှစ်တွင် ထားဝယ်မြို့ ဃောသိတာရာမဆရာတော်ဘုရားကြီးထံတွင် ညီအစ်ကိုများနှင့်အတူ မြင့်မြတ်သော ရဟန်းဘဝအား ပထမအကြိမ် ရရှိခဲ့သော်လည်း စီးပွါးရေး ပလိဗောဓများရှိသေးသဖြင့် လူပြန်ထွက်ကာ မိဘများကို ဆက်လက်ကူညီခဲ့ပါသည်။",
+              "၁၉၉၁ ခုနှစ်တွင် သံဝေဂဉာဏ်များ ပိုမိုဖြစ်လာကာ ရှင်ရဟန်း ရာသက်ပန်ဝတ်ရန် မိဘများကို ခွင့်ပန်သော်လည်း လွယ်လွယ်နှင့် မရရှိခဲ့ဘဲ သေခြင်းတရားမှာ သံဝေဂရဖွယ်ဖြစ်ကြောင်းအား ပြောပြကာ အကြိမ်ကြိမ် ခွင့်ပန်သောကြောင့်သာလျှင် မိဘများက ခွင့်ပြုခဲ့သည်။",
+              "၁၉၉၁ ခုနှစ် မေလတွင် ရေးမြို့နေ ဒါယိကာမများ အကူအညီဖြင့် မော်လမြိုင် မြို့ ဖားအောက်တောရရိပ်သာ(ပင်မ) တွင် သီတင်းသုံးတော်မူသော ဖားအောက်တောရဆရာတော်ဘုရားကြီး ခြေတော်ရင်းသို့ ရောက်ရှိခဲ့ပြီး ထိုလ (၂၃)ရက်တွင်ပင် ဆရာတော်ဘုရားကြီးကို ဥပဇ္ဈာယ်ပြုကာ မြင့်မြတ်သော ရဟန်းအဖြစ်ကို ဒုတိယအကြိမ် ရရှိခဲ့ပါသည်။",
+              "မြင့်မြတ်သော ရဟန်းအဖြစ်ရောက်ရှိပြီးနောက် ဖားအောက်တောရ(ပင်မ)တွင် (၁၈)ဝါတိုင်တိုင် ဆက်တိုက်သီတင်းသုံးတော်မူခဲ့ကာ ဖားအောက်ဆရာတော်ဘုရားကြီးနှင့် နာယကဆရာတော်များထံမှ ပရိယတ္တိ၊ ပဋိပတ္တိ များကို သင်ကြားခွင့် ရရှိခဲ့သည်။",
+              "ဖားအောက်ဆရာတော်ဘုရားကြီး၏ သာသနာပြုလုပ်ငန်းများတွင်လည်း ကူညီခွင့်ရရှိပြီး အင်္ဂလန်၊ အမေရိကန်၊ ဂျပန်၊ သီရိလင်္ကာ၊ တရုတ်၊ အင်ဒိုနီးရှား၊ မလေးရှား၊ စင်ကာပူ၊ ထိုင်းနှင့် ဗီယက်နမ်နိုင်ငံများသို့ ဖားအောက်ဆရာတော်ဘုရားကြီးနှင့်အတူ ကြွရောက် သာသနာပြုခွင့် ရရှိခဲ့ပါသည်။",
+              "(၁၉)ဝါ၌ မလေးရှားနိုင်ငံ၊ ပီနမ်ကျွန်းရှိ နိဗ္ဗိန္ဒကျောင်း ဖားအောက်ရိပ်သာတွင် သီတင်းသုံးခဲ့ပြီး (၂၀)ဝါမှ စတင်ကာ ထားဝယ်ဖားအောက်ရိပ်သာတွင် ပဓာနနာယကကျောင်းထိုင်ဆရာတော်အဖြစ် ယခုအချိန်အထိ တာဝန်ယူလျက်ရှိပါသည်။",
+              "(၂၈ )ဝါမှစ၍ အင်ဒိုနီးရှားနိုင်ငံ၊ ဘိုဂေါမြို့ရှိ တမန်စာရီ ဖားအောက်တောရရိပ်သာ၏ ပဓာနနာယကကျောင်းထိုင်ဆရာတော်အဖြစ် ထပ်မံပူးတွဲတာဝန်ယူခဲ့သည်။",
+              "နိုင်ငံတကာခရီးစဉ်များအဖြစ် အင်ဒိုနီးရှား၊ ဗီယက်နမ်၊ မကာအို၊ တရုတ်၊ မလေးရှား၊ စင်္ကာပူ၊ ကမ္ဘောဒီးယား၊ နီပေါ၊ အိန္ဒိယ၊ သီရိလင်္ကာ၊ ထိုင်ဝမ်၊ အမေရိကန်ပြည်ထောင်စု၊ ကနေဒါနှင့် ထိုင်းနိုင်ငံများသို့ ကြွရောက်ခဲ့ပြီး ဖြစ်သည်။ ၂၀၂၂ မှ ၂၀၂၅ ခုနှစ် ယခု ရဟန်းသိက္ခာ ( ၃၄ )ဝါအချိန်အထိ အင်ဒိုနီးရှားနိုင်ငံ၊ ဘိုဂေါမြို့ရှိ တမန်စာရီ ဖားအောက်တောရရိပ်သာတွင် သီတင်းသုံးနေထိုင်လျက်ရှိပါသည်။ မြန်မာ၊ အင်္ဂလိပ်ဘာသာ တို့ဖြင့် တရားနှင့် ဝိနည်းတော်များကို အွန်လိုင်းမှတစ်ဆင့်လည်း ဟောကြားပို့ချလျက်ရှိပါသည်၊ အခြားဘာသာစကားများသို့လည်းဘာသာပြန်များဖြင့် ဟောကြားပေးလျက်ရှိပါသည်။"
+            ]
+          }
+        ],
+        "reviewed": true
+      },
+      "en": {
+        "sections": [
+          {
+            "paragraphs": [
+              "Chief abbot of Tamansari Pa-Auk Forest Monastery in Bogor, Indonesia, and of Dawei Pa-Auk Forest Monastery in Myanmar.",
+              "Sayadaw Ashin Kuṇḍadhāna Mahāthera was born on 8 September 1969 in the Khonwindap quarter of Dawei. He is the fourth of five sons of his father U Kyin Swam (1938–2018) and his mother Daw San Yi (1936–2002); his childhood name was Maung Kyaw Kyaw.",
+              "He studied at No. 2 High School in Dawei from kindergarten to Tenth Standard, always placing between first and third in every class, and he received a distinction in Tenth Standard.",
+              "In 1986 he entered the Rangoon Institute of Technology (R.I.T.). When the schools were closed in 1988 he helped with his parents' business.",
+              "In 1988 he practised meditation for three months as a lay yogi at the Mahāsi Meditation Centre in Ye, which awakened his interest in practice.",
+              "In 1989, together with his brothers, he was ordained for the first time under the Sayadawgyi of Ghositārāma in Dawei, but because of business obligations he disrobed and continued to help his parents.",
+              "In 1991 his sense of urgency (saṃvega) grew and he asked his parents for permission to be ordained for life. It was not easily given; only after he asked repeatedly and spoke of death as a cause for urgency did his parents agree.",
+              "In May 1991, with the help of lay supporters in Ye, he came to the feet of the Pa-Auk Sayadaw at Pa-Auk Forest Monastery (main) in Mawlamyine. On the 23rd of that month he received full ordination for the second time, with the Pa-Auk Sayadaw as his preceptor.",
+              "After ordination he stayed at Pa-Auk Forest Monastery (main) for eighteen consecutive rains retreats, learning pariyatti and paṭipatti from the Pa-Auk Sayadaw and the senior teachers.",
+              "He also assisted in the Pa-Auk Sayadaw's mission work and travelled with him to England, the United States, Japan, Sri Lanka, China, Indonesia, Malaysia, Singapore, Thailand and Vietnam.",
+              "He spent his 19th rains retreat at Nibbinda Monastery, the Pa-Auk centre on Penang Island, Malaysia. From his 20th rains retreat he has been the chief abbot of Dawei Pa-Auk Monastery up to the present.",
+              "From his 28th rains retreat he has also served as the chief abbot of Tamansari Pa-Auk Forest Monastery in Bogor, Indonesia.",
+              "His international teaching trips have included Indonesia, Vietnam, Macau, China, Malaysia, Singapore, Cambodia, Nepal, India, Sri Lanka, Taiwan, the United States, Canada and Thailand. From 2022 until 2025, at his 34th rains retreat, he has lived at Tamansari Pa-Auk Forest Monastery in Bogor, Indonesia. He also teaches Dhamma and Vinaya online in Burmese and English, and in other languages through interpreters."
+            ]
+          }
+        ],
+        "reviewed": false
+      }
+    },
+    "bioSourceUrl": "https://winmetta.org/ashin-kundadhana-bio/",
+    "sourceUrl": "https://winmetta.org/ashin-kundadhana-bio/",
+    "verifiedAt": "2026-10-04"
+  }
+]

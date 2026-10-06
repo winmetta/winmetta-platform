@@ -1,0 +1,1589 @@
+[
+  {
+    "id": "ghositabhivamsa-13-2025-12",
+    "status": "past",
+    "format": "hybrid",
+    "days": 10,
+    "startDate": "2025-12-25",
+    "endDate": "2026-01-03",
+    "timezone": "America/Los_Angeles",
+    "teacherIds": ["ghositabhivamsa"],
+    "languages": ["my"],
+    "sourceLanguage": "my",
+    "translations": {
+      "my": {
+        "title": "တေရသမအကြိမ် 10 ရက် တရားစခန်း",
+        "description": "ဆရာတော် ဦးဃောသိတာဘိဝံသ (မေတ္တာနန္ဒ) ဦးဆောင်သော 10 ရက် တရားစခန်း"
+      },
+      "en": {
+        "title": "13th 10-day retreat",
+        "description": "A 10-day meditation retreat led by Sayadaw U Ghositābhivaṃsa (Mettānanda)."
+      }
+    },
+    "series": "ghositabhivamsa-10-day",
+    "venue": {
+      "name": {
+        "en": "Mettananda Vihara",
+        "my": "မေတ္တာနန္ဒဝိဟာရကျောင်း"
+      },
+      "city": "Oakland, CA, USA",
+      "address": "2707 Seminary Ave, Oakland, CA",
+      "mapUrl": "https://maps.app.goo.gl/PCvzspZTcaEW19QQ6"
+    },
+    "sessions": [],
+    "timetables": [
+      {
+        "label": "တေရသမ (၁၃) ကြိမ်မြောက်၊ (၁၀) ရက် တရားစခန်း အချိန်ဇယား",
+        "url": "https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2025/12/Daily-Schedule_13th-Retreat.pdf"
+      }
+    ],
+    "notes": [],
+    "sourceUrl": "https://winmetta.org/2025/12/19/2025-dec-25-retreat-13th-news/",
+    "verifiedAt": "2026-10-05"
+  },
+  {
+    "id": "ghositabhivamsa-12-2025-04",
+    "status": "past",
+    "format": "hybrid",
+    "days": 10,
+    "startDate": "2025-04-18",
+    "endDate": "2025-04-27",
+    "timezone": "America/Los_Angeles",
+    "teacherIds": ["ghositabhivamsa"],
+    "languages": ["my"],
+    "sourceLanguage": "my",
+    "translations": {
+      "my": {
+        "title": "ဒွါဒသမအကြိမ် 10 ရက် တရားစခန်း",
+        "description": "ဆရာတော် ဦးဃောသိတာဘိဝံသ (မေတ္တာနန္ဒ) ဦးဆောင်သော 10 ရက် တရားစခန်း"
+      },
+      "en": {
+        "title": "12th 10-day retreat",
+        "description": "A 10-day meditation retreat led by Sayadaw U Ghositābhivaṃsa (Mettānanda)."
+      }
+    },
+    "series": "ghositabhivamsa-10-day",
+    "venue": {
+      "name": {
+        "en": "Mettananda Vihara",
+        "my": "မေတ္တာနန္ဒဝိဟာရကျောင်း"
+      },
+      "city": "Oakland, CA, USA",
+      "address": "2707 Seminary Ave, Oakland, CA",
+      "mapUrl": "https://maps.app.goo.gl/PCvzspZTcaEW19QQ6"
+    },
+    "sessions": [],
+    "timetables": [
+      {
+        "label": "ဒွါဒသမကြိမ်မြောက် ဝင်းမတ္တောတရားစခန်း အချိန်ဇယား",
+        "url": "https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2025/04/12th-Retreat-Programs-and-Timetable-V1.pdf"
+      }
+    ],
+    "notes": [],
+    "sourceUrl": "https://winmetta.org/2025-apr-18-12th-10-days-meditation-retreat/",
+    "verifiedAt": "2026-10-05"
+  },
+  {
+    "id": "kundadhana-2025-04",
+    "status": "past",
+    "format": "hybrid",
+    "days": 3,
+    "startDate": "2025-04-05",
+    "endDate": "2025-04-07",
+    "timezone": "America/Los_Angeles",
+    "teacherIds": ["kundadhana"],
+    "languages": ["my"],
+    "sourceLanguage": "my",
+    "translations": {
+      "my": {
+        "title": "3 ရက် တရားစခန်း",
+        "description": "အရှင်ကုဏ္ဍဓာန (ထားဝယ်) ဦးဆောင်သော 3 ရက် တရားစခန်း"
+      },
+      "en": {
+        "title": "3-day retreat",
+        "description": "A 3-day meditation retreat led by Ashin Kuṇḍadhāna (Dawei)."
+      }
+    },
+    "series": "kundadhana-3-day",
+    "venue": {
+      "name": {
+        "en": "Kusalakari Monastery",
+        "my": "ကုသလကာရီဘုန်းတော်ကြီးကျောင်း"
+      },
+      "city": "Fremont, CA, USA",
+      "address": "40174 Spady St, Fremont, CA 94538"
+    },
+    "sessions": [],
+    "timetables": [
+      {
+        "label": "မြန်မာလို အသေးစိတ် တရားစခန်း အချိန်ဇယားများ",
+        "url": "https://winmetta.org/wp-content/uploads/2025/04/Burmese-Ashin-Kunda-Dhana-Timetable-3-Day-FremontV2.pdf"
+      },
+      {
+        "label": "Detailed Retreat Timetable in English",
+        "url": "https://winmetta.org/wp-content/uploads/2025/04/English-Ashin-Kunda-Dhana-Timetable-3-Day-FremontV2.pdf"
+      }
+    ],
+    "notes": [],
+    "sourceUrl": "https://winmetta.org/2025/03/23/ashin-kunda-dhana-daweis-3-day-meditation-retreat/",
+    "verifiedAt": "2026-10-05"
+  },
+  {
+    "id": "ghositabhivamsa-11-2024-10",
+    "status": "past",
+    "format": "online",
+    "days": 10,
+    "startDate": "2024-10-25",
+    "endDate": "2024-11-03",
+    "timezone": "America/Los_Angeles",
+    "teacherIds": ["ghositabhivamsa"],
+    "languages": ["my"],
+    "sourceLanguage": "my",
+    "translations": {
+      "my": {
+        "title": "ဧကာဒသမအကြိမ် 10 ရက် တရားစခန်း",
+        "description": "ဆရာတော် ဦးဃောသိတာဘိဝံသ (မေတ္တာနန္ဒ) ဦးဆောင်သော 10 ရက် တရားစခန်း"
+      },
+      "en": {
+        "title": "11th 10-day retreat",
+        "description": "A 10-day meditation retreat led by Sayadaw U Ghositābhivaṃsa (Mettānanda)."
+      }
+    },
+    "series": "ghositabhivamsa-10-day",
+    "sessions": [],
+    "timetables": [
+      {
+        "label": "Mettananda Win Metta 11th Retreat Programs and Timetable",
+        "url": "https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2024/10/Mettananda-Win-Metta-11th-Retreat-Programs-and-Timetable.pdf"
+      }
+    ],
+    "notes": [
+      {
+        "label": "တရားစခန်းမှတ်စုများ",
+        "url": "https://winmetta.org/2024/10/10/11th-zoom-online-10-days-meditation-retreat-class-notes/"
+      }
+    ],
+    "sourceUrl": "https://winmetta.org/2024-oct-25-11th-zoom-online-10-days-meditation-retreat/",
+    "verifiedAt": "2026-10-05"
+  },
+  {
+    "id": "kovida-2024-07",
+    "status": "past",
+    "format": "online",
+    "days": 10,
+    "startDate": "2024-07-22",
+    "endDate": "2024-07-31",
+    "timezone": "America/Los_Angeles",
+    "teacherIds": ["kovida"],
+    "languages": ["my", "en"],
+    "sourceLanguage": "my",
+    "translations": {
+      "my": {
+        "title": "10 ရက် တရားစခန်း",
+        "description": "အရှင်ကောဝိဒ (ဆိပ်ဖြူ) ဦးဆောင်သော 10 ရက် တရားစခန်း"
+      },
+      "en": {
+        "title": "10-day retreat",
+        "description": "A 10-day meditation retreat led by Ashin Kovida (Seikphyu)."
+      }
+    },
+    "series": "kovida-10-day",
+    "sessions": [],
+    "timetables": [
+      {
+        "label": "Ashin Kovida PT MM SG Timetable 10 Day Online Retreat 2024",
+        "url": "https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2024/07/Ashin-Kovida-PT-MM-SG-Timetable-10-Day-Online-Retreat-2024.pdf"
+      },
+      {
+        "label": "Ashin Kovida USA Timetable 10 Day Online Retreat 2024",
+        "url": "https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2024/07/Ashin-Kovida-USA-Timetable-10-Day-Online-Retreat-2024.pdf"
+      }
+    ],
+    "notes": [],
+    "sourceUrl": "https://winmetta.org/2024/06/29/ashin-koivda-10-day-online-meditation-retreat-in-2024/",
+    "verifiedAt": "2026-10-05"
+  },
+  {
+    "id": "ghositabhivamsa-10-2023-12",
+    "status": "past",
+    "format": "online",
+    "days": 10,
+    "startDate": "2023-12-22",
+    "endDate": "2023-12-31",
+    "timezone": "America/Los_Angeles",
+    "teacherIds": ["ghositabhivamsa"],
+    "languages": ["my"],
+    "sourceLanguage": "my",
+    "translations": {
+      "my": {
+        "title": "ဒသမအကြိမ် 10 ရက် တရားစခန်း",
+        "description": "ဆရာတော် ဦးဃောသိတာဘိဝံသ (မေတ္တာနန္ဒ) ဦးဆောင်သော 10 ရက် တရားစခန်း"
+      },
+      "en": {
+        "title": "10th 10-day retreat",
+        "description": "A 10-day meditation retreat led by Sayadaw U Ghositābhivaṃsa (Mettānanda)."
+      }
+    },
+    "series": "ghositabhivamsa-10-day",
+    "sessions": [],
+    "timetables": [
+      {
+        "label": "တရားစခန်းနှင့်ပတ်သက်သော အချိန်ဇယား၊ တရားခေါင်းစဥ်များ၊ ဝတ်ရွတ်စဥ်များကို ရယူရန်",
+        "url": "https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2023/12/10th-Retreat-Programs-and-Timetable_Typofixed20231227.pdf"
+      }
+    ],
+    "notes": [
+      {
+        "label": "တရားစခန်းမှတ်စုများ",
+        "url": "https://winmetta.org/2023/12/21/%e1%80%92%e1%80%9e%e1%80%99%e1%80%a1%e1%80%80%e1%80%bc%e1%80%ad%e1%80%99%e1%80%ba-%e1%81%81%e1%81%80%e1%80%9b%e1%80%80%e1%80%ba-%e1%80%90%e1%80%9b%e1%80%ac%e1%80%b8%e1%80%85%e1%80%81%e1%80%94/"
+      }
+    ],
+    "sourceUrl": "https://winmetta.org/2023-dec-22-10th-zoom-online-10-days-meditation-retreat/",
+    "verifiedAt": "2026-10-05"
+  },
+  {
+    "id": "ghositabhivamsa-09-2023-09",
+    "status": "past",
+    "format": "online",
+    "days": 10,
+    "startDate": "2023-09-01",
+    "endDate": "2023-09-10",
+    "timezone": "America/Los_Angeles",
+    "teacherIds": ["ghositabhivamsa"],
+    "languages": ["my"],
+    "sourceLanguage": "my",
+    "translations": {
+      "my": {
+        "title": "နဝမအကြိမ် 10 ရက် တရားစခန်း",
+        "description": "ဆရာတော် ဦးဃောသိတာဘိဝံသ (မေတ္တာနန္ဒ) ဦးဆောင်သော 10 ရက် တရားစခန်း"
+      },
+      "en": {
+        "title": "9th 10-day retreat",
+        "description": "A 10-day meditation retreat led by Sayadaw U Ghositābhivaṃsa (Mettānanda)."
+      }
+    },
+    "series": "ghositabhivamsa-10-day",
+    "sessions": [],
+    "timetables": [
+      {
+        "label": "နဝမအကြီမ်မြောက် တရားစခန်းဆိုင်ရာ အချိန်စာရင်းများ Printer-Friendly",
+        "url": "https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2023/08/9th-Retreat-Programs-and-Timetable_V3.pdf"
+      }
+    ],
+    "notes": [
+      {
+        "label": "တရားစခန်းမှတ်စုများ",
+        "url": "https://winmetta.org/2023/09/01/9th-zoom-online-10-days-meditation-retreat-class-notes/"
+      }
+    ],
+    "sourceUrl": "https://winmetta.org/2023-sep-1-9th-zoom-online-10-days-meditation-retreat/",
+    "verifiedAt": "2026-10-05"
+  },
+  {
+    "id": "ghositabhivamsa-08-2023-05",
+    "status": "past",
+    "format": "online",
+    "days": 10,
+    "startDate": "2023-05-26",
+    "endDate": "2023-06-04",
+    "timezone": "America/Los_Angeles",
+    "teacherIds": ["ghositabhivamsa"],
+    "languages": ["my"],
+    "sourceLanguage": "my",
+    "translations": {
+      "my": {
+        "title": "အဋ္ဌမအကြိမ် 10 ရက် တရားစခန်း",
+        "description": "ဆရာတော် ဦးဃောသိတာဘိဝံသ (မေတ္တာနန္ဒ) ဦးဆောင်သော 10 ရက် တရားစခန်း"
+      },
+      "en": {
+        "title": "8th 10-day retreat",
+        "description": "A 10-day meditation retreat led by Sayadaw U Ghositābhivaṃsa (Mettānanda)."
+      }
+    },
+    "series": "ghositabhivamsa-10-day",
+    "sessions": [
+      {
+        "day": 1,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၁၁)",
+        "postUrl": "https://winmetta.org/2023/05/26/sayadaw-u-ghositabhivamsa-8th-retreat-morning-class-11/"
+      },
+      {
+        "day": 1,
+        "part": "evening",
+        "title": "ရဟန်းပြုရခြင်း၏ လက်တွေ့အကျိုးတရားတို့ကိုမေးခြင်း",
+        "postUrl": "https://winmetta.org/2023/05/26/https-winmetta-org-2023-05-26-sayadaw-u-ghositabhivamsa-8th-retreat-evening-class-1/"
+      },
+      {
+        "day": 2,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၁၂)",
+        "postUrl": "https://winmetta.org/2023/05/28/sayadaw-u-ghositabhivamsa-8th-retreat-morning-class-12/"
+      },
+      {
+        "day": 2,
+        "part": "evening",
+        "title": "ဘာသာခြားဆရာကြီး (၆)ယောက်တို့၏ အယူအဆများ (၁)",
+        "postUrl": "https://winmetta.org/2023/05/28/sayadaw-u-ghositabhivamsa-8th-retreat-evening-class-2/"
+      },
+      {
+        "day": 3,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၁၃)",
+        "postUrl": "https://winmetta.org/2023/05/28/sayadaw-u-ghositabhivamsa-8th-retreat-morning-class-13/"
+      },
+      {
+        "day": 3,
+        "part": "evening",
+        "title": "ဘာသာခြားဆရာကြီး (၆)ယောက်တို့၏ အယူအဆများ (၂)",
+        "postUrl": "https://winmetta.org/2023/05/28/sayadaw-u-ghositabhivamsa-8th-retreat-evening-class-3/"
+      },
+      {
+        "day": 4,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၁၄)",
+        "postUrl": "https://winmetta.org/2023/05/29/sayadaw-u-ghositabhivamsa-8th-retreat-morning-class-14/"
+      },
+      {
+        "day": 4,
+        "part": "evening",
+        "title": "ရဟန်းပြုရခြင်း၏ အကျိုး၊ သီလပြည့်စုံမှု",
+        "postUrl": "https://winmetta.org/2023/05/29/sayadaw-u-ghositabhivamsa-8th-retreat-evening-class-4/"
+      },
+      {
+        "day": 5,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၁၅)",
+        "postUrl": "https://winmetta.org/2023/05/30/sayadaw-u-ghositabhivamsa-8th-retreat-morning-class-15/"
+      },
+      {
+        "day": 5,
+        "part": "evening",
+        "title": "သတိသမ္ပဇည, သန္တောသတို့နှင့် ပြည့်စုံမှု",
+        "postUrl": "https://winmetta.org/2023/05/30/sayadaw-u-ghositabhivamsa-8th-retreat-evening-class-5/"
+      },
+      {
+        "day": 6,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၁၆)",
+        "postUrl": "https://winmetta.org/2023/05/31/sayadaw-u-ghositabhivamsa-8th-retreat-morning-class-16/"
+      },
+      {
+        "day": 6,
+        "part": "evening",
+        "title": "နီဝရဏတရားငါးပါးနှင့် ဥပမာများ",
+        "postUrl": "https://winmetta.org/2023/05/31/sayadaw-u-ghositabhivamsa-8th-retreat-evening-class-6/"
+      },
+      {
+        "day": 7,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၁၇)",
+        "postUrl": "https://winmetta.org/2023/06/01/sayadaw-u-ghositabhivamsa-8th-retreat-morning-class-17/"
+      },
+      {
+        "day": 7,
+        "part": "evening",
+        "title": "နီဝရဏတရားငါးပါးနှင့် ဥပမာများ (၂)",
+        "postUrl": "https://winmetta.org/2023/06/01/sayadaw-u-ghositabhivamsa-8th-retreat-evening-class-7/"
+      },
+      {
+        "day": 8,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၁၈)",
+        "postUrl": "https://winmetta.org/2023/06/02/sayadaw-u-ghositabhivamsa-8th-retreat-morning-class-18/"
+      },
+      {
+        "day": 8,
+        "part": "evening",
+        "title": "စျာန်များအကြောင်း၊ ဝိပဿနာဉာဏ်များအကြောင်း၊ အဘိညာဉ်များအကြောင်း (၁)",
+        "postUrl": "https://winmetta.org/2023/06/02/sayadaw-u-ghositabhivamsa-8th-retreat-evening-class-8/"
+      },
+      {
+        "day": 9,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၁၉)",
+        "postUrl": "https://winmetta.org/2023/06/03/sayadaw-u-ghositabhivamsa-8th-retreat-morning-class-19/"
+      },
+      {
+        "day": 9,
+        "part": "evening",
+        "title": "စျာန်များအကြောင်း၊ ဝိပဿနာဉာဏ်များအကြောင်း၊ အဘိညာဉ်များအကြောင်း (၂)",
+        "postUrl": "https://winmetta.org/2023/06/03/sayadaw-u-ghositabhivamsa-8th-retreat-evening-class-9/"
+      },
+      {
+        "day": 10,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၂၀)",
+        "postUrl": "https://winmetta.org/2023/06/04/sayadaw-u-ghositabhivamsa-8th-retreat-morning-class-20/"
+      },
+      {
+        "day": 10,
+        "part": "evening",
+        "title": "သရဏဂုံအကြောင်းနှင့် သရဏဂုံဆောက်တည်ခြင်း၊ အပြစ်ကိုဝန်ချခြင်းနှင့် အဇာတသတ်မင်း၏ အနာဂတ်ဘဝ",
+        "postUrl": "https://winmetta.org/2023/06/04/sayadaw-u-ghositabhivamsa-8th-retreat-evening-class-10/"
+      },
+      {
+        "day": 10,
+        "part": "closing",
+        "title": "အောင်ပွဲအခမ်းအနား",
+        "postUrl": "https://winmetta.org/2023/06/04/sayadaw-u-ghositabhivamsa-8th-retreat-closing-ceremony/"
+      }
+    ],
+    "timetables": [
+      {
+        "label": "တရားစခန်း အချိန်ဇယား Print (သို့) Download လုပ်နိုင်ရန်",
+        "url": "https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2023/05/8th-Retreat-Programs.pdf"
+      }
+    ],
+    "notes": [
+      {
+        "label": "တရားစခန်းမှတ်စုများ",
+        "url": "https://winmetta.org/2023/05/26/8th-zoom-online-10-days-meditation-retreat-class-notes/"
+      }
+    ],
+    "sourceUrl": "https://winmetta.org/2023-may-26-8th-zoom-online-10-days-meditation-retreat/",
+    "verifiedAt": "2026-10-05"
+  },
+  {
+    "id": "ghositabhivamsa-07-2022-12",
+    "status": "past",
+    "format": "online",
+    "days": 10,
+    "startDate": "2022-12-23",
+    "endDate": "2023-01-01",
+    "timezone": "America/Los_Angeles",
+    "teacherIds": ["ghositabhivamsa"],
+    "languages": ["my"],
+    "sourceLanguage": "my",
+    "translations": {
+      "my": {
+        "title": "သတ္တမအကြိမ် 10 ရက် တရားစခန်း",
+        "description": "ဆရာတော် ဦးဃောသိတာဘိဝံသ (မေတ္တာနန္ဒ) ဦးဆောင်သော 10 ရက် တရားစခန်း"
+      },
+      "en": {
+        "title": "7th 10-day retreat",
+        "description": "A 10-day meditation retreat led by Sayadaw U Ghositābhivaṃsa (Mettānanda)."
+      }
+    },
+    "series": "ghositabhivamsa-10-day",
+    "sessions": [
+      {
+        "day": 1,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၁)",
+        "postUrl": "https://winmetta.org/2022/12/23/sayadaw-u-ghositabhivamsa-7th-retreat-morning-class-1/"
+      },
+      {
+        "day": 1,
+        "part": "evening",
+        "title": "ဗြဟ္မဇာလသုတ်ကို ဟောရခြင်းအကြောင်း",
+        "postUrl": "https://winmetta.org/2022/12/23/sayadaw-u-ghositabhivamsa-7th-retreat-evening-class-1/"
+      },
+      {
+        "day": 2,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၂)",
+        "postUrl": "https://winmetta.org/2022/12/24/sayadaw-u-ghositabhivamsa-7th-retreat-morning-class-2/"
+      },
+      {
+        "day": 2,
+        "part": "evening",
+        "title": "သီလ (၃)မျိုး (၁)",
+        "postUrl": "https://winmetta.org/2022/12/24/sayadaw-u-ghositabhivamsa-7th-retreat-evening-class-2/"
+      },
+      {
+        "day": 3,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၃)",
+        "postUrl": "https://winmetta.org/2022/12/25/sayadaw-u-ghositabhivamsa-7th-retreat-morning-class-3/"
+      },
+      {
+        "day": 3,
+        "part": "evening",
+        "title": "သီလ (၃)မျိုး (၂)",
+        "postUrl": "https://winmetta.org/2022/12/25/sayadaw-u-ghositabhivamsa-7th-retreat-evening-class-3/"
+      },
+      {
+        "day": 4,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၄)",
+        "postUrl": "https://winmetta.org/2022/12/26/sayadaw-u-ghositabhivamsa-7th-retreat-morning-class-4/"
+      },
+      {
+        "day": 4,
+        "part": "evening",
+        "title": "မိစ္ဆာအယူ (၆၂)ပါး (၁)",
+        "postUrl": "https://winmetta.org/2022/12/26/sayadaw-u-ghositabhivamsa-7th-retreat-evening-class-4/"
+      },
+      {
+        "day": 5,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၅)",
+        "postUrl": "https://winmetta.org/2022/12/27/sayadaw-u-ghositabhivamsa-7th-retreat-morning-class-5/"
+      },
+      {
+        "day": 5,
+        "part": "evening",
+        "title": "မိစ္ဆာအယူ (၆၂)ပါး (၂)",
+        "postUrl": "https://winmetta.org/2022/12/27/sayadaw-u-ghositabhivamsa-7th-retreat-evening-class-5/"
+      },
+      {
+        "day": 6,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၆)",
+        "postUrl": "https://winmetta.org/2022/12/28/sayadaw-u-ghositabhivamsa-7th-retreat-morning-class-6/"
+      },
+      {
+        "day": 6,
+        "part": "evening",
+        "title": "မိစ္ဆာအယူ (၆၂)ပါး (၃)",
+        "postUrl": "https://winmetta.org/2022/12/28/sayadaw-u-ghositabhivamsa-7th-retreat-evening-class-6/"
+      },
+      {
+        "day": 7,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၇)",
+        "postUrl": "https://winmetta.org/2022/12/29/sayadaw-u-ghositabhivamsa-7th-retreat-morning-class-7/"
+      },
+      {
+        "day": 7,
+        "part": "evening",
+        "title": "ဝေဒနာကမ္မဋ္ဌာန်း (၁)",
+        "postUrl": "https://winmetta.org/2022/12/29/sayadaw-u-ghositabhivamsa-7th-retreat-evening-class-7/"
+      },
+      {
+        "day": 8,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၈)",
+        "postUrl": "https://winmetta.org/2022/12/30/sayadaw-u-ghositabhivamsa-7th-retreat-morning-class-8/"
+      },
+      {
+        "day": 8,
+        "part": "evening",
+        "title": "ဝေဒနာကမ္မဋ္ဌာန်း (၂)",
+        "postUrl": "https://winmetta.org/2022/12/30/sayadaw-u-ghositabhivamsa-7th-retreat-evening-class-8/"
+      },
+      {
+        "day": 9,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၉)",
+        "postUrl": "https://winmetta.org/2022/12/31/sayadaw-u-ghositabhivamsa-7th-retreat-morning-class-9/"
+      },
+      {
+        "day": 9,
+        "part": "evening",
+        "title": "ဝေဒနာကမ္မဋ္ဌာန်း (၃)",
+        "postUrl": "https://winmetta.org/2022/12/31/sayadaw-u-ghositabhivamsa-7th-retreat-evening-class-9/"
+      },
+      {
+        "day": 10,
+        "part": "morning",
+        "title": "ဘဝဆင်းရဲမှ လွတ်မြောက်ရာသို့ လမ်းပြတရား (၁၀)",
+        "postUrl": "https://winmetta.org/2023/01/01/sayadaw-u-ghositabhivamsa-7th-retreat-morning-class-10/"
+      },
+      {
+        "day": 10,
+        "part": "evening",
+        "title": "မိစ္ဆာအမြင် နှင့် သမ္မာအမြင် ခြားနားချက်",
+        "postUrl": "https://winmetta.org/2023/01/01/sayadaw-u-ghositabhivamsa-7th-retreat-evening-class-10/"
+      },
+      {
+        "day": 10,
+        "part": "closing",
+        "title": "အောင်ပွဲအခမ်းအနား",
+        "postUrl": "https://winmetta.org/2023/01/01/sayadaw-u-ghositabhivamsa-7th-retreat-ending-ceremony/"
+      }
+    ],
+    "timetables": [
+      {
+        "label": "တရားစခန်း အချိန်ဇယား Print လုပ်နိုင်ရန်",
+        "url": "https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2022/12/7th-Retreat-Timetable_Updated_20221222.pdf"
+      }
+    ],
+    "notes": [
+      {
+        "label": "တရားစခန်းမှတ်စုများ",
+        "url": "https://winmetta.org/2022/12/23/7th-zoom-online-10-days-meditation-retreat-class-notes/"
+      }
+    ],
+    "sourceUrl": "https://winmetta.org/2022-dec-23-7th-zoom-online-10-days-meditation-retreat/",
+    "verifiedAt": "2026-10-05"
+  },
+  {
+    "id": "ghositabhivamsa-06-2022-09",
+    "status": "past",
+    "format": "online",
+    "days": 10,
+    "startDate": "2022-09-02",
+    "endDate": "2022-09-11",
+    "timezone": "America/Los_Angeles",
+    "teacherIds": ["ghositabhivamsa"],
+    "languages": ["my"],
+    "sourceLanguage": "my",
+    "translations": {
+      "my": {
+        "title": "ဆဋ္ဌမအကြိမ် 10 ရက် တရားစခန်း",
+        "description": "ဆရာတော် ဦးဃောသိတာဘိဝံသ (မေတ္တာနန္ဒ) ဦးဆောင်သော 10 ရက် တရားစခန်း"
+      },
+      "en": {
+        "title": "6th 10-day retreat",
+        "description": "A 10-day meditation retreat led by Sayadaw U Ghositābhivaṃsa (Mettānanda)."
+      }
+    },
+    "series": "ghositabhivamsa-10-day",
+    "sessions": [
+      {
+        "day": 1,
+        "part": "morning",
+        "title": "သမာဓိဟူသည် …",
+        "postUrl": "https://winmetta.org/2022/09/02/sayadaw-u-ghositabhivamsa-6th-retreat-morning-class-1/"
+      },
+      {
+        "day": 1,
+        "part": "evening",
+        "title": "လူဖြစ်ကျိုး နပ်ရန်",
+        "postUrl": "https://winmetta.org/2022/09/02/sayadaw-u-ghositabhivamsa-6th-retreat-evening-class-1/"
+      },
+      {
+        "day": 2,
+        "part": "morning",
+        "title": "သမာဓိအမျိုးစားများ (၁)",
+        "postUrl": "https://winmetta.org/2022/09/03/sayadaw-u-ghositabhivamsa-6th-retreat-morning-class-2/"
+      },
+      {
+        "day": 2,
+        "part": "evening",
+        "title": "ဗောဓိပက္ခိယတရား (၃၇) ပါးမှ သတိပဋ္ဌာန (၄)ပါး (၁)",
+        "postUrl": "https://winmetta.org/2022/09/03/sayadaw-u-ghositabhivamsa-6th-retreat-evening-class-2/"
+      },
+      {
+        "day": 3,
+        "part": "morning",
+        "title": "သမာဓိအမျိုးစားများ (၂)",
+        "postUrl": "https://winmetta.org/2022/09/04/sayadaw-u-ghositabhivamsa-6th-retreat-morning-class-3/"
+      },
+      {
+        "day": 3,
+        "part": "evening",
+        "title": "ဗောဓိပက္ခိယတရား (၃၇) ပါးမှ သတိပဋ္ဌာန (၄)ပါး (၂)",
+        "postUrl": "https://winmetta.org/2022/09/04/sayadaw-u-ghositabhivamsa-6th-retreat-evening-class-3/"
+      },
+      {
+        "day": 4,
+        "part": "morning",
+        "title": "သမာဓိအမျိုးစားများ (၃)",
+        "postUrl": "https://winmetta.org/2022/09/05/sayadaw-u-ghositabhivamsa-6th-retreat-morning-class-4/"
+      },
+      {
+        "day": 4,
+        "part": "evening",
+        "title": "ဗောဓိပက္ခိယတရား (၃၇) ပါးမှ သတိပဋ္ဌာန (၄)ပါး (၃)",
+        "postUrl": "https://winmetta.org/2022/09/05/sayadaw-u-ghositabhivamsa-6th-retreat-evening-class-4/"
+      },
+      {
+        "day": 5,
+        "part": "morning",
+        "title": "သမာဓိအမျိုးစားများ (၄)",
+        "postUrl": "https://winmetta.org/2022/09/06/sayadaw-u-ghositabhivamsa-6th-retreat-morning-class-5/"
+      },
+      {
+        "day": 5,
+        "part": "evening",
+        "title": "ဗောဓိပက္ခိယတရား (၃၇) ပါးမှ သတိပဋ္ဌာန (၄)ပါး (၃) နှင့် သမ္မပ္ပဓာန် (၄)ပါး",
+        "postUrl": "https://winmetta.org/2022/09/06/sayadaw-u-ghositabhivamsa-6th-retreat-evening-class-5/"
+      },
+      {
+        "day": 6,
+        "part": "morning",
+        "title": "သမာဓိပွားများနည်း",
+        "postUrl": "https://winmetta.org/2022/09/07/sayadaw-u-ghositabhivamsa-6th-retreat-morning-class-6/"
+      },
+      {
+        "day": 6,
+        "part": "evening",
+        "title": "ဗောဓိပက္ခိယတရား (၃၇)ပါးမှ",
+        "postUrl": "https://winmetta.org/2022/09/07/sayadaw-u-ghositabhivamsa-6th-retreat-evening-class-6/"
+      },
+      {
+        "day": 7,
+        "part": "morning",
+        "title": "ဆရာကောင်းကို ရှာရခြင်း",
+        "postUrl": "https://winmetta.org/2022/09/08/sayadaw-u-ghositabhivamsa-6th-retreat-morning-class-7/"
+      },
+      {
+        "day": 7,
+        "part": "evening",
+        "title": "ဗောဓိပက္ခိယတရား (၃၇)ပါးမှ",
+        "postUrl": "https://winmetta.org/2022/09/08/sayadaw-u-ghositabhivamsa-6th-retreat-evening-class-7/"
+      },
+      {
+        "day": 8,
+        "part": "morning",
+        "title": "စရိုက်များအကြောင်း",
+        "postUrl": "https://winmetta.org/2022/09/09/sayadaw-u-ghositabhivamsa-6th-retreat-morning-class-8/"
+      },
+      {
+        "day": 8,
+        "part": "evening",
+        "title": "ဗောဓိပက္ခိယတရား (၃၇)ပါးမှ",
+        "postUrl": "https://winmetta.org/2022/09/09/sayadaw-u-ghositabhivamsa-6th-etreat-evening-class-8/"
+      },
+      {
+        "day": 9,
+        "part": "morning",
+        "title": "သမာဓိဘာဝနာနှင့် မလျော်သောနေရာ",
+        "postUrl": "https://winmetta.org/2022/09/10/sayadaw-u-ghositabhivamsa-6th-retreat-morning-class-9/"
+      },
+      {
+        "day": 9,
+        "part": "evening",
+        "title": "ဗောဓိပက္ခိယတရား (၃၇)ပါးမှ",
+        "postUrl": "https://winmetta.org/2022/09/10/sayadaw-u-ghositabhivamsa-6th-retreat-evening-class-9-2/"
+      },
+      {
+        "day": 10,
+        "part": "morning",
+        "title": "သမာဓိ၏ ရန်သူများ",
+        "postUrl": "https://winmetta.org/2022/09/11/sayadaw-u-ghositabhivamsa-6th-retreat-morning-class-10/"
+      },
+      {
+        "day": 10,
+        "part": "evening",
+        "title": "ဗောဓိပက္ခိယတရား (၃၇)ပါးမှ မဂ္ဂင် (၈)ပါး၊ ပုထုဇဥ်နှင့် သောတာပန်",
+        "postUrl": "https://winmetta.org/2022/09/11/sayadaw-u-ghositabhivamsa-6th-retreat-evening-class-10/"
+      },
+      {
+        "day": 10,
+        "part": "closing",
+        "title": "တရားစခန်း အောင်ပွဲအခမ်းအနား",
+        "postUrl": "https://winmetta.org/2022/09/11/sayadaw-u-ghositabhivamsa-6th-retreat-closing-ceremony/"
+      }
+    ],
+    "timetables": [
+      {
+        "label": "တရားစခန်း အချိန်ဇယား Print လုပ်နိုင်ရန်",
+        "url": "https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2022/08/Win-Metta_6th-Retreat-Timetable_20220827.pdf"
+      }
+    ],
+    "notes": [
+      {
+        "label": "ဆဋ္ဌမအကြိမ် (၁၀)ရက် တရားစခန်း – မှတ်စု",
+        "url": "https://winmetta.org/2022/09/01/6th-zoom-online-10-days-meditation-retreat-class-notes/"
+      }
+    ],
+    "sourceUrl": "https://winmetta.org/6th-zoom-online-10-days-meditation-retreat/",
+    "verifiedAt": "2026-10-05"
+  },
+  {
+    "id": "ghositabhivamsa-05-2022-04",
+    "status": "past",
+    "format": "online",
+    "days": 10,
+    "startDate": "2022-04-09",
+    "endDate": "2022-04-18",
+    "timezone": "America/Los_Angeles",
+    "teacherIds": ["ghositabhivamsa"],
+    "languages": ["my"],
+    "sourceLanguage": "my",
+    "translations": {
+      "my": {
+        "title": "ပဉ္စမအကြိမ် 10 ရက် တရားစခန်း",
+        "description": "ဆရာတော် ဦးဃောသိတာဘိဝံသ (မေတ္တာနန္ဒ) ဦးဆောင်သော 10 ရက် တရားစခန်း"
+      },
+      "en": {
+        "title": "5th 10-day retreat",
+        "description": "A 10-day meditation retreat led by Sayadaw U Ghositābhivaṃsa (Mettānanda)."
+      }
+    },
+    "series": "ghositabhivamsa-10-day",
+    "sessions": [
+      {
+        "day": 1,
+        "part": "morning",
+        "title": "ကောင်းမြတ်သော ဣန္ဒြေ ရှိပါစေ (၁) – ပဥ္စမအကြိမ် တရားစခန်း – နံနက်",
+        "postUrl": "https://winmetta.org/2022/04/08/5th-zoom-online-10-days-meditation-retreat-morning-1/"
+      },
+      {
+        "day": 1,
+        "part": "evening",
+        "title": "ဓမ္မအမွေသာ ခံထိုက်စေ (၁) – ပဥ္စမအကြိမ် တရားစခန်း – ညနေ",
+        "postUrl": "https://winmetta.org/2022/04/08/5th-zoom-online-10-days-meditation-retreat-evening-1/"
+      },
+      {
+        "day": 2,
+        "part": "morning",
+        "title": "ကောင်းမြတ်သော ဣန္ဒြေ ရှိပါစေ (၂) – ပဥ္စမအကြိမ် တရားစခန်း – နံနက်",
+        "postUrl": "https://winmetta.org/2022/04/09/5th-zoom-online-10-days-meditation-retreat-morning-2/"
+      },
+      {
+        "day": 2,
+        "part": "evening",
+        "title": "ဓမ္မအမွေသာ ခံထိုက်စေ (၂)(၃) – ပဥ္စမအကြိမ် တရားစခန်း – ညနေ",
+        "postUrl": "https://winmetta.org/2022/04/09/5th-zoom-online-10-days-meditation-retreat-evening-2/"
+      },
+      {
+        "day": 3,
+        "part": "morning",
+        "title": "ကောင်းမြတ်သော ဣန္ဒြေ ရှိပါစေ (၃) – ပဥ္စမအကြိမ် တရားစခန်း – နံနက်",
+        "postUrl": "https://winmetta.org/2022/04/10/5th-zoom-online-10-days-meditation-retreat-morning-3/"
+      },
+      {
+        "day": 4,
+        "part": "morning",
+        "title": "ကောင်းမြတ်သော ဣန္ဒြေ ရှိပါစေ (၄) – ပဥ္စမအကြိမ် တရားစခန်း – နံနက်",
+        "postUrl": "https://winmetta.org/2022/04/11/5th-zoom-online-10-days-meditation-retreat-morning-4/"
+      },
+      {
+        "day": 4,
+        "part": "evening",
+        "title": "ဓမ္မအမွေသာ ခံထိုက်စေ (၄) – ပဥ္စမအကြိမ် တရားစခန်း – ညနေ",
+        "postUrl": "https://winmetta.org/2022/04/11/5th-zoom-online-10-days-meditation-retreat-evening-4/"
+      },
+      {
+        "day": 5,
+        "part": "morning",
+        "title": "ကောင်းမြတ်သော ဣန္ဒြေ ရှိပါစေ (၅) – ပဥ္စမအကြိမ် တရားစခန်း – နံနက်",
+        "postUrl": "https://winmetta.org/2022/04/12/5th-zoom-online-10-days-meditation-retreat-morning-5/"
+      },
+      {
+        "day": 5,
+        "part": "evening",
+        "title": "ဓမ္မအမွေသာ ခံထိုက်စေ (၅) – ပဥ္စမအကြိမ် တရားစခန်း – ညနေ",
+        "postUrl": "https://winmetta.org/2022/04/12/5th-zoom-online-10-days-meditation-retreat-evening/"
+      },
+      {
+        "day": 6,
+        "part": "morning",
+        "title": "အသိဉာဏ်ရှိလျှင် ရုန်းထွက်ချင် (၁) – ပဥ္စမအကြိမ် တရားစခန်း – နံနက်￼￼",
+        "postUrl": "https://winmetta.org/2022/04/13/5th-zoom-online-10-days-meditation-retreat-morning-6/"
+      },
+      {
+        "day": 6,
+        "part": "evening",
+        "title": "တောင်ပို့ပမာ ကိုယ်ခန္ဓာ (၁) – ပဥ္စမအကြိမ် တရားစခန်း – ညနေ￼￼",
+        "postUrl": "https://winmetta.org/2022/04/13/5th-zoom-online-10-days-meditation-retreat-evening-2-1/"
+      },
+      {
+        "day": 7,
+        "part": "morning",
+        "title": "အသိဉာဏ်ရှိလျှင် ရုန်းထွက်ချင် (၂) – ပဥ္စမအကြိမ် တရားစခန်း – နံနက်￼",
+        "postUrl": "https://winmetta.org/2022/04/14/5th-zoom-online-10-days-meditation-retreat-morning-7/"
+      },
+      {
+        "day": 7,
+        "part": "evening",
+        "title": "တောင်ပို့ပမာ ကိုယ်ခန္ဓာ (၂) – ပဥ္စမအကြိမ် တရားစခန်း – ညနေ",
+        "postUrl": "https://winmetta.org/2022/04/14/5th-zoom-online-10-days-meditation-retreat-evening-2-2/"
+      },
+      {
+        "day": 8,
+        "part": "morning",
+        "title": "အသိဉာဏ်ရှိလျှင် ရုန်းထွက်ချင် (၃) – ပဥ္စမအကြိမ် တရားစခန်း – နံနက်￼",
+        "postUrl": "https://winmetta.org/2022/04/15/5th-zoom-online-10-days-meditation-retreat-morning-8/"
+      },
+      {
+        "day": 8,
+        "part": "evening",
+        "title": "တောင်ပို့ပမာ ကိုယ်ခန္ဓာ (၃) – ပဥ္စမအကြိမ် တရားစခန်း – ညနေ",
+        "postUrl": "https://winmetta.org/2022/04/15/5th-zoom-online-10-days-meditation-retreat-evening-2-3/"
+      },
+      {
+        "day": 9,
+        "part": "morning",
+        "title": "အသိဉာဏ်ရှိလျှင် ရုန်းထွက်ချင် (၄) – ပဥ္စမအကြိမ် တရားစခန်း – နံနက်￼",
+        "postUrl": "https://winmetta.org/2022/04/16/5th-zoom-online-10-days-meditation-retreat-morning-9/"
+      },
+      {
+        "day": 9,
+        "part": "evening",
+        "title": "တောင်ပို့ပမာ ကိုယ်ခန္ဓာ (၄) – ပဥ္စမအကြိမ် တရားစခန်း – ညနေ",
+        "postUrl": "https://winmetta.org/2022/04/16/5th-zoom-online-10-days-meditation-retreat-evening-2-4/"
+      },
+      {
+        "day": 10,
+        "part": "morning",
+        "title": "အသိဉာဏ်ရှိလျှင် ရုန်းထွက်ချင် (၅) – ပဥ္စမအကြိမ် တရားစခန်း – နံနက်￼",
+        "postUrl": "https://winmetta.org/2022/04/17/5th-zoom-online-10-days-meditation-retreat-morning/"
+      },
+      {
+        "day": 10,
+        "part": "evening",
+        "title": "တောင်ပို့ပမာ ကိုယ်ခန္ဓာ (၅) – ပဥ္စမအကြိမ် တရားစခန်း – ညနေ",
+        "postUrl": "https://winmetta.org/2022/04/17/5th-zoom-online-10-days-meditation-retreat-evening-2-5/"
+      },
+      {
+        "day": 10,
+        "part": "closing",
+        "title": "ပဥ္စမအကြိမ် တရားစခန်း (၁၀) ရက်ပြည့် အောင်ပွဲနေ့￼",
+        "postUrl": "https://winmetta.org/2022/04/17/5th-zoom-online-10-days-meditation-retreat-closing/"
+      }
+    ],
+    "timetables": [],
+    "notes": [
+      {
+        "label": "သင်တန်းမှတ်စုများ",
+        "url": "https://winmetta.org/2022/04/08/5th-zoom-online-10-days-meditation-retreat-class-notes/"
+      }
+    ],
+    "sourceUrl": "https://winmetta.org/5th-zoom-online-10-days-meditation-retreat/",
+    "verifiedAt": "2026-10-05"
+  },
+  {
+    "id": "ghositabhivamsa-04-2021-12",
+    "status": "past",
+    "format": "online",
+    "days": 10,
+    "startDate": "2021-12-24",
+    "endDate": "2022-01-02",
+    "timezone": "America/Los_Angeles",
+    "teacherIds": ["ghositabhivamsa"],
+    "languages": ["my"],
+    "sourceLanguage": "my",
+    "translations": {
+      "my": {
+        "title": "စတုတ္ထအကြိမ် 10 ရက် တရားစခန်း",
+        "description": "ဆရာတော် ဦးဃောသိတာဘိဝံသ (မေတ္တာနန္ဒ) ဦးဆောင်သော 10 ရက် တရားစခန်း"
+      },
+      "en": {
+        "title": "4th 10-day retreat",
+        "description": "A 10-day meditation retreat led by Sayadaw U Ghositābhivaṃsa (Mettānanda)."
+      }
+    },
+    "series": "ghositabhivamsa-10-day",
+    "sessions": [
+      {
+        "day": 1,
+        "part": "morning",
+        "title": "တရားစခန်း နေ့ (၁) နံနက် – အာနာပါန အားထုတ်ရခြင်းအကြောင်း",
+        "postUrl": "https://winmetta.org/2021/12/24/10-day-retreat-2021-12-24-day-1-morning/"
+      },
+      {
+        "day": 1,
+        "part": "evening",
+        "title": "တရားစခန်း နေ့ (၁) ညနေ – သလ္လေခသုတ် – ကိလေသာကင်းအောင် ကျင့်နည်းများ (၁) – မနှိပ်စက်မညှဉ်းဆဲမှုမှ ရှောင်ကြဥ်မှု",
+        "postUrl": "https://winmetta.org/2021/12/24/10-day-retreat-2021-12-24-day-1-evening/"
+      },
+      {
+        "day": 1,
+        "part": "other",
+        "title": "ဒုစရိုက် (၁၀) ပါး၊ ကိလေသာ (၁၀) ပါး",
+        "postUrl": "https://winmetta.org/2021/12/24/%e1%80%92%e1%80%af%e1%80%85%e1%80%9b%e1%80%ad%e1%80%af%e1%80%80%e1%80%ba-%e1%81%81%e1%81%80-%e1%80%95%e1%80%ab%e1%80%b8/"
+      },
+      {
+        "day": 2,
+        "part": "morning",
+        "title": "တရားစခန်း နေ့ (၂) နံနက် – အာနာပါနလမ်းစဉ်",
+        "postUrl": "https://winmetta.org/2021/12/25/10-day-retreat-2021-12-24-day-2-morning/"
+      },
+      {
+        "day": 2,
+        "part": "evening",
+        "title": "တရားစခန်း နေ့ (၂) ညနေ – သလ္လေခသုတ် – ကိလေသာကင်းအောင် ကျင့်နည်းများ (၂) – ပါဏာတိပါတမှ ရှောင်ကြဥ်မှု",
+        "postUrl": "https://winmetta.org/2021/12/25/10-day-retreat-2021-12-24-day-2-evening/"
+      },
+      {
+        "day": 3,
+        "part": "morning",
+        "title": "တရားစခန်း နေ့ (၃) နံနက် – အာနာပါနဿတိ ပထမစတုက္က (၁)",
+        "postUrl": "https://winmetta.org/2021/12/26/10-day-retreat-2021-12-24-day-3-morning/"
+      },
+      {
+        "day": 3,
+        "part": "evening",
+        "title": "တရားစခန်း နေ့ (၃) ညနေ – သလ္လေခသုတ် – ကိလေသာကင်းအောင် ကျင့်နည်းများ (၃) – ခိုးခြင်းမှ ရှောင်ကြဉ်မှု",
+        "postUrl": "https://winmetta.org/2021/12/26/10-day-retreat-2021-12-24-day-3-evening/"
+      },
+      {
+        "day": 4,
+        "part": "morning",
+        "title": "တရားစခန်း နေ့ (၄) နံနက် – အာနာပါနဿတိ ပထမစတုက္က (၂)",
+        "postUrl": "https://winmetta.org/2021/12/27/10-day-retreat-2021-12-24-day-4-morning/"
+      },
+      {
+        "day": 4,
+        "part": "evening",
+        "title": "တရားစခန်း နေ့ (၄) ညနေ – သလ္လေခသုတ် – ကိလေသာကင်းအောင် ကျင့်နည်းများ (၄) – အဗြဟ္မစရိယမှ ရှောင်ကြဉ်မှု",
+        "postUrl": "https://winmetta.org/2021/12/27/10-day-retreat-2021-12-24-day-4-evening/"
+      },
+      {
+        "day": 5,
+        "part": "morning",
+        "title": "တရားစခန်း နေ့ (၅) နံနက် – အာနာပါနဿတိ ပထမစတုက္က (၃)",
+        "postUrl": "https://winmetta.org/2021/12/28/10-day-retreat-2021-12-24-day-5-morning/"
+      },
+      {
+        "day": 5,
+        "part": "evening",
+        "title": "တရားစခန်း နေ့ (၅) ညနေ – သလ္လေခသုတ် – ကိလေသာကင်းအောင် ကျင့်နည်းများ (၅) – မုသာဝါဒမှ ရှောင်ကြဉ်မှု",
+        "postUrl": "https://winmetta.org/2021/12/28/10-day-retreat-2021-12-24-day-5-evening/"
+      },
+      {
+        "day": 6,
+        "part": "morning",
+        "title": "တရားစခန်း နေ့ (၆) နံနက် – အာနာပါနဿတိ ပထမစတုက္က (၄)",
+        "postUrl": "https://winmetta.org/2021/12/29/10-day-retreat-2021-12-24-day-6-morning/"
+      },
+      {
+        "day": 6,
+        "part": "evening",
+        "title": "တရားစခန်း နေ့ (၆) ညနေ – သလ္လေခသုတ် – ကိလေသာကင်းအောင် ကျင့်နည်းများ (၆) – ပိသုဏဝါစာ၊ ဖရုသဝါစာ၊ သမ္ဖပ္ပလာပ၊ အဘိဇ္ဈာ၊ ဗျာပါဒ တို့မှ ရှောင်ကြဉ်မှု",
+        "postUrl": "https://winmetta.org/2021/12/29/10-day-retreat-2021-12-24-day-6-evening/"
+      },
+      {
+        "day": 7,
+        "part": "morning",
+        "title": "တရားစခန်း နေ့ (၇) နံနက် – အာနာပါနဿတိ ဒုတိယစတုက္က",
+        "postUrl": "https://winmetta.org/2021/12/30/10-day-retreat-2021-12-24-day-7-morning/"
+      },
+      {
+        "day": 7,
+        "part": "evening",
+        "title": "တရားစခန်း နေ့ (၇) ညနေ – သလ္လေခသုတ် – ကိလေသာကင်းအောင် ကျင့်နည်းများ (၇) – မှန်သောအယူအဆရှိမှု (မိစ္ဆာဒိဋ္ဌိမှ ရှောင်ကြဉ်မှု)",
+        "postUrl": "https://winmetta.org/2021/12/30/10-day-retreat-2021-12-24-day-7-evening/"
+      },
+      {
+        "day": 8,
+        "part": "morning",
+        "title": "တရားစခန်း နေ့ (၈) နံနက် – အာနာပါနဿတိ တတိယစတုက္က",
+        "postUrl": "https://winmetta.org/2021/12/31/10-day-retreat-2021-12-24-day-8-morning/"
+      },
+      {
+        "day": 8,
+        "part": "evening",
+        "title": "တရားစခန်း နေ့ (၈) ညနေ – သလ္လေခသုတ် – ကိလေသာကင်းအောင် ကျင့်နည်းများ (၈) – ထိနမိဒ္ဓ၊ ဥဒ္ဓစ္စ ဝိစိကိစ္ဆာ၊ ဒေါသကြီးခြင်း စသည်တို့မှ ရှောင်ကြဉ်မှု",
+        "postUrl": "https://winmetta.org/2021/12/31/10-day-retreat-2021-12-24-day-8-evening/"
+      },
+      {
+        "day": 9,
+        "part": "morning",
+        "title": "တရားစခန်း နေ့ (၉) နံနက် – အာနာပါနဿတိ စတုက္ကစတုက္က",
+        "postUrl": "https://winmetta.org/2022/01/01/10-day-retreat-2021-12-24-day-9-morning/"
+      },
+      {
+        "day": 9,
+        "part": "evening",
+        "title": "တရားစခန်း နေ့ (၉) ညနေ – သလ္လေခသုတ် – ကိလေသာကင်းအောင် ကျင့်နည်းများ (၉) – ဆုံးမခက်ခြင်း၊ မကောင်းသောမိတ်ဆွေနှင့်ပေါင်းခြင်း စသည်တို့မှ ရှောင်ကြဉ်မှု",
+        "postUrl": "https://winmetta.org/2022/01/01/10-day-retreat-2021-12-24-day-9-evening/"
+      },
+      {
+        "day": 10,
+        "part": "morning",
+        "title": "တရားစခန်း နေ့ (၁၀) နံနက် – အာနာပါန မှ ဝိပဿနာသို့",
+        "postUrl": "https://winmetta.org/2022/01/02/10-day-retreat-2021-12-24-day-10-morning/"
+      },
+      {
+        "day": 10,
+        "part": "evening",
+        "title": "တရားစခန်း နေ့ (၁၀) ညနေ – သလ္လေခသုတ် – ကိလေသာကင်းအောင် ကျင့်နည်းများ (၁၀) – သဒ္ဓါတရားမရှိခြင်း၊ အဟိရိက၊ အနောတ္တပ္ပ စသည်တို့မှ ရှောင်ကြဉ်မှု",
+        "postUrl": "https://winmetta.org/2022/01/02/10-day-retreat-2021-12-24-day-10-evening/"
+      }
+    ],
+    "timetables": [
+      {
+        "label": "တနေ့တာအချိန်ဇယား",
+        "url": "https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2021/12/တနေ့တာအချိန်ဇယား-Daly-Schedule_4th-Retreat.pdf"
+      },
+      {
+        "label": "(၁၀)ရက်မြောက်နေ့ အချိန်ဇယား",
+        "url": "https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2021/12/၁၀ရက်နေ့အချိန်ဇယား-Day-10_4th-retreat-_-schedule-1.pdf"
+      },
+      {
+        "label": "ညနေ သဘောတရားရေးရာ အပိုင်း",
+        "url": "https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2021/12/ညနေ-သဘောတရားရေးရာ-အပိုင်း-Evening-Schedule-Program_2022-4th-Retreat.pdf"
+      }
+    ],
+    "notes": [
+      {
+        "label": "စတုတ္ထအကြိမ် (၁၀)ရက်တရားစခန်း သင်တန်းမှတ်စုများ",
+        "url": "https://winmetta.org/2021/12/24/2021-dec-10-days-meditation-retreat-class-notes/"
+      }
+    ],
+    "sourceUrl": "https://winmetta.org/2021-dec-10-days-meditation-retreat/",
+    "verifiedAt": "2026-10-05"
+  },
+  {
+    "id": "ghositabhivamsa-03-2021-09",
+    "status": "past",
+    "format": "online",
+    "days": 10,
+    "startDate": "2021-09-03",
+    "endDate": "2021-09-12",
+    "timezone": "America/Los_Angeles",
+    "teacherIds": ["ghositabhivamsa"],
+    "languages": ["my"],
+    "sourceLanguage": "my",
+    "translations": {
+      "my": {
+        "title": "တတိယအကြိမ် 10 ရက် တရားစခန်း",
+        "description": "ဆရာတော် ဦးဃောသိတာဘိဝံသ (မေတ္တာနန္ဒ) ဦးဆောင်သော 10 ရက် တရားစခန်း"
+      },
+      "en": {
+        "title": "3rd 10-day retreat",
+        "description": "A 10-day meditation retreat led by Sayadaw U Ghositābhivaṃsa (Mettānanda)."
+      }
+    },
+    "series": "ghositabhivamsa-10-day",
+    "sessions": [
+      {
+        "day": 1,
+        "part": "morning",
+        "title": "နေ့ (၁) – နံနက်ခင်း အလုပ်ပေးတရား – ပညတ်(၂)မျိုး",
+        "postUrl": "https://winmetta.org/2021/09/03/10-day-retreat-2021-09-03-day-1-morning/"
+      },
+      {
+        "day": 1,
+        "part": "evening",
+        "title": "နေ့ (၁) – ညနေ တရားနာယူခြင်း – တရားကျင့်ရာ၌ လိုအပ်ချက် နှင့် ရည်ရွယ်ချက်",
+        "postUrl": "https://winmetta.org/2021/09/03/10-day-retreat-2021-09-03-day-1-evening/"
+      },
+      {
+        "day": 2,
+        "part": "morning",
+        "title": "နေ့ (၂) – နံနက်ခင်း အလုပ်ပေးတရား – ပရမတ္တတရားစီစစ်နည်း",
+        "postUrl": "https://winmetta.org/2021/09/04/10-day-retreat-2021-09-03-day-2-morning/"
+      },
+      {
+        "day": 2,
+        "part": "evening",
+        "title": "နေ့ (၂) – ညနေ တရားနာယူခြင်း – မီး (၁၁)ပါး ငြိမ်းရန် ကျင့်ခြင်း (၁)",
+        "postUrl": "https://winmetta.org/2021/09/04/10-day-retreat-2021-09-03-day-2-evening/"
+      },
+      {
+        "day": 3,
+        "part": "morning",
+        "title": "နေ့ (၃) – နံနက်ခင်း အလုပ်ပေးတရား – ဒိဋ္ဌိ",
+        "postUrl": "https://winmetta.org/2021/09/05/10-day-retreat-2021-09-03-day-3-morning/"
+      },
+      {
+        "day": 3,
+        "part": "evening",
+        "title": "နေ့ (၃) – ညနေ တရားနာယူခြင်း – မီး (၁၁)ပါး ငြိမ်းရန် ကျင့်ခြင်း (၂)",
+        "postUrl": "https://winmetta.org/2021/09/05/10-day-retreat-2021-09-03-day-3-evening/"
+      },
+      {
+        "day": 4,
+        "part": "morning",
+        "title": "နေ့ (၄) – နံနက်ခင်း အလုပ်ပေးတရား – လောဘ ဒေါသ မောဟ တရားတို့ ထူးခြားပုံ",
+        "postUrl": "https://winmetta.org/2021/09/06/10-day-retreat-2021-09-03-day-4-morning/"
+      },
+      {
+        "day": 4,
+        "part": "evening",
+        "title": "နေ့ (၄) – ညနေ တရားနာယူခြင်း – အနာထပိဏ်သူဌေးနှင့် ဆိုင်ရာတရား",
+        "postUrl": "https://winmetta.org/2021/09/06/10-day-retreat-2021-09-03-day-4-evening/"
+      },
+      {
+        "day": 5,
+        "part": "morning",
+        "title": "နေ့ (၅) – နံနက်ခင်း အလုပ်ပေးတရား – အကုသိုလ်တရား (၃)ပါး ကို ပယ်ခြင်း",
+        "postUrl": "https://winmetta.org/2021/09/07/10-day-retreat-2021-09-03-day-5-morning/"
+      },
+      {
+        "day": 5,
+        "part": "evening",
+        "title": "နေ့ (၅) – ညနေ တရားနာယူခြင်း – အနာထပိဏ္ဍိကောဝါဒသုတ်",
+        "postUrl": "https://winmetta.org/2021/09/07/10-day-retreat-2021-09-03-day-5-evening/"
+      },
+      {
+        "day": 6,
+        "part": "morning",
+        "title": "နေ့ (၆) – နံနက်ခင်း အလုပ်ပေးတရား – အမိုက် (၅)သင်း အလင်း (၅)ချက် – (၁)",
+        "postUrl": "https://winmetta.org/2021/09/08/10-day-retreat-2021-09-03-day-6-morning/"
+      },
+      {
+        "day": 6,
+        "part": "evening",
+        "title": "နေ့ (၆) – ညနေ တရားနာယူခြင်း – သေခြင်းကို မရင်ဆိုင်ရဲသူ နှင့် ရင်ဆိုင်ရဲသူ (၄)မျိုး (အဘယသုတ်)",
+        "postUrl": "https://winmetta.org/2021/09/08/10-day-retreat-2021-09-03-day-6-evening/"
+      },
+      {
+        "day": 7,
+        "part": "morning",
+        "title": "နေ့ (၇) – နံနက်ခင်း အလုပ်ပေးတရား – အမိုက် (၅)သင်း အလင်း (၅)ချက် – (၂)",
+        "postUrl": "https://winmetta.org/2021/09/09/10-day-retreat-2021-09-03-day-7-morning/"
+      },
+      {
+        "day": 7,
+        "part": "evening",
+        "title": "နေ့ (၇) – ညနေ တရားနာယူခြင်း – ပုဂ္ဂိုလ် (၅)မျိုး နှင့် ရှုရမည့်တရား (သီလဝန္တသုတ်-၁)",
+        "postUrl": "https://winmetta.org/2021/09/09/10-day-retreat-2021-09-03-day-7-evening/"
+      },
+      {
+        "day": 8,
+        "part": "morning",
+        "title": "နေ့ (၈) – နံနက်ခင်း အလုပ်ပေးတရား – ကိလေသာအသိုက်အအုံကြီး (၃) မျိုး",
+        "postUrl": "https://winmetta.org/2021/09/10/10-day-retreat-2021-09-03-day-8-morning/"
+      },
+      {
+        "day": 8,
+        "part": "evening",
+        "title": "နေ့ (၈) – ညနေ တရားနာယူခြင်း – ပုဂ္ဂိုလ် (၅)မျိုး နှင့် ရှုရမည့်တရား (သီလဝန္တသုတ်-၂)",
+        "postUrl": "https://winmetta.org/2021/09/10/10-day-retreat-2021-09-03-day-8-evening/"
+      },
+      {
+        "day": 9,
+        "part": "morning",
+        "title": "နေ့ (၉) – နံနက်ခင်း အလုပ်ပေးတရား – နိဗ္ဗာန်သဘော ၊ နိဗ္ဗာန် အမျိုးအစား",
+        "postUrl": "https://winmetta.org/2021/09/11/10-day-retreat-2021-09-03-day-9-morning/"
+      },
+      {
+        "day": 9,
+        "part": "evening",
+        "title": "နေ့ (၉) – ညနေ တရားနာယူခြင်း – ပုဂ္ဂိုလ် (၅)မျိုး နှင့် ရှုရမည့်တရား (သီလဝန္တသုတ်-၃)",
+        "postUrl": "https://winmetta.org/2021/09/11/10-day-retreat-2021-09-03-day-9-evening/"
+      },
+      {
+        "day": 10,
+        "part": "morning",
+        "title": "နေ့ (၁၀) – နံနက်ခင်း အလုပ်ပေးတရား – အဓိပတိထား၍ တရား အားထုတ်ဖို့လိုသည်",
+        "postUrl": "https://winmetta.org/2021/09/12/10-day-retreat-2021-09-03-day-10-morning/"
+      },
+      {
+        "day": 10,
+        "part": "closing",
+        "title": "နေ့ (၁၀) – ညနေ – တတိယအကြိမ် (၁၀)ရက်တရားစခန်း အောင်ပွဲ",
+        "postUrl": "https://winmetta.org/2021/09/12/10-day-retreat-2021-09-03-day-10-evening/"
+      }
+    ],
+    "timetables": [
+      {
+        "label": "Time Table – Retreat 3",
+        "url": "https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2021/09/Time-Table-_Retreat-3_2021-1-1.pdf"
+      }
+    ],
+    "notes": [
+      {
+        "label": "တတိယအကြိမ် (၁၀)ရက်တရားစခန်း သင်တန်းမှတ်စုများ",
+        "url": "https://winmetta.org/2021/09/03/2021-sep-10-days-meditation-retreat-class-notes/"
+      }
+    ],
+    "sourceUrl": "https://winmetta.org/2021-sep-10-days-meditation-retreat/",
+    "verifiedAt": "2026-10-05"
+  },
+  {
+    "id": "ghositabhivamsa-02-2021-04",
+    "status": "past",
+    "format": "online",
+    "days": 10,
+    "startDate": "2021-04-16",
+    "endDate": "2021-04-25",
+    "timezone": "America/Los_Angeles",
+    "teacherIds": ["ghositabhivamsa"],
+    "languages": ["my"],
+    "sourceLanguage": "my",
+    "translations": {
+      "my": {
+        "title": "ဒုတိယအကြိမ် 10 ရက် တရားစခန်း",
+        "description": "ဆရာတော် ဦးဃောသိတာဘိဝံသ (မေတ္တာနန္ဒ) ဦးဆောင်သော 10 ရက် တရားစခန်း"
+      },
+      "en": {
+        "title": "2nd 10-day retreat",
+        "description": "A 10-day meditation retreat led by Sayadaw U Ghositābhivaṃsa (Mettānanda)."
+      }
+    },
+    "series": "ghositabhivamsa-10-day",
+    "sessions": [
+      {
+        "day": 1,
+        "part": "morning",
+        "title": "နေ့ (၁) – နံနက်ခင်း အလုပ်ပေးတရား – ပါတုဘာဝသုတ် (ရခဲသော အရာ (၆)ပါး)",
+        "postUrl": "https://winmetta.org/2021/04/16/10-day-retreat-2021-04-16-day-1-morning/"
+      },
+      {
+        "day": 1,
+        "part": "evening",
+        "title": "နေ့ (၁) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2021/04/16/10-day-retreat-2021-04-16-day-1-evening/"
+      },
+      {
+        "day": 2,
+        "part": "morning",
+        "title": "နေ့ (၂) – နံနက်ခင်း အလုပ်ပေးတရား – ပံသုဓောဝကသုတ် (ရွှေကျင်နည်းပမာ တရားကျင့်ပါ)",
+        "postUrl": "https://winmetta.org/2021/04/17/10-day-retreat-2021-04-16-day-2-morning/"
+      },
+      {
+        "day": 2,
+        "part": "evening",
+        "title": "နေ့ (၂) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2021/04/17/10-day-retreat-2021-04-16-day-2-evening/"
+      },
+      {
+        "day": 3,
+        "part": "morning",
+        "title": "နေ့ (၃) – နံနက်ခင်း အလုပ်ပေးတရား – သီလမဂ္ဂင် (သမ္မာဝါစာ, သမ္မာကမ္မန္တ)",
+        "postUrl": "https://winmetta.org/2021/04/18/10-day-retreat-2021-04-16-day-3-morning/"
+      },
+      {
+        "day": 3,
+        "part": "evening",
+        "title": "နေ့ (၃) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2021/04/18/10-day-retreat-2021-04-16-day-3-evening/"
+      },
+      {
+        "day": 4,
+        "part": "morning",
+        "title": "နေ့ (၄) – နံနက်ခင်း အလုပ်ပေးတရား – သီလမဂ္ဂင် (သမ္မာအာဇီဝ)",
+        "postUrl": "https://winmetta.org/2021/04/19/10-day-retreat-2021-04-16-day-4-morning/"
+      },
+      {
+        "day": 4,
+        "part": "evening",
+        "title": "နေ့ (၄) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2021/04/19/10-day-retreat-2021-04-16-day-4-evening/"
+      },
+      {
+        "day": 5,
+        "part": "morning",
+        "title": "နေ့ (၅) – နံနက်ခင်း အလုပ်ပေးတရား – သမာဓိမဂ္ဂင် (သမ္မာသတိ, သမ္မာဝါယာမ)",
+        "postUrl": "https://winmetta.org/2021/04/20/10-day-retreat-2021-04-16-day-5-morning/"
+      },
+      {
+        "day": 5,
+        "part": "evening",
+        "title": "နေ့ (၅) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2021/04/20/10-day-retreat-2021-04-16-day-5-evening/"
+      },
+      {
+        "day": 6,
+        "part": "morning",
+        "title": "နေ့ (၆) – နံနက်ခင်း အလုပ်ပေးတရား – သမာဓိမဂ္ဂင် (သမ္မာသမာဓိ)",
+        "postUrl": "https://winmetta.org/2021/04/21/10-day-retreat-2021-04-16-day-6-morning/"
+      },
+      {
+        "day": 6,
+        "part": "evening",
+        "title": "နေ့ (၆) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2021/04/21/10-day-retreat-2021-04-16-day-6-evening/"
+      },
+      {
+        "day": 7,
+        "part": "morning",
+        "title": "နေ့ (၇) – နံနက် အလုပ်ပေးတရား – ပညာမဂ္ဂင် (သမ္မာဒိဋ္ဌိ)",
+        "postUrl": "https://winmetta.org/2021/04/22/10-day-retreat-2021-04-16-day-7-morning/"
+      },
+      {
+        "day": 7,
+        "part": "evening",
+        "title": "နေ့ (၇) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2021/04/22/10-day-retreat-2021-04-16-day-7-evening/"
+      },
+      {
+        "day": 8,
+        "part": "morning",
+        "title": "နေ့ (၈) – နံနက် အလုပ်ပေးတရား – ပညာမဂ္ဂင် (သမ္မာသင်္ကပ္ပ)",
+        "postUrl": "https://winmetta.org/2021/04/23/10-day-retreat-2021-04-16-day-8-morning/"
+      },
+      {
+        "day": 8,
+        "part": "evening",
+        "title": "နေ့ (၈) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2021/04/23/10-day-retreat-2021-04-16-day-8-evening/"
+      },
+      {
+        "day": 9,
+        "part": "morning",
+        "title": "နေ့ (၉) – နံနက် အလုပ်ပေးတရား – မဂ္ဂင် (၈) ပါး နှင့် သစ္စာ (၄)ပါး",
+        "postUrl": "https://winmetta.org/2021/04/24/10-day-retreat-2021-04-16-day-9-morning/"
+      },
+      {
+        "day": 9,
+        "part": "evening",
+        "title": "နေ့ (၉) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2021/04/24/10-day-retreat-2021-04-16-day-9-evening/"
+      },
+      {
+        "day": 10,
+        "part": "morning",
+        "title": "နေ့ (၁၀) – နံနက်ခင်း အလုပ်ပေးတရား – အဓိဂမသုတ် (ကုသိုလ်ရကြောင်း တရား ၆ ပါး)",
+        "postUrl": "https://winmetta.org/2021/04/25/https-winmetta-org-2021-04-24-10-day-retreat-2021-04-16-day-10-morning/"
+      },
+      {
+        "day": 10,
+        "part": "evening",
+        "title": "နေ့ (၁၀) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2021/04/25/10-day-retreat-2021-04-16-day-10-evening/"
+      },
+      {
+        "day": 10,
+        "part": "closing",
+        "title": "မြန်မာနှစ်ကူး (၁၀) ရက်တရားစခန်း အောင်ပွဲနေ့",
+        "postUrl": "https://winmetta.org/2021/04/24/10-day-retreat-2021-04-16-day-10-annocement/"
+      }
+    ],
+    "timetables": [
+      {
+        "label": "ဆ ဆက္က ဇယား နှင့် စိတ္တာနုပဿနာ – Sasakka & Seiktanuppasana",
+        "url": "https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2020/07/ဆ-ဆက္က-ဇယား-နှင့်-စိတ္တာနုပဿနာ-Sasakka-Seiktanuppasana32417.pdf"
+      }
+    ],
+    "notes": [],
+    "sourceUrl": "https://winmetta.org/2021-april-10-days-meditation-retreat/",
+    "verifiedAt": "2026-10-05"
+  },
+  {
+    "id": "ghositabhivamsa-01-2020-12",
+    "status": "past",
+    "format": "online",
+    "days": 10,
+    "startDate": "2020-12-25",
+    "endDate": "2021-01-03",
+    "timezone": "America/Los_Angeles",
+    "teacherIds": ["ghositabhivamsa"],
+    "languages": ["my"],
+    "sourceLanguage": "my",
+    "translations": {
+      "my": {
+        "title": "ပထမအကြိမ် 10 ရက် တရားစခန်း",
+        "description": "ဆရာတော် ဦးဃောသိတာဘိဝံသ (မေတ္တာနန္ဒ) ဦးဆောင်သော 10 ရက် တရားစခန်း"
+      },
+      "en": {
+        "title": "1st 10-day retreat",
+        "description": "A 10-day meditation retreat led by Sayadaw U Ghositābhivaṃsa (Mettānanda)."
+      }
+    },
+    "series": "ghositabhivamsa-10-day",
+    "sessions": [
+      {
+        "day": 1,
+        "part": "morning",
+        "title": "နေ့ (၁) – နံနက် သီလခံယူ + ဘုရားဝတ်ပြု + အလုပ်ပေးတရား",
+        "postUrl": "https://winmetta.org/2020/12/25/10-day-retreat-2020-day-1-morning/"
+      },
+      {
+        "day": 1,
+        "part": "evening",
+        "title": "နေ့ (၁) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2020/12/25/10-day-retreat-2020-day-1/"
+      },
+      {
+        "day": 1,
+        "part": "other",
+        "title": "စင်္ကြန်လျှောက်လျှက် တရားရှူမှတ်နည်း",
+        "postUrl": "https://winmetta.org/2020/12/24/walking-mediation/"
+      },
+      {
+        "day": 1,
+        "part": "other",
+        "title": "တရားအလုပ်မဝင်ခင် ကြိုတင်ပြင်…ထိုင်ရှုမှတ်တဲ့ခါ ဘယ်လိုထိုင်မလဲ?",
+        "postUrl": "https://winmetta.org/2020/12/24/preparation-for-sitting-mediation/"
+      },
+      {
+        "day": 2,
+        "part": "morning",
+        "title": "နေ့ (၂) – နံနက် သီလခံယူ + ဘုရားဝတ်ပြု + အလုပ်ပေးတရား",
+        "postUrl": "https://winmetta.org/2020/12/26/10-day-retreat-2020-day-2-morning/"
+      },
+      {
+        "day": 2,
+        "part": "evening",
+        "title": "နေ့ (၂) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2020/12/26/10-day-retreat-2020-day-2/"
+      },
+      {
+        "day": 3,
+        "part": "morning",
+        "title": "နေ့ (၃) – နံနက် သီလခံယူ + ဘုရားဝတ်ပြု + အလုပ်ပေးတရား",
+        "postUrl": "https://winmetta.org/2020/12/27/10-day-retreat-2020-day-3-morning/"
+      },
+      {
+        "day": 3,
+        "part": "evening",
+        "title": "နေ့ (၃) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2020/12/27/10-day-retreat-2020-day-3/"
+      },
+      {
+        "day": 4,
+        "part": "morning",
+        "title": "နေ့ (၄) – နံနက် သီလခံယူ + ဘုရားဝတ်ပြု + အလုပ်ပေးတရား",
+        "postUrl": "https://winmetta.org/2020/12/28/10-day-retreat-2020-day-4-morning/"
+      },
+      {
+        "day": 4,
+        "part": "evening",
+        "title": "နေ့ (၄) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2020/12/28/10-day-retreat-2020-day-4/"
+      },
+      {
+        "day": 5,
+        "part": "morning",
+        "title": "နေ့ (၅) – နံနက် သီလခံယူ + ဘုရားဝတ်ပြု + အလုပ်ပေးတရား",
+        "postUrl": "https://winmetta.org/2020/12/29/10-day-retreat-2020-day-5-morning/"
+      },
+      {
+        "day": 5,
+        "part": "evening",
+        "title": "နေ့ (၅) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2020/12/29/10-day-retreat-2020-day-5/"
+      },
+      {
+        "day": 6,
+        "part": "morning",
+        "title": "နေ့ (၆) – နံနက် သီလခံယူ + ဘုရားဝတ်ပြု + အလုပ်ပေးတရား",
+        "postUrl": "https://winmetta.org/2020/12/30/10-day-retreat-2020-day-6-morning/"
+      },
+      {
+        "day": 6,
+        "part": "evening",
+        "title": "နေ့ (၆) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2020/12/30/10-day-retreat-2020-day-6/"
+      },
+      {
+        "day": 7,
+        "part": "morning",
+        "title": "နေ့ (၇) – နံနက် သီလခံယူ + ဘုရားဝတ်ပြု + အလုပ်ပေးတရား",
+        "postUrl": "https://winmetta.org/2020/12/31/10-day-retreat-2020-day-7-morning/"
+      },
+      {
+        "day": 7,
+        "part": "evening",
+        "title": "နေ့ (၇) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2020/12/31/10-day-retreat-2020-day-7/"
+      },
+      {
+        "day": 8,
+        "part": "morning",
+        "title": "နေ့ (၈) – နံနက် သီလခံယူ + ဘုရားဝတ်ပြု + အလုပ်ပေးတရား",
+        "postUrl": "https://winmetta.org/2021/01/01/10-day-retreat-2020-day-8-morning/"
+      },
+      {
+        "day": 8,
+        "part": "evening",
+        "title": "နေ့ (၈) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2021/01/01/10-day-retreat-2020-day-8/"
+      },
+      {
+        "day": 9,
+        "part": "morning",
+        "title": "နေ့ (၉) – နံနက် သီလခံယူ + ဘုရားဝတ်ပြု + အလုပ်ပေးတရား",
+        "postUrl": "https://winmetta.org/2021/01/02/10-day-retreat-2020-day-9-morning/"
+      },
+      {
+        "day": 9,
+        "part": "evening",
+        "title": "နေ့ (၉) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2021/01/02/10-day-retreat-2020-day-9/"
+      },
+      {
+        "day": 10,
+        "part": "morning",
+        "title": "နေ့ (၁၀) – နံနက် သီလခံယူ + ဘုရားဝတ်ပြု + အလုပ်ပေးတရား",
+        "postUrl": "https://winmetta.org/2021/01/03/10-day-retreat-2020-day-10-morning/"
+      },
+      {
+        "day": 10,
+        "part": "evening",
+        "title": "နေ့ (၁၀) – ညနေ တရားနာယူခြင်း",
+        "postUrl": "https://winmetta.org/2021/01/03/10-day-retreat-2020-day-10/"
+      }
+    ],
+    "timetables": [
+      {
+        "label": "Daily Meditation Retreat Time Table",
+        "url": "https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2020/12/Daly-Meditation-Retreat-Time-Table.pdf"
+      }
+    ],
+    "notes": [],
+    "sourceUrl": "https://winmetta.org/2020-dec-10-days-meditation-retreat/",
+    "verifiedAt": "2026-10-05"
+  }
+]

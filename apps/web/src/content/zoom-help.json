@@ -1,0 +1,242 @@
+{
+  "en": [
+    {
+      "id": "install",
+      "icon": "⬇️",
+      "heading": "1. Install Zoom",
+      "paragraphs": ["It is free. You do not need a Zoom account to join."],
+      "links": [
+        {
+          "label": "iPhone and iPad (App Store)",
+          "url": "https://apps.apple.com/us/app/id546505307",
+          "icon": "📱"
+        },
+        {
+          "label": "Android (Google Play)",
+          "url": "https://play.google.com/store/apps/details?id=us.zoom.videomeetings",
+          "icon": "🤖"
+        },
+        {
+          "label": "Windows and Mac (Zoom download center)",
+          "url": "https://zoom.us/download",
+          "icon": "💻"
+        }
+      ]
+    },
+    {
+      "id": "name",
+      "icon": "✏️",
+      "heading": "2. Set your name before joining",
+      "items": [
+        {
+          "icon": "⚠️",
+          "text": "Most classes do not let you rename yourself after you join. The meeting is public, so this keeps everyone safe."
+        },
+        {
+          "icon": "✅",
+          "text": "Type your correct name in the name box on Zoom's join screen."
+        },
+        {
+          "icon": "🔢",
+          "text": "For retreats, type your yogi number before your name."
+        },
+        {
+          "icon": "🔁",
+          "text": "Joined with the wrong name? Leave the meeting and join again with the right one."
+        }
+      ]
+    },
+    {
+      "id": "join",
+      "icon": "🚪",
+      "heading": "3. Join a class",
+      "steps": [
+        "Tap Join on Zoom on the class card at class time.",
+        "Or open Zoom, tap Join, and type the meeting ID.",
+        "Check your name is correct. You usually cannot change it after joining.",
+        "Type the passcode if asked: metta.",
+        "Wait to be admitted, then choose audio."
+      ]
+    },
+    {
+      "id": "audio",
+      "icon": "🎤",
+      "heading": "4. Microphone and camera",
+      "items": [
+        {
+          "icon": "🔇",
+          "text": "Stay muted while the Sayadaw speaks."
+        },
+        {
+          "icon": "🎤",
+          "text": "Tap Unmute to speak, Mute when done."
+        },
+        {
+          "icon": "🎥",
+          "text": "Start Video or Stop Video turns your camera on or off."
+        },
+        {
+          "icon": "👆",
+          "text": "On a phone, tap the screen if the buttons are hidden."
+        }
+      ]
+    },
+    {
+      "id": "raise-hand",
+      "icon": "✋",
+      "heading": "5. Raise your hand",
+      "items": [
+        {
+          "icon": "📱",
+          "text": "Phone or tablet: tap the screen, then More, then Raise Hand."
+        },
+        {
+          "icon": "💻",
+          "text": "Computer: choose Reactions, then Raise Hand."
+        },
+        {
+          "icon": "👇",
+          "text": "Lower your hand the same way when you finish."
+        }
+      ]
+    },
+    {
+      "id": "breakout",
+      "icon": "👥",
+      "heading": "6. Breakout rooms",
+      "paragraphs": [
+        "In online retreats the host may invite you to a breakout room to ask the Sayadaw a personal question."
+      ],
+      "items": [
+        {
+          "icon": "✅",
+          "text": "When the invitation appears, choose Join."
+        },
+        {
+          "icon": "↩️",
+          "text": "Choose Leave Room to return to the main meeting."
+        }
+      ]
+    }
+  ],
+  "my": [
+    {
+      "id": "install",
+      "icon": "⬇️",
+      "heading": "၁။ Zoom ထည့်သွင်းရန်",
+      "paragraphs": ["အခမဲ့ ဖြစ်ပါသည်။ တက်ရောက်ရန် Zoom account မလိုပါ။"],
+      "links": [
+        {
+          "label": "iPhone နှင့် iPad (App Store)",
+          "url": "https://apps.apple.com/us/app/id546505307",
+          "icon": "📱"
+        },
+        {
+          "label": "Android (Google Play)",
+          "url": "https://play.google.com/store/apps/details?id=us.zoom.videomeetings",
+          "icon": "🤖"
+        },
+        {
+          "label": "Windows နှင့် Mac (Zoom download center)",
+          "url": "https://zoom.us/download",
+          "icon": "💻"
+        }
+      ]
+    },
+    {
+      "id": "name",
+      "icon": "✏️",
+      "heading": "၂။ မဝင်ခင် အမည်မှန်မှန် ထည့်ပါ",
+      "items": [
+        {
+          "icon": "⚠️",
+          "text": "သင်တန်းအများစုတွင် ဝင်ပြီးနောက် အမည်ပြောင်းခွင့် မပေးပါ။ အစည်းအဝေးသည် အများပြည်သူ ဝင်ရောက်နိုင်သဖြင့် လုံခြုံရေးအတွက် ဖြစ်ပါသည်။"
+        },
+        {
+          "icon": "✅",
+          "text": "Zoom ၏ ဝင်ရောက်မည့်မျက်နှာပြင်ရှိ အမည်ကွက်တွင် မိမိအမည်မှန်ကို ရိုက်ထည့်ပါ။"
+        },
+        {
+          "icon": "🔢",
+          "text": "တရားစခန်းတွင် ယောဂီနံပါတ်ကို အမည်ရှေ့တွင် ရိုက်ထည့်ပါ။"
+        },
+        {
+          "icon": "🔁",
+          "text": "အမည်မှားဝင်မိပါက အစည်းအဝေးမှ ထွက်ပြီး အမည်မှန်ဖြင့် ပြန်ဝင်ပါ။"
+        }
+      ]
+    },
+    {
+      "id": "join",
+      "icon": "🚪",
+      "heading": "၃။ သင်တန်းသို့ ဝင်ရန်",
+      "steps": [
+        "သင်တန်းချိန်တွင် သင်တန်းကတ်ပြားရှိ Zoom တွင် ဝင်ရန် ကိုနှိပ်ပါ။",
+        "သို့မဟုတ် Zoom ကိုဖွင့်ပြီး Join ကိုနှိပ်ကာ အစည်းအဝေးနံပါတ် ရိုက်ထည့်ပါ။",
+        "အမည်မှန်မမှန် စစ်ပါ။ ဝင်ပြီးနောက် ပြောင်းခွင့် များသောအားဖြင့် မရှိပါ။",
+        "စကားဝှက် တောင်းပါက metta ဟု ရိုက်ပါ။",
+        "ဝင်ခွင့်ပေးသည်အထိ စောင့်ပြီး အသံကို ရွေးပါ။"
+      ]
+    },
+    {
+      "id": "audio",
+      "icon": "🎤",
+      "heading": "၄။ မိုက်ခရိုဖုန်းနှင့် ကင်မရာ",
+      "items": [
+        {
+          "icon": "🔇",
+          "text": "ဆရာတော် သင်ကြားနေစဉ် မိုက်ကို ပိတ်ထားပါ။"
+        },
+        {
+          "icon": "🎤",
+          "text": "ပြောရန် Unmute ကိုနှိပ်ပြီး ပြီးလျှင် Mute ပြန်နှိပ်ပါ။"
+        },
+        {
+          "icon": "🎥",
+          "text": "Start Video / Stop Video ဖြင့် ကင်မရာကို ဖွင့်ပိတ်ပါ။"
+        },
+        {
+          "icon": "👆",
+          "text": "ဖုန်းတွင် ခလုတ်မမြင်ပါက မျက်နှာပြင်ကို တို့ပါ။"
+        }
+      ]
+    },
+    {
+      "id": "raise-hand",
+      "icon": "✋",
+      "heading": "၅။ လက်ထောင်ရန်",
+      "items": [
+        {
+          "icon": "📱",
+          "text": "ဖုန်း / တက်ဘလက်: မျက်နှာပြင်ကို တို့ပြီး More၊ ထို့နောက် Raise Hand ကိုနှိပ်ပါ။"
+        },
+        {
+          "icon": "💻",
+          "text": "ကွန်ပျူတာ: Reactions ကိုရွေးပြီး Raise Hand ကိုရွေးပါ။"
+        },
+        {
+          "icon": "👇",
+          "text": "ပြောပြီးလျှင် လက်ကို ထိုနည်းတူပြန်ချပါ။"
+        }
+      ]
+    },
+    {
+      "id": "breakout",
+      "icon": "👥",
+      "heading": "၆။ Breakout room",
+      "paragraphs": [
+        "အွန်လိုင်းတရားစခန်းတွင် ဆရာတော်ထံ ကိုယ်ပိုင်မေးခွန်း မေးနိုင်ရန် host က breakout room သို့ ဖိတ်ခေါ်နိုင်ပါသည်။"
+      ],
+      "items": [
+        {
+          "icon": "✅",
+          "text": "ဖိတ်ခေါ်ချက်ပေါ်လျှင် Join ကိုရွေးပါ။"
+        },
+        {
+          "icon": "↩️",
+          "text": "ပင်မအစည်းအဝေးသို့ ပြန်လိုပါက Leave Room ကိုရွေးပါ။"
+        }
+      ]
+    }
+  ]
+}

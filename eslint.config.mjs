@@ -1,7 +1,7 @@
 import js from '@eslint/js';
 import ts from 'typescript-eslint';
 import astro from 'eslint-plugin-astro';
-import a11y from 'eslint-plugin-jsx-a11y';
+import a11y from 'eslint-plugin-jsx-a11y-x';
 import globals from 'globals';
 
 export default ts.config(
@@ -22,9 +22,5 @@ export default ts.config(
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
     rules: { '@typescript-eslint/no-explicit-any': 'error' },
   },
-  {
-    files: ['**/*.tsx'],
-    plugins: { 'jsx-a11y': a11y },
-    rules: a11y.configs.recommended.rules,
-  },
+  { files: ['**/*.tsx'], ...a11y.configs.recommended },
 );

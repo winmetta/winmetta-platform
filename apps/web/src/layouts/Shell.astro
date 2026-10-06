@@ -2,15 +2,34 @@
 import '../styles/global.css';
 import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 import { locales, localeCodes, type Locale } from '../i18n/locales';
-import { route } from '../i18n/routes';
+import { pagePaths, route, type PageId } from '../i18n/routes';
 import { t } from '../i18n/messages';
 import { allowIndexing } from '../lib/site';
 interface Props {
   locale: Locale;
   title: string;
+  page?: PageId;
+  /** Path after the locale for pages that are not in pagePaths, e.g. dhamma-library/folders/f001/. */
+  path?: string;
 }
-const { locale, title } = Astro.props;
-const canonical = new URL(route(locale), Astro.site);
+const { locale, title, page = 'home', path } = Astro.props;
+const href = (code: Locale) => (path ? `/${code}/${path}` : route(code, page));
+const canonical = new URL(href(locale), Astro.site);
+// Only built pages are listed here; add Classes, Study groups, Retreats and Teachers as they land.
+const navItems = [
+  {
+    page: 'classes',
+    label: 'navClasses',
+    children: [
+      { page: 'teachers', label: 'navTeachers' },
+      { page: 'retreats', label: 'navRetreats' },
+    ],
+  },
+  { page: 'studyGroups', label: 'navStudyGroups' },
+  { page: 'library', label: 'navLibrary' },
+] as const;
+const inLibrary =
+  page === 'library' || Boolean(path?.startsWith('dhamma-library/'));
 ---
 
 <!doctype html>
@@ -26,30 +45,145 @@ const canonical = new URL(route(locale), Astro.site);
         <link
           rel="alternate"
           hreflang={code}
-          href={new URL(route(code), Astro.site)}
+          href={new URL(href(code), Astro.site)}
         />
       ))
     }
     <link rel="alternate" hreflang="x-default" href={Astro.site} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#ffffff" />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
   </head>
-  <body>
-    <a href="#main" class="sr-only focus:not-sr-only focus:block focus:p-4"
-      >{t(locale, 'skip')}</a
-    >
-    <header
-      class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-5 py-5"
-    >
-      <a href={route(locale)} class="font-bold">{t(locale, 'brand')}</a>
-      <LanguageSwitcher locale={locale} />
+  <body class="flex min-h-screen flex-col">
+    <a href="#main" class="skip-link">{t(locale, 'skip')}</a>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a href={route(locale)} class="brand">
+          <img src="/logo-96.png" width="44" height="44" alt="" />
+          <span>{t(locale, 'brand')}</span>
+        </a>
+        <button
+          type="button"
+          class="menu-button"
+          aria-expanded="false"
+          aria-controls="site-nav"
+          data-menu
+        >
+          {t(locale, 'menu')}
+        </button>
+        <nav id="site-nav" class="site-nav" aria-label={t(locale, 'navMain')}>
+          {
+            navItems.map((item) => {
+              const current = (target: string) =>
+                page === target
+                  ? 'page'
+                  : target === 'library' && inLibrary
+                    ? 'true'
+                    : target === 'classes' && path?.startsWith('classes/')
+                      ? 'true'
+                      : undefined;
+              const link = (
+                <a
+                  href={route(locale, item.page)}
+                  class="nav-link"
+                  aria-current={
+                    current(item.page) ??
+                    ('children' in item &&
+                    item.children.some((child) => child.page === page)
+                      ? 'true'
+                      : undefined)
+                  }
+                >
+                  {t(locale, item.label)}
+                </a>
+              );
+              return 'children' in item ? (
+                <div class="nav-group">
+                  {link}
+                  <ul class="nav-sub">
+                    {item.children.map((child) => (
+                      <li>
+                        <a
+                          href={route(locale, child.page)}
+                          class="nav-sublink"
+                          aria-current={
+                            page === child.page ||
+                            Boolean(path?.startsWith(pagePaths[child.page]))
+                              ? 'page'
+                              : undefined
+                          }
+                        >
+                          {t(locale, child.label)}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                link
+              );
+            })
+          }
+        </nav>
+        <LanguageSwitcher locale={locale} />
+      </div>
     </header>
-    <main
-      id="main"
-      class="mx-auto min-h-64 max-w-5xl space-y-6 px-5 py-8 sm:py-12"
-    >
+    <main id="main" class="page">
       <slot />
     </main>
-    <footer class="mx-auto max-w-5xl px-5 py-6 text-sm">
-      {t(locale, 'footer')}
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <nav
+          aria-label={t(locale, 'footerNav')}
+          class="-ms-3 flex flex-wrap items-center gap-x-1"
+        >
+          <a
+            href={route(locale, 'about')}
+            class="footer-link"
+            aria-current={page === 'about' ? 'page' : undefined}
+            >{t(locale, 'navAbout')}</a
+          >
+          <a
+            href={route(locale, 'privacy')}
+            class="footer-link"
+            aria-current={page === 'privacy' ? 'page' : undefined}
+            >{t(locale, 'navPrivacy')}</a
+          >
+          <a
+            href={route(locale, 'zoomHelp')}
+            class="footer-link"
+            aria-current={page === 'zoomHelp' ? 'page' : undefined}
+            >{t(locale, 'navZoomHelp')}</a
+          >
+          <a href="https://winmetta.org/" class="footer-link" rel="noopener"
+            >winmetta.org</a
+          >
+        </nav>
+        <p class="muted">{t(locale, 'footerNote')}</p>
+      </div>
     </footer>
+    <script>
+      // Phones: the menu button shows and hides the navigation. Without JavaScript the links stay visible.
+      const button = document.querySelector<HTMLButtonElement>('[data-menu]');
+      const nav = document.getElementById('site-nav');
+      if (button && nav) {
+        const set = (open: boolean) => {
+          button.setAttribute('aria-expanded', String(open));
+          nav.toggleAttribute('data-open', open);
+        };
+        button.addEventListener('click', () =>
+          set(button.getAttribute('aria-expanded') !== 'true'),
+        );
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape' && nav.hasAttribute('data-open')) {
+            set(false);
+            button.focus();
+          }
+        });
+      }
+    </script>
   </body>
 </html>

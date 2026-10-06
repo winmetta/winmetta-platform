@@ -9,7 +9,7 @@ describe('locale contracts', () => {
       'translation keys',
     );
     expect(() =>
-      validateMessages({ ...messages, my: { ...messages.my, smoke: '' } }),
+      validateMessages({ ...messages, my: { ...messages.my, brand: '' } }),
     ).toThrow();
   });
   it('preserves page, search and fragment while changing locale', () => {

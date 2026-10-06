@@ -1,0 +1,31 @@
+---
+import Shell from '../../../../layouts/Shell.astro';
+import TeacherCard from '../../../../components/TeacherCard.astro';
+import { localeCodes, type Locale } from '../../../../i18n/locales';
+import { t } from '../../../../i18n/messages';
+import { allTeachers } from '../../../../lib/teachers';
+export function getStaticPaths() {
+  return localeCodes.map((locale) => ({
+    params: { locale },
+    props: { locale },
+  }));
+}
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+---
+
+<Shell locale={locale} title={t(locale, 'teachersTitle')} page="teachers">
+  <header class="space-y-4">
+    <h1 class="text-3xl font-bold sm:text-4xl">{t(locale, 'teachersTitle')}</h1>
+    <p class="lead">{t(locale, 'teachersIntro')}</p>
+  </header>
+  <ul class="grid gap-4 sm:grid-cols-2">
+    {
+      allTeachers.map((teacher) => (
+        <TeacherCard teacher={teacher} locale={locale} />
+      ))
+    }
+  </ul>
+</Shell>

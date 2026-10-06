@@ -1,0 +1,49 @@
+---
+import type { FolderNode, FolderTree } from '../lib/library-folders';
+import { languageOf } from '../lib/library-index';
+import { folderRoute } from '../i18n/routes';
+import { t } from '../i18n/messages';
+import { locales, type Locale } from '../i18n/locales';
+import { formatCount, isSingular } from '../lib/library-url';
+import FolderTreeSelf from './FolderTree.astro';
+interface Props {
+  tree: FolderTree;
+  nodes: FolderNode[];
+  locale: Locale;
+  /** Show subfolders nested under each folder. */
+  nested?: boolean;
+}
+const { tree, nodes, locale, nested = false } = Astro.props;
+const formatLocale = locales[locale].formatLocale;
+---
+
+<ul class="tree">
+  {
+    nodes.map((node) => (
+      <li>
+        <a
+          class="tree-row"
+          href={folderRoute(locale, node.id)}
+          lang={languageOf(node.name)}
+        >
+          <span class="font-medium">{node.name}</span>
+          <span class="badge" lang={locale}>
+            {formatCount(node.total, formatLocale)}{' '}
+            {t(
+              locale,
+              isSingular(node.total, formatLocale) ? 'bookOne' : 'bookOther',
+            )}
+          </span>
+        </a>
+        {nested && node.childIds.length > 0 && (
+          <FolderTreeSelf
+            tree={tree}
+            locale={locale}
+            nodes={node.childIds.flatMap((id) => tree.nodes.get(id) ?? [])}
+            nested
+          />
+        )}
+      </li>
+    ))
+  }
+</ul>

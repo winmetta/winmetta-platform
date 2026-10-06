@@ -18,7 +18,7 @@ Separately, there is a well-documented and largely unaddressed gap: the Burmese 
 
 ## 2. Target Audience
 
-The platform has **two primary user groups**: students attending online Zoom classes, and anonymous independent learners worldwide seeking Burmese-language and Dhamma (Buddhist teachings) resources. Both groups have equal access without login; neither enrollment nor Burmese heritage is required. The five bilingual pages (Phase 1) serve both from launch (implementation-plan.md §3). Personas are deferred to the future plan (§8).
+The platform has **two primary user groups**: students attending online Zoom classes, and anonymous independent learners worldwide seeking Burmese-language and Dhamma (Buddhist teachings) resources. Both groups have equal access without login; neither enrollment nor Burmese heritage is required. The bilingual pages (Phase 1) serve both from launch (implementation-plan.md §3). Personas are deferred to the future plan (§8).
 
 ---
 
@@ -68,8 +68,8 @@ No account is required to set or use these preferences — they are stored local
 
 * **Classes and Dhamma Library are the two main page groups**, primarily serving online students and independent learners respectively, with access open to both. Class pages link to relevant library resources.
 * **Dhamma Resources is part of Dhamma Library**, not a separate top-level page. The unified library supports books, PDF files, mobile/desktop app URLs, audio, video, images, slides, blog posts and other curated links.
-* Phase 1 provides **basic** search (case-insensitive substring match over English/Burmese titles, descriptions, author/teacher names and tags) plus category, content-type and language filters over a small curated collection, with browse navigation, clear filters, empty states and shareable query/filter URLs. Full-featured search is Phase 4.
-* Keep subject categories, resource types, file formats and app platforms distinct. A book can have a PDF download, and an app can have mobile/desktop links within one entry. Preserve source language and attribution. Full-text indexing, OCR, transcripts and ranked/fuzzy search are future work (Phase 4).
+* Phase 1 **indexes every PDF in the existing S3 bucket** (about 3,000 files, mostly Burmese books; already public via winmetta.org). Most visitors type Burmese words and do not know a title or author, so search is **fuzzy** and surfaces similar books, built on MiniSearch with Burmese-aware normalization (ဥ/ဉ and Burmese/ASCII digits treated as equal). Folders become **tags** (number prefix removed; each path segment is a tag) used for folder-style browsing and filtering, with clear filters, empty states and shareable query/tag URLs. Apps, blog links and other non-S3 items stay curated. Details: tech-architecture.md §3.
+* Keep subject categories, resource types, file formats and app platforms distinct. A book can have a PDF download, and an app can have mobile/desktop links within one entry. Preserve source language and attribution. Full-text indexing inside PDFs, OCR and transcripts are future work (Phase 4).
 * A unified class archive: recordings and descriptions per teacher/series pulled together from YouTube and Facebook into one browsable, searchable timeline (e.g., "Paṭṭhāna course episode 115") so students aren't hunting across three platforms.
 * **Link out to, rather than rebuild, existing best-in-class Tipiṭaka reader apps** (e.g., Tipitaka.app, tipitakapali.org) for full canonical-text search — that problem is already well solved.
 * **Rights check required before republishing:** confirm copyright/attribution status of JPTS (Journal of the Pali Text Society) material and other rare-book scans; only host what Win Metta has the right to redistribute.
@@ -86,7 +86,7 @@ No account is required to set or use these preferences — they are stored local
 * English (`en`) and Burmese (`my`) are the launch interface languages. Phase 0 builds the localization foundation; Phase 1 delivers translated versions of all five starter pages and shared navigation, with locale-prefixed routes and a same-page language switcher.
 * Design for additional languages/locales through a central locale registry, keyed UI messages, localized content records and locale-aware formatting. Interface language, source material language and timezone are separate fields; linked teachings need not exist in every UI language. See implementation-plan.md §2 and tech-architecture.md §5 for fallback and validation rules.
 
-* All Burmese-script content in v1 is **Unicode-only**. Legacy Zawgyi encoding is explicitly out of scope for now (full rationale and the reason Zawgyi support may be needed later is documented in [tech-architecture.md](tech-architecture.md)).
+* All Burmese-script content in v1 is **Unicode-only**. Legacy Zawgyi encoding is out of scope for UI text and curated content, except that the library manifest generator converts Zawgyi filenames in the S3 bucket to Unicode for review (see [tech-architecture.md](tech-architecture.md) §5).
 
 ### 4.6. Geographic & Access Considerations
 
@@ -102,7 +102,7 @@ Explicitly deferred, not abandoned:
 * **Cross-device account sync of LLB lesson progress and library bookmarks** (not "playlists" — that was a feature of an earlier, pre-pivot version of this product). A tentative auth approach is sketched in tech-architecture.md §10 for when Phase 5 arrives.
 * **Community submissions & moderated reflections queue.**
 * **Native mobile apps** (Electron/Capacitor builds). v1 targets a single responsive web app designed for mobile and desktop; native wrappers are evaluated only after the web app validates real usage.
-* **Zawgyi legacy encoding support** — see §4.5 and tech-architecture.md.
+* **Zawgyi legacy encoding support** — see §4.5 and tech-architecture.md. This includes searching the library with Zawgyi-typed queries: v1 search assumes Unicode input, and supporting Zawgyi input is a future improvement with no scheduled phase or date (tech-architecture.md §10).
 * **Product analytics and metric collection** — deferred beyond v1; no analytics scripts or learner-event collection in Phase 0–2. Local progress remains available for the learner.
 * **A/B testing / experimentation tooling** — deferred until there's a concrete, mission-aligned question worth testing (not for engagement optimization, which conflicts with Calm by Default). Tentative notes in tech-architecture.md §9 for when it's needed.
 
@@ -117,7 +117,7 @@ Explicitly deferred, not abandoned:
   * International precedent exists for this kind of funding outside the US (e.g., EU Erasmus+-funded minority/heritage-language projects like IndyLan) — worth researching comparable programs in the UK, Australia, and Singapore rather than assuming grants are US-only.
 * **Volunteer-driven delivery model:** curriculum digitization, translation/transcription, and much of the initial build will likely rely on volunteer labor from the congregation and diaspora rather than paid staff. Project scope (see Phased Roadmap) should be sized to realistic volunteer capacity, not to a full commercial engineering team's output.
 * **Low fixed-cost infrastructure by design:** v1 is a static web app with no server or database to run, so hosting stays cheap and maintenance stays light without earned revenue.
-* **Free nonprofit programs first, paid tools when worthwhile:** prefer free services and nonprofit grants (e.g. the Azure for Nonprofits grant). Paying for tooling is fine when it saves volunteer time or reduces risk; donations may fund tech development and maintenance.
+* **Free nonprofit programs first, paid tools when worthwhile:** prefer free services and nonprofit grants (for example any AWS nonprofit credits; permanent hosting never depends on a grant that can lapse). Paying for tooling is fine when it saves volunteer time or reduces risk; donations may fund tech development and maintenance.
 * **Popular, well-supported tools:** choose widely used stacks with large communities and good documentation so volunteers can learn them easily and the project stays maintainable for years.
 * **Explicitly not pursued:** ads, data-selling, or paywalls on core Dhamma or language content. A possible future option (not part of v1) is earned revenue from physical book publishing/compilations or in-person retreat logistics, noted here only as a future possibility.
 
@@ -145,14 +145,14 @@ Metric collection is deferred beyond v1. Do not instrument these outcomes or add
                                            |
                                            v
 +---------------------------------------------------------------------------------------+
-| Phase 1: Five Bilingual Pages                                                          |
-| Home, About, Privacy, Classes, Dhamma Library (basic search) in English and Burmese    |
+| Phase 1: Bilingual Pages                                                               |
+| Home, About, Privacy, Classes, Dhamma Library (S3 index, fuzzy search); en + my        |
 +---------------------------------------------------------------------------------------+
                                            |
                                            v
 +---------------------------------------------------------------------------------------+
 | Phase 2: Infrastructure & Deployment                                                   |
-| Terraform, domains, AWS S3 + bunny.net CDN; staging and production, public launch      |
+| Pulumi, domains, AWS S3 + bunny.net CDN; staging and production, public launch      |
 +---------------------------------------------------------------------------------------+
                                            |
                                            v
@@ -164,7 +164,7 @@ Metric collection is deferred beyond v1. Do not instrument these outcomes or add
                                            v
 +---------------------------------------------------------------------------------------+
 | Phase 4: Library & Class Archive Expansion                                             |
-| More curated content, unified class archive, full-featured search                      |
+| S3 upload and index pipeline, class archive, full-text/OCR search, more content        |
 +---------------------------------------------------------------------------------------+
                                            |
                                            v
@@ -181,10 +181,10 @@ Metric collection is deferred beyond v1. Do not instrument these outcomes or add
 ```
 
 * **Phase 0 — Foundation Code:** Public MIT-licensed repo, tooling, basic CI, and an Astro app with all needed libraries and English/Burmese localization support. No real pages or content and no deployment. See implementation-plan.md §2.
-* **Phase 1 — Five Bilingual Pages:** Home, About, Privacy, Classes and Dhamma Library (basic search) in English and Burmese, with an original mobile/desktop design, serving online class students and independent learners worldwide. Adds the CI deploy workflow to a single non-public review app. See implementation-plan.md §3.
-* **Phase 2 — Infrastructure & Deployment:** Terraform, domains (`app.winmetta.org`), Azure, AWS S3 media storage with bunny.net CDN, Cloudflare DNS, and staging and production environments with promotion. The site becomes public here. See implementation-plan.md §4. No backend or database.
+* **Phase 1 — Bilingual Pages:** Home, About, Privacy, the Classes group (classes with a weekly schedule, Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library (the whole S3 PDF library with tag browsing and fuzzy Burmese search) in English and Burmese, with an original mobile/desktop design, serving online class students and independent learners worldwide. No hosting or deployment yet. See implementation-plan.md §3.
+* **Phase 2 — Infrastructure & Deployment:** Pulumi (TypeScript), domains (`app.winmetta.org`), AWS hosting (S3 + CloudFront), AWS S3 media storage with bunny.net CDN (already used for the Dhamma Library PDFs), Route 53 DNS for `app.winmetta.org`, and staging and production environments with promotion. The site becomes public here. See implementation-plan.md §4. No backend or database.
 * **Phase 3 — LLB Pilot:** The flagship learning deliverable. Digitizes the LLB curriculum, proven and already-tested; piloted directly with the existing "Let's Learn Burmese" class roster (currently taught by Ven. U Garudhamma) before wider release.
-* **Phase 4 — Library & Class Archive Expansion:** Expands the Phase 1 library with more curated content, a unified class timeline, and full-featured search; evaluate deeper content indexing when needed.
+* **Phase 4 — Library & Class Archive Expansion:** Defines the repeatable pipeline for adding PDFs to S3 and refreshing the index and pages (generator, review PR, CI checks, deploy; see tech-architecture.md §3), plus a unified class timeline and deeper content indexing (full-text, OCR, transcripts) when needed.
 * **Phase 5 — Optional Accounts & Progress Sync:** Cross-device sync for learners who want it, opt-in only. This is likely where a backend and database are first introduced (tentative; see tech-architecture.md §10).
 * **Phase 6 — Future Plan:** Monastic-facing content tools, community submissions/moderation, native mobile apps, and further curricula beyond LLB (e.g. PGTP, the natural next step, may be pulled forward once LLB is validated — plans can change).
 

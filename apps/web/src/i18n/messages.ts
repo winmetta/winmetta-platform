@@ -9,6 +9,22 @@ export type MessageKey = keyof typeof en;
 export function t(locale: Locale, key: MessageKey): string {
   return messages[locale][key];
 }
+/** Fills `{name}` placeholders. Throws if a value is missing, so a typo is caught at build time. */
+export function format(
+  template: string,
+  values: Record<string, string | number>,
+): string {
+  return template.replace(/\{(\w+)\}/g, (_match, name: string) => {
+    const value = values[name];
+    if (value === undefined) throw new Error(`Missing value for {${name}}`);
+    return String(value);
+  });
+}
+const placeholdersOf = (template: string): string =>
+  [...template.matchAll(/\{(\w+)\}/g)]
+    .map((match) => match[1])
+    .sort()
+    .join(',');
 export function validateMessages(
   catalogs: Record<string, Record<string, string>> = messages,
 ): void {
@@ -24,6 +40,12 @@ export function validateMessages(
       throw new Error(
         `Missing, empty or unexpected translation keys for ${locale}`,
       );
+    }
+    // Every locale must use the same {placeholders} as English for the same key.
+    for (const [key, value] of Object.entries(catalog)) {
+      const source = (en as Record<string, string>)[key] ?? '';
+      if (placeholdersOf(value) !== placeholdersOf(source))
+        throw new Error(`Placeholders differ for "${key}" in ${locale}`);
     }
   }
 }

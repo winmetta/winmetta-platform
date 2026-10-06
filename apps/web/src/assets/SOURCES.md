@@ -1,0 +1,14 @@
+# Image sources
+
+Images copied from winmetta.org (the organization's own published content). Run the importers to refresh.
+
+| File                          | Source URL                                                                                                                                                                                                                        | Retrieved  |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| people/ghositabhivamsa.jpeg   | https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2022/07/U-Ghositabhivamda-profile-1.jpeg                                                                                                                        | 2026-10-04 |
+| people/garudhamma.jpeg        | https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2022/06/ugarudhamma-profile2-1.jpeg                                                                                                                             | 2026-10-04 |
+| people/kelasa.png             | https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2023/06/Ashin-Kelasa-profile-image-for-Pali-Sutta-Reading-Class.png                                                                                             | 2026-10-04 |
+| people/kovida.jpg             | https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2023/11/Ashin-Kovida-bio.jpg                                                                                                                                    | 2026-10-04 |
+| people/kumarabhivamsa.jpg     | https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2022/03/Kumara%CC%84bhivam%CC%A3sa-sm.jpg                                                                                                                       | 2026-10-04 |
+| people/janakabhivamsa.jpg     | https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2022/03/%E1%80%98%E1%80%92%E1%80%B9%E1%80%92%E1%80%94%E1%80%B9%E1%80%90%E1%80%87%E1%80%94%E1%80%80%E1%80%AC%E1%80%98%E1%80%AD%E1%80%9D%E1%80%B6%E1%80%9E-sm.jpg | 2026-10-04 |
+| people/pannadhikalankara.jpeg | https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2022/08/panaadica-4.jpeg                                                                                                                                        | 2026-10-04 |
+| people/kundadhana.jpeg        | https://bunny-wp-pullzone-vixrt9neqs.b-cdn.net/wp-content/uploads/2025/03/U-Kun_Photo-31-2.jpeg                                                                                                                                   | 2026-10-04 |
