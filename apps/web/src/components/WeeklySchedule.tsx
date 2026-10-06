@@ -160,7 +160,7 @@ export default function WeeklySchedule({
         role="region"
         aria-label={labels.caption}
         // Focusable so keyboard users can scroll the table sideways.
-        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+        // eslint-disable-next-line jsx-a11y-x/no-noninteractive-tabindex
         tabIndex={0}
       >
         <table className="schedule">
