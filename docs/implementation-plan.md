@@ -18,7 +18,7 @@ Public GitHub repo [`winmetta/winmetta-platform`](https://github.com/winmetta/wi
 | --- | --- | --- |
 | Node.js | 24.x (Active LTS) | Node 22 is Maintenance LTS only (EOL April 2027). |
 | npm | 11.x | Bundled with Node 24. |
-| TypeScript | ^6.0 | TS 7 is beta — don't build on it yet. |
+| TypeScript | ^6.0 | TS 7.0 is stable, but `typescript-eslint` supports only TypeScript below 6.1 (checked 2026-10-06), so stay on 6.x until it supports 7. |
 | Turborepo | ^2.11 | |
 | Astro | ^7.3 | Static-first pages, React islands. |
 | React | ^19.3 | Islands only, not the whole app shell. |

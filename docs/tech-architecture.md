@@ -45,14 +45,14 @@ Core content must always work with **no account and no login** (PRD §4.6).
 
 ## 2. Technology Choices (v1)
 
-Versions are a baseline as of September 2026 — re-check before kickoff.
+Versions were checked against the npm registry, the Node.js release schedule and GitHub releases on 2026-10-06; re-check before upgrading and never copy a version from memory. A newer major exists for npm (12.2, while Node 24 bundles npm 11); adopt it deliberately, not by default. Linting uses ESLint 10 with `typescript-eslint`, `eslint-plugin-astro` 3 and `eslint-plugin-jsx-a11y-x`, the maintained fork of `eslint-plugin-jsx-a11y` (the original's latest release, 6.10.2, does not support ESLint 10; the fork's rules are named `jsx-a11y-x/…`). Switch back to the original if it adds ESLint 10 support (checked 2026-10-06).
 
 | Layer | Selection | Version baseline | Why |
 | --- | --- | --- | --- |
 | Runtime | **Node.js** | 24.x (Active LTS) | Longest support runway. Node 22 is Maintenance LTS (EOL April 2027). |
 | Package manager | **npm** | 11.x (bundled) | No extra tool for contributors to learn. |
 | Monorepo | **Turborepo + npm workspaces** | ^2.11 | Lightweight, standard Node tooling. |
-| Language | **TypeScript** (strict) | ^6.0 | TS 7 (native rewrite) is in beta — track it, don't build on it yet. |
+| Language | **TypeScript** (strict) | ^6.0 | TypeScript 7.0 is stable (7.0.2 on npm as of 2026-10-06), but `typescript-eslint` 8.71 supports only TypeScript below 6.1, so stay on 6.x until it supports 7. |
 | Web app | **Astro** + **React** islands | Astro ^7.3, React ^19.3 | Ships almost no JS by default; pre-renders content for SEO and low-bandwidth connections and supported devices; React only where interactivity is needed. |
 | Content & schemas | **Astro content collections** with **Zod** | — | Zod is Astro's built-in schema layer and the most popular TypeScript validator. Content lives in the repo as Markdown/JSON. |
 | Styling / UI | **Tailwind CSS + shadcn/ui** | Tailwind ^4.3 | Widely used; components are copied into the repo, so no dependency abandonment risk. |

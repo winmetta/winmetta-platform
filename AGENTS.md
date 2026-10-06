@@ -48,7 +48,7 @@ Don't group content by subject (e.g. a generic "Pāḷi" bucket), and always qua
 
 ## 5. Tech Stack & Versions
 
-Baseline as of September 2026 — re-verify current versions before using if significant time has passed (tech-architecture.md §2).
+Versions verified on 2026-10-06 against the npm registry and GitHub releases — re-verify with the registry before using if significant time has passed, never from memory (tech-architecture.md §2).
 
 | Layer | Choice |
 | --- | --- |
