@@ -56,7 +56,7 @@
   "privacyTitle": "Privacy",
   "privacyIntro": "This page explains what this site does with your information. It describes how the site works today.",
   "privacyNoneTitle": "What we do not do",
-  "privacyNone": "This site has no accounts, no advertising, no analytics and no tracking cookies. What you search for stays in your browser; searches are never sent to us.",
+  "privacyNone": "This site has no accounts, no advertising, no analytics and no tracking cookies. Searching and filtering happen in your browser, and typing a search does not send it to us. See \"Search words in the page address\" below for one exception.",
   "privacyStoredTitle": "What your browser stores",
   "privacyStored": "If you choose a language, your browser remembers it on your device so the site can offer it next time. It is not sent anywhere. If your browser blocks this storage, the site works the same and you can still change language.",
   "privacyHostingTitle": "Hosting and downloads",
@@ -198,5 +198,7 @@
   "meetSayadawsTitle": "Meet the Sayadaws",
   "meetSayadawsText": "Read about the Sayadaws who teach our classes and lead our retreats.",
   "meetRetreatsTitle": "Retreats",
-  "meetRetreatsText": "Online and in-person meditation retreats, and an archive of past retreats."
+  "meetRetreatsText": "Online and in-person meditation retreats, and an archive of past retreats.",
+  "privacySearchUrlTitle": "Search words in the page address",
+  "privacySearchUrl": "While you search or filter, the site adds your search words, filters and chosen time zone to the page address (for example ?q=…) so that you can bookmark or share the page and use the Back button. The address stays in your browser as you type. But when you open, reload or share such a link, the address is requested from the hosting provider like any other page address, so your search words can appear in its request logs. Please do not put personal information in a search, and share a link only if you are comfortable with its words being visible."
 }

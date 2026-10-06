@@ -18,10 +18,11 @@ const updated = new Intl.DateTimeFormat(locales[locale].formatLocale, {
   dateStyle: 'long',
   numberingSystem: 'latn',
   timeZone: 'UTC',
-}).format(new Date('2026-10-04T00:00:00Z'));
+}).format(new Date('2026-10-05T00:00:00Z'));
 const sections = [
   ['privacyNoneTitle', 'privacyNone'],
   ['privacyStoredTitle', 'privacyStored'],
+  ['privacySearchUrlTitle', 'privacySearchUrl'],
   ['privacyHostingTitle', 'privacyHosting'],
   ['privacyLinksTitle', 'privacyLinks'],
 ] as const;

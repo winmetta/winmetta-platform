@@ -72,7 +72,7 @@ test('Privacy states what the site does and shows a Latin-digit date', async ({
   await expect(page.locator('main')).toContainText('bunny.net');
   await expect(page.locator('main')).toContainText('2026');
   await page.goto('/en/privacy/');
-  await expect(page.getByRole('heading', { level: 2 })).toHaveCount(5);
+  await expect(page.getByRole('heading', { level: 2 })).toHaveCount(6);
   await expect(page.locator('main')).toContainText('October 4, 2026');
 });
 
@@ -104,4 +104,20 @@ test('new pages fit a 320px screen', async ({ page }) => {
       ),
     ).toBe(true);
   }
+});
+
+test('privacy page discloses that search words appear in the page address', async ({
+  page,
+}) => {
+  await page.goto('/en/privacy/');
+  await expect(
+    page.getByRole('heading', { name: 'Search words in the page address' }),
+  ).toBeVisible();
+  await expect(page.getByText('request logs')).toBeVisible();
+  await page.goto('/my/privacy/');
+  await expect(
+    page.getByRole('heading', {
+      name: 'စာမျက်နှာလိပ်စာထဲရှိ ရှာဖွေစကားလုံးများ',
+    }),
+  ).toBeVisible();
 });
