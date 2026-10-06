@@ -7,11 +7,9 @@ playwright-report/
 test-results/
 .env*
 !.env.example
-*.tfvars
-!*.tfvars.example
-.terraform/
-*.tfstate
-*.tfstate.*
+# Pulumi local state and stack outputs (config files without secrets are committed)
+.pulumi/
+infra/pulumi/node_modules/
 *.tsbuildinfo
 .DS_Store
 *.log

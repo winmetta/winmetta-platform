@@ -152,7 +152,7 @@ Metric collection is deferred beyond v1. Do not instrument these outcomes or add
                                            v
 +---------------------------------------------------------------------------------------+
 | Phase 2: Infrastructure & Deployment                                                   |
-| Terraform, domains, AWS S3 + bunny.net CDN; staging and production, public launch      |
+| Pulumi, domains, AWS S3 + bunny.net CDN; staging and production, public launch      |
 +---------------------------------------------------------------------------------------+
                                            |
                                            v
@@ -182,7 +182,7 @@ Metric collection is deferred beyond v1. Do not instrument these outcomes or add
 
 * **Phase 0 — Foundation Code:** Public MIT-licensed repo, tooling, basic CI, and an Astro app with all needed libraries and English/Burmese localization support. No real pages or content and no deployment. See implementation-plan.md §2.
 * **Phase 1 — Bilingual Pages:** Home, About, Privacy, the Classes group (classes with a weekly schedule, Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library (the whole S3 PDF library with tag browsing and fuzzy Burmese search) in English and Burmese, with an original mobile/desktop design, serving online class students and independent learners worldwide. No hosting or deployment yet. See implementation-plan.md §3.
-* **Phase 2 — Infrastructure & Deployment:** Terraform, domains (`app.winmetta.org`), AWS hosting (S3 + CloudFront), AWS S3 media storage with bunny.net CDN (already used for the Dhamma Library PDFs), Route 53 DNS for `app.winmetta.org`, and staging and production environments with promotion. The site becomes public here. See implementation-plan.md §4. No backend or database.
+* **Phase 2 — Infrastructure & Deployment:** Pulumi (TypeScript), domains (`app.winmetta.org`), AWS hosting (S3 + CloudFront), AWS S3 media storage with bunny.net CDN (already used for the Dhamma Library PDFs), Route 53 DNS for `app.winmetta.org`, and staging and production environments with promotion. The site becomes public here. See implementation-plan.md §4. No backend or database.
 * **Phase 3 — LLB Pilot:** The flagship learning deliverable. Digitizes the LLB curriculum, proven and already-tested; piloted directly with the existing "Let's Learn Burmese" class roster (currently taught by Ven. U Garudhamma) before wider release.
 * **Phase 4 — Library & Class Archive Expansion:** Defines the repeatable pipeline for adding PDFs to S3 and refreshing the index and pages (generator, review PR, CI checks, deploy; see tech-architecture.md §3), plus a unified class timeline and deeper content indexing (full-text, OCR, transcripts) when needed.
 * **Phase 5 — Optional Accounts & Progress Sync:** Cross-device sync for learners who want it, opt-in only. This is likely where a backend and database are first introduced (tentative; see tech-architecture.md §10).

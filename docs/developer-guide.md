@@ -28,7 +28,7 @@ No Docker, database or env file is needed. Run `npm run dev` and open <http://lo
 | `apps/web/src/fixtures` | Synthetic content used by the content collections in Phase 0. |
 | `apps/web/tests` | Playwright smoke tests. |
 | `scripts/setup-local-dev.sh` | Repo setup: Node, npm, dependencies, Playwright browser. |
-| `infra/terraform/` | Phase 2 and later; not present yet. |
+| `infra/pulumi/` | Phase 2 and later (Pulumi, TypeScript); not present yet. |
 
 Keep code in `apps/web` until a second consumer needs it. Only then extract a package under `packages/`.
 
@@ -94,7 +94,7 @@ All user-facing text supports English (`en`) and Burmese (`my`).
 - No real personal data, even in fixtures: no student or roster names, emails, phone numbers or private meeting details. Use synthetic placeholders.
 - The only exception is the already-public weekly class Zoom links and passcodes, which may appear in schedule content. Retreat or one-off session credentials, meeting host keys and anything not already published stay out.
 - Review `git diff --cached` before every commit. If something sensitive was staged, stop and ask a maintainer before pushing. Don't try to hide it with a follow-up commit.
-- Terraform (later): commit only `*.tfvars.example`.
+- Pulumi (later): commit only non-secret `Pulumi.<stack>.yaml`; secrets use `pulumi config set --secret` (AWS KMS) or the environment.
 
 ## 10. Testing
 

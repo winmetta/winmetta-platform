@@ -56,11 +56,11 @@ Versions are a baseline as of September 2026 — re-check before kickoff.
 | Web app | **Astro** + **React** islands | Astro ^7.3, React ^19.3 | Ships almost no JS by default; pre-renders content for SEO and low-bandwidth connections and supported devices; React only where interactivity is needed. |
 | Content & schemas | **Astro content collections** with **Zod** | — | Zod is Astro's built-in schema layer and the most popular TypeScript validator. Content lives in the repo as Markdown/JSON. |
 | Styling / UI | **Tailwind CSS + shadcn/ui** | Tailwind ^4.3 | Widely used; components are copied into the repo, so no dependency abandonment risk. |
-| Static hosting | **AWS S3 + CloudFront** | Private S3 bucket with origin access control behind CloudFront; ACM certificates | Cheap and low-maintenance: the site is small, CloudFront's free tier (1 TB/month transfer at the time of writing; verify) covers it, and it sits in the AWS account that already holds the media. Everything is Terraform-able. |
+| Static hosting | **AWS S3 + CloudFront** | Private S3 bucket with origin access control behind CloudFront; ACM certificates | Cheap and low-maintenance: the site is small, CloudFront's free tier (1 TB/month transfer at the time of writing; verify) covers it, and it sits in the AWS account that already holds the media. Everything can be defined in code with Pulumi. |
 | Media | **AWS S3** + **bunny.net CDN** | — | S3 is the most widely used, best-documented object store, with an S3-compatible API that keeps media portable; bunny.net serves and caches media cheaply so most reads never hit S3 egress (§6). |
-| DNS | **AWS Route 53** | One hosted zone for `app.winmetta.org` (about $0.50/month) | Delegated from DreamHost, which keeps `winmetta.org` itself. Holds the app, staging, preview, CDN and ACM validation records, all managed by Terraform. |
+| DNS | **AWS Route 53** | One hosted zone for `app.winmetta.org` (about $0.50/month) | Delegated from DreamHost, which keeps `winmetta.org` itself. Holds the app, staging, preview, CDN and ACM validation records, all managed by Pulumi. |
 | Analytics | **Deferred beyond v1** | — | No analytics service or learner-event collection in Phase 0–2; see §4.4. |
-| Infra as code | **Terraform** | — | Portable across clouds; see §8. |
+| Infra as code | **Pulumi (TypeScript)** | — | The same language as the app, so one toolchain, editor setup and test runner for the volunteer team; covers AWS natively and other providers through bridged providers; see §8. |
 | CI/CD | **GitHub Actions** | — | Free for public repos. |
 
 ### Browser and layout baseline
@@ -98,9 +98,10 @@ winmetta-platform/
 │   ├── ui/                    # shared components, once a second consumer exists
 │   └── shared-types/          # shared Zod schemas, once code is shared
 ├── infra/                     # deployment/infrastructure definitions (Phase 2)
-│   └── terraform/
-│       ├── modules/platform/
-│       └── environments/{staging,production}/
+│   └── pulumi/
+│       ├── index.ts               # reads the stack config and creates the platform component
+│       ├── platform.ts            # ComponentResource: site, media, DNS
+│       └── Pulumi.{staging,production}.yaml
 ├── content/                   # optional future independent curated content
 ├── docs/
 ├── scripts/
@@ -234,7 +235,7 @@ Permanent hosting and media both live in **AWS**, where Win Metta already has an
 | `staging.app.winmetta.org` | AWS CloudFront (staging) | Pre-release verification, `noindex`. |
 | `cdn.app.winmetta.org` (proposed) | bunny.net pull zone (CNAME) | Public platform media, backed by AWS S3. Staging uses its own hostname and bucket. |
 
-`winmetta.org` stays on DreamHost's name servers, because DreamHost's free nonprofit shared hosting requires it, so its DNS is managed in the DreamHost panel. The platform's names live in a separate **Route 53** hosted zone for `app.winmetta.org`, delegated once by adding four NS records for `app` in DreamHost's panel (confirm the panel accepts NS records for a subdomain). Everything under `app.winmetta.org` (production, `staging.app…`, the preview wildcard, `cdn.app…` and the ACM validation CNAMEs) is then created in Route 53 by Terraform. The CDN hostname is a plain CNAME to the bunny.net pull zone. Existing WordPress records stay intact. WordPress navigation can link to `app.winmetta.org`, and the app can link back for blog/news.
+`winmetta.org` stays on DreamHost's name servers, because DreamHost's free nonprofit shared hosting requires it, so its DNS is managed in the DreamHost panel. The platform's names live in a separate **Route 53** hosted zone for `app.winmetta.org`, delegated once by adding four NS records for `app` in DreamHost's panel (confirm the panel accepts NS records for a subdomain). Everything under `app.winmetta.org` (production, `staging.app…`, the preview wildcard, `cdn.app…` and the ACM validation CNAMEs) is then created in Route 53 by Pulumi. The CDN hostname is a plain CNAME to the bunny.net pull zone. Existing WordPress records stay intact. WordPress navigation can link to `app.winmetta.org`, and the app can link back for blog/news.
 
 | Component | Where | Why |
 | --- | --- | --- |
@@ -262,7 +263,7 @@ Deliberately small, for a volunteer team. Rollout by phase:
 
 * **Phase 0:** local development plus `ci.yml` (lint, typecheck, tests, build). No deploy.
 * **Phase 1:** no deployment. Pages are built and reviewed locally, and `ci.yml` keeps checking every PR.
-* **Phase 2:** add the deploy workflow (`deploy-web.yml`), static hosting on S3 + CloudFront, Terraform, custom domains, media storage/CDN, and separate staging and production environments with a promotion step.
+* **Phase 2:** add the deploy workflow (`deploy-web.yml`), static hosting on S3 + CloudFront, Pulumi, custom domains, media storage/CDN, and separate staging and production environments with a promotion step.
 
 | Environment | Where | Purpose |
 | --- | --- | --- |
@@ -285,18 +286,19 @@ Enable GitHub secret scanning and push protection on the repo (free for public r
 
 ## 8. Infrastructure Provisioning
 
-**Terraform**, not manual Portal clicks — the same tool works across AWS, bunny.net and other providers, so a future host move changes provider blocks, not workflow. Terraform has a learning curve; the Phase 2 footprint is small (two site buckets with CloudFront distributions and ACM certificates, media S3 buckets with IAM, Bunny pull zones, the Route 53 zone and records), so a first pass can be done by hand and codified right after. Use the Bunny Terraform provider if it covers the needed resources; otherwise document the manual Bunny steps. Confirm the team is comfortable before committing to it.
+**Pulumi in TypeScript**, not manual console clicks. The infrastructure is ordinary TypeScript, so the team keeps one language, one package manager, one editor setup and Vitest for infrastructure tests, and the same loops and functions that build a staging stack build production. The Phase 2 footprint is small (two site buckets with CloudFront distributions and ACM certificates, media S3 buckets with IAM, Bunny pull zones, the Route 53 zone and records), so a first pass can be done by hand and codified right after. Pulumi covers AWS natively; for bunny.net use a bridged provider (`pulumi package add terraform-provider …`) if one covers the needed resources, otherwise document the manual Bunny steps. A future host move changes the provider calls in one component, not the workflow. Confirm the team is comfortable before committing to it.
 
 ```
-infra/terraform/
-├── modules/platform/         # site bucket + CloudFront + ACM, media S3 bucket + IAM, Bunny pull zone, Route 53 zone and records
-├── environments/staging/     # Calls the module with staging names
-└── environments/production/  # Calls the module with production names
+infra/pulumi/
+├── index.ts                  # reads the stack config and creates the platform component
+├── platform.ts               # ComponentResource: site bucket + CloudFront + ACM, media S3 bucket + IAM, Bunny pull zone, Route 53 zone and records
+├── Pulumi.staging.yaml       # non-secret config for the staging stack
+└── Pulumi.production.yaml    # non-secret config for the production stack
 ```
 
-* **State:** Terraform Cloud free tier (remote state and locking, nothing in git).
-* **Public repo rule:** commit only `.tfvars.example` with placeholders; real `.tfvars`, subscription/tenant IDs and connection strings stay untracked.
-* `terraform plan` runs on PRs touching `infra/`; `terraform apply` is a manual maintainer action, never automatic.
+* **State and secrets:** a private, versioned S3 bucket as the Pulumi backend (`pulumi login s3://…`) and an AWS KMS key as the secrets provider, so state, locking and encryption stay inside the one AWS account and need no extra service or subscription. Pulumi Cloud's free individual tier is an alternative if the team prefers its UI. Nothing is stored in git.
+* **Public repo rule:** commit only non-secret `Pulumi.<stack>.yaml`; secrets are set with `pulumi config set --secret` or come from the environment, and access keys and connection strings stay out of the repo.
+* `pulumi preview` runs on PRs touching `infra/` with a read-only role; `pulumi up` is a manual maintainer action, never automatic.
 * **CI auth:** a GitHub OIDC trust to an AWS IAM role scoped to the site buckets and distributions only, so no long-lived AWS keys are stored in GitHub.
 
 ---
