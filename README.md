@@ -2,7 +2,7 @@
 
 A bilingual (English and Burmese) web platform for [Win Metta](https://winmetta.org/about/), a California 501(c)(3) nonprofit continuing an existing Burmese Theravāda Buddhist teaching community online. It helps online class students and independent learners worldwide find classes and Dhamma resources, and will grow into interactive Burmese literacy lessons.
 
-The first phases deliver a foundation app (Phase 0), five bilingual pages — Home, About, Privacy, Classes and Dhamma Library (Phase 1) — then AWS hosting, the deploy workflow and public staging/production infrastructure (Phase 2). After that, the plan is to digitize **"Let's Learn Burmese" (LLB)**, an existing, proven Burmese-literacy course currently taught by Ven. U Garudhamma, into an interactive self-paced app, and to expand the Dhamma Library and class archive. Full reasoning and scope live in the docs below.
+The first phases deliver a foundation app (Phase 0), bilingual pages — Home, About, Privacy, Classes (with Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library (Phase 1) — then AWS hosting, the deploy workflow and public staging/production infrastructure (Phase 2). After that, the plan is to digitize **"Let's Learn Burmese" (LLB)**, an existing, proven Burmese-literacy course currently taught by Ven. U Garudhamma, into an interactive self-paced app, and to expand the Dhamma Library and class archive. Full reasoning and scope live in the docs below.
 
 ## Status
 
@@ -14,10 +14,10 @@ This public repo currently contains **planning documentation only** — decision
 | --- | --- |
 | [docs/prd.md](docs/prd.md) | Product scope, target audience, feature specs, funding plan, success metrics, phased roadmap |
 | [docs/tech-architecture.md](docs/tech-architecture.md) | Stack, hosting/domains, environments & CI/CD, infrastructure provisioning; deferred analytics and tentative future directions (backend, accounts, offline) |
-| [docs/implementation-plan.md](docs/implementation-plan.md) | Phases 0–2: foundation code, five bilingual pages, infrastructure & deployment; checklists and macOS setup |
+| [docs/implementation-plan.md](docs/implementation-plan.md) | Phases 0–2: foundation code, bilingual pages, infrastructure & deployment; checklists and macOS setup |
 | [AGENTS.md](AGENTS.md) | Quick-reference conventions for contributors and AI coding agents working in this repo — **read this before making changes**, especially §2 on this repo being public |
 
-Phase 1 will introduce Home, About, Privacy, Classes and Dhamma Library for online Zoom students and anonymous independent learners worldwide. Content will be concise and curated from the existing site, with an original mobile/desktop design. Classes and Dhamma Library are the two main page groups; the library indexes every PDF in the project's S3 bucket (about 3,000 mostly Burmese books) with folder-style tag browsing and fuzzy, Burmese-aware search, plus curated links such as blog posts and apps.
+Phase 1 introduces Home, About, Privacy, Classes (with Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library for online Zoom students and anonymous independent learners worldwide. Content will be concise and curated from the existing site, with an original mobile/desktop design. Classes and Dhamma Library are the two main page groups; the library indexes every PDF in the project's S3 bucket (about 3,000 mostly Burmese books) with folder-style tag browsing and fuzzy, Burmese-aware search, plus curated links such as blog posts and apps.
 
 ## Core Principles
 

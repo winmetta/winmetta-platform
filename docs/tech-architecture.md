@@ -1,6 +1,6 @@
 # Technical Architecture
 
-**Status:** Phases 0–2 (foundation code, five bilingual pages, infrastructure & deployment) are specified in detail in [implementation-plan.md](implementation-plan.md). Everything under "Future" is a *tentative direction* recorded so ideas aren't lost — it is **not** a source of truth and will be redesigned when that phase is actually planned.
+**Status:** Phases 0–2 (foundation code, bilingual pages, infrastructure & deployment) are specified in detail in [implementation-plan.md](implementation-plan.md). Everything under "Future" is a *tentative direction* recorded so ideas aren't lost — it is **not** a source of truth and will be redesigned when that phase is actually planned.
 
 **Guiding principle:** pick popular, well-documented tools with large communities, easy learning curves for volunteers, and good long-term support. Prefer free programs offered to nonprofits, but paying for tooling is fine when it saves volunteer time or reduces risk — donations may fund tech development and maintenance (see [prd.md](prd.md) §5).
 
