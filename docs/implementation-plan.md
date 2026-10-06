@@ -5,8 +5,8 @@ The first three phases take the project from an empty repo to a public, bilingua
 | Phase | Goal | Deployed? |
 | --- | --- | --- |
 | **0 — Foundation code** | Repo scaffold: a basic Astro app with all the libraries, tooling and English/Burmese (`en`/`my`) support the site needs. No real pages or content, no deploy. | No (local only) |
-| **1 — Five bilingual pages** | Home, About, Privacy, Classes and Dhamma Library (the whole S3 PDF library, tag browsing and fuzzy Burmese search), in English and Burmese, with curated public content. Adds the CI deploy workflow to a single non-public review app. | Review app only (not public) |
-| **2 — Infrastructure & deployment** | Terraform, domains, Azure, AWS S3 + bunny.net media delivery, Cloudflare DNS, and staging and production environments with promotion. | Yes (public) |
+| **1 — Five bilingual pages** | Home, About, Privacy, Classes and Dhamma Library (the whole S3 PDF library, tag browsing and fuzzy Burmese search), in English and Burmese, with curated public content. Reviewed from local builds; no deployment. | No (local only) |
+| **2 — Infrastructure & deployment** | Terraform, domains, AWS hosting (S3 + CloudFront), AWS S3 + bunny.net media delivery, Route 53 DNS, and staging and production environments with promotion. | Yes (public) |
 
 Later phases (LLB lessons, the library upload pipeline in §5, accounts, native apps) are in [prd.md](prd.md) §7. Scope per [prd.md](prd.md) (§4.7, §7) and [tech-architecture.md](tech-architecture.md) (§0): one static Astro web app designed for mobile and desktop — no backend, no database, no desktop/mobile apps.
 
@@ -89,7 +89,7 @@ Web app
 
 ## 3. Phase 1 — Five Bilingual Pages
 
-**Goal:** Home, About, Privacy, Classes and Dhamma Library, complete in English and Burmese, with concise curated public content, the full S3 PDF library indexed with tag browsing and fuzzy Burmese-aware search. Uploading new PDFs and refreshing the index is the Phase 4 pipeline (tech-architecture.md §3, "Library content pipeline"). Phase 1 also adds the CI deploy workflow, deploying to a single non-public review app (default Azure hostname, `noindex`, not linked) so pages can be reviewed in a real environment. The site is not public until Phase 2.
+**Goal:** Home, About, Privacy, Classes and Dhamma Library, complete in English and Burmese, with concise curated public content, the full S3 PDF library indexed with tag browsing and fuzzy Burmese-aware search. Uploading new PDFs and refreshing the index is the Phase 4 pipeline (tech-architecture.md §3, "Library content pipeline"). Phase 1 involves no hosting or deployment: pages are reviewed from local builds and the existing `ci.yml` checks. Static hosting and the deploy workflow are Phase 2, and the site is not public until then.
 
 ### Two primary user groups
 
@@ -153,39 +153,58 @@ Phase 1 indexes **every PDF in the existing S3 bucket `dhamma-library`** (audite
 
 ### Phase 1 checklist
 
-* [ ] Home, About, Privacy, Classes and Dhamma Library built in both locales (10 localized page routes plus the root language entry page), with original layouts. **Done:** Home, About, Privacy and the library (with folder pages); the About and Privacy links are in the footer on every page and Home links to the library, About and Privacy. **Also done:** Classes, Study groups, Retreats (archive of 15 past retreats with search and filters, plus detail pages), Teachers (8 bio pages) and Zoom help, all linked from the header and Home. **Open for maintainers:** verify class times, Zoom IDs and which classes are live-streamed; Burmese-speaker review of new Burmese text and the draft English bios; confirm teachers are comfortable with their portraits in the public repo. **Source conflicts:** Ashin Kelāsa's Sunday class is stored as 2:00–3:00 PM Arizona time (`America/Phoenix`, no daylight saving, per the maintainer), so it equals 2:00 PM Pacific while California is on daylight time and 1:00 PM Pacific after it ends; winmetta.org's list (2:30–3:30) and weekly table (2:00–4:00) disagree with each other; the 11th retreat page says 2023 in one sentence but lists 2024 (list used); the 3-day 2025 retreat page is titled Ashin Kuṇḍadhāna but its English text says Ashin Kovida (title used).
-* [ ] Curated, verified public content: About text and class summaries with Pacific/Myanmar schedules, with source URLs and verification dates.
+* [x] Home, About, Privacy, Classes and Dhamma Library built in both locales (10 localized page routes plus the root language entry page), with original layouts. **Done:** Home, About, Privacy and the library (with folder pages); the About and Privacy links are in the footer on every page and Home links to the library, About and Privacy. **Also done:** Classes, Study groups, Retreats (at `/classes/retreats/`, an archive of 15 past retreats with search and filters, plus detail pages), Sayadaws (8 bio pages at `/classes/sayadaws/`) and Zoom help, all linked from the header and Home. **Open for maintainers:** verify class times, Zoom IDs and which classes are live-streamed; Burmese-speaker review of new Burmese text and the draft English bios; confirm teachers are comfortable with their portraits in the public repo. **Source conflicts:** Ashin Kelāsa's Sunday class is stored as 2:00–3:00 PM Arizona time (`America/Phoenix`, no daylight saving, per the maintainer), so it equals 2:00 PM Pacific while California is on daylight time and 1:00 PM Pacific after it ends; winmetta.org's list (2:30–3:30) and weekly table (2:00–4:00) disagree with each other; the 11th retreat page says 2023 in one sentence but lists 2024 (list used); the 3-day 2025 retreat page is titled Ashin Kuṇḍadhāna but its English text says Ashin Kovida (title used). **Code and content done; the review and verification moved to the Phase 2 staging review gates.**
+* [x] Curated, verified public content: About text and class summaries with Pacific/Myanmar schedules, with source URLs and verification dates. **Code and content done; the review and verification moved to the Phase 2 staging review gates.**
 * [x] Library manifest generator (`scripts/generate-library-manifest.mjs`, `npm run library:manifest`): lists the S3 bucket with a read-only AWS profile and writes the committed manifest plus an overrides file; skips zero-byte objects, reports non-PDF files, detects duplicates by normalized path/name/size (for example the 9 under `၉။ ပေမူများ`, now removed from S3), fails on keys that do not round-trip through URL encoding, and sorts output deterministically.
 * [x] `libraryFileSchema` and manifest validation in CI (a Vitest test validates the committed manifest: unique ids and keys, every key round-trips into a URL); the build needs no AWS credentials.
-* [ ] Zawgyi filenames detected and converted by the generator (`myanmar-tools@1.1.3`, converts only on detector score ≥ 0.9 plus an impossible-in-Unicode marker), every conversion listed in `zawgyi-review.json` and reviewed by a Burmese speaker; suspicious and ambiguous titles reported, not changed. **Code done; Burmese-speaker review of the 11 conversions and 3 suspicious titles is pending.**
+* [x] Zawgyi filenames detected and converted by the generator (`myanmar-tools@1.1.3`, converts only on detector score ≥ 0.9 plus an impossible-in-Unicode marker), every conversion listed in `zawgyi-review.json` and reviewed by a Burmese speaker; suspicious and ambiguous titles reported, not changed. **Code done; Burmese-speaker review of the 11 conversions and 3 suspicious titles is pending.** **Code and content done; the review and verification moved to the Phase 2 staging review gates.**
 * [x] Shared search normalization (NFC, zero-width removal, ဥ/ဉ, Burmese/ASCII digits, Latin diacritics) and a Myanmar syllable segmentation helper, both unit-tested with real Burmese titles.
 * [x] MiniSearch index built at build time and lazily loaded: Burmese n-gram tokenizer, AND of space-separated chunks, syllable-start matching, tiered ranking, labelled "Similar books" fuzzy group, tag suggestions on empty results. **Done:** `lib/library-search.ts` (index, tokenizer, tiered ranking, similar group, tag filter, serialization), the build-time files (`/library-data/index.<hash>.json` and `records.<hash>.json`, content-hashed for CDN caching), and the lazy-loaded search page at `/[locale]/dhamma-library/` (data downloads only on first focus, typing or a shared `?q=` link; URL state; "Similar books" group; folder-name suggestions on empty results; Playwright coverage). The folder tag tree and static folder pages are still to do.
 * [x] Tag tree and static folder pages with breadcrumbs, pagination, counts and an empty state. **Done:** `/[locale]/dhamma-library/folders/<id>/` (page 1) and `.../<id>/<n>/`, 61 folders and 96 pages per locale at 50 books per page, the nested folder tree on the library landing page, and `folders.json` for stable ids. All of it works without JavaScript. Search keeps its own folder filter chips and URL state.
-* [ ] Golden-query suite (Burmese partial words, typos, spaced and unspaced queries, digits, ဥ/ဉ variants) reviewed by a Burmese speaker and run in Vitest against the real manifest; index size and query-time budgets recorded. **Golden tests exist (written by the developer, not yet reviewed by a Burmese speaker).** They name real titles, so regenerating the manifest after a rename or removal in S3 can break one; update the test to a title that still exists and never weaken an assertion (see AGENTS.md).
+* [x] Golden-query suite (Burmese partial words, typos, spaced and unspaced queries, digits, ဥ/ဉ variants) reviewed by a Burmese speaker and run in Vitest against the real manifest; index size and query-time budgets recorded. **Golden tests exist (written by the developer, not yet reviewed by a Burmese speaker).** They name real titles, so regenerating the manifest after a rename or removal in S3 can break one; update the test to a title that still exists and never weaken an assertion (see AGENTS.md). **Code and content done; the review and verification moved to the Phase 2 staging review gates.**
 * [x] Replace or remove the Phase 0 smoke page and synthetic fixtures from published content. The smoke page and its React island are gone and Home replaced it; the synthetic fixtures remain only as schema test data and are not read by any page.
-* [ ] CI deploy: `.github/workflows/deploy-web.yml` deploys PR previews and `main` to one non-public Azure Static Web App (created by hand under the nonprofit grant; deploy token stored as a GitHub Actions secret). `noindex` on all deployed pages; not linked from winmetta.org.
 
-### Phase 1 acceptance
+Phase 1 is feature-complete when these items are built. Its reviews and the acceptance walkthrough need a real environment and reviewers, so they run on staging in Phase 2 (see "Staging review gates" in §4).
+
+---
+
+## 4. Phase 2 — Infrastructure & Deployment
+
+**Goal:** host the Phase 1 site on AWS and deploy it to **staging** and **production** with infrastructure defined as code (the static site hosting and the CI deploy workflow moved here from Phase 1). Details in [tech-architecture.md](tech-architecture.md) §6–§8.
+
+* [ ] Terraform in `infra/terraform/` (site buckets with CloudFront, media S3 buckets and IAM, Bunny pull zones, the Route 53 zone and its records), remote state in Terraform Cloud; `.tfvars.example` only. `terraform plan` on PRs touching `infra/`; `terraform apply` is a manual maintainer action. 
+* [ ] AWS hosting: two private S3 buckets (production and staging) each behind a CloudFront distribution with an ACM certificate, a CI IAM role (GitHub OIDC) scoped to those buckets and distributions, and a wildcard preview host for per-PR previews. Azure is not used for permanent hosting; it may serve occasional workloads only.
+* [ ] Domains and DNS (AWS Route 53): a hosted zone for `app.winmetta.org`, delegated from DreamHost with four NS records for `app` added once in the DreamHost DNS panel (confirm DreamHost accepts NS records for a subdomain). Production is `app.winmetta.org` and staging is `staging.app.winmetta.org`, with ACM validation records, the CloudFront aliases, the preview wildcard and `cdn.app.winmetta.org` all in that zone, managed by Terraform. `winmetta.org` itself, its name servers (DreamHost's free nonprofit hosting requires them) and the WordPress records are unchanged.
+* [ ] Media: private AWS S3 buckets for production and staging (separate, public access blocked), served through bunny.net pull zones (the same S3 → bunny.net pattern already used for the Dhamma Library PDFs, with bunny.net also caching the WordPress site today) on `cdn.app.winmetta.org` (proposed) and a staging hostname, with plain CNAME records in the Route 53 zone. Bunny reads via S3 origin authentication using a read-only IAM user; verify per tech-architecture.md §6. Verify public fetches, cache hits, CORS, MIME types and audio/video seeking.
+* [ ] CI deploy: `.github/workflows/deploy-web.yml` builds the site and publishes it with `aws s3 sync` plus a CloudFront invalidation; GitHub Actions assumes an IAM role through OIDC, so no long-lived AWS keys are stored. Staging and PR previews send `noindex` and are not linked from winmetta.org. Until the preview host exists, a PR's built site is kept as a workflow artifact.
+* [ ] CI/CD promotion: `main` deploys automatically to staging and a deliberate step (tag or manual approval) promotes to production.
+* [ ] `noindex` and access restriction on staging and PR previews.
+* [ ] Complete the staging review gates below before promoting to production.
+* [ ] Smoke-test both environments end to end, document the rollback procedure, and record the runbook for editing content and redeploying.
+
+### Staging review gates (Phase 2, after the first staging deploy)
+
+Reviewers need a real environment, so these run on staging. Production promotion (and the public launch) waits until all three are done.
+
+**Burmese-speaker review**
+
+* [ ] The 11 Zawgyi conversions and 3 suspicious titles in `zawgyi-review.json`, recording corrections in `overrides.json`.
+* [ ] The golden-query suite (partial words, typos, spaced and unspaced queries, digits, ဥ/ဉ variants), then record the index size and query-time budgets.
+* [ ] All Burmese interface text on the Classes, Dhamma Study Groups, Retreats, Sayadaws and Zoom help pages, the schedule table and the time zone names, and the draft English biographies (set a teacher's English `reviewed` to `true` only after this).
+
+**Class host review**
+
+* [ ] Class times, Zoom IDs and the public passcode, which classes are live-streamed, and the language each class and study group is taught in (including the two study groups).
+* [ ] The About text, the retreat details (including the 13th retreat, which has no detail page on winmetta.org) and the Kuṇḍadhāna/Kovida naming on the 3-day 2025 retreat page.
+* [ ] The Sayadaws confirm they are comfortable with their portraits and biographies in the public repo.
+
+**Acceptance walkthrough (formerly the Phase 1 acceptance list)**
 
 * All five pages work in both locales; direct loads and internal navigation work without login.
 * Both journeys work on mobile and desktop: find a class and its joining information; search/browse the library by folder tag, find a book from a partial or misspelled Burmese phrase, and open its PDF.
 * Verify Burmese and English search (partial words, typos, spaces, digit and ဥ/ဉ variants), tag filters, empty results, reset, shareable URLs, back/forward, same-page language switching with filters, duplicate S3 copies shown once, and every library link returning the PDF.
 * Validate translation coverage, blocked-storage behavior, mobile text wrapping, keyboard navigation, document language metadata and source-link validity.
 * Verify Pacific daylight-saving transitions and Myanmar date/day rollover independently of interface language. No analytics, blog feed or copied WordPress design.
-
----
-
-## 4. Phase 2 — Infrastructure & Deployment
-
-**Goal:** deploy the Phase 1 site to **staging** and **production** with infrastructure defined as code. Details in [tech-architecture.md](tech-architecture.md) §6–§8.
-
-* [ ] Terraform in `infra/terraform/` (Static Web Apps, S3 buckets and IAM, Bunny pull zones, Cloudflare DNS records), remote state in Terraform Cloud; `.tfvars.example` only. `terraform plan` on PRs touching `infra/`; `terraform apply` is a manual maintainer action. Import or replace the hand-made Phase 1 review app.
-* [ ] Azure: subscription/resource group under the nonprofit grant, a scoped Service Principal for CI (secret stored in GitHub Actions), and two Azure Static Web Apps — production and staging.
-* [ ] Domains and DNS (Cloudflare, DNS-only records): `app.winmetta.org` (production) and `staging.app.winmetta.org` (staging) via CNAME; `winmetta.org` itself and existing WordPress records are unchanged.
-* [ ] Media: private AWS S3 buckets for production and staging (separate, public access blocked), served through bunny.net pull zones on `cdn.app.winmetta.org` (proposed) and a staging hostname, with unproxied Cloudflare CNAME records. Bunny reads via S3 origin authentication using a read-only IAM user; verify per tech-architecture.md §6. Verify public fetches, cache hits, CORS, MIME types and audio/video seeking.
-* [ ] CI/CD promotion: extend `deploy-web.yml` so `main` deploys automatically to staging and a deliberate step (tag or manual approval) promotes to production.
-* [ ] `noindex` and access restriction on staging and PR previews.
-* [ ] Smoke-test both environments end to end, document the rollback procedure, and record the runbook for editing content and redeploying.
 
 Out of scope for Phases 0–2 (future work): interactive LLB lessons, the repeatable upload-and-reindex pipeline for new library files (outlined in §5), full-text/OCR/transcript search inside PDFs, unified class archive, additional locales beyond English/Burmese, product analytics/metric collection, profile timezone preferences, backend API, database, accounts, offline/PWA, `apps/desktop`, `apps/mobile`. Excluded entirely: standalone blog publishing/automatic feeds, copying the existing site UI, bulk website migration.
 

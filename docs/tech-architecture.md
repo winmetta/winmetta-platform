@@ -23,19 +23,19 @@ A backend (Fastify + PostgreSQL), accounts, offline support and native apps are 
 +-----------------------------------+
 | Astro static site                 |
 | app.winmetta.org                  |
-| (Azure Static Web Apps)           |
+| (AWS S3 + CloudFront)             |
 |  - pre-rendered pages             |
 |  - React islands (practice)       |
 |  - progress stored in IndexedDB   |
 +-----------------------------------+
         | Browser fetches public media URLs
         v
-bunny.net CDN (proposed: cdn.app.winmetta.org, DNS on Cloudflare)
+bunny.net CDN (proposed: cdn.app.winmetta.org, DNS in Route 53)
         | Origin fetch on cache miss
         v
 AWS S3 bucket (audio, video, PDF, images)
 
-Future (tentative, see §10): Fastify API + PostgreSQL on Azure Container Apps,
+Future (tentative, see §10): Fastify API + PostgreSQL on AWS (container hosting + RDS),
 accounts (Google sign-in, email link via SendGrid), offline/PWA, native shells.
 ```
 
@@ -56,9 +56,9 @@ Versions are a baseline as of September 2026 — re-check before kickoff.
 | Web app | **Astro** + **React** islands | Astro ^7.3, React ^19.3 | Ships almost no JS by default; pre-renders content for SEO and low-bandwidth connections and supported devices; React only where interactivity is needed. |
 | Content & schemas | **Astro content collections** with **Zod** | — | Zod is Astro's built-in schema layer and the most popular TypeScript validator. Content lives in the repo as Markdown/JSON. |
 | Styling / UI | **Tailwind CSS + shadcn/ui** | Tailwind ^4.3 | Widely used; components are copied into the repo, so no dependency abandonment risk. |
-| Static hosting | **Azure Static Web Apps** | Free tier; Standard if needed | Free SSL, CDN, custom domain, PR preview environments. Covered by the Azure for Nonprofits grant. |
+| Static hosting | **AWS S3 + CloudFront** | Private S3 bucket with origin access control behind CloudFront; ACM certificates | Cheap and low-maintenance: the site is small, CloudFront's free tier (1 TB/month transfer at the time of writing; verify) covers it, and it sits in the AWS account that already holds the media. Everything is Terraform-able. |
 | Media | **AWS S3** + **bunny.net CDN** | — | S3 is the most widely used, best-documented object store, with an S3-compatible API that keeps media portable; bunny.net serves and caches media cheaply so most reads never hit S3 egress (§6). |
-| DNS | **Cloudflare DNS** | Free plan | Hosts the `winmetta.org` zone; records for Bunny hostnames stay DNS-only (not proxied). |
+| DNS | **AWS Route 53** | One hosted zone for `app.winmetta.org` (about $0.50/month) | Delegated from DreamHost, which keeps `winmetta.org` itself. Holds the app, staging, preview, CDN and ACM validation records, all managed by Terraform. |
 | Analytics | **Deferred beyond v1** | — | No analytics service or learner-event collection in Phase 0–2; see §4.4. |
 | Infra as code | **Terraform** | — | Portable across clouds; see §8. |
 | CI/CD | **GitHub Actions** | — | Free for public repos. |
@@ -79,7 +79,7 @@ This is the intended structure over time; future directories are not scaffolded 
 winmetta-platform/
 ├── .github/workflows/
 │   ├── ci.yml                 # lint, typecheck, test, build on every PR (Phase 0)
-│   └── deploy-web.yml         # Azure Static Web Apps deploy: PR previews and review app (Phase 1); staging + production promotion (Phase 2)
+│   └── deploy-web.yml         # AWS deploy (S3 sync + CloudFront invalidation via GitHub OIDC): PR previews, staging and production promotion (Phase 2)
 ├── apps/
 │   ├── web/                   # Astro app (the only v1 app)
 │   │   ├── src/
@@ -120,7 +120,7 @@ Start simple: keep code and Astro content collections inside `apps/web`, and ext
 
 Keep one committed `.env.example` and one optional, ignored root `.env.local` for developer-machine overrides. The web config loads `.env.local`, with injected process variables taking precedence. Turbo includes this file in its cache dependencies. `SITE_URL` controls canonical/alternate URLs; `PUBLIC_ALLOW_INDEXING` is enabled only for public production builds. `PUBLIC_LIBRARY_CDN_BASE` is the public origin that serves library PDFs (default: the existing bunny.net pull zone). Public variables must never contain secrets.
 
-Deployment workflows use GitHub `staging` and `production` environments, mapping their variables and secrets explicitly into build/deploy jobs. Do not maintain `.env.staging` or `.env.production` files. Phase 1's review build supplies its origin through CI with indexing disabled. Add `.env.test` later only if tests need it.
+Deployment workflows use GitHub `staging` and `production` environments, mapping their variables and secrets explicitly into build/deploy jobs. Do not maintain `.env.staging` or `.env.production` files. Non-production builds supply their origin through CI with indexing disabled. Add `.env.test` later only if tests need it.
 
 ### Library model and discovery (Phase 1)
 
@@ -186,7 +186,7 @@ Static generation means content changes appear after a rebuild:
 ```
 Content change merged to main (new class time, new library entry, new LLB content)
    -> GitHub Actions builds the Astro site
-   -> Deployed to Azure Static Web Apps
+   -> Deployed to AWS S3 + CloudFront
 ```
 
 Volunteers edit Markdown/JSON in the repo via pull request. If a non-technical editing workflow becomes necessary, evaluate a Git-based CMS later. A scheduled rebuild can be added if content needs to change without a merge.
@@ -221,7 +221,7 @@ Zawgyi and Unicode look similar but are byte-incompatible; mixing them garbles t
 
 ## 6. Hosting & Domains
 
-Win Metta has an Azure for Nonprofits grant ($2,000/year). It covers only first-party Azure services (the static hosting here), doesn't roll over, and must be reactivated annually — a lapse year should be planned for, not a surprise. Media storage on AWS S3 and delivery on bunny.net are outside the grant and paid separately.
+Permanent hosting and media both live in **AWS**, where Win Metta already has an account. The Azure for Nonprofits grant is not stable enough to build on (it does not roll over and must be renewed yearly), so nothing permanent depends on it: the site, its DNS targets, data and CI deploys must not require Azure. Azure may still be used for occasional or short-lived workloads (experiments, one-off batch jobs) while the grant lasts. AWS nonprofit credits, if approved, are a bonus and not part of the plan. Delivery of media through bunny.net is paid separately.
 
 **Cost policy:** prefer free tiers and nonprofit programs, but spending money on the tech stack is acceptable. Donation funds may pay for development and maintenance.
 
@@ -230,16 +230,16 @@ Win Metta has an Azure for Nonprofits grant ($2,000/year). It covers only first-
 | Host | Points to | Purpose |
 | --- | --- | --- |
 | `winmetta.org` (+ `www`) | Existing WordPress hosting | Blog/news, About, existing pages — untouched. |
-| `app.winmetta.org` | Azure Static Web Apps (production) | This platform's frontend. `app.` chosen as the most understandable label for less tech-fluent users. |
-| `staging.app.winmetta.org` | Azure Static Web Apps (staging) | Pre-release verification, `noindex`. |
+| `app.winmetta.org` | AWS CloudFront (production) | This platform's frontend. `app.` chosen as the most understandable label for less tech-fluent users. |
+| `staging.app.winmetta.org` | AWS CloudFront (staging) | Pre-release verification, `noindex`. |
 | `cdn.app.winmetta.org` (proposed) | bunny.net pull zone (CNAME) | Public platform media, backed by AWS S3. Staging uses its own hostname and bucket. |
 
-`winmetta.org` DNS is managed in **Cloudflare** (DNS only, free plan); add the app and CDN hostnames as CNAME records there. Keep records that point to Bunny **DNS-only (unproxied)** so Bunny serves the traffic directly. Existing WordPress records stay intact. WordPress navigation can link to `app.winmetta.org`, and the app can link back for blog/news.
+`winmetta.org` stays on DreamHost's name servers, because DreamHost's free nonprofit shared hosting requires it, so its DNS is managed in the DreamHost panel. The platform's names live in a separate **Route 53** hosted zone for `app.winmetta.org`, delegated once by adding four NS records for `app` in DreamHost's panel (confirm the panel accepts NS records for a subdomain). Everything under `app.winmetta.org` (production, `staging.app…`, the preview wildcard, `cdn.app…` and the ACM validation CNAMEs) is then created in Route 53 by Terraform. The CDN hostname is a plain CNAME to the bunny.net pull zone. Existing WordPress records stay intact. WordPress navigation can link to `app.winmetta.org`, and the app can link back for blog/news.
 
 | Component | Where | Why |
 | --- | --- | --- |
-| Astro build output | **Azure Static Web Apps** | SSL, CDN, custom domain, PR previews. Free tier caps at 100 GB/month bandwidth; heavy media goes through the CDN below, not this path. |
-| Audio, video, PDF, images | **AWS S3** origin + **bunny.net** CDN | S3 is outside the Azure grant, so it is a paid service, but storage is cheap. S3 charges internet egress (about $0.09/GB beyond a small free allowance), so all public traffic goes through bunny.net, which caches media and pulls from S3 only on cache misses. Bunny delivery is billed separately; both costs are small at low traffic and acceptable per the cost policy. Check whether AWS nonprofit credit programs apply. |
+| Astro build output | **AWS S3 + CloudFront** | SSL (ACM), CDN, custom domain through a Route 53 alias record. Heavy media goes through the bunny.net CDN below, not this path. |
+| Audio, video, PDF, images | **AWS S3** origin + **bunny.net** CDN | S3 is a paid service, but storage is cheap. S3 charges internet egress (about $0.09/GB beyond a small free allowance), so all public traffic goes through bunny.net, which caches media and pulls from S3 only on cache misses. Bunny delivery is billed separately; both costs are small at low traffic and acceptable per the cost policy. bunny.net is already in use for the Dhamma Library PDFs and as a cache in front of the WordPress site, so future media follows the same S3 → bunny.net setup. Check whether AWS nonprofit credit programs apply. |
 
 ### Media delivery setup
 
@@ -252,7 +252,7 @@ Win Metta has an Azure for Nonprofits grant ($2,000/year). It covers only first-
 
 Release checks: anonymous fetches succeed on cache misses and hits; audio/video seeking (range requests) works; MIME types, cache headers and CORS for browser fetches are correct.
 
-**Portability:** S3's API is the de facto standard, so media can move to another S3-compatible store (Backblaze B2, Cloudflare R2, MinIO) by re-pointing the CDN origin. Pages reference only the public CDN URL, and bucket access is limited to the upload script and the Bunny origin. Avoid cloud-specific SDKs in application code; keep the static output host-agnostic.
+**Portability:** S3's API is the de facto standard, so media can move to another S3-compatible store (Backblaze B2, MinIO) by re-pointing the CDN origin. Pages reference only the public CDN URL, and bucket access is limited to the upload script and the Bunny origin. Avoid cloud-specific SDKs in application code; keep the static output host-agnostic.
 
 ---
 
@@ -261,22 +261,22 @@ Release checks: anonymous fetches succeed on cache misses and hits; audio/video 
 Deliberately small, for a volunteer team. Rollout by phase:
 
 * **Phase 0:** local development plus `ci.yml` (lint, typecheck, tests, build). No deploy.
-* **Phase 1:** add the deploy workflow (`deploy-web.yml`) to a single, non-public Azure Static Web App reachable at its default Azure hostname, with PR previews. It is `noindex` and not linked publicly, so pages can be reviewed in a real environment. The site is **not public** yet.
-* **Phase 2:** formalize with Terraform, custom domains, media storage/CDN, and separate staging and production environments with a promotion step.
+* **Phase 1:** no deployment. Pages are built and reviewed locally, and `ci.yml` keeps checking every PR.
+* **Phase 2:** add the deploy workflow (`deploy-web.yml`), static hosting on S3 + CloudFront, Terraform, custom domains, media storage/CDN, and separate staging and production environments with a promotion step.
 
 | Environment | Where | Purpose |
 | --- | --- | --- |
 | **Local** | `npm run dev` | Development. No Docker, no database. |
-| **PR previews** | Azure Static Web Apps' auto-generated ephemeral URL (from Phase 1) | Per-pull-request check; torn down when the PR closes. |
-| **Staging** | `staging.app.winmetta.org` (its own Static Web App) + separate media storage and CDN hostname (Phase 2) | Pre-release verification with the real build. Synthetic or scrubbed data only where content isn't public. |
+| **PR previews** | Phase 2: one preview bucket and CloudFront distribution on a wildcard host (for example `pr-12.preview.app.winmetta.org`); a CloudFront Function maps the host to that PR's folder, so root-relative links keep working | Per-pull-request check; the folder is deleted when the PR closes. |
+| **Staging** | `staging.app.winmetta.org` (its own bucket and CloudFront distribution) + separate media storage and CDN hostname (Phase 2) | Pre-release verification with the real build. Synthetic or scrubbed data only where content isn't public. |
 | **Production** | `app.winmetta.org` (Phase 2) | Live site. |
 
-Staging and PR previews must not be indexed: send `noindex` and, if unfinished content needs hiding, restrict access. Access restriction on Static Web Apps may require the **Standard** plan (paid, ~$9/month per app) — acceptable, but verify current plan features before relying on it.
+Staging and PR previews must not be indexed: send `noindex` and, if unfinished content needs hiding, restrict access. CloudFront sends the `noindex` header from a response headers policy. If unfinished content needs real access control, add basic authentication in a CloudFront Function; verify the chosen option before relying on it.
 
 **Flow (complete by Phase 2):**
 
-1. **PR opened** → `ci.yml` runs lint, typecheck, tests, build → Static Web Apps deploys a preview (from Phase 1).
-2. **Merge to `main`** → automatic deploy to **staging** (the single review app in Phase 1).
+1. **PR opened** → `ci.yml` runs lint, typecheck, tests, build → the deploy workflow publishes a preview (workflow artifact in Phase 1, preview host from Phase 2).
+2. **Merge to `main`** → automatic deploy to **staging** (the staging environment).
 3. **Promotion to production** (Phase 2) is a deliberate step — a tagged release or a GitHub Actions environment with manual approval. For a small team, a conscious approval is a sufficient safety net; canary or blue/green rollouts aren't worth the overhead. Rollback is redeploying the previous tag.
 
 Enable GitHub secret scanning and push protection on the repo (free for public repos) in Phase 0.
@@ -285,11 +285,11 @@ Enable GitHub secret scanning and push protection on the repo (free for public r
 
 ## 8. Infrastructure Provisioning
 
-**Terraform**, not manual Portal clicks — the same tool works across Azure, AWS, Cloudflare, bunny.net and other providers, so a future host move changes provider blocks, not workflow. Terraform has a learning curve; the Phase 2 footprint is small (two Static Web Apps, S3 buckets with IAM, Bunny pull zones, Cloudflare DNS records), so a first pass can be done by hand and codified right after. Use the Bunny Terraform provider if it covers the needed resources; otherwise document the manual Bunny steps. Confirm the team is comfortable before committing to it. (The single Phase 1 review app may be created by hand.)
+**Terraform**, not manual Portal clicks — the same tool works across AWS, bunny.net and other providers, so a future host move changes provider blocks, not workflow. Terraform has a learning curve; the Phase 2 footprint is small (two site buckets with CloudFront distributions and ACM certificates, media S3 buckets with IAM, Bunny pull zones, the Route 53 zone and records), so a first pass can be done by hand and codified right after. Use the Bunny Terraform provider if it covers the needed resources; otherwise document the manual Bunny steps. Confirm the team is comfortable before committing to it.
 
 ```
 infra/terraform/
-├── modules/platform/         # Static Web App, S3 bucket + IAM, Bunny pull zone, Cloudflare DNS records
+├── modules/platform/         # site bucket + CloudFront + ACM, media S3 bucket + IAM, Bunny pull zone, Route 53 zone and records
 ├── environments/staging/     # Calls the module with staging names
 └── environments/production/  # Calls the module with production names
 ```
@@ -297,7 +297,7 @@ infra/terraform/
 * **State:** Terraform Cloud free tier (remote state and locking, nothing in git).
 * **Public repo rule:** commit only `.tfvars.example` with placeholders; real `.tfvars`, subscription/tenant IDs and connection strings stay untracked.
 * `terraform plan` runs on PRs touching `infra/`; `terraform apply` is a manual maintainer action, never automatic.
-* **CI auth:** an Azure Service Principal scoped to the needed resource group only, stored as a GitHub Actions secret.
+* **CI auth:** a GitHub OIDC trust to an AWS IAM role scoped to the site buckets and distributions only, so no long-lived AWS keys are stored in GitHub.
 
 ---
 
@@ -315,8 +315,8 @@ Not needed for v1. If a concrete learning-outcome question arises (e.g. does one
 
 When a feature needs server state (accounts, progress sync, dynamic content), add:
 
-* **Fastify + TypeScript** API in `apps/api`, run as a plain Docker container on **Azure Container Apps** (Consumption plan scales to zero).
-* **PostgreSQL 18** on Azure Database for PostgreSQL – Flexible Server (Burstable). Vanilla Postgres only, so it stays portable. Note this is a real fixed cost; stopped Flexible Servers restart automatically after ~7 days.
+* **Fastify + TypeScript** API in `apps/api`, run as a plain Docker container on AWS (**App Runner** or ECS Fargate; choose when the backend is real).
+* **PostgreSQL 18** on Amazon RDS (or Aurora Serverless). Vanilla Postgres only, so it stays portable. Note this is a real fixed cost.
 * `api.winmetta.org` as a sibling subdomain; a staging environment with its own separate database at that point.
 * Local dev against a native Postgres at `localhost:5432/winmetta_dev`.
 

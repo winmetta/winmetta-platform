@@ -70,7 +70,7 @@ Never put secrets in `PUBLIC_*` variables, because they can appear in the genera
 
 All user-facing text supports English (`en`) and Burmese (`my`).
 
-- **Burmese terms:** "ဆရာတော်" is reserved for monks. Interface labels that can include any teacher (menu, filters, table headers, intros) say "သင်ကြားသူ" instead, and a lay teacher such as Daw Khin Hla Tin must never appear under "ဆရာတော်". Everyday English technical words (for example Zoom, Web Hosting) are kept beside or instead of rarely used Burmese terms when readers know the English better. "ဘုန်းကြီးကျောင်း" means a monastery; never use plain "ကျောင်း" (it can mean a school).
+- **Burmese terms:** the Sayadaws page and menu say "ဆရာတော်" (English "Sayadaws"), and "ဆရာတော်" is reserved for monks, so a lay teacher such as Daw Khin Hla Tin must never be listed there or under that term; give lay teachers their own page and label if they are added. Everyday English technical words (for example Zoom, Web Hosting) are kept beside or instead of rarely used Burmese terms when readers know the English better. "ဘုန်းကြီးကျောင်း" means a monastery; never use plain "ကျောင်း" (it can mean a school).
 - **Messages:** add each key to `en.json` and `my.json`, and use `t(locale, key)`. The build fails on missing, empty or extra keys. Don't hardcode strings, branch on `locale === 'en'`, or concatenate sentences.
 - **Burmese text** must be Unicode (U+1000–U+109F), never Zawgyi (the library generator converts legacy Zawgyi filenames and lists them in `zawgyi-review.json`). Have a Burmese speaker review wording.
 - **New locale:** add it to the registry in `i18n/locales.ts` and add its message file.
