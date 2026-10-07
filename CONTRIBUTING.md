@@ -24,7 +24,7 @@ at the repository root; that file is ignored. Injected environment variables tak
 precedence over local values, and changes to `.env.local` invalidate the Turbo cache.
 Restart the dev server after changing local values. No env file is needed for defaults.
 
-When deployment is added, use GitHub `staging` and `production` environment variables
+When deployment is added, use GitHub `production` environment variables
 (and environment secrets for credentials), mapped explicitly into the build job.
 Do not add `.env.staging` or `.env.production`. Add `.env.test` only if tests later
 need separate configuration.
