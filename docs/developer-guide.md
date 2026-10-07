@@ -43,7 +43,7 @@ Keep code in `apps/web` until a second consumer needs it. Only then extract a pa
 | `npm run typecheck` | `astro check` (strict TypeScript). |
 | `npm test` | Vitest unit tests. |
 | `npm run build` | Static production build. |
-| `npm run test:smoke` | Playwright tests against the built site (served on port 4331, so a running dev server on 4321 is never reused). Run `npm run build` first. The first time, run `npx playwright install chromium`. |
+| `npm run test:smoke` | Playwright tests against the built site (served on port 4331, so a running dev server on 4321 is never reused). Run `npm run build` first. The first time, run `npx playwright install chromium`. Set `BASE_URL` to run them against a deployed site instead; no local server is started. |
 
 CI runs all of these on every pull request and does not deploy. Run lint, typecheck, test and build locally before pushing.
 
@@ -52,9 +52,10 @@ CI runs all of these on every pull request and does not deploy. Run lint, typech
 `.env.example` documents the variables. For local overrides copy it to `.env.local` at the repo root (ignored by git) and restart the dev server.
 
 - `SITE_URL`: origin for canonical and alternate-language URLs. Defaults to `http://localhost:4321`.
-- `PUBLIC_ALLOW_INDEXING`: only the public production build sets this to `true`. Every other build sends `noindex`.
+- `PUBLIC_ALLOW_INDEXING`: only the public production build sets this to `true` (after the launch gates). Every other build sends `noindex`.
+- `PUBLIC_LIBRARY_CDN_BASE`: public origin that serves library PDFs. Defaults to the existing bunny.net pull zone.
 
-Never put secrets in `PUBLIC_*` variables, because they can appear in the generated site. Don't add `.env.staging` or `.env.production`; deployed environments use GitHub environment variables and secrets.
+Never put secrets in `PUBLIC_*` variables, because they can appear in the generated site. Don't add `.env.staging` or `.env.production`; the deployed environment (`production`) uses GitHub environment variables and secrets.
 
 ## 6. Coding conventions
 
@@ -84,7 +85,7 @@ All user-facing text supports English (`en`) and Burmese (`my`).
 - Schemas are in `src/lib/schemas.ts`. Every record has a stable kebab-case `id`, a `sourceLanguage`, `translations` that include the source language, a `sourceUrl` and a `verifiedAt` date.
 - Organize classes by the real class name, with a `curriculum` code and `teacher` as a separate field (see [AGENTS.md](../AGENTS.md) §3). Add a new curriculum to that table before adding its content.
 - **Schedules** store the source IANA timezone and a local weekday/time (ISO weekday, Monday=1 to Sunday=7). Compute occurrences with `occurrenceOn` and show Pacific (`America/Los_Angeles`) and Myanmar (`Asia/Yangon`) by default. Don't compute with the browser's local zone. Nonexistent daylight-saving times are rejected and repeated times resolve to the earlier instant.
-- **Library files** come from a generated manifest of the S3 bucket, not hand-written records (see [tech-architecture.md](tech-architecture.md) §3). Fix a title, author, language or tags in the overrides file, never by renaming S3 objects, and never edit the manifest by hand. Every folder in a file's path is a tag with its number prefix removed, and has a stable id in `folders.json` that its static page URL uses; never change or reuse an id. Search normalization treats ဥ/ဉ and Burmese/ASCII digits as equal; change it only with the golden-query tests. The generator command will be listed here when Phase 1 adds it.
+- **Library files** come from a generated manifest of the S3 bucket, not hand-written records (see [tech-architecture.md](tech-architecture.md) §3). Fix a title, author, language or tags in the overrides file, never by renaming S3 objects, and never edit the manifest by hand. Every folder in a file's path is a tag with its number prefix removed, and has a stable id in `folders.json` that its static page URL uses; never change or reuse an id. Search normalization treats ဥ/ဉ and Burmese/ASCII digits as equal; change it only with the golden-query tests. Regenerate the manifest with `npm run library:manifest` (needs a read-only AWS profile; builds and CI never do), then review `zawgyi-review.json` and the manifest diff.
 - **Classes, study groups, teachers and retreats** are committed JSON in `apps/web/src/content/` (`classes.json`, `teachers.json`, `retreats.json`, `channels.json`) plus `zoom-help.json` for the Zoom help page. Edit `classes.json` by hand (set `streamed` per class; archived classes carry no schedule or Zoom details). Teachers and retreats are first imported from winmetta.org, then reviewed: `node scripts/import-teachers.mjs` (bios and portraits into `src/assets/people/`, recorded in `src/assets/SOURCES.md`; it keeps the English drafts and `reviewed` flags) and `node scripts/import-retreats.mjs` (dates, format, venue and teacher are authored in the script's event list; it reads each page for timetable PDFs, per-day post links and class notes; a session's day comes from its title or its position in the page's list, never from the WordPress post date, with reviewed overrides in `sessionDayOverrides`). Both are read-only against winmetta.org. Retreat photos are deliberately not imported (they show lay participants). Never copy volunteer phone numbers or e-mail addresses, registration forms, roster spreadsheets, chat invites or flyers with contact details. Set a teacher's English `reviewed` to `true` only after a Burmese speaker has checked it.
 - **Phase 0 fixtures** are synthetic and use reserved domains (`example.invalid`). Keep them separate from real published content, which arrives in Phase 1.
 

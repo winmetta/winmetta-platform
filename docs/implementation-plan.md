@@ -1,12 +1,12 @@
 # Implementation Plan: Phases 0–2 (plus the Phase 4 library pipeline outline)
 
-The first three phases take the project from an empty repo to a public, bilingual site running in staging and production. Each phase has one purpose so a small volunteer team can finish and review it before starting the next.
+The first three phases take the project from an empty repo to a public, bilingual site running in production (labelled Beta). Each phase has one purpose so a small volunteer team can finish and review it before starting the next.
 
 | Phase | Goal | Deployed? |
 | --- | --- | --- |
 | **0 — Foundation code** | Repo scaffold: a basic Astro app with all the libraries, tooling and English/Burmese (`en`/`my`) support the site needs. No real pages or content, no deploy. | No (local only) |
 | **1 — Bilingual pages** | Home, About, Privacy, the Classes group (classes with a weekly schedule, Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library (the whole S3 PDF library, tag browsing and fuzzy Burmese search), in English and Burmese, with curated public content. Reviewed from local builds; no deployment. | No (local only) |
-| **2 — Infrastructure & deployment** | Pulumi (TypeScript), domains, AWS hosting (S3 + CloudFront), AWS S3 + bunny.net media delivery, Route 53 DNS, and staging and production environments with promotion. | Yes (public) |
+| **2 — Infrastructure & deployment** | Pulumi (TypeScript), domains, AWS hosting (S3 + CloudFront), Route 53 DNS, a CI deploy workflow, a Beta label and a single production environment. New media infrastructure and staging come later. | Yes (public) |
 
 Later phases (LLB lessons, the library upload pipeline in §5, accounts, native apps) are in [prd.md](prd.md) §7. Scope per [prd.md](prd.md) (§4.7, §7) and [tech-architecture.md](tech-architecture.md) (§0): one static Astro web app designed for mobile and desktop — no backend, no database, no desktop/mobile apps.
 
@@ -130,9 +130,9 @@ Phase 1 indexes **every PDF in the existing S3 bucket `dhamma-library`** (audite
 * **Performance budget** (confirmed in a prototype before building the UI): serialized index at most about 400 KB gzipped, a query in well under 50 ms on a mid-range phone, results rendered in pages and never all 3,000 at once. If Burmese relevance or the budget fails, reduce n-gram size or fall back to a substring-plus-tiers matcher.
 * **Not Phase 1:** audio, video and app resources (curated links only), file-body text search, OCR and transcription (Phase 4), and uploading new files (the Phase 4 pipeline). Curated blog-post links may still be added as library resources through the curated `resources` collection; there is no blog feed.
 
-### Phase 1 library status and decisions (as of 2026-10-03)
+### Phase 1 library status and decisions (started 2026-10-03; later bullets carry their own dates)
 
-* **Built and committed or in review:** normalization, syllable segmentation, record and tag helpers, `libraryFileSchema`, the generator, the manifest (3,009 records from 3,013 S3 objects), Zawgyi detection and conversion, the MiniSearch index with golden tests, the lazy-loaded search page, and the static folder tree and folder pages. **Not started:** the other four pages (Home, About, Privacy, Classes) and the deploy workflow.
+* **Built and committed or in review:** normalization, syllable segmentation, record and tag helpers, `libraryFileSchema`, the generator, the manifest (3,009 records from 3,013 S3 objects), Zawgyi detection and conversion, the MiniSearch index with golden tests, the lazy-loaded search page, and the static folder tree and folder pages. **Not started at that date (since built, see below):** the other four pages (Home, About, Privacy, Classes). The deploy workflow is Phase 2.
 * **Measured on the real manifest:** serialized index about 1.1 MB raw and 217 KB gzipped (budget 400 KB), build about 60 ms, load about 20 ms, queries about 0.1 to 3 ms in Node. Not yet measured on a phone.
 * **Search decisions made while prototyping:**
   * Only the last term of the last chunk accepts a prefix. An earlier version let every term match as a prefix, so a finished word could extend into a different word.
@@ -158,65 +158,122 @@ Phase 1 indexes **every PDF in the existing S3 bucket `dhamma-library`** (audite
 
 ### Phase 1 checklist
 
-* [x] Home, About, Privacy, Classes and Dhamma Library built in both locales (every page has an `/en/` and a `/my/` route, plus the root language entry page), with original layouts. **Done:** Home, About, Privacy and the library (with folder pages); the About and Privacy links are in the footer on every page and Home links to the library, About and Privacy. **Also done:** Classes, Study groups, Retreats (at `/classes/retreats/`, an archive of 15 past retreats with search and filters, plus detail pages), Sayadaws (8 bio pages at `/classes/sayadaws/`) and Zoom help, all linked from the header and Home. **Open for maintainers:** verify class times, Zoom IDs and which classes are live-streamed; Burmese-speaker review of new Burmese text and the draft English bios; confirm teachers are comfortable with their portraits in the public repo. **Source conflicts:** Ashin Kelāsa's Sunday class is stored as 2:00–3:00 PM Arizona time (`America/Phoenix`, no daylight saving, per the maintainer), so it equals 2:00 PM Pacific while California is on daylight time and 1:00 PM Pacific after it ends; winmetta.org's list (2:30–3:30) and weekly table (2:00–4:00) disagree with each other; the 11th retreat page says 2023 in one sentence but lists 2024 (list used); the 3-day 2025 retreat page is titled Ashin Kuṇḍadhāna but its English text says Ashin Kovida (title used). **Code and content done; the review and verification moved to the Phase 2 staging review gates.**
-* [x] Curated, verified public content: About text and class summaries with Pacific/Myanmar schedules, with source URLs and verification dates. **Code and content done; the review and verification moved to the Phase 2 staging review gates.**
+* [x] Home, About, Privacy, Classes and Dhamma Library built in both locales (every page has an `/en/` and a `/my/` route, plus the root language entry page), with original layouts. **Done:** Home, About, Privacy and the library (with folder pages); the About and Privacy links are in the footer on every page and Home links to the library, About and Privacy. **Also done:** Classes, Study groups, Retreats (at `/classes/retreats/`, an archive of 15 past retreats with search and filters, plus detail pages), Sayadaws (8 bio pages at `/classes/sayadaws/`) and Zoom help, all linked from the header and Home. **Open for maintainers:** verify class times, Zoom IDs and which classes are live-streamed; Burmese-speaker review of new Burmese text and the draft English bios; confirm teachers are comfortable with their portraits in the public repo. **Source conflicts:** Ashin Kelāsa's Sunday class is stored as 2:00–3:00 PM Arizona time (`America/Phoenix`, no daylight saving, per the maintainer), so it equals 2:00 PM Pacific while California is on daylight time and 1:00 PM Pacific after it ends; winmetta.org's list (2:30–3:30) and weekly table (2:00–4:00) disagree with each other; the 11th retreat page says 2023 in one sentence but lists 2024 (list used); the 3-day 2025 retreat page is titled Ashin Kuṇḍadhāna but its English text says Ashin Kovida (title used). **Code and content done; the review and verification moved to the Phase 2 launch gates.**
+* [x] Curated, verified public content: About text and class summaries with Pacific/Myanmar schedules, with source URLs and verification dates. **Code and content done; the review and verification moved to the Phase 2 launch gates.**
 * [x] Library manifest generator (`scripts/generate-library-manifest.mjs`, `npm run library:manifest`): lists the S3 bucket with a read-only AWS profile and writes the committed manifest plus an overrides file; skips zero-byte objects, reports non-PDF files, detects duplicates by normalized path/name/size (for example the 9 under `၉။ ပေမူများ`, now removed from S3), fails on keys that do not round-trip through URL encoding, and sorts output deterministically.
 * [x] `libraryFileSchema` and manifest validation in CI (a Vitest test validates the committed manifest: unique ids and keys, every key round-trips into a URL); the build needs no AWS credentials.
-* [x] Zawgyi filenames detected and converted by the generator (`myanmar-tools@1.1.3`, converts only on detector score ≥ 0.9 plus an impossible-in-Unicode marker), every conversion listed in `zawgyi-review.json` and reviewed by a Burmese speaker; suspicious and ambiguous titles reported, not changed. **Code done; Burmese-speaker review of the 11 conversions and 3 suspicious titles is pending.** **Code and content done; the review and verification moved to the Phase 2 staging review gates.**
+* [x] Zawgyi filenames detected and converted by the generator (`myanmar-tools@1.1.3`, converts only on detector score ≥ 0.9 plus an impossible-in-Unicode marker), every conversion listed in `zawgyi-review.json` and reviewed by a Burmese speaker; suspicious and ambiguous titles reported, not changed. **Code done; Burmese-speaker review of the 11 conversions and 3 suspicious titles is pending.** **Code and content done; the review and verification moved to the Phase 2 launch gates.**
 * [x] Shared search normalization (NFC, zero-width removal, ဥ/ဉ, Burmese/ASCII digits, Latin diacritics) and a Myanmar syllable segmentation helper, both unit-tested with real Burmese titles.
 * [x] MiniSearch index built at build time and lazily loaded: Burmese n-gram tokenizer, AND of space-separated chunks, syllable-start matching, tiered ranking, labelled "Similar books" fuzzy group, tag suggestions on empty results. **Done:** `lib/library-search.ts` (index, tokenizer, tiered ranking, similar group, tag filter, serialization), the build-time files (`/library-data/index.<hash>.json` and `records.<hash>.json`, content-hashed for CDN caching), and the lazy-loaded search page at `/[locale]/dhamma-library/` (data downloads only on first focus, typing or a shared `?q=` link; URL state; "Similar books" group; folder-name suggestions on empty results; Playwright coverage). The folder tag tree and static folder pages are still to do.
 * [x] Tag tree and static folder pages with breadcrumbs, pagination, counts and an empty state. **Done:** `/[locale]/dhamma-library/folders/<id>/` (page 1) and `.../<id>/<n>/`, 61 folders and 96 pages per locale at 50 books per page, the nested folder tree on the library landing page, and `folders.json` for stable ids. All of it works without JavaScript. Search keeps its own folder filter chips and URL state.
-* [x] Golden-query suite (Burmese partial words, typos, spaced and unspaced queries, digits, ဥ/ဉ variants) reviewed by a Burmese speaker and run in Vitest against the real manifest; index size and query-time budgets recorded. **Golden tests exist (written by the developer, not yet reviewed by a Burmese speaker).** They name real titles, so regenerating the manifest after a rename or removal in S3 can break one; update the test to a title that still exists and never weaken an assertion (see AGENTS.md). **Code and content done; the review and verification moved to the Phase 2 staging review gates.**
+* [x] Golden-query suite (Burmese partial words, typos, spaced and unspaced queries, digits, ဥ/ဉ variants) reviewed by a Burmese speaker and run in Vitest against the real manifest; index size and query-time budgets recorded. **Golden tests exist (written by the developer, not yet reviewed by a Burmese speaker).** They name real titles, so regenerating the manifest after a rename or removal in S3 can break one; update the test to a title that still exists and never weaken an assertion (see AGENTS.md). **Code and content done; the review and verification moved to the Phase 2 launch gates.**
 * [x] Replace or remove the Phase 0 smoke page and synthetic fixtures from published content. The smoke page and its React island are gone and Home replaced it; the synthetic fixtures remain only as schema test data and are not read by any page.
 
-Phase 1 is feature-complete when these items are built. Its reviews and the acceptance walkthrough need a real environment and reviewers, so they run on staging in Phase 2 (see "Staging review gates" in §4).
+Phase 1 is feature-complete when these items are built. Its reviews and the acceptance walkthrough need a real environment and reviewers, so they run on the first production deploy in Phase 2 (see "Launch gates" in §4).
 
 ---
 
 ## 4. Phase 2 — Infrastructure & Deployment
 
-**Goal:** host the Phase 1 site on AWS and deploy it to **staging** and **production** with infrastructure defined as code (the static site hosting and the CI deploy workflow moved here from Phase 1). Details in [tech-architecture.md](tech-architecture.md) §6–§8.
+**Goal:** host the Phase 1 site on AWS and deploy it to a single **production** environment (`app.winmetta.org`) with infrastructure defined as code, labelled **Beta** in the UI (the static site hosting and the CI deploy workflow moved here from Phase 1). Details in [tech-architecture.md](tech-architecture.md) §6–§8.
 
-* [ ] Pulumi (TypeScript) program in `infra/pulumi/` with `staging` and `production` stacks (site buckets with CloudFront, media S3 buckets and IAM, Bunny pull zones, the Route 53 zone and its records). State in a private, versioned S3 bucket (`pulumi login s3://…`) and secrets encrypted with an AWS KMS key, so nothing leaves AWS; only non-secret `Pulumi.<stack>.yaml` is committed. `pulumi preview` runs on PRs touching `infra/` with a read-only role; `pulumi up` is a manual maintainer action.
-* [ ] AWS hosting: two private S3 buckets (production and staging) each behind a CloudFront distribution with an ACM certificate, a CI IAM role (GitHub OIDC) scoped to those buckets and distributions, and a wildcard preview host for per-PR previews. Azure is not used for permanent hosting; it may serve occasional workloads only.
-* [ ] Domains and DNS (AWS Route 53): a hosted zone for `app.winmetta.org`, delegated from DreamHost with four NS records for `app` added once in the DreamHost DNS panel (confirm DreamHost accepts NS records for a subdomain). Production is `app.winmetta.org` and staging is `staging.app.winmetta.org`, with ACM validation records, the CloudFront aliases, the preview wildcard and `cdn.app.winmetta.org` all in that zone, managed by Pulumi. `winmetta.org` itself, its name servers (DreamHost's free nonprofit hosting requires them) and the WordPress records are unchanged.
-* [ ] Media: private AWS S3 buckets for production and staging (separate, public access blocked), served through bunny.net pull zones (the same S3 → bunny.net pattern already used for the Dhamma Library PDFs, with bunny.net also caching the WordPress site today) on `cdn.app.winmetta.org` (proposed) and a staging hostname, with plain CNAME records in the Route 53 zone. Bunny reads via S3 origin authentication using a read-only IAM user; verify per tech-architecture.md §6. Verify public fetches, cache hits, CORS, MIME types and audio/video seeking.
-* [ ] CI deploy: `.github/workflows/deploy-web.yml` builds the site and publishes it with `aws s3 sync` plus a CloudFront invalidation; GitHub Actions assumes an IAM role through OIDC, so no long-lived AWS keys are stored. Staging and PR previews send `noindex` and are not linked from winmetta.org. Until the preview host exists, a PR's built site is kept as a workflow artifact.
+**Scope decisions (2026-10-06):**
+
+* **One environment, production only.** The site is static with no backend, so a second environment adds buckets, certificates, roles and promotion steps without testing much. The first deploy is unindexed and not linked from winmetta.org; the pre-launch gates below run there, then indexing is switched on. PR builds stay workflow artifacts. Staging and integration testing are planned when an API or backend exists (see tech-architecture.md §10); a PR preview host can be added once several people contribute or non-technical reviewers need to see PR changes.
+* **Media infrastructure is deferred to Phase 3.** The existing `dhamma-library` bucket and `dhamma-library.b-cdn.net` pull zone stay as they are, outside Pulumi, and builds keep the default `PUBLIC_LIBRARY_CDN_BASE`. New media buckets, Bunny pull zones and `cdn.app.winmetta.org` arrive when a phase needs them (Phase 3 lesson audio).
+* **Beta label.** Production is fully functional and public, and the UI says it is in beta.
+
+### Implementation order
+
+Do the steps in this order; each one lists what it needs first and how to tell it is done. Steps 0 and 1 can run in parallel, and the launch-gate reviews (step 7) can start as soon as step 0 is done. The detail for each item is in [tech-architecture.md](tech-architecture.md) §6–§8.
+
+| Step | What | Needs | Done when |
+| --- | --- | --- | --- |
+| 0 | Prerequisites: decisions, access, versions | This design PR merged | Every box in step 0 is ticked and the choices are recorded in the runbook. |
+| 1 | App changes the hosting depends on (no AWS) | Nothing | `npm run build` outputs `404.html`, `robots.txt` and a sitemap, and CI uploads the built site as an artifact. **Done in the design PR**, except the Privacy wording, which waits for launch. |
+| 2 | One-time AWS bootstrap | Step 0 | The state bucket, KMS key and OIDC provider exist and `pulumi login` works for a maintainer. |
+| 3 | Pulumi program, staged first apply | Steps 1 and 2 | `app.winmetta.org` serves a hand-uploaded build over HTTPS from CloudFront. |
+| 4 | Verify hosting behavior by hand | Step 3 | Trailing-slash, 404, cache-header and `robots.txt` checks pass on the live distribution. |
+| 5 | Deploy workflow, IAM roles, post-deploy smoke test | Steps 1 and 4 | A merge to `main` deploys to production after approval, and the smoke test runs against the live site. |
+| 6 | Runbook, rollback drill, ruleset hardening | Step 5 | A maintainer who did not build it redeploys and rolls back using only the runbook. |
+| 7 | Launch gates, then launch | Steps 5 and 6, plus the step 0 reviews started | The "before launch" gates below pass, indexing is switched on and winmetta.org links to the site. |
+| 8 | During beta | Step 7 | The Burmese-speaker review is done or consciously accepted, and the Beta label is removed. |
+
+**Step 0: prerequisites**
+
+* [ ] Merge the Phase 2 design PR (this plan, the doc updates and the Beta pill).
+* [ ] Confirm DreamHost accepts NS records for a subdomain (`app`), before building anything on it. If it does not, the DNS design in tech-architecture.md §6 changes.
+* [ ] Name the maintainer who administers the AWS account and which login profile they use; choose the AWS region for the state bucket and site bucket (`us-east-1` is simplest, because CloudFront certificates must be there); set an AWS budget alert. Record the choices in the runbook, never the account ID.
+* [ ] Confirm the team is comfortable with Pulumi (see tech-architecture.md §8).
+* [ ] Create the GitHub `production` environment with a required reviewer and the variables `SITE_URL=https://app.winmetta.org` and `PUBLIC_ALLOW_INDEXING=false`.
+* [ ] Look up the latest stable Pulumi CLI, `@pulumi/aws`, `pulumi/actions` and `aws-actions/configure-aws-credentials` versions from their registries, record them with the date in tech-architecture.md §2, and re-check CloudFront pricing and its free tier.
+* [x] Burmese review of the new Burmese wording (the `beta…` and `notFound…` keys in `my.json`): reviewed and accepted for now on 2026-10-06; it can change later.
+* [ ] Start the "before launch" class host review and the Sayadaw consent requests (see Launch gates): they have the longest lead time.
+
+**Step 1: app changes**
+
+* [x] Beta indicator: a visible "Beta" pill in the header on every page in both locales, keyboard and screen-reader accessible, linking to a short note on About (`#beta`) that the site is new and being reviewed. **Done:** `isBeta` in `lib/site.ts` is the one switch to remove it, the `beta…` message keys exist in `en` and `my` (the Burmese wording needs review), the styles use existing tokens, and `pages.spec.ts` covers it. The root language chooser (`/`) has no header and shows no pill.
+* [x] Custom 404 page: with origin access control a missing key returns 403, so CloudFront answers with a real 404 page. **Done:** `src/pages/404.astro` shows the message in both languages with a link to each home page (the language of a missing address is unknown), always sends `noindex`, and is left out of the sitemap. The CloudFront error response that serves it is step 3.
+* [x] `robots.txt` and a sitemap, built from `SITE_URL` and `PUBLIC_ALLOW_INDEXING`: allow all plus the sitemap URL when indexing is on, allow all without the sitemap while it is off (a `Disallow` would stop crawlers from fetching pages and seeing their `noindex` tag). The build variable stays the single switch for indexing (meta tag and sitemap line); CloudFront adds security headers but no `X-Robots-Tag`, so the two cannot disagree. **Done:** `src/pages/robots.txt.ts` (allow all, plus the sitemap URL only when indexing is on) and `@astrojs/sitemap` (`sitemap-index.xml`, 256 pages, each with its other-language alternate; the root chooser and 404 are excluded), covered by `pages.spec.ts`.
+* [x] PR builds as artifacts: **Done:** `ci.yml` uploads `apps/web/dist` as `site-build` on pull requests (7 days), so reviewers can download a PR's build.
+* [x] `BASE_URL` option in `apps/web/playwright.config.ts`: **Done:** `BASE_URL=https://… npm run test:smoke` runs the suite against a deployed site and starts no local server. The robots and 404 checks work for both indexing states.
+* [ ] Privacy page, in the launch PR (step 7), not before: the `privacyHosting` text names only bunny.net for PDF files, so name AWS CloudFront for the pages once they are served from there (`en` and `my`, Burmese reviewed), and change the page's last-updated date and the test that expects it.
+
+**Step 2: bootstrap**
+
+* [ ] One-time bootstrap by a maintainer, written into the runbook and not managed by Pulumi: a private, versioned S3 bucket for Pulumi state, an AWS KMS key, and the GitHub OIDC identity provider. These must exist before `pulumi login s3://…`. Record resource names, never the account ID.
+
+**Step 3: Pulumi and DNS**
+
+* [ ] Pulumi (TypeScript) program in `infra/pulumi/` with one `production` stack: private site bucket with origin access control, CloudFront, ACM certificate, the CloudFront Function, a response headers policy, the Route 53 zone and records, and the deploy IAM role. Only non-secret `Pulumi.production.yaml` is committed; Phase 2 needs no secrets, so keep the stack config secret-free. `pulumi preview` runs on PRs touching `infra/` with a read-only role; `pulumi up` is a manual maintainer action.
+* [ ] Domains and DNS (AWS Route 53): a hosted zone for `app.winmetta.org`, delegated from DreamHost with four NS records for `app` added once in the DreamHost DNS panel. The first `pulumi up` is staged because ACM DNS validation waits for delegation: create the zone, add the NS records, wait until `dig NS app.winmetta.org` shows them, then apply the certificate validation, distribution and alias records. `winmetta.org` itself, its name servers (DreamHost's free nonprofit hosting requires them) and the WordPress records are unchanged.
+* [ ] CloudFront viewer-request Function: the site uses `trailingSlash: 'always'` and a private bucket behind origin access control does not serve directory indexes, so map `/en/about/` to its `index.html` and redirect a missing trailing slash.
+
+**Step 4: verify hosting by hand**
+
+* [ ] Upload a local build with `aws s3 sync` and check by hand: directory URLs and the trailing-slash redirect, the 404 page, cache headers on hashed assets and HTML, `robots.txt` and the `noindex` meta tag while `PUBLIC_ALLOW_INDEXING=false`, and library search loading its lazy index.
+
+**Step 5: CI deploy**
+
+* [ ] `.github/workflows/deploy-web.yml`: runs after CI passes on `main`, and by `workflow_dispatch` with a chosen ref for rollback. The deploy job uses the GitHub `production` environment with a required reviewer. It builds with `SITE_URL=https://app.winmetta.org` and `PUBLIC_ALLOW_INDEXING` from the environment's variables, then publishes with `aws s3 sync` in two passes, because `sync` sets no `Cache-Control`: content-hashed `_astro/*` and `library-data/*.<hash>.json` get `immutable` for a year, and HTML and icons get a short or no-cache value. Upload HTML last, then invalidate `/*`. Do not delete old hashed files immediately (a tab opened before the deploy would 404 on its lazy search index); prune unreferenced hashed files only after about a week.
+* [ ] IAM, with no long-lived AWS keys in GitHub: the deploy role trusts only GitHub's OIDC token for the `production` environment of this repo and may touch only the site bucket and its distribution (sync and invalidation). The Pulumi preview role is read-only plus `kms:Decrypt` on the stack's key only (the KMS secrets provider keeps an encrypted data key with the stack; confirm in step 3 that a preview needs it and nothing broader). Fork pull requests get no OIDC token; use `pull_request`, never `pull_request_target`, in these workflows.
+* [ ] Post-deploy smoke test: the deploy workflow runs `test:smoke` against the live site using the `BASE_URL` option from step 1.
+
+**Step 6: runbook and hardening**
+
+* [ ] Runbook: bootstrap and the staged first apply, editing content and redeploying, rolling back by redeploying an earlier ref, and the choices recorded in step 0. Do a rollback drill once.
 * [ ] Harden the default-branch ruleset once the CI workflows run reliably (it currently requires a pull request, squash merges only, no bypass, conversation resolution and the `checks` status check, with 0 approvals and code owner review off):
   * [x] Require the `checks` status check from `.github/workflows/ci.yml` (done, set not to require an up-to-date branch). Still to do: add the deploy workflow's checks once they exist; up-to-date branches stay off in favour of the merge queue item below.
   * [x] Turn on "Require conversation resolution before merging", so unresolved review threads, including the Codex app's findings, block the merge. Done.
-  * [ ] Use GitHub's merge queue instead of the "Require branches to be up to date" setting, once several people open PRs in parallel or `main` deploys automatically to staging: add the `merge_group` trigger to `ci.yml` (and to the deploy workflow's checks) first, then switch on "Require merge queue" in the ruleset (confirm it is available for this organization's public repo), so every PR is tested on top of the latest `main` without manual branch updates.
+  * [ ] Use GitHub's merge queue instead of the "Require branches to be up to date" setting, once several people open PRs in parallel or merges to `main` start deploying to production: add the `merge_group` trigger to `ci.yml` (and to the deploy workflow's checks) first, then switch on "Require merge queue" in the ruleset (confirm it is available for this organization's public repo), so every PR is tested on top of the latest `main` without manual branch updates.
   * [ ] Revisit the approval and code owner settings (`.github/CODEOWNERS` names `@winmetta/developers`) once the team has a second member, for example 1 required approval with code owner review.
-* [ ] CI/CD promotion: `main` deploys automatically to staging and a deliberate step (tag or manual approval) promotes to production.
-* [ ] `noindex` and access restriction on staging and PR previews.
-* [ ] Complete the staging review gates below before promoting to production.
-* [ ] Smoke-test both environments end to end, document the rollback procedure, and record the runbook for editing content and redeploying.
 
-### Staging review gates (Phase 2, after the first staging deploy)
+### Launch gates (Phase 2)
 
-Reviewers need a real environment, so these run on staging. Production promotion (and the public launch) waits until all three are done.
+This is step 7 above. Reviewers need a real environment, so these run on the first production deploy, which is unindexed (`PUBLIC_ALLOW_INDEXING=false`) and not linked from winmetta.org. The launch is switching indexing on, redeploying and linking from winmetta.org, and it waits for the **before launch** items (the launch PR also updates the Privacy page hosting text and date, step 1). The **during beta** items continue after launch, and the Beta label stays until they are done or consciously accepted.
 
-**Burmese-speaker review**
-
-* [ ] The 11 Zawgyi conversions and 3 suspicious titles in `zawgyi-review.json`, recording corrections in `overrides.json`.
-* [ ] The golden-query suite (partial words, typos, spaced and unspaced queries, digits, ဥ/ဉ variants), then record the index size and query-time budgets.
-* [ ] All Burmese interface text on the Classes, Dhamma Study Groups, Retreats, Sayadaws and Zoom help pages, the schedule table and the time zone names, and the draft English biographies (set a teacher's English `reviewed` to `true` only after this).
-
-**Class host review**
+**Before launch: class host review** (public-facing facts and consent)
 
 * [ ] Class times, Zoom IDs and the public passcode, which classes are live-streamed, and the language each class and study group is taught in (including the two study groups).
 * [ ] The About text, the retreat details (including the 13th retreat, which has no detail page on winmetta.org) and the Kuṇḍadhāna/Kovida naming on the 3-day 2025 retreat page.
-* [ ] The Sayadaws confirm they are comfortable with their portraits and biographies in the public repo.
+* [ ] The Sayadaws confirm they are comfortable with their portraits and biographies in the public repo and on the site.
 
-**Acceptance walkthrough (formerly the Phase 1 acceptance list)**
+**Before launch: acceptance walkthrough (formerly the Phase 1 acceptance list)**
 
 * All pages work in both locales; direct loads and internal navigation work without login.
 * Both journeys work on mobile and desktop: find a class and its joining information; search/browse the library by folder tag, find a book from a partial or misspelled Burmese phrase, and open its PDF.
 * Verify Burmese and English search (partial words, typos, spaces, digit and ဥ/ဉ variants), tag filters, empty results, reset, shareable URLs, back/forward, same-page language switching with filters, duplicate S3 copies shown once, and every library link returning the PDF.
 * Validate translation coverage, blocked-storage behavior, mobile text wrapping, keyboard navigation, document language metadata and source-link validity.
 * Verify Pacific daylight-saving transitions and Myanmar date/day rollover independently of interface language. No analytics, blog feed or copied WordPress design.
+* Verify the infrastructure end to end: trailing-slash and 404 behavior, cache headers, `robots.txt` and the `noindex` switch in both states, and the rollback procedure.
 
-Out of scope for Phases 0–2 (future work): interactive LLB lessons, the repeatable upload-and-reindex pipeline for new library files (outlined in §5), full-text/OCR/transcript search inside PDFs, unified class archive, additional locales beyond English/Burmese, product analytics/metric collection, profile timezone preferences, backend API, database, accounts, offline/PWA, `apps/desktop`, `apps/mobile`. Excluded entirely: standalone blog publishing/automatic feeds, copying the existing site UI, bulk website migration.
+**During beta: Burmese-speaker review**
+
+* [ ] The 11 Zawgyi conversions and 3 suspicious titles in `zawgyi-review.json`, recording corrections in `overrides.json`.
+* [ ] The golden-query suite (partial words, typos, spaced and unspaced queries, digits, ဥ/ဉ variants), then record the index size and query-time budgets.
+* [ ] All Burmese interface text on the Classes, Dhamma Study Groups, Retreats, Sayadaws and Zoom help pages, the schedule table, the time zone names, and the draft English biographies (set a teacher's English `reviewed` to `true` only after this).
+
+Out of scope for Phases 0–2 (future work): a staging environment and PR preview host (planned with the first API or backend), new media buckets and the `cdn.app.winmetta.org` hostname (Phase 3), interactive LLB lessons, the repeatable upload-and-reindex pipeline for new library files (outlined in §5), full-text/OCR/transcript search inside PDFs, unified class archive, additional locales beyond English/Burmese, product analytics/metric collection, profile timezone preferences, backend API, database, accounts, offline/PWA, `apps/desktop`, `apps/mobile`. Excluded entirely: standalone blog publishing/automatic feeds, copying the existing site UI, bulk website migration.
 
 ---
 
@@ -237,66 +294,13 @@ Acceptance: a maintainer who has never touched the repo adds one new PDF followi
 
 ## 6. Reference: Monorepo Configuration
 
-### Root `package.json`
+The root configuration lives in the repo and is the source of truth; this plan no longer copies it, because the copies drifted (workspaces, engines and scripts changed after Phase 0). Read these files instead:
 
-```json
-{
-  "name": "winmetta-platform",
-  "private": true,
-  "packageManager": "npm@11.20.0",
-  "license": "MIT",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
-  "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "typecheck": "turbo run typecheck",
-    "clean": "turbo run clean && rm -rf node_modules"
-  },
-  "devDependencies": {
-    "turbo": "^2.11.0",
-    "prettier": "^3.9.0",
-    "typescript": "^6.0.0"
-  },
-  "engines": {
-    "node": ">=24.0.0",
-    "npm": ">=11.0.0"
-  }
-}
-```
+* [`package.json`](../package.json): workspaces (`apps/*`), the `packageManager` and `engines` declarations, and the npm scripts.
+* [`turbo.json`](../turbo.json): task graph. The `build` task lists `SITE_URL`, `PUBLIC_ALLOW_INDEXING` and `PUBLIC_LIBRARY_CDN_BASE` as inputs, so a build with different values is never served from the Turborepo cache.
+* [`.nvmrc`](../.nvmrc): Node major version.
 
-Pin npm consistently in local setup and CI using the root `packageManager` declaration; `engines.npm` alone is not the Turborepo package-manager declaration. The example uses npm 11.20.0; re-verify at kickoff. Commit the generated lockfile and use `npm ci` for repeat installs.
-
-### `.nvmrc`
-
-```
-24
-```
-
-### `turbo.json`
-
-```json
-{
-  "$schema": "https://turbo.build/schema.json",
-  "tasks": {
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true
-    },
-    "typecheck": {
-      "dependsOn": ["^typecheck"]
-    },
-    "lint": {}
-  }
-}
-```
+Pin npm consistently in local setup and CI using the root `packageManager` declaration; `engines.npm` alone is not the Turborepo package-manager declaration. Re-verify the npm version at kickoff, commit the generated lockfile and use `npm ci` for repeat installs.
 
 ---
 

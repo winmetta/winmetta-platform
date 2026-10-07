@@ -2,6 +2,7 @@
 import Shell from '../../../layouts/Shell.astro';
 import { localeCodes, type Locale } from '../../../i18n/locales';
 import { t } from '../../../i18n/messages';
+import { isBeta } from '../../../lib/site';
 export function getStaticPaths() {
   return localeCodes.map((locale) => ({
     params: { locale },
@@ -40,6 +41,20 @@ const text = (key: Parameters<typeof t>[1]) => t(locale, key);
       <h2 id="free" class="text-xl font-bold">{text('aboutFreeTitle')}</h2>
       <p>{text('aboutFree')}</p>
     </section>
+    {
+      isBeta && (
+        <section
+          id="beta"
+          class="card space-y-3 md:col-span-2"
+          aria-labelledby="beta-title"
+        >
+          <h2 id="beta-title" class="text-xl font-bold">
+            {text('betaTitle')}
+          </h2>
+          <p class="max-w-prose">{text('betaBody')}</p>
+        </section>
+      )
+    }
   </div>
 
   <p class="flex flex-wrap items-center gap-x-6 gap-y-2">

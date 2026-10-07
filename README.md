@@ -2,7 +2,7 @@
 
 A bilingual (English and Burmese) web platform for [Win Metta](https://winmetta.org/about/), a California 501(c)(3) nonprofit continuing an existing Burmese Theravāda Buddhist teaching community online. It helps online class students and independent learners worldwide find classes and Dhamma resources, and will grow into interactive Burmese literacy lessons.
 
-The first phases deliver a foundation app (Phase 0), bilingual pages — Home, About, Privacy, Classes (with Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library (Phase 1) — then AWS hosting, the deploy workflow and public staging/production infrastructure (Phase 2). After that, the plan is to digitize **"Let's Learn Burmese" (LLB)**, an existing, proven Burmese-literacy course currently taught by Ven. U Garudhamma, into an interactive self-paced app, and to expand the Dhamma Library and class archive. Full reasoning and scope live in the docs below.
+The first phases deliver a foundation app (Phase 0), bilingual pages — Home, About, Privacy, Classes (with Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library (Phase 1) — then AWS hosting, the deploy workflow and the public, Beta-labelled production site (Phase 2). After that, the plan is to digitize **"Let's Learn Burmese" (LLB)**, an existing, proven Burmese-literacy course currently taught by Ven. U Garudhamma, into an interactive self-paced app, and to expand the Dhamma Library and class archive. Full reasoning and scope live in the docs below.
 
 ## Status
 
@@ -30,7 +30,7 @@ Phase 1 introduces Home, About, Privacy, Classes (with Sayadaws, Dhamma Study Gr
 
 ## Tech Stack (planned)
 
-Astro (with React islands) · TypeScript · Tailwind · Turborepo/npm workspaces · AWS S3 + CloudFront hosting · AWS S3 + bunny.net media CDN · Route 53 DNS (subdomain delegated from DreamHost). A Fastify/PostgreSQL backend is a possible future addition. See [docs/tech-architecture.md](docs/tech-architecture.md) for versions and the reasoning behind each choice.
+Astro (with React islands) · TypeScript · Tailwind · Turborepo/npm workspaces · AWS S3 + CloudFront hosting · bunny.net library CDN over S3 · Route 53 DNS (subdomain delegated from DreamHost). A Fastify/PostgreSQL backend is a possible future addition. See [docs/tech-architecture.md](docs/tech-architecture.md) for versions and the reasoning behind each choice.
 
 ## Contributing
 

@@ -200,5 +200,12 @@
   "meetRetreatsTitle": "Retreats",
   "meetRetreatsText": "Online and in-person meditation retreats, and an archive of past retreats.",
   "privacySearchUrlTitle": "Search words in the page address",
-  "privacySearchUrl": "While you search or filter, the site adds your search words, filters and chosen time zone to the page address (for example ?q=…) so that you can bookmark or share the page and use the Back button. The address stays in your browser as you type. But when you open, reload or share such a link, the address is requested from the hosting provider like any other page address, so your search words can appear in its request logs. Please do not put personal information in a search, and share a link only if you are comfortable with its words being visible."
+  "privacySearchUrl": "While you search or filter, the site adds your search words, filters and chosen time zone to the page address (for example ?q=…) so that you can bookmark or share the page and use the Back button. The address stays in your browser as you type. But when you open, reload or share such a link, the address is requested from the hosting provider like any other page address, so your search words can appear in its request logs. Please do not put personal information in a search, and share a link only if you are comfortable with its words being visible.",
+  "betaLabel": "Beta",
+  "betaLink": "Beta: about this site",
+  "betaTitle": "This site is in beta",
+  "betaBody": "This site is new and still being reviewed. Some Burmese wording and library titles may contain mistakes while Burmese speakers finish checking them. If you find one, please tell us.",
+  "notFoundTitle": "Page not found",
+  "notFoundText": "We could not find that page. It may have moved, or the address may have a typo.",
+  "notFoundHome": "Go to the home page"
 }
