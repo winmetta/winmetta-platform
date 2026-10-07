@@ -161,7 +161,9 @@ test.describe('hosting files', () => {
     const sitemap = await request.get('/sitemap-index.xml');
     expect(sitemap.ok()).toBe(true);
     if (noindex) {
-      expect(robots).toContain('Disallow: /');
+      // Crawlers must still be able to fetch the pages to see their noindex tag.
+      expect(robots).toContain('Allow: /');
+      expect(robots).not.toContain('Disallow');
       expect(robots).not.toContain('Sitemap:');
     } else {
       expect(robots).toContain('Allow: /');

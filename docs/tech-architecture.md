@@ -294,7 +294,7 @@ Deliberately small, for a volunteer team. Rollout by phase:
 2. **Merge to `main`** → `deploy-web.yml` waits for a required reviewer to approve the `production` environment, builds with the production variables, syncs to S3, invalidates CloudFront and runs the Playwright smoke test against the live URL.
 3. **Rollback** is a manual run of the same workflow (`workflow_dispatch`) with an earlier ref. A bad deploy goes straight to production, so keep the smoke test and the approval step.
 
-Until launch, the production environment variable `PUBLIC_ALLOW_INDEXING` is `false`, so every page sends `noindex` and `robots.txt` disallows everything. Launch sets it to `true` and redeploys. CI authenticates to AWS only through GitHub OIDC (§8), and fork pull requests get no AWS access.
+Until launch, the production environment variable `PUBLIC_ALLOW_INDEXING` is `false`, so every page sends `noindex`. `robots.txt` stays allow-all but leaves out the sitemap: a `Disallow` would stop crawlers from fetching the pages, so they would never see the `noindex` tag. Launch sets it to `true` and redeploys. CI authenticates to AWS only through GitHub OIDC (§8), and fork pull requests get no AWS access.
 
 Enable GitHub secret scanning and push protection on the repo (free for public repos) in Phase 0.
 
@@ -313,7 +313,7 @@ infra/pulumi/
 
 * **Bootstrap (one time, outside Pulumi):** the state bucket, the KMS key and the GitHub OIDC identity provider must exist before `pulumi login s3://…`, so a maintainer creates them once by hand or with a short script, and the runbook records their names (never the account ID).
 * **State and secrets:** a private, versioned S3 bucket as the Pulumi backend and an AWS KMS key as the secrets provider, so state, locking and encryption stay inside the one AWS account and need no extra service or subscription. Pulumi Cloud's free individual tier is an alternative if the team prefers its UI. Nothing is stored in git.
-* **Public repo rule:** commit only non-secret `Pulumi.<stack>.yaml`; secrets are set with `pulumi config set --secret` or come from the environment, and access keys and connection strings stay out of the repo. Phase 2 needs no secrets, so keep the stack config secret-free; that also means the read-only preview role never needs `kms:Decrypt`.
+* **Public repo rule:** commit only non-secret `Pulumi.<stack>.yaml`; secrets are set with `pulumi config set --secret` or come from the environment, and access keys and connection strings stay out of the repo. Phase 2 needs no secrets, so keep the stack config secret-free. The KMS secrets provider still stores an encrypted data key with the stack, so the read-only preview role most likely needs `kms:Decrypt` on that one key (Pulumi's documentation implies this for stack operations but does not spell it out for previews; confirm with a dry run in step 3). With secret-free config that decrypts nothing sensitive. Revisit this before the first real secret, for example by making previews maintainer-triggered only.
 * `pulumi preview` runs on PRs touching `infra/` with a read-only role; `pulumi up` is a manual maintainer action, never automatic.
 * **CI auth:** GitHub OIDC trust to AWS IAM roles, so no long-lived AWS keys are stored in GitHub. The production deploy role trusts only this repository's `production` environment and may touch only the site bucket and its distribution (sync and invalidation). The Pulumi preview role is separate and read-only. Workflows use `pull_request`, never `pull_request_target`, and fork pull requests get no OIDC token.
 
