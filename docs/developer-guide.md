@@ -43,7 +43,7 @@ Keep code in `apps/web` until a second consumer needs it. Only then extract a pa
 | `npm run typecheck` | `astro check` (strict TypeScript). |
 | `npm test` | Vitest unit tests. |
 | `npm run build` | Static production build. |
-| `npm run test:smoke` | Playwright tests against the built site (served on port 4331, so a running dev server on 4321 is never reused). Run `npm run build` first. The first time, run `npx playwright install chromium`. |
+| `npm run test:smoke` | Playwright tests against the built site (served on port 4331, so a running dev server on 4321 is never reused). Run `npm run build` first. The first time, run `npx playwright install chromium`. Set `BASE_URL` to run them against a deployed site instead; no local server is started. |
 
 CI runs all of these on every pull request and does not deploy. Run lint, typecheck, test and build locally before pushing.
 

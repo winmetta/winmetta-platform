@@ -28,6 +28,14 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      # Lets reviewers download and open a PR's built site (there is no hosted preview).
+      - name: Upload the built site
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v7
+        with:
+          name: site-build
+          path: apps/web/dist
+          retention-days: 7
       - name: Read the Playwright version
         id: playwright
         run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"

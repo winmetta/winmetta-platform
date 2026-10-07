@@ -133,3 +133,39 @@ test('privacy page discloses that search words appear in the page address', asyn
     }),
   ).toBeVisible();
 });
+
+test.describe('hosting files', () => {
+  test('an unknown address shows the bilingual 404 page', async ({ page }) => {
+    const response = await page.goto('/en/no-such-page/');
+    expect(response?.status()).toBe(404);
+    await expect(page.locator('section[lang="en"] h2')).toHaveText(
+      'Page not found',
+    );
+    await expect(page.locator('section[lang="my"] h2')).toBeVisible();
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+      'content',
+      'noindex',
+    );
+    await page.locator('a[hreflang="my"]').click();
+    await expect(page).toHaveURL(/\/my\/$/);
+  });
+
+  test('robots.txt and the sitemap follow the indexing switch', async ({
+    page,
+    request,
+  }) => {
+    // Works against a local build (indexing off) and the public site (indexing on).
+    await page.goto('/en/');
+    const noindex = (await page.locator('meta[name="robots"]').count()) > 0;
+    const robots = await (await request.get('/robots.txt')).text();
+    const sitemap = await request.get('/sitemap-index.xml');
+    expect(sitemap.ok()).toBe(true);
+    if (noindex) {
+      expect(robots).toContain('Disallow: /');
+      expect(robots).not.toContain('Sitemap:');
+    } else {
+      expect(robots).toContain('Allow: /');
+      expect(robots).toContain('sitemap-index.xml');
+    }
+  });
+});

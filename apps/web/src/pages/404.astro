@@ -1,0 +1,50 @@
+---
+import '../styles/global.css';
+import { localeCodes, locales } from '../i18n/locales';
+import { route } from '../i18n/routes';
+import { t } from '../i18n/messages';
+---
+
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- An error page is never worth indexing, even on the public site. -->
+    <meta name="robots" content="noindex" />
+    <title>{t('en', 'notFoundTitle')} · {t('en', 'brand')}</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#ffffff" />
+  </head>
+  <body class="flex min-h-screen items-center justify-center p-5">
+    <main
+      class="card w-full max-w-md space-y-6 p-8 text-center"
+      style="background: linear-gradient(160deg, var(--sand), var(--sky));"
+    >
+      <img
+        src="/logo-512.png"
+        width="160"
+        height="160"
+        alt=""
+        class="mx-auto size-32"
+      />
+      <h1 class="text-2xl font-bold">{t('en', 'brand')}</h1>
+      {
+        localeCodes.map((code) => (
+          <section lang={code} class="space-y-2">
+            <h2 class="text-xl font-bold">{t(code, 'notFoundTitle')}</h2>
+            <p>{t(code, 'notFoundText')}</p>
+            <a
+              class="btn btn-primary w-full"
+              href={route(code)}
+              hreflang={code}
+            >
+              {t(code, 'notFoundHome')} ({locales[code].name})
+            </a>
+          </section>
+        ))
+      }
+    </main>
+  </body>
+</html>

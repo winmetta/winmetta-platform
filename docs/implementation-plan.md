@@ -190,7 +190,7 @@ Do the steps in this order; each one lists what it needs first and how to tell i
 | Step | What | Needs | Done when |
 | --- | --- | --- | --- |
 | 0 | Prerequisites: decisions, access, versions | This design PR merged | Every box in step 0 is ticked and the choices are recorded in the runbook. |
-| 1 | App changes the hosting depends on (no AWS) | Nothing | `npm run build` outputs `404.html`, `robots.txt` and a sitemap, and CI uploads the built site as an artifact. |
+| 1 | App changes the hosting depends on (no AWS) | Nothing | `npm run build` outputs `404.html`, `robots.txt` and a sitemap, and CI uploads the built site as an artifact. **Done in the design PR**, except the Privacy wording, which waits for launch. |
 | 2 | One-time AWS bootstrap | Step 0 | The state bucket, KMS key and OIDC provider exist and `pulumi login` works for a maintainer. |
 | 3 | Pulumi program, staged first apply | Steps 1 and 2 | `app.winmetta.org` serves a hand-uploaded build over HTTPS from CloudFront. |
 | 4 | Verify hosting behavior by hand | Step 3 | Trailing-slash, 404, cache-header and `robots.txt` checks pass on the live distribution. |
@@ -213,11 +213,11 @@ Do the steps in this order; each one lists what it needs first and how to tell i
 **Step 1: app changes**
 
 * [x] Beta indicator: a visible "Beta" pill in the header on every page in both locales, keyboard and screen-reader accessible, linking to a short note on About (`#beta`) that the site is new and being reviewed. **Done:** `isBeta` in `lib/site.ts` is the one switch to remove it, the `beta…` message keys exist in `en` and `my` (the Burmese wording needs review), the styles use existing tokens, and `pages.spec.ts` covers it. The root language chooser (`/`) has no header and shows no pill.
-* [ ] Custom 404 page: with origin access control a missing key returns 403, so CloudFront answers with a real 404 page. `apps/web` has no `404.astro` yet; add one (locale-aware if feasible).
-* [ ] `robots.txt` and a sitemap, built from `SITE_URL` and `PUBLIC_ALLOW_INDEXING`: allow all plus the sitemap URL when indexing is on, disallow all while it is off. The build variable stays the single switch for indexing (meta tag and `robots.txt`); CloudFront adds security headers but no `X-Robots-Tag`, so the two cannot disagree.
-* [ ] PR builds as artifacts: `ci.yml` does not upload the built site yet; add an `upload-artifact` step for `apps/web/dist` so reviewers can download a PR's build.
-* [ ] `BASE_URL` option in `apps/web/playwright.config.ts` (it currently serves only a local preview on port 4331), so `test:smoke` can run against a deployed site.
-* [ ] Privacy page: check that its hosting and CDN wording matches AWS CloudFront and bunny.net, and change its last-updated date (and the test that expects it) with the change that makes the site public.
+* [x] Custom 404 page: with origin access control a missing key returns 403, so CloudFront answers with a real 404 page. **Done:** `src/pages/404.astro` shows the message in both languages with a link to each home page (the language of a missing address is unknown), always sends `noindex`, and is left out of the sitemap. The CloudFront error response that serves it is step 3.
+* [x] `robots.txt` and a sitemap, built from `SITE_URL` and `PUBLIC_ALLOW_INDEXING`: allow all plus the sitemap URL when indexing is on, disallow all while it is off. The build variable stays the single switch for indexing (meta tag and `robots.txt`); CloudFront adds security headers but no `X-Robots-Tag`, so the two cannot disagree. **Done:** `src/pages/robots.txt.ts` (disallow all, or allow all plus the sitemap URL) and `@astrojs/sitemap` (`sitemap-index.xml`, 256 pages, each with its other-language alternate; the root chooser and 404 are excluded), covered by `pages.spec.ts`.
+* [x] PR builds as artifacts: **Done:** `ci.yml` uploads `apps/web/dist` as `site-build` on pull requests (7 days), so reviewers can download a PR's build.
+* [x] `BASE_URL` option in `apps/web/playwright.config.ts`: **Done:** `BASE_URL=https://… npm run test:smoke` runs the suite against a deployed site and starts no local server. The robots and 404 checks work for both indexing states.
+* [ ] Privacy page, in the launch PR (step 7), not before: the `privacyHosting` text names only bunny.net for PDF files, so name AWS CloudFront for the pages once they are served from there (`en` and `my`, Burmese reviewed), and change the page's last-updated date and the test that expects it.
 
 **Step 2: bootstrap**
 
@@ -250,7 +250,7 @@ Do the steps in this order; each one lists what it needs first and how to tell i
 
 ### Launch gates (Phase 2)
 
-This is step 7 above. Reviewers need a real environment, so these run on the first production deploy, which is unindexed (`PUBLIC_ALLOW_INDEXING=false`) and not linked from winmetta.org. The launch is switching indexing on, redeploying and linking from winmetta.org, and it waits for the **before launch** items (the launch itself also updates the Privacy page date, step 1). The **during beta** items continue after launch, and the Beta label stays until they are done or consciously accepted.
+This is step 7 above. Reviewers need a real environment, so these run on the first production deploy, which is unindexed (`PUBLIC_ALLOW_INDEXING=false`) and not linked from winmetta.org. The launch is switching indexing on, redeploying and linking from winmetta.org, and it waits for the **before launch** items (the launch PR also updates the Privacy page hosting text and date, step 1). The **during beta** items continue after launch, and the Beta label stays until they are done or consciously accepted.
 
 **Before launch: class host review** (public-facing facts and consent)
 

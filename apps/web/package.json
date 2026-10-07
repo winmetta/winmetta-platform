@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@astrojs/react": "^7.0.0",
+    "@astrojs/sitemap": "^3.7.4",
     "@fontsource/noto-sans-myanmar": "^5.2.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@tailwindcss/vite": "^4.3.0",

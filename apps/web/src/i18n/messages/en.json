@@ -204,5 +204,8 @@
   "betaLabel": "Beta",
   "betaLink": "Beta: about this site",
   "betaTitle": "This site is in beta",
-  "betaBody": "This site is new and still being reviewed. Some Burmese wording and library titles may contain mistakes while Burmese speakers finish checking them. If you find one, please tell us."
+  "betaBody": "This site is new and still being reviewed. Some Burmese wording and library titles may contain mistakes while Burmese speakers finish checking them. If you find one, please tell us.",
+  "notFoundTitle": "Page not found",
+  "notFoundText": "We could not find that page. It may have moved, or the address may have a typo.",
+  "notFoundHome": "Go to the home page"
 }
