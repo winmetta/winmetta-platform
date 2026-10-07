@@ -26,6 +26,18 @@ for (const l of locales) {
       await expect(page).toHaveURL(new RegExp(`/${l.code}/dhamma-library/$`));
     });
 
+    test('the Beta pill in the header opens the beta note on About', async ({
+      page,
+    }) => {
+      await page.goto(`/${l.code}/dhamma-library/`);
+      const pill = page.locator('header a.beta-pill');
+      await expect(pill).toBeVisible();
+      await expect(pill).toHaveText('Beta');
+      await pill.click();
+      await expect(page).toHaveURL(new RegExp(`/${l.code}/about/#beta$`));
+      await expect(page.locator('section#beta')).toBeVisible();
+    });
+
     test('footer links open About and Privacy', async ({ page }) => {
       await page.goto(`/${l.code}/`);
       const footer = page.locator('footer');

@@ -4,7 +4,7 @@ import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 import { locales, localeCodes, type Locale } from '../i18n/locales';
 import { pagePaths, route, type PageId } from '../i18n/routes';
 import { t } from '../i18n/messages';
-import { allowIndexing } from '../lib/site';
+import { allowIndexing, isBeta } from '../lib/site';
 interface Props {
   locale: Locale;
   title: string;
@@ -61,10 +61,23 @@ const inLibrary =
     <a href="#main" class="skip-link">{t(locale, 'skip')}</a>
     <header class="site-header">
       <div class="site-header__inner">
-        <a href={route(locale)} class="brand">
-          <img src="/logo-96.png" width="44" height="44" alt="" />
-          <span>{t(locale, 'brand')}</span>
-        </a>
+        <div class="brand-group">
+          <a href={route(locale)} class="brand">
+            <img src="/logo-96.png" width="44" height="44" alt="" />
+            <span>{t(locale, 'brand')}</span>
+          </a>
+          {
+            isBeta && (
+              <a
+                href={`${route(locale, 'about')}#beta`}
+                class="beta-pill"
+                aria-label={t(locale, 'betaLink')}
+              >
+                <span aria-hidden="true">{t(locale, 'betaLabel')}</span>
+              </a>
+            )
+          }
+        </div>
         <button
           type="button"
           class="menu-button"
