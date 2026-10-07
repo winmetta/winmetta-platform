@@ -207,7 +207,7 @@ Do the steps in this order; each one lists what it needs first and how to tell i
 * [ ] Confirm the team is comfortable with Pulumi (see tech-architecture.md §8).
 * [ ] Create the GitHub `production` environment with a required reviewer and the variables `SITE_URL=https://app.winmetta.org` and `PUBLIC_ALLOW_INDEXING=false`.
 * [ ] Look up the latest stable Pulumi CLI, `@pulumi/aws`, `pulumi/actions` and `aws-actions/configure-aws-credentials` versions from their registries, record them with the date in tech-architecture.md §2, and re-check CloudFront pricing and its free tier.
-* [ ] Burmese-speaker review of the Beta wording (`beta…` keys in `my.json`).
+* [x] Burmese review of the new Burmese wording (the `beta…` and `notFound…` keys in `my.json`): reviewed and accepted for now on 2026-10-06; it can change later.
 * [ ] Start the "before launch" class host review and the Sayadaw consent requests (see Launch gates): they have the longest lead time.
 
 **Step 1: app changes**
@@ -271,7 +271,7 @@ This is step 7 above. Reviewers need a real environment, so these run on the fir
 
 * [ ] The 11 Zawgyi conversions and 3 suspicious titles in `zawgyi-review.json`, recording corrections in `overrides.json`.
 * [ ] The golden-query suite (partial words, typos, spaced and unspaced queries, digits, ဥ/ဉ variants), then record the index size and query-time budgets.
-* [ ] All Burmese interface text on the Classes, Dhamma Study Groups, Retreats, Sayadaws and Zoom help pages, the schedule table, the time zone names and the Beta label, and the draft English biographies (set a teacher's English `reviewed` to `true` only after this).
+* [ ] All Burmese interface text on the Classes, Dhamma Study Groups, Retreats, Sayadaws and Zoom help pages, the schedule table, the time zone names, and the draft English biographies (set a teacher's English `reviewed` to `true` only after this).
 
 Out of scope for Phases 0–2 (future work): a staging environment and PR preview host (planned with the first API or backend), new media buckets and the `cdn.app.winmetta.org` hostname (Phase 3), interactive LLB lessons, the repeatable upload-and-reindex pipeline for new library files (outlined in §5), full-text/OCR/transcript search inside PDFs, unified class archive, additional locales beyond English/Burmese, product analytics/metric collection, profile timezone preferences, backend API, database, accounts, offline/PWA, `apps/desktop`, `apps/mobile`. Excluded entirely: standalone blog publishing/automatic feeds, copying the existing site UI, bulk website migration.
 
