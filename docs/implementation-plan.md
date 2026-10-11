@@ -68,7 +68,7 @@ Repository & governance
 
 Tooling
 * [x] Commit `.nvmrc`, root `package.json` (with `packageManager`), `turbo.json`, base `tsconfig`, Prettier and ESLint config, and the npm lockfile.
-* [x] Add `scripts/setup-local-dev.sh` (`chmod +x`) for repo setup; shared tooling comes from the org `.github` repo (`bootstrap-dev-env.sh`, see its [README](https://github.com/winmetta/.github#developer-setup)).
+* [x] Add `scripts/setup-local-dev.sh` (`chmod +x`) for repo setup; shared tooling comes from the [`bootstrap-dev-env` repo](https://github.com/winmetta/bootstrap-dev-env) (`bootstrap.sh`, see its [README](https://github.com/winmetta/bootstrap-dev-env#readme)).
 * [x] `.github/workflows/ci.yml`: lint, typecheck, unit tests and build on every PR (no deploy).
 
 Web app
@@ -306,7 +306,7 @@ Pin npm consistently in local setup and CI using the root `packageManager` decla
 
 ## 7. Reference: macOS Setup Script
 
-Shared developer tooling (Homebrew, git, gh, shellcheck, shfmt, nvm, editor, AI CLIs) is installed by `bootstrap-dev-env.sh` in the org [`.github` repo](https://github.com/winmetta/.github#developer-setup). This repo's own `scripts/setup-local-dev.sh` then installs Node from `.nvmrc`, the pinned npm, locked dependencies and the Playwright browser.
+Shared developer tooling (Homebrew, git, gh, shellcheck, shfmt, nvm, editor, AI CLIs) is installed by `bootstrap.sh` in the [`bootstrap-dev-env` repo](https://github.com/winmetta/bootstrap-dev-env). This repo's own `scripts/setup-local-dev.sh` then installs Node from `.nvmrc`, the pinned npm, locked dependencies and the Playwright browser.
 
 ---
 

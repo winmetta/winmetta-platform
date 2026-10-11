@@ -8,7 +8,7 @@ Phase 0 contains only synthetic smoke pages; real content and deployments come l
 
 First set up the Win Metta workspace and tooling by following the org-wide
 [developer setup](https://github.com/winmetta/.github#developer-setup). On macOS, run
-`../.github/bootstrap-dev-env.sh` once for shared tooling, then `./scripts/setup-local-dev.sh`,
+`../bootstrap-dev-env/bootstrap.sh` once for shared tooling, then `./scripts/setup-local-dev.sh`,
 which installs Node 24, the npm version in `package.json`, locked dependencies and the
 Playwright browser.
 For an existing Node 24 installation, install the declared npm version and run `npm ci`.

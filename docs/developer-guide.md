@@ -10,9 +10,9 @@ How to set up, change and submit code for `winmetta-platform`. [CONTRIBUTING.md]
 
 ## 2. Setup
 
-Start with the org-wide [developer setup](https://github.com/winmetta/.github#developer-setup) (workspace layout, required tools, `bootstrap-dev-env.sh`).
+Start with the org-wide [developer setup](https://github.com/winmetta/.github#developer-setup) (workspace layout and required tools), which points to the [`bootstrap-dev-env`](https://github.com/winmetta/bootstrap-dev-env) repo for the shared tooling script.
 
-**macOS:** run `../.github/bootstrap-dev-env.sh` once for shared tooling (Homebrew, git, gh, shellcheck, shfmt, nvm, VS Code, Claude Code, Codex CLI). If it asks you to finish the Command Line Tools installer, do that and rerun it. Then run `./scripts/setup-local-dev.sh` from the repo root. It installs Node 24, the npm version pinned in `package.json`, locked dependencies and the Playwright Chromium browser. Both scripts are safe to re-run.
+**macOS:** run `../bootstrap-dev-env/bootstrap.sh` once for shared tooling (Homebrew, git, gh, shellcheck, shfmt, nvm, VS Code, Claude Code, Codex CLI). If it asks you to finish the Command Line Tools installer, do that and rerun it. Then run `./scripts/setup-local-dev.sh` from the repo root. It installs Node 24, the npm version pinned in `package.json`, locked dependencies and the Playwright Chromium browser. Both scripts are safe to re-run.
 
 **Other systems:** install Node 24 (see `.nvmrc`), install the npm version in the `packageManager` field of `package.json`, then run `npm ci`.
 
