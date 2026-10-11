@@ -35,7 +35,7 @@ Start with the org-wide [developer setup](https://github.com/winmetta/.github#de
    ./scripts/setup-local-dev.sh
    ```
 
-   It installs Node 24 with mise (pinned in `mise.toml`, which must match `.nvmrc`), the npm version pinned in `package.json`, locked dependencies and the Playwright Chromium browser.
+   It installs Node 24 with mise (pinned in `mise.toml`, which must match `.nvmrc`), the npm version pinned in `package.json`, locked dependencies and the Playwright Chromium browser, then installs the git hooks (`lefthook install`).
 
 All three scripts are safe to re-run. The root `AGENTS.md` (from step 1) holds the organization-wide rules for people and AI agents; this repo's `AGENTS.md` and this guide override it.
 
@@ -171,7 +171,7 @@ All user-facing text supports English (`en`) and Burmese (`my`).
 
 1. Branch from `main` (for example `feat/library-filter`). Don't push directly to `main`.
 2. Make small commits using [Conventional Commits](https://www.conventionalcommits.org/): `<type>(<scope>): <description>`, with types `feat`, `fix`, `docs`, `refactor`, `chore` or `test`. Example: `fix(schedule): reject nonexistent DST times`.
-3. Run lint, typecheck, test and build locally.
+3. Run lint, typecheck, test and build locally. The git hooks ([lefthook.yml](../lefthook.yml), installed by `./scripts/setup-local-dev.sh` or `lefthook install`) run eslint, prettier, shellcheck, shfmt, actionlint and a gitleaks secret scan on staged files, check the commit message format, and run typecheck and tests before `git push`. Fix what they report; skip them only with `--no-verify` when you must, and CI still checks.
 4. Open a pull request describing the purpose, what you changed and how you checked it. Include screenshots for UI changes, in both locales.
 5. CI must pass. Address review comments with follow-up commits.
 

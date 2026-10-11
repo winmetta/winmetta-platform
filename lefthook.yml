@@ -1,0 +1,51 @@
+# Git hooks for this repo, run by lefthook (https://lefthook.dev). Install them once per
+# clone with `lefthook install` (./scripts/setup-local-dev.sh does it).
+# lefthook, shellcheck, shfmt, actionlint and gitleaks come from the org bootstrap
+# (../bootstrap-dev-env/bootstrap.sh, installed with mise), so run git from a terminal
+# where mise is active. eslint and prettier come from `npm ci`. Skip the hooks once with
+# `git commit --no-verify` (or `git push --no-verify`), but fix the problem instead.
+# CI runs lint, typecheck, test and build on every pull request.
+
+pre-commit:
+  parallel: true
+  commands:
+    eslint:
+      glob: '*.{js,mjs,cjs,ts,tsx,astro}'
+      run: npx --no-install eslint {staged_files}
+    # Files listed in .prettierignore are skipped by prettier itself.
+    prettier:
+      glob: '*.{js,mjs,cjs,ts,tsx,astro,json,md,yml,yaml,css}'
+      # CLAUDE.md is a symlink to AGENTS.md and prettier refuses symlinks.
+      exclude: 'CLAUDE.md'
+      run: npx --no-install prettier --check {staged_files}
+    shellcheck:
+      glob: '*.sh'
+      run: shellcheck -s bash -x {staged_files}
+    shfmt:
+      glob: '*.sh'
+      run: shfmt -d {staged_files}
+    # Lint GitHub Actions workflows (syntax, expressions, shell steps).
+    actionlint:
+      glob: '.github/workflows/*.{yml,yaml}'
+      run: actionlint {staged_files}
+    # Block commits that contain secrets (tokens, keys, passwords). Config: .gitleaks.toml.
+    gitleaks:
+      run: gitleaks git --staged --redact
+
+# Commit messages follow Conventional Commits (see AGENTS.md):
+#   <type>(<optional scope>): <description>
+commit-msg:
+  skip:
+    - merge
+    - rebase
+  commands:
+    conventional-commits:
+      run: scripts/conventional-commit.sh {1}
+
+# The same typecheck and tests CI runs, before the code leaves your machine.
+pre-push:
+  commands:
+    typecheck:
+      run: npm run typecheck
+    test:
+      run: npm test

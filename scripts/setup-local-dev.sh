@@ -76,6 +76,16 @@ install_playwright_browser() {
 	log_ok "chromium installed"
 }
 
+install_git_hooks() {
+	log_step "Git hooks (lefthook)"
+	if command -v lefthook >/dev/null 2>&1; then
+		lefthook install
+		log_ok "hooks installed (config in lefthook.yml)"
+	else
+		log_info "lefthook not found; run ../bootstrap-dev-env/bootstrap.sh, then: lefthook install"
+	fi
+}
+
 print_summary() {
 	printf '\n%sReady.%s\n' "$c_green" "$c_off"
 	log_info "Run: npm run dev | lint | typecheck | test | build | test:smoke"
@@ -87,6 +97,7 @@ main() {
 	install_package_manager
 	install_dependencies
 	install_playwright_browser
+	install_git_hooks
 	print_summary
 }
 

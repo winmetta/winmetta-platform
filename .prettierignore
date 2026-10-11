@@ -12,3 +12,5 @@ README.md
 docs
 apps/web/src/library/manifest.json
 apps/web/src/library/zawgyi-review.json
+# Pulumi rewrites this file in its own style (double quotes) on every `pulumi config set`.
+infra/pulumi/Pulumi.*.yaml
