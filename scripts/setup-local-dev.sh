@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Sets up winmetta-platform for local development. Safe to re-run.
 #
-# Installs the Node version from .nvmrc, the npm version pinned in package.json,
-# locked dependencies and the Playwright browser. Shared tools (nvm, git, gh,
-# editor, AI CLIs, linters) come from the org bootstrap script first:
+# Installs the Node version from mise.toml (through mise), the npm version pinned
+# in package.json, locked dependencies and the Playwright browser. Shared tools
+# (mise, git, gh, editor, AI CLIs, linters) come from the org bootstrap script first:
 #   ../.github/bootstrap-dev-env.sh
 #
 # Usage: ./scripts/setup-local-dev.sh   (from anywhere; it runs from the repo root)
@@ -30,24 +30,26 @@ die() {
 }
 trap 'printf "%s✖ setup failed at line %s (exit %s)%s\n" "$c_red" "$LINENO" "$?" "$c_off" >&2' ERR
 
-load_nvm() {
-	log_step "Loading nvm"
-	export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-	[[ -s "$NVM_DIR/nvm.sh" ]] || die "nvm not found. Run ../.github/bootstrap-dev-env.sh first."
-	# nvm is third-party shell code and may reference unset variables.
-	set +u
-	# shellcheck disable=SC1091
-	source "$NVM_DIR/nvm.sh" --no-use
-	set -u
-	log_ok "nvm found at $NVM_DIR"
+load_mise() {
+	log_step "Loading mise"
+	# A fresh bootstrap puts mise in ~/.local/bin before a new terminal activates it.
+	if ! command -v mise >/dev/null 2>&1 && [[ -x "$HOME/.local/bin/mise" ]]; then
+		PATH="$HOME/.local/bin:$PATH"
+	fi
+	command -v mise >/dev/null 2>&1 || die "mise not found. Run ../.github/bootstrap-dev-env.sh first, then open a new terminal."
+	log_ok "mise $(mise --version | awk '{print $1}')"
 }
 
 install_node() {
-	log_step "Node $(<.nvmrc)"
-	set +u
-	nvm install
-	nvm use
-	set -u
+	log_step "Node (from mise.toml)"
+	mise trust --quiet mise.toml
+	mise install
+	# Put the tools mise.toml pins on PATH for the rest of this script.
+	eval "$(mise env -s bash)"
+	local want have
+	want="$(<.nvmrc)"
+	have="$(node -p "process.versions.node.split('.')[0]")"
+	[[ "$have" == "${want#v}" ]] || die "node $have from mise.toml does not match .nvmrc ($want); update one to match the other."
 	log_ok "node $(node -v)"
 }
 
@@ -80,7 +82,7 @@ print_summary() {
 }
 
 main() {
-	load_nvm
+	load_mise
 	install_node
 	install_package_manager
 	install_dependencies

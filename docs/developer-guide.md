@@ -12,9 +12,33 @@ How to set up, change and submit code for `winmetta-platform`. [CONTRIBUTING.md]
 
 Start with the org-wide [developer setup](https://github.com/winmetta/.github#developer-setup) (workspace layout, required tools, `bootstrap-dev-env.sh`).
 
-**macOS:** run `../.github/bootstrap-dev-env.sh` once for shared tooling (Homebrew, git, gh, shellcheck, shfmt, nvm, VS Code, Claude Code, Codex CLI). If it asks you to finish the Command Line Tools installer, do that and rerun it. Then run `./scripts/setup-local-dev.sh` from the repo root. It installs Node 24, the npm version pinned in `package.json`, locked dependencies and the Playwright Chromium browser. Both scripts are safe to re-run.
+**macOS:** this repo is one of several cloned side by side under the workspace root (usually `~/winmetta`), next to the org [`.github`](https://github.com/winmetta/.github) repo, which owns the shared setup. Run these once, in order, from the workspace root:
 
-**Other systems:** install Node 24 (see `.nvmrc`), install the npm version in the `packageManager` field of `package.json`, then run `npm ci`.
+1. Clone `.github` if you have not already (`gh repo clone winmetta/.github`), then link the shared workspace files (`AGENTS.md`, `CLAUDE.md`, `.editorconfig`, `.markdownlint.json` and the VS Code workspace) into the workspace root:
+
+   ```bash
+   ./.github/link-workspace.sh
+   ```
+
+2. Install the shared tools and settings (mise and the CLI tools it manages, git settings, shell, editors, git hooks for `.github`). It needs no Homebrew and no admin rights:
+
+   ```bash
+   ./.github/bootstrap-dev-env.sh
+   ```
+
+   If it asks you to finish the Command Line Tools installer, do that and rerun it. Open a new terminal afterwards so mise is active. The `.github` [README](https://github.com/winmetta/.github#developer-setup) lists what it installs and how to learn the tools (`explain-tools`).
+
+3. Set up this repo from its root:
+
+   ```bash
+   ./scripts/setup-local-dev.sh
+   ```
+
+   It installs Node 24 with mise (pinned in `mise.toml`, which must match `.nvmrc`), the npm version pinned in `package.json`, locked dependencies and the Playwright Chromium browser.
+
+All three scripts are safe to re-run. The root `AGENTS.md` (from step 1) holds the organization-wide rules for people and AI agents; this repo's `AGENTS.md` and this guide override it.
+
+**Other systems:** install Node 24 (see `mise.toml` and `.nvmrc`), install the npm version in the `packageManager` field of `package.json`, then run `npm ci`.
 
 No Docker, database or env file is needed. Run `npm run dev` and open <http://localhost:4321>.
 
@@ -46,6 +70,44 @@ Keep code in `apps/web` until a second consumer needs it. Only then extract a pa
 | `npm run test:smoke` | Playwright tests against the built site (served on port 4331, so a running dev server on 4321 is never reused). Run `npm run build` first. The first time, run `npx playwright install chromium`. Set `BASE_URL` to run them against a deployed site instead; no local server is started. |
 
 CI runs all of these on every pull request and does not deploy. Run lint, typecheck, test and build locally before pushing.
+
+### AWS access (read-only profile)
+
+Most work needs no AWS access. You need it only for `npm run library:manifest` and to inspect the account. Access goes through AWS IAM Identity Center (SSO) with short-lived credentials from a browser sign-in; never create or store long-lived access keys.
+
+1. Ask the AWS administrator to add you to Identity Center with the `ReadOnlyAccess` permission set, and for the **SSO start URL**, the **SSO region** and the **account ID**. Keep the account ID out of the repo, issues and PRs (this repository is public).
+2. Install AWS CLI v2 (`aws --version` must show 2.x), preferably with mise: `mise use -g aws-cli`.
+3. Create the profile with the standard name `winmetta-ro`, so scripts and docs work on every machine:
+
+   ```bash
+   aws configure sso
+   ```
+
+   Answer the prompts: SSO session name `winmetta-ro`, the start URL and region from step 1, scopes `sso:account:access` (the default), then pick the `winmetta` account and the `ReadOnlyAccess` role, client region `us-east-1`, output `json`, and profile name `winmetta-ro`. The result in `~/.aws/config` looks like this (placeholders in capitals):
+
+   ```ini
+   [profile winmetta-ro]
+   sso_session = winmetta-ro
+   sso_account_id = ACCOUNT_ID
+   sso_role_name = ReadOnlyAccess
+   region = us-east-1
+
+   [sso-session winmetta-ro]
+   sso_start_url = START_URL
+   sso_region = SSO_REGION
+   sso_registration_scopes = sso:account:access
+   ```
+
+4. Sign in and check it works. Repeat the login when the session expires:
+
+   ```bash
+   aws sso login --profile winmetta-ro
+   aws sts get-caller-identity --profile winmetta-ro
+   ```
+
+5. Use it per command (`AWS_PROFILE=winmetta-ro npm run library:manifest`) or for the shell session (`export AWS_PROFILE=winmetta-ro`).
+
+If `aws configure sso` also created a profile named like `ReadOnlyAccess-<account id>`, delete that section from `~/.aws/config`; it duplicates `winmetta-ro`. Maintainers who run the one-time bootstrap or `pulumi up` need a separate write-access profile, set up the same way and documented in the runbook.
 
 ## 5. Configuration
 

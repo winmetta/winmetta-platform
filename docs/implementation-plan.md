@@ -299,7 +299,7 @@ The root configuration lives in the repo and is the source of truth; this plan n
 
 * [`package.json`](../package.json): workspaces (`apps/*`), the `packageManager` and `engines` declarations, and the npm scripts.
 * [`turbo.json`](../turbo.json): task graph. The `build` task lists `SITE_URL`, `PUBLIC_ALLOW_INDEXING` and `PUBLIC_LIBRARY_CDN_BASE` as inputs, so a build with different values is never served from the Turborepo cache.
-* [`.nvmrc`](../.nvmrc): Node major version.
+* [`mise.toml`](../mise.toml) and [`.nvmrc`](../.nvmrc): Node major version (mise for developers, `.nvmrc` for CI; keep them equal, the setup script checks).
 
 Pin npm consistently in local setup and CI using the root `packageManager` declaration; `engines.npm` alone is not the Turborepo package-manager declaration. Re-verify the npm version at kickoff, commit the generated lockfile and use `npm ci` for repeat installs.
 
@@ -307,7 +307,7 @@ Pin npm consistently in local setup and CI using the root `packageManager` decla
 
 ## 7. Reference: macOS Setup Script
 
-Shared developer tooling (Homebrew, git, gh, shellcheck, shfmt, nvm, editor, AI CLIs) is installed by `bootstrap-dev-env.sh` in the org [`.github` repo](https://github.com/winmetta/.github#developer-setup). This repo's own `scripts/setup-local-dev.sh` then installs Node from `.nvmrc`, the pinned npm, locked dependencies and the Playwright browser.
+Shared developer tooling (mise and the tools it manages, git settings, shell, editors, AI CLIs, git hooks for `.github`; no Homebrew) is installed by `bootstrap-dev-env.sh` in the org [`.github` repo](https://github.com/winmetta/.github#developer-setup). This repo's own `scripts/setup-local-dev.sh` then installs Node from `mise.toml` (through mise), the pinned npm, locked dependencies and the Playwright browser.
 
 ---
 

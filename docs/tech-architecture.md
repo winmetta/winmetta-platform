@@ -112,7 +112,8 @@ winmetta-platform/
 │   └── setup-local-dev.sh
 ├── .env.example               # committed configuration documentation
 ├── .env.local                 # ignored developer-machine overrides
-├── .nvmrc                     # 24
+├── .nvmrc                     # 24 (CI)
+├── mise.toml                  # node = "24" (developers)
 ├── AGENTS.md / CLAUDE.md -> AGENTS.md
 ├── LICENSE                    # MIT
 ├── package.json
