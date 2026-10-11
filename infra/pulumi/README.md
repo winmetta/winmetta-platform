@@ -22,7 +22,7 @@ The Pulumi preview role arrives with the deploy workflow (plan step 5).
 ## Prerequisites
 
 Do the one-time bootstrap first (`../bootstrap/bootstrap.sh`) and install the tools
-with `../../.github/bootstrap-dev-env.sh` (Pulumi comes from mise). Then, in this
+with `../../../bootstrap-dev-env/bootstrap.sh` (Pulumi comes from mise). Then, in this
 folder:
 
 ```bash

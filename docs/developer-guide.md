@@ -10,7 +10,7 @@ How to set up, change and submit code for `winmetta-platform`. [CONTRIBUTING.md]
 
 ## 2. Setup
 
-Start with the org-wide [developer setup](https://github.com/winmetta/.github#developer-setup) (workspace layout, required tools, `bootstrap-dev-env.sh`).
+Start with the org-wide [developer setup](https://github.com/winmetta/.github#developer-setup) (workspace layout and required tools), which points to the [`bootstrap-dev-env`](https://github.com/winmetta/bootstrap-dev-env) repo for the shared tooling script.
 
 **macOS:** this repo is one of several cloned side by side under the workspace root (usually `~/winmetta`), next to the org [`.github`](https://github.com/winmetta/.github) repo, which owns the shared setup. Run these once, in order, from the workspace root:
 
@@ -20,13 +20,14 @@ Start with the org-wide [developer setup](https://github.com/winmetta/.github#de
    ./.github/link-workspace.sh
    ```
 
-2. Install the shared tools and settings (mise and the CLI tools it manages, git settings, shell, editors, git hooks for `.github`). It needs no Homebrew and no admin rights:
+2. Clone the shared setup repo, [`bootstrap-dev-env`](https://github.com/winmetta/bootstrap-dev-env) (it is not specific to Win Metta), and run it once per machine. It installs mise and the CLI tools it manages, shared git settings, the shell prompt and helpers, editors and the terminal profile:
 
    ```bash
-   ./.github/bootstrap-dev-env.sh
+   gh repo clone winmetta/bootstrap-dev-env
+   ./bootstrap-dev-env/bootstrap.sh
    ```
 
-   If it asks you to finish the Command Line Tools installer, do that and rerun it. Open a new terminal afterwards so mise is active. The `.github` [README](https://github.com/winmetta/.github#developer-setup) lists what it installs and how to learn the tools (`explain-tools`).
+   If it asks you to finish the Command Line Tools installer, do that and rerun it. Open a new terminal afterwards so mise is active. Its [README](https://github.com/winmetta/bootstrap-dev-env#readme) lists what it installs and how to learn the tools (`explain-tools`).
 
 3. Set up this repo from its root:
 

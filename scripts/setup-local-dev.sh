@@ -4,7 +4,7 @@
 # Installs the Node version from mise.toml (through mise), the npm version pinned
 # in package.json, locked dependencies and the Playwright browser. Shared tools
 # (mise, git, gh, editor, AI CLIs, linters) come from the org bootstrap script first:
-#   ../.github/bootstrap-dev-env.sh
+#   ../bootstrap-dev-env/bootstrap.sh
 #
 # Usage: ./scripts/setup-local-dev.sh   (from anywhere; it runs from the repo root)
 set -euo pipefail
@@ -36,7 +36,7 @@ load_mise() {
 	if ! command -v mise >/dev/null 2>&1 && [[ -x "$HOME/.local/bin/mise" ]]; then
 		PATH="$HOME/.local/bin:$PATH"
 	fi
-	command -v mise >/dev/null 2>&1 || die "mise not found. Run ../.github/bootstrap-dev-env.sh first, then open a new terminal."
+	command -v mise >/dev/null 2>&1 || die "mise not found. Run ../bootstrap-dev-env/bootstrap.sh first, then open a new terminal."
 	log_ok "mise $(mise --version | awk '{print $1}')"
 }
 
