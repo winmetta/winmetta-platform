@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { siteOrigin } from './site';
 test('locale routes, layout and local Burmese font', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
@@ -26,11 +27,11 @@ test('locale routes, layout and local Burmese font', async ({ page }) => {
   );
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'http://localhost:4321/en/',
+    `${siteOrigin}/en/`,
   );
   await expect(page.locator('link[hreflang="my"]')).toHaveAttribute(
     'href',
-    'http://localhost:4321/my/',
+    `${siteOrigin}/my/`,
   );
   await page.keyboard.press('Tab');
   expect(await page.evaluate(() => document.activeElement?.tagName)).toBe('A');
