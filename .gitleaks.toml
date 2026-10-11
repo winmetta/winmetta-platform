@@ -1,0 +1,8 @@
+# gitleaks configuration (https://github.com/gitleaks/gitleaks). Keep the default rules
+# and allow only the one known false positive below.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Pulumi.production.yaml holds the stack's data key encrypted with AWS KMS (encryptedkey). Pulumi designs it to be committed; it cannot be used without the KMS key."
+paths = ['''infra/pulumi/Pulumi\.production\.yaml''']

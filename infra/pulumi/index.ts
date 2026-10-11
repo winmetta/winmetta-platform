@@ -82,8 +82,10 @@ const encryption = new aws.s3.BucketServerSideEncryptionConfiguration(
   },
   { provider, dependsOn: [publicAccessBlock] },
 );
-// Versioning gives a way back from a bad upload. Old versions and the old hashed files
-// the deploy keeps for about a week are cleaned up by age, not by the deploy.
+// Versioning gives a way back from a bad upload. The lifecycle rule below only expires
+// noncurrent versions (replaced or deleted objects). A hashed file that is no longer
+// referenced but is still current is never expired by age, so the deploy workflow must
+// prune those itself, about a week after they stop being referenced (plan step 5).
 const versioning = new aws.s3.BucketVersioning(
   'site',
   { bucket: bucket.id, versioningConfiguration: { status: 'Enabled' } },
@@ -366,13 +368,23 @@ if (delegationConfirmed) {
           {
             Sid: 'ListSiteBucket',
             Effect: 'Allow',
-            Action: ['s3:ListBucket', 's3:GetBucketLocation'],
+            Action: [
+              's3:ListBucket',
+              's3:GetBucketLocation',
+              's3:ListBucketMultipartUploads',
+            ],
             Resource: bucket.arn,
           },
           {
             Sid: 'WriteSiteObjects',
             Effect: 'Allow',
-            Action: ['s3:PutObject', 's3:GetObject', 's3:DeleteObject'],
+            // AbortMultipartUpload lets `aws s3 sync` clean up a failed large upload.
+            Action: [
+              's3:PutObject',
+              's3:GetObject',
+              's3:DeleteObject',
+              's3:AbortMultipartUpload',
+            ],
             Resource: pulumi.interpolate`${bucket.arn}/*`,
           },
           {
