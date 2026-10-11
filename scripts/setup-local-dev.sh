@@ -4,7 +4,7 @@
 # Installs the Node version from .nvmrc, the npm version pinned in package.json,
 # locked dependencies and the Playwright browser. Shared tools (nvm, git, gh,
 # editor, AI CLIs, linters) come from the org bootstrap script first:
-#   ../.github/bootstrap-dev-env.sh
+#   ../bootstrap-dev-env/bootstrap.sh
 #
 # Usage: ./scripts/setup-local-dev.sh   (from anywhere; it runs from the repo root)
 set -euo pipefail
@@ -33,7 +33,7 @@ trap 'printf "%s✖ setup failed at line %s (exit %s)%s\n" "$c_red" "$LINENO" "$
 load_nvm() {
 	log_step "Loading nvm"
 	export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-	[[ -s "$NVM_DIR/nvm.sh" ]] || die "nvm not found. Run ../.github/bootstrap-dev-env.sh first."
+	[[ -s "$NVM_DIR/nvm.sh" ]] || die "nvm not found. Run ../bootstrap-dev-env/bootstrap.sh first."
 	# nvm is third-party shell code and may reference unset variables.
 	set +u
 	# shellcheck disable=SC1091
