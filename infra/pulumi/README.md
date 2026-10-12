@@ -165,7 +165,13 @@ gh variable set AWS_PREVIEW_ROLE_ARN --body "$(pulumi stack output previewRoleAr
 ```
 
 The preview does not refresh from AWS, so it shows code changes, not drift made by
-hand. Only maintainers run `pulumi up`, after reading the preview.
+hand. It also needs no write access to the state: without `--refresh` it takes no stack
+lock and writes nothing (checked on the first run, which succeeded with the read-only
+role and left no object in the versioned state bucket). Pulumi's documentation lists
+`preview` among the operations needing `s3:PutObject` and `s3:DeleteObject`; if a
+future change such as `--refresh` makes the workflow fail with `AccessDenied` on
+`.pulumi/locks/`, grant those on that prefix only, and note that a pull request could
+then hold a lock and block `pulumi up`. Only maintainers run `pulumi up`, after reading the preview.
 
 ## Config
 

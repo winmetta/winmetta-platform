@@ -432,6 +432,14 @@ if (delegationConfirmed) {
 // the Pulumi state, decrypt the stack's data key with the KMS key (even a stack with no
 // secrets keeps an encrypted data key) and read the two CloudFront data sources the
 // program uses. It cannot change anything and cannot read the site or other resources.
+// It has no s3:PutObject or s3:DeleteObject on the state bucket on purpose. Pulumi's docs
+// list `preview` among the operations that need them (for the stack lock), but a preview
+// without --refresh takes no lock and writes nothing: the first run of the workflow
+// (pull request 7) succeeded with this read-only role, and the versioned state bucket
+// shows no object written during that run. Granting write access would let any pull
+// request from a branch of this repository create or hold a lock and block `pulumi up`.
+// If a future preview needs the lock (for example with --refresh), add the write
+// permissions on the `.pulumi/locks/` prefix only, and weigh that risk first.
 const stateKey = aws.kms.getKeyOutput({ keyId: stateKeyAlias }, { provider });
 const previewRole = new aws.iam.Role(
   'preview',
