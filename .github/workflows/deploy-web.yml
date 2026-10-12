@@ -59,6 +59,18 @@ jobs:
       DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
     steps:
+      # actions/checkout only treats a full 40-character (or 64-character) value as a commit
+      # SHA; an abbreviated one is looked up as a branch or tag name and fails. Say so
+      # before the build instead of letting the rollback stop at the checkout.
+      - name: Check the ref
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          REF: ${{ inputs.ref }}
+        run: |
+          if printf '%s' "$REF" | grep -qE '^[0-9a-fA-F]{7,39}$'; then
+            echo "::error::The ref looks like an abbreviated commit SHA, which checkout cannot resolve. Use the full 40-character SHA (git rev-parse <short sha>), a branch or a tag."
+            exit 1
+          fi
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || inputs.ref }}
@@ -114,4 +126,4 @@ jobs:
           BASE_URL: ${{ vars.SITE_URL }}
       - name: Summary
         run: |
-          echo "Deployed $(git rev-parse --short HEAD) to $SITE_URL (indexing: $PUBLIC_ALLOW_INDEXING)" >> "$GITHUB_STEP_SUMMARY"
+          echo "Deployed $(git rev-parse HEAD) to $SITE_URL (indexing: $PUBLIC_ALLOW_INDEXING)" >> "$GITHUB_STEP_SUMMARY"
