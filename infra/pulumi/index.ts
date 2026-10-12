@@ -352,7 +352,7 @@ if (delegationConfirmed) {
   // --- Deploy role for GitHub Actions (OIDC, no stored keys) --------------------------
   // Trusts only this repository's `production` environment. It can sync the site bucket
   // and invalidate this one distribution, nothing else. The Pulumi preview role is
-  // separate and arrives with the deploy workflow (plan step 5).
+  // separate, see the preview role below.
   const deployRole = new aws.iam.Role(
     'deploy',
     {
@@ -438,6 +438,11 @@ if (delegationConfirmed) {
 // (pull request 7) succeeded with this read-only role, and the versioned state bucket
 // shows no object written during that run. Granting write access would let any pull
 // request from a branch of this repository create or hold a lock and block `pulumi up`.
+// Trust is wide on purpose: the subject `<prefix>:pull_request` matches any pull request
+// of this repository, including one that edits the workflow. That is harmless while the
+// stack has no secrets (Phase 2 has none), since the role can only read the state and
+// decrypt a data key with nothing sensitive behind it. Revisit it before a secret is
+// added to the stack (for example by trusting only a protected branch or an environment).
 // If a future preview needs the lock (for example with --refresh), add the write
 // permissions on the `.pulumi/locks/` prefix only, and weigh that risk first.
 const stateKey = aws.kms.getKeyOutput({ keyId: stateKeyAlias }, { provider });

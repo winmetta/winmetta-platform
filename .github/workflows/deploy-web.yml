@@ -9,13 +9,14 @@ name: Deploy web
 # OIDC token for that environment only (no stored keys).
 #
 # One-time setup, in Settings > Environments > production: a required reviewer and these
-# variables (none is secret; the role ARN contains the account ID, so keep it out of the
-# repository):
+# variables (none is secret):
 #   SITE_URL                    https://app.winmetta.org
 #   PUBLIC_ALLOW_INDEXING       false until the launch gates pass, then true
-#   AWS_DEPLOY_ROLE_ARN         the `deployRole` stack output (pulumi stack output deployRole)
 #   SITE_BUCKET                 the `siteBucket` stack output
 #   CLOUDFRONT_DISTRIBUTION_ID  the `distributionId` stack output
+# and the repository secret AWS_ACCOUNT_ID (the AWS account ID). The deploy role's ARN is
+# built from it. This repository is public and GitHub never masks variables in the logs,
+# so the account ID must be a secret: a secret is masked wherever it appears in a log.
 on:
   workflow_run:
     workflows: [CI]
@@ -56,15 +57,16 @@ jobs:
       PUBLIC_ALLOW_INDEXING: ${{ vars.PUBLIC_ALLOW_INDEXING }}
       SITE_BUCKET: ${{ vars.SITE_BUCKET }}
       DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || inputs.ref }}
       - name: Check the environment variables
         run: |
-          for name in SITE_URL PUBLIC_ALLOW_INDEXING SITE_BUCKET DISTRIBUTION_ID; do
+          for name in SITE_URL PUBLIC_ALLOW_INDEXING SITE_BUCKET DISTRIBUTION_ID AWS_ACCOUNT_ID; do
             if [ -z "${!name}" ]; then
-              echo "::error::The production environment variable for $name is not set"
+              echo "::error::The variable or secret for $name is not set (see the top of this workflow)"
               exit 1
             fi
           done
@@ -81,7 +83,7 @@ jobs:
       - name: Sign in to AWS with the deploy role
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
-          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/winmetta-app-deploy
           aws-region: us-east-1
       # `aws s3 sync` sets no Cache-Control, so upload in passes. Hashed files are never
       # deleted: a tab opened before a deploy would 404 on its lazy search index or scripts
