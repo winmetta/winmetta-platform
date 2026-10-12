@@ -53,6 +53,33 @@ settings and the encrypted data key.
 pulumi stack init production --secrets-provider "awskms://alias/winmetta-pulumi?region=us-east-1"
 ```
 
+## Why `encryptedkey` is committed
+
+`Pulumi.production.yaml` holds an `encryptedkey` line. It looks like a secret, but it is
+ciphertext and safe to commit; Pulumi needs it to unlock the stack.
+
+- With the KMS secrets provider (`awskms://alias/winmetta-pulumi`), Pulumi asks AWS KMS
+  for a random **data key** when the stack is created. It uses that key to encrypt the
+  stack's secret config values and state, and it stores the data key in this file,
+  **encrypted by the KMS key**. That stored value is `encryptedkey`.
+- To work on the stack, Pulumi sends `encryptedkey` to KMS (`kms:Decrypt`) and gets the
+  data key back for that session. Without the line, nobody (a teammate, CI) could
+  decrypt the stack's secrets.
+- Reading the ciphertext in this public repo gives an attacker nothing: decrypting it
+  needs `kms:Decrypt` on the `winmetta-pulumi` key, which only the allowed IAM roles have
+  (the `winmetta-admin` profile today, and the Pulumi preview role later). Keep that
+  access narrow.
+- Phase 2 has no secrets, so the key encrypts nothing yet. The KMS provider stays so
+  adding a secret later needs no migration.
+- **Never delete the KMS key** (`alias/winmetta-pulumi`). Without it `encryptedkey` and
+  anything encrypted with it cannot be decrypted. Key rotation is on and is safe.
+- Do commit `Pulumi.production.yaml` after every `pulumi config set`. Never commit
+  plaintext secrets, state files or `.env` files.
+- gitleaks flags the value as a generic API key. `.gitleaks.toml` allows exactly this
+  KMS ciphertext shape (it matches the secret, not the file, so a real credential added
+  to the same file is still caught). Don't remove the line or silence the rule more
+  widely.
+
 ## Staged first apply
 
 ACM DNS validation needs the delegation from DreamHost to be live, so the first apply
