@@ -1,7 +1,9 @@
 name: Pulumi preview
 
 # Shows what `pulumi up` would change when a pull request touches the infrastructure code
-# (infra/pulumi/). It only previews: the role it assumes can read the Pulumi state and
+# (infra/pulumi/). It runs on every pull request and does nothing, successfully, when none
+# of the changed files is infrastructure: a path filter on the trigger would leave the check
+# pending forever on other pull requests, which blocks merging once it is a required check. It only previews: the role it assumes can read the Pulumi state and
 # decrypt the stack key, nothing else, and `pulumi up` stays a manual maintainer action
 # (infra/pulumi/README.md). Fork pull requests get no OIDC token, so the job is skipped
 # for them; this uses `pull_request`, never `pull_request_target`.
@@ -12,9 +14,6 @@ name: Pulumi preview
 # so it lives in the variable, not in the repository.
 on:
   pull_request:
-    paths:
-      - 'infra/pulumi/**'
-      - '.github/workflows/pulumi-preview.yml'
 
 permissions:
   contents: read
@@ -31,30 +30,54 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      pull-requests: read
     env:
       AWS_PREVIEW_ROLE_ARN: ${{ vars.AWS_PREVIEW_ROLE_ARN }}
     steps:
+      # Decide here, not in the trigger, whether there is anything to preview. The pull
+      # request's file list (old and new names) is read from the API, so no checkout is
+      # needed for a pull request without infrastructure changes.
+      - name: Look for infrastructure changes
+        id: changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          files="$(gh api --paginate "repos/$REPO/pulls/$PR_NUMBER/files" --jq '.[] | .filename, (.previous_filename // empty)')"
+          if printf '%s\n' "$files" | grep -qE '^(infra/pulumi/|\.github/workflows/pulumi-preview\.yml$)'; then
+            echo "infra=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "infra=false" >> "$GITHUB_OUTPUT"
+            echo "No infrastructure changes in this pull request: nothing to preview." >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Check the repository variable
+        if: steps.changes.outputs.infra == 'true'
         run: |
           if [ -z "$AWS_PREVIEW_ROLE_ARN" ]; then
             echo "::error::The repository variable AWS_PREVIEW_ROLE_ARN is not set (see the top of this workflow)"
             exit 1
           fi
       - uses: actions/checkout@v7
+        if: steps.changes.outputs.infra == 'true'
       - uses: actions/setup-node@v7
+        if: steps.changes.outputs.infra == 'true'
         with:
           node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: infra/pulumi/package-lock.json
       - name: Install the Pulumi program's dependencies
+        if: steps.changes.outputs.infra == 'true'
         run: npm ci
         working-directory: infra/pulumi
       - name: Sign in to AWS with the preview role
+        if: steps.changes.outputs.infra == 'true'
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
           role-to-assume: ${{ vars.AWS_PREVIEW_ROLE_ARN }}
           aws-region: us-east-1
       - name: Pulumi preview
+        if: steps.changes.outputs.infra == 'true'
         uses: pulumi/actions@8e5e406f4007fca908480587cb9893c07090f58d # v7.0.0
         with:
           command: preview
