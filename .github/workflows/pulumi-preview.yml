@@ -86,5 +86,8 @@ jobs:
           cloud-url: s3://winmetta-pulumi-state
           pulumi-version: 3.268.0
           diff: true
-          comment-on-summary: true
+          # No diff in the run summary: GitHub masks secrets in logs but not in summaries, and a diff that
+          # touches an IAM resource shows ARNs with the account ID. Read the diff in this
+          # step's log, where AWS_ACCOUNT_ID is masked.
+          comment-on-summary: false
           suppress-progress: true

@@ -89,7 +89,7 @@ Because `SITE_URL` and `PUBLIC_ALLOW_INDEXING` come from the environment variabl
 
 ## 6. Change the infrastructure
 
-- **Open a pull request** that changes `infra/pulumi/`. The `Pulumi preview` check runs `pulumi preview` and shows the diff in its run summary. A pull request without infrastructure changes passes that check immediately.
+- **Open a pull request** that changes `infra/pulumi/`. The `Pulumi preview` check runs `pulumi preview` and shows the diff in the log of its `Pulumi preview` step, where the account ID is masked. The workflow deliberately does not put the diff in the run summary, because summaries are not masked. A pull request without infrastructure changes passes that check immediately.
 - **Apply by hand,** after review and merge (or before, for an urgent fix, then merge the code): `aws sso login --profile winmetta-admin`, then `export AWS_PROFILE=winmetta-admin AWS_REGION=us-east-1` (logging in does not select the profile; without it the AWS tools use `default` or fail), `cd infra/pulumi`, `pulumi login s3://winmetta-pulumi-state`, `pulumi preview --stack production --diff`, read it, then `pulumi up --stack production`. Only a maintainer runs `pulumi up`.
 - **Protected resources:** the Route 53 zone and the site bucket are protected from deletion. Replacing either would change the name servers or lose the site, so a preview that shows a replacement of them needs a decision, not a click.
 - **Drift:** the preview does not refresh from AWS, so it shows code changes only. After a console change, run `pulumi refresh` (a write to the state, so confirm first) or undo the console change.
