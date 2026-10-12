@@ -6,18 +6,19 @@ GitHub OIDC deploy role. One stack, `production`, all in `us-east-1`. Design:
 [tech-architecture.md](../../docs/tech-architecture.md) §6-§8. Plan:
 [implementation-plan.md](../../docs/implementation-plan.md) §4, step 3.
 
-| Resource                       | Purpose                                                                                       |
-| ------------------------------ | --------------------------------------------------------------------------------------------- |
-| Route 53 zone                  | `app.winmetta.org`, delegated from DreamHost. Protected from deletion.                        |
-| S3 bucket                      | Private, versioned, encrypted. Only the distribution can read it. Protected from deletion.    |
-| CloudFront function            | `functions/viewer-request.js`: directory index and trailing-slash redirect. Tested.           |
-| Response headers policy        | Security headers (HSTS, nosniff, frame, referrer, permissions). No CSP and no robots header.  |
-| ACM certificate                | DNS-validated through Route 53 (it must be in `us-east-1`).                                   |
-| CloudFront distribution        | Pay-as-you-go, `PriceClass_All`, 403 and 404 answered with `/404.html` and a real 404 status. |
-| Alias records (A and AAAA)     | `app.winmetta.org` to the distribution.                                                       |
-| IAM role `winmetta-app-deploy` | GitHub OIDC, `production` environment of this repo only; sync the bucket and invalidate.      |
+| Resource                               | Purpose                                                                                                        |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Route 53 zone                          | `app.winmetta.org`, delegated from DreamHost. Protected from deletion.                                         |
+| S3 bucket                              | Private, versioned, encrypted. Only the distribution can read it. Protected from deletion.                     |
+| CloudFront function                    | `functions/viewer-request.js`: directory index and trailing-slash redirect. Tested.                            |
+| Response headers policy                | Security headers (HSTS, nosniff, frame, referrer, permissions). No CSP and no robots header.                   |
+| ACM certificate                        | DNS-validated through Route 53 (it must be in `us-east-1`).                                                    |
+| CloudFront distribution                | Pay-as-you-go, `PriceClass_All`, 403 and 404 answered with `/404.html` and a real 404 status.                  |
+| Alias records (A and AAAA)             | `app.winmetta.org` to the distribution.                                                                        |
+| IAM role `winmetta-app-pulumi-preview` | GitHub OIDC for pull requests of this repo; read-only on the Pulumi state plus `kms:Decrypt` on the stack key. |
+| IAM role `winmetta-app-deploy`         | GitHub OIDC, `production` environment of this repo only; sync the bucket and invalidate.                       |
 
-The Pulumi preview role arrives with the deploy workflow (plan step 5).
+The `winmetta-app-pulumi-preview` role (below) lets the `Pulumi preview` workflow run `pulumi preview` on pull requests.
 
 ## Prerequisites
 
@@ -138,15 +139,58 @@ Set it with `pulumi config set githubSubjectPrefix <value>` and apply. Repeat th
 any of: renaming the organization, renaming the repository, transferring it, or deleting
 and re-creating it (the last two also change the repository ID).
 
+## Pull request previews
+
+`.github/workflows/pulumi-preview.yml` runs `pulumi preview` on pull requests that touch
+`infra/pulumi/` and shows the result in the run's summary. It assumes the
+`winmetta-app-pulumi-preview` role through GitHub OIDC. A pull request has no
+environment, so the role trusts the subject `<githubSubjectPrefix>:pull_request` (see the
+section above). The role can only:
+
+- read the Pulumi state bucket,
+- decrypt the stack's data key with the stack's KMS key (a stack with no secrets still
+  keeps an encrypted data key), and
+- read the two CloudFront data sources the program uses.
+
+It cannot change anything and cannot read the site, the other buckets or other
+resources. Fork pull requests get no OIDC token, so the job is skipped for them. A pull
+request from a branch of this repository can run it, even one that edits the workflow,
+so keep the role this small. That is acceptable while the stack has no secrets; revisit
+the trust before one is added.
+
+One-time setup, after the stack is applied: set the repository secret `AWS_ACCOUNT_ID`.
+This repository is public and GitHub never masks variables in the logs, so the account
+ID must be a secret, which GitHub masks wherever it appears. Both workflows build the
+role ARNs from it (`arn:aws:iam::<account id>:role/winmetta-app-pulumi-preview` and
+`.../winmetta-app-deploy`):
+
+```bash
+gh secret set AWS_ACCOUNT_ID --body "$(aws sts get-caller-identity --query Account --output text)"
+```
+
+A Pulumi diff in the run summary can still show an ARN when a change touches an IAM
+resource. Summaries are not masked, so check a diff before sharing it.
+
+The preview does not refresh from AWS, so it shows code changes, not drift made by
+hand. It also needs no write access to the state: without `--refresh` it takes no stack
+lock and writes nothing (checked on the first run, which succeeded with the read-only
+role and left no object in the versioned state bucket). Pulumi's documentation lists
+`preview` among the operations needing `s3:PutObject` and `s3:DeleteObject`; if a
+future change such as `--refresh` makes the workflow fail with `AccessDenied` on
+`.pulumi/locks/`, grant those on that prefix only, and note that a pull request could
+then hold a lock and block `pulumi up`. Only maintainers run `pulumi up`, after reading the preview.
+
 ## Config
 
-| Key                   | Default                                                                        |
-| --------------------- | ------------------------------------------------------------------------------ |
-| `domain`              | `app.winmetta.org`                                                             |
-| `githubRepo`          | `winmetta/winmetta-platform`                                                   |
-| `githubEnvironment`   | `production`                                                                   |
-| `githubSubjectPrefix` | `repo:<githubRepo>`; set to the immutable prefix above |
-| `siteBucketName`      | `winmetta-app-production-site`                                                 |
-| `delegationConfirmed` | `false` (set `true` for stage 3)                                               |
+| Key                   | Default                                                     |
+| --------------------- | ----------------------------------------------------------- |
+| `domain`              | `app.winmetta.org`                                          |
+| `githubRepo`          | `winmetta/winmetta-platform`                                |
+| `githubEnvironment`   | `production`                                                |
+| `githubSubjectPrefix` | `repo:<githubRepo>`; set to the immutable prefix above      |
+| `stateBucketName`     | `winmetta-pulumi-state` (the preview role reads it)         |
+| `stateKeyAlias`       | `alias/winmetta-pulumi` (the preview role decrypts with it) |
+| `siteBucketName`      | `winmetta-app-production-site`                              |
+| `delegationConfirmed` | `false` (set `true` for stage 3)                            |
 
 Never put the account ID, keys or other secrets in config or code.

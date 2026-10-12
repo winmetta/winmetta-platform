@@ -37,6 +37,10 @@ const githubSubjectPrefix =
 const siteBucketName =
   config.get('siteBucketName') ?? 'winmetta-app-production-site';
 const delegationConfirmed = config.getBoolean('delegationConfirmed') ?? false;
+// The bootstrap resources (infra/bootstrap/bootstrap.sh), which the preview role reads.
+const stateBucketName =
+  config.get('stateBucketName') ?? 'winmetta-pulumi-state';
+const stateKeyAlias = config.get('stateKeyAlias') ?? 'alias/winmetta-pulumi';
 
 const tags = {
   project: 'winmetta-platform',
@@ -50,6 +54,7 @@ const provider = new aws.Provider('aws', {
 const opts: pulumi.CustomResourceOptions = { provider };
 
 const account = aws.getCallerIdentityOutput({}, { provider });
+const oidcProviderArn = pulumi.interpolate`arn:aws:iam::${account.accountId}:oidc-provider/token.actions.githubusercontent.com`;
 
 // --- DNS: the zone for app.winmetta.org, delegated from DreamHost ------------------
 // Protected: deleting the zone would change its name servers and break the delegation.
@@ -347,8 +352,7 @@ if (delegationConfirmed) {
   // --- Deploy role for GitHub Actions (OIDC, no stored keys) --------------------------
   // Trusts only this repository's `production` environment. It can sync the site bucket
   // and invalidate this one distribution, nothing else. The Pulumi preview role is
-  // separate and arrives with the deploy workflow (plan step 5).
-  const oidcProviderArn = pulumi.interpolate`arn:aws:iam::${account.accountId}:oidc-provider/token.actions.githubusercontent.com`;
+  // separate, see the preview role below.
   const deployRole = new aws.iam.Role(
     'deploy',
     {
@@ -420,6 +424,91 @@ if (delegationConfirmed) {
   );
   deployRoleArn = deployRole.arn;
 }
+
+// --- Pulumi preview role for pull requests (OIDC, read-only, no stored keys) ----------
+// The "Pulumi preview" workflow runs `pulumi preview` on pull requests that touch
+// infra/. A pull request has no environment, so its token's subject ends in
+// `:pull_request`. Fork pull requests get no OIDC token at all. The role can only read
+// the Pulumi state, decrypt the stack's data key with the KMS key (even a stack with no
+// secrets keeps an encrypted data key) and read the two CloudFront data sources the
+// program uses. It cannot change anything and cannot read the site or other resources.
+// It has no s3:PutObject or s3:DeleteObject on the state bucket on purpose. Pulumi's docs
+// list `preview` among the operations that need them (for the stack lock), but a preview
+// without --refresh takes no lock and writes nothing: the first run of the workflow
+// (pull request 7) succeeded with this read-only role, and the versioned state bucket
+// shows no object written during that run. Granting write access would let any pull
+// request from a branch of this repository create or hold a lock and block `pulumi up`.
+// Trust is wide on purpose: the subject `<prefix>:pull_request` matches any pull request
+// of this repository, including one that edits the workflow. That is harmless while the
+// stack has no secrets (Phase 2 has none), since the role can only read the state and
+// decrypt a data key with nothing sensitive behind it. Revisit it before a secret is
+// added to the stack (for example by trusting only a protected branch or an environment).
+// If a future preview needs the lock (for example with --refresh), add the write
+// permissions on the `.pulumi/locks/` prefix only, and weigh that risk first.
+const stateKey = aws.kms.getKeyOutput({ keyId: stateKeyAlias }, { provider });
+const previewRole = new aws.iam.Role(
+  'preview',
+  {
+    name: 'winmetta-app-pulumi-preview',
+    description:
+      'GitHub Actions pulumi preview on pull requests (read-only on the Pulumi state)',
+    maxSessionDuration: 3600,
+    assumeRolePolicy: pulumi.jsonStringify({
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Effect: 'Allow',
+          Principal: { Federated: oidcProviderArn },
+          Action: 'sts:AssumeRoleWithWebIdentity',
+          Condition: {
+            StringEquals: {
+              'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
+              'token.actions.githubusercontent.com:sub': `${githubSubjectPrefix}:pull_request`,
+            },
+          },
+        },
+      ],
+    }),
+  },
+  opts,
+);
+new aws.iam.RolePolicy(
+  'preview',
+  {
+    role: previewRole.id,
+    policy: pulumi.jsonStringify({
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Sid: 'ReadPulumiStateBucket',
+          Effect: 'Allow',
+          Action: ['s3:ListBucket', 's3:GetBucketLocation'],
+          Resource: `arn:aws:s3:::${stateBucketName}`,
+        },
+        {
+          Sid: 'ReadPulumiState',
+          Effect: 'Allow',
+          Action: 's3:GetObject',
+          Resource: `arn:aws:s3:::${stateBucketName}/*`,
+        },
+        {
+          Sid: 'DecryptStackKey',
+          Effect: 'Allow',
+          Action: ['kms:Decrypt', 'kms:DescribeKey'],
+          Resource: stateKey.arn,
+        },
+        {
+          Sid: 'ReadCloudFrontCachePolicies',
+          Effect: 'Allow',
+          Action: ['cloudfront:GetCachePolicy', 'cloudfront:ListCachePolicies'],
+          Resource: '*',
+        },
+      ],
+    }),
+  },
+  opts,
+);
+export const previewRoleArn = previewRole.arn;
 
 const pending = 'not created yet (delegationConfirmed is false)';
 export const distributionId = distribution ? distribution.id : pending;
