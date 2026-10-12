@@ -60,25 +60,26 @@ Notes:
 
 ## 5. Manual publish when GitHub Actions is down
 
-Only for an emergency, with `winmetta-admin`. Build with the production variables, upload in the same order as the workflow, then invalidate:
+Only for an emergency, with `winmetta-admin` (`aws sso login --profile winmetta-admin` first) and `gh` signed in. Build with the values the `production` environment uses, so the live indexing state does not change, then upload in the same order as the workflow and invalidate:
 
 ```bash
-SITE_URL=https://app.winmetta.org PUBLIC_ALLOW_INDEXING=false npm run build   # use true only after launch
-export AWS_PAGER="" AWS_REGION=us-east-1
-B=winmetta-app-production-site; D=apps/web/dist
+export AWS_PROFILE=winmetta-admin AWS_PAGER="" AWS_REGION=us-east-1
+prod_var() { gh variable get "$1" --env production; }   # reads the production environment variables
+SITE_URL="$(prod_var SITE_URL)" PUBLIC_ALLOW_INDEXING="$(prod_var PUBLIC_ALLOW_INDEXING)" npm run build
+B="$(prod_var SITE_BUCKET)"; D=apps/web/dist
 aws s3 sync $D/_astro "s3://$B/_astro" --cache-control "public, max-age=31536000, immutable" --size-only
 aws s3 sync $D/library-data "s3://$B/library-data" --cache-control "public, max-age=31536000, immutable" --size-only
 aws s3 sync $D "s3://$B" --exclude "*.html" --exclude "_astro/*" --exclude "library-data/*" --delete --cache-control "public, max-age=3600"
 aws s3 sync $D "s3://$B" --exclude "*" --include "*.html" --delete --cache-control "public, max-age=0, must-revalidate"
-aws cloudfront create-invalidation --distribution-id <distributionId stack output> --paths "/*"
+aws cloudfront create-invalidation --distribution-id "$(prod_var CLOUDFRONT_DISTRIBUTION_ID)" --paths "/*"
 ```
 
-Use the same `PUBLIC_ALLOW_INDEXING` value as the `production` environment variable, or the site changes its indexing state.
+Because `SITE_URL` and `PUBLIC_ALLOW_INDEXING` come from the environment variables, an emergency publish after launch keeps indexing on, and before launch keeps it off. Do not type them by hand.
 
 ## 6. Change the infrastructure
 
 - **Open a pull request** that changes `infra/pulumi/`. The `Pulumi preview` check runs `pulumi preview` and shows the diff in its run summary. A pull request without infrastructure changes passes that check immediately.
-- **Apply by hand,** after review and merge (or before, for an urgent fix, then merge the code): `aws sso login --profile winmetta-admin`, `cd infra/pulumi`, `pulumi login s3://winmetta-pulumi-state`, `pulumi preview --stack production --diff`, read it, then `pulumi up --stack production`. Only a maintainer runs `pulumi up`.
+- **Apply by hand,** after review and merge (or before, for an urgent fix, then merge the code): `aws sso login --profile winmetta-admin`, then `export AWS_PROFILE=winmetta-admin AWS_REGION=us-east-1` (logging in does not select the profile; without it the AWS tools use `default` or fail), `cd infra/pulumi`, `pulumi login s3://winmetta-pulumi-state`, `pulumi preview --stack production --diff`, read it, then `pulumi up --stack production`. Only a maintainer runs `pulumi up`.
 - **Protected resources:** the Route 53 zone and the site bucket are protected from deletion. Replacing either would change the name servers or lose the site, so a preview that shows a replacement of them needs a decision, not a click.
 - **Drift:** the preview does not refresh from AWS, so it shows code changes only. After a console change, run `pulumi refresh` (a write to the state, so confirm first) or undo the console change.
 - **Trust policies match GitHub's immutable OIDC subject,** which has the organization and repository names and IDs. Renaming the organization or the repository, transferring it, or re-creating it needs `githubSubjectPrefix` updated and applied. See [infra/pulumi/README.md](../infra/pulumi/README.md).
@@ -86,12 +87,14 @@ Use the same `PUBLIC_ALLOW_INDEXING` value as the `production` environment varia
 
 ## 7. Set it up from nothing (or rebuild it)
 
-Needs `winmetta-admin`, a clone of this repository with `mise` active, and the DreamHost panel. Never put the account ID in a file.
+Needs `winmetta-admin`, a clone of this repository with `mise` active, and the DreamHost panel. Never put the account ID in a file. Sign in with `aws sso login --profile winmetta-admin` and run `export AWS_PROFILE=winmetta-admin AWS_REGION=us-east-1` in the shell you use for every step below.
 
-1. **Bootstrap** (once per account): `AWS_PROFILE=winmetta-admin ./infra/bootstrap/bootstrap.sh` is a dry run. Read it, then add `--apply`. It creates the state bucket, the KMS key and the GitHub OIDC provider. If the bucket name is taken, rerun with `BUCKET=<other name>`.
-2. **Stack:** in `infra/pulumi`, run `npm install`, `pulumi login s3://winmetta-pulumi-state`, then `pulumi stack init production --secrets-provider "awskms://alias/winmetta-pulumi?region=us-east-1"`. Commit the generated `Pulumi.production.yaml`; it has no secrets.
+This is for a new account, or after the Pulumi state or its KMS key is lost. If the state bucket and the KMS key still exist and only the infrastructure is gone, skip steps 1 and 2: log in to the state bucket and run steps 4 to 8 against the existing stack.
+
+1. **Bootstrap** (once per account): `AWS_PROFILE=winmetta-admin ./infra/bootstrap/bootstrap.sh` is a dry run. Read it, then add `--apply`. It creates the state bucket, the KMS key and the GitHub OIDC provider. If the bucket name is taken, rerun with `BUCKET=<other name>`, and then use that name everywhere the default `winmetta-pulumi-state` appears: in `pulumi login s3://<other name>` below, in `pulumi config set stateBucketName <other name>` (the preview role reads that bucket), and in the `cloud-url` of `.github/workflows/pulumi-preview.yml`. Commit the workflow change in a pull request.
+2. **Stack:** in `infra/pulumi`, run `npm install`, `pulumi login s3://winmetta-pulumi-state`, then `pulumi stack init production --secrets-provider "awskms://alias/winmetta-pulumi?region=us-east-1"`. Before `stack init`, remove the committed `infra/pulumi/Pulumi.production.yaml` (`git rm`): it belongs to the old stack. Its encrypted data key can only be opened with the old KMS key, and it already says `delegationConfirmed: "true"`, which would skip the staged apply below. `stack init` writes a new file. Commit it; it has no secrets.
 3. **Config:** set `githubSubjectPrefix` to the value from `gh api repos/winmetta/winmetta-platform/actions/oidc/customization/sub --jq .sub_claim_prefix`.
-4. **Stage 1 apply** (`delegationConfirmed` unset): `pulumi preview`, then `pulumi up`. This creates the zone, the bucket and the CloudFront pieces that do not need DNS. `pulumi stack output nameServers` lists the four name servers.
+4. **Stage 1 apply** (`delegationConfirmed` must be unset: check with `pulumi config`, and run `pulumi config rm delegationConfirmed` if it is there): `pulumi preview`, then `pulumi up`. This creates the zone, the bucket and the CloudFront pieces that do not need DNS. `pulumi stack output nameServers` lists the four name servers.
 5. **Delegate:** in the DreamHost DNS panel add four `NS` records for the name `app`, one per name server, and change nothing else. Check delegation by asking public resolvers for the zone's own SOA record (it exists only in the new zone), not for the NS records, which DreamHost may not show:
    `dig +short SOA app.winmetta.org @1.1.1.1` and `@8.8.8.8` should return a `ns-….awsdns-…` answer.
 6. **Stage 2 apply:** `pulumi config set delegationConfirmed true`, `pulumi preview`, `pulumi up`. This creates the certificate, its validation record, the distribution (about 10 minutes), the bucket policy, the alias records and the deploy role. Commit `Pulumi.production.yaml`.
