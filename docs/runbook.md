@@ -100,7 +100,7 @@ Because `SITE_URL` and `PUBLIC_ALLOW_INDEXING` come from the environment variabl
 
 Needs `winmetta-admin`, a clone of this repository with `mise` active, and the DreamHost panel. Never put the account ID in a file. Sign in with `aws sso login --profile winmetta-admin` and run `export AWS_PROFILE=winmetta-admin AWS_REGION=us-east-1` in the shell you use for every step below.
 
-Which case are you in?
+Which case are you in? The two recovery cases are guidance that has not been tried on a real failure: use them as a checklist, check each result before the next action, and ask another maintainer if you can.
 
 - **A new account, or nothing exists:** follow steps 1 to 8.
 - **The state bucket and the KMS key exist, but resources were deleted outside Pulumi:** do the six actions below in order instead of setup steps 1 to 8. They replace setup step 1 (the bootstrap), the stack creation in setup step 2 (the `git rm` and `pulumi stack init`), setup step 3 (the config is already in the stack file), setup step 5 (the delegation) and setup step 7 (the GitHub settings), none of which is lost in this case.
