@@ -17,6 +17,23 @@ const config = new pulumi.Config();
 const domain = config.get('domain') ?? 'app.winmetta.org';
 const githubRepo = config.get('githubRepo') ?? 'winmetta/winmetta-platform';
 const githubEnvironment = config.get('githubEnvironment') ?? 'production';
+// The start of GitHub's OIDC `sub` claim, which the deploy role's trust policy must match
+// exactly. This repository uses GitHub's immutable subjects: next to the names the claim
+// carries the numeric IDs of the owner (the winmetta organization) and of the repository,
+// e.g. `repo:winmetta@<org id>/winmetta-platform@<repo id>`. The IDs are what cannot be
+// faked: a new repository that reuses this one's name gets a different ID, so it cannot
+// assume the role. The names are still part of the string, so renaming the organization or
+// the repository changes the subject and deploys fail (safely) until this is updated.
+// A trust policy that still uses the name-only form fails at deploy time with
+// "Not authorized to perform sts:AssumeRoleWithWebIdentity".
+// Read the real value with:
+//   gh api repos/<owner>/<repo>/actions/oidc/customization/sub --jq .sub_claim_prefix
+// and set it as the stack config `githubSubjectPrefix` (the IDs are public, not secrets).
+// Update it after a rename of the organization or the repository, a transfer, or a
+// deletion and re-creation. The name-based fallback below suits a repository that has
+// not switched to immutable subjects.
+const githubSubjectPrefix =
+  config.get('githubSubjectPrefix') ?? `repo:${githubRepo}`;
 const siteBucketName =
   config.get('siteBucketName') ?? 'winmetta-app-production-site';
 const delegationConfirmed = config.getBoolean('delegationConfirmed') ?? false;
@@ -349,7 +366,7 @@ if (delegationConfirmed) {
             Condition: {
               StringEquals: {
                 'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
-                'token.actions.githubusercontent.com:sub': `repo:${githubRepo}:environment:${githubEnvironment}`,
+                'token.actions.githubusercontent.com:sub': `${githubSubjectPrefix}:environment:${githubEnvironment}`,
               },
             },
           },
