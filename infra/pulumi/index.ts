@@ -17,6 +17,21 @@ const config = new pulumi.Config();
 const domain = config.get('domain') ?? 'app.winmetta.org';
 const githubRepo = config.get('githubRepo') ?? 'winmetta/winmetta-platform';
 const githubEnvironment = config.get('githubEnvironment') ?? 'production';
+// The start of GitHub's OIDC `sub` claim, which the deploy role's trust policy must match
+// exactly. This repository uses GitHub's immutable subjects: instead of the names
+// (`repo:winmetta/winmetta-platform`) the claim carries the numeric IDs of the owner (the
+// winmetta organization) and of the repository, e.g. `repo:winmetta@<org id>/winmetta-platform@<repo id>`.
+// IDs never change, while a rename or a deleted-and-recreated repository could otherwise
+// hand the role to the wrong repository. A trust policy that still uses the name form fails
+// at deploy time with "Not authorized to perform sts:AssumeRoleWithWebIdentity".
+// Read the real value with:
+//   gh api repos/<owner>/<repo>/actions/oidc/customization/sub --jq .sub_claim_prefix
+// and set it as the stack config `githubSubjectPrefix` (the IDs are public, not secrets).
+// If the repository is transferred or recreated its ID changes: update the config and
+// apply. Falling back to the name-based form suits a repository that has not switched to
+// immutable subjects.
+const githubSubjectPrefix =
+  config.get('githubSubjectPrefix') ?? `repo:${githubRepo}`;
 const siteBucketName =
   config.get('siteBucketName') ?? 'winmetta-app-production-site';
 const delegationConfirmed = config.getBoolean('delegationConfirmed') ?? false;
@@ -349,7 +364,7 @@ if (delegationConfirmed) {
             Condition: {
               StringEquals: {
                 'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
-                'token.actions.githubusercontent.com:sub': `repo:${githubRepo}:environment:${githubEnvironment}`,
+                'token.actions.githubusercontent.com:sub': `${githubSubjectPrefix}:environment:${githubEnvironment}`,
               },
             },
           },

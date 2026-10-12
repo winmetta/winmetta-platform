@@ -6,16 +6,16 @@ GitHub OIDC deploy role. One stack, `production`, all in `us-east-1`. Design:
 [tech-architecture.md](../../docs/tech-architecture.md) §6-§8. Plan:
 [implementation-plan.md](../../docs/implementation-plan.md) §4, step 3.
 
-| Resource                     | Purpose                                                                                       |
-| ---------------------------- | --------------------------------------------------------------------------------------------- |
-| Route 53 zone                | `app.winmetta.org`, delegated from DreamHost. Protected from deletion.                        |
-| S3 bucket                    | Private, versioned, encrypted. Only the distribution can read it. Protected from deletion.    |
-| CloudFront function          | `functions/viewer-request.js`: directory index and trailing-slash redirect. Tested.           |
-| Response headers policy      | Security headers (HSTS, nosniff, frame, referrer, permissions). No CSP and no robots header.  |
-| ACM certificate              | DNS-validated through Route 53 (it must be in `us-east-1`).                                   |
-| CloudFront distribution      | Pay-as-you-go, `PriceClass_All`, 403 and 404 answered with `/404.html` and a real 404 status. |
-| Alias records (A and AAAA)   | `app.winmetta.org` to the distribution.                                                       |
-| IAM role `winmetta-app-deploy` | GitHub OIDC, `production` environment of this repo only; sync the bucket and invalidate.    |
+| Resource                       | Purpose                                                                                       |
+| ------------------------------ | --------------------------------------------------------------------------------------------- |
+| Route 53 zone                  | `app.winmetta.org`, delegated from DreamHost. Protected from deletion.                        |
+| S3 bucket                      | Private, versioned, encrypted. Only the distribution can read it. Protected from deletion.    |
+| CloudFront function            | `functions/viewer-request.js`: directory index and trailing-slash redirect. Tested.           |
+| Response headers policy        | Security headers (HSTS, nosniff, frame, referrer, permissions). No CSP and no robots header.  |
+| ACM certificate                | DNS-validated through Route 53 (it must be in `us-east-1`).                                   |
+| CloudFront distribution        | Pay-as-you-go, `PriceClass_All`, 403 and 404 answered with `/404.html` and a real 404 status. |
+| Alias records (A and AAAA)     | `app.winmetta.org` to the distribution.                                                       |
+| IAM role `winmetta-app-deploy` | GitHub OIDC, `production` environment of this repo only; sync the bucket and invalidate.      |
 
 The Pulumi preview role arrives with the deploy workflow (plan step 5).
 
@@ -111,14 +111,36 @@ has two stages. `pulumi up` changes AWS: a maintainer runs it by hand, after rea
    Commit the changed `Pulumi.production.yaml`. The certificate validation can take a
    few minutes, and a new distribution takes about 10 to 15 minutes to deploy.
 
+## GitHub OIDC subject (why the config has numeric IDs)
+
+The deploy role trusts GitHub's OIDC token only when its `sub` claim equals
+`<githubSubjectPrefix>:environment:production`. This repository uses GitHub's
+**immutable subject**, so the prefix is `repo:winmetta@<org id>/winmetta-platform@<repo id>`:
+the numeric IDs of the `winmetta` organization and of this repository, not the names.
+IDs cannot change, whereas a renamed or recreated repository could otherwise be
+mistaken for this one. Both IDs are public and are not secrets. The AWS account ID is a
+different thing and stays out of the repository.
+
+If the trust policy uses the name form instead, the deploy fails at "Sign in to AWS with
+the deploy role" with `Not authorized to perform sts:AssumeRoleWithWebIdentity`. To read
+the value GitHub uses:
+
+```bash
+gh api repos/winmetta/winmetta-platform/actions/oidc/customization/sub --jq .sub_claim_prefix
+```
+
+Set it with `pulumi config set githubSubjectPrefix <value>` and apply. After a repository
+transfer or re-creation the repository ID changes, so repeat this.
+
 ## Config
 
-| Key                   | Default                         |
-| --------------------- | ------------------------------- |
-| `domain`              | `app.winmetta.org`              |
-| `githubRepo`          | `winmetta/winmetta-platform`    |
-| `githubEnvironment`   | `production`                    |
-| `siteBucketName`      | `winmetta-app-production-site`  |
-| `delegationConfirmed` | `false` (set `true` for stage 3) |
+| Key                   | Default                                                                        |
+| --------------------- | ------------------------------------------------------------------------------ |
+| `domain`              | `app.winmetta.org`                                                             |
+| `githubRepo`          | `winmetta/winmetta-platform`                                                   |
+| `githubEnvironment`   | `production`                                                                   |
+| `githubSubjectPrefix` | `repo:<githubRepo>`; set to the immutable prefix above |
+| `siteBucketName`      | `winmetta-app-production-site`                                                 |
+| `delegationConfirmed` | `false` (set `true` for stage 3)                                               |
 
 Never put the account ID, keys or other secrets in config or code.

@@ -2,3 +2,4 @@ secretsprovider: awskms://alias/winmetta-pulumi?region=us-east-1
 encryptedkey: AQICAHiSkgpqWBq/Wpbhfxv7eV5eKQiojJqZYuVvguCVzk9pGgFbigBVkre7Rfr3FE5Nnlr5AAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQM4MJX0bgC2L4Sh136AgEQgDsvtMmW1iweTAYUjxJzqRQNhq3492YdXpBtTXUUO3UO//PmDyOeOopnO02vKfia5IlD5UgZd4FMjTZ0RQ==
 config:
   winmetta-platform:delegationConfirmed: "true"
+  winmetta-platform:githubSubjectPrefix: repo:winmetta@325823115/winmetta-platform@1391779321
