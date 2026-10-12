@@ -242,7 +242,7 @@ Do the steps in this order; each one lists what it needs first and how to tell i
 
 **Step 6: runbook and hardening**
 
-* [ ] Runbook: bootstrap and the staged first apply, editing content and redeploying, rolling back by redeploying an earlier ref, and the choices recorded in step 0. Do a rollback drill once.
+* [ ] Runbook: bootstrap and the staged first apply, editing content and redeploying, rolling back by redeploying an earlier ref, and the choices recorded in step 0. Do a rollback drill once. **Runbook written (2026-10-12):** [runbook.md](runbook.md) covers access, deploying, rolling back, a manual publish, infrastructure changes, setup from nothing, switching indexing on, troubleshooting and the recorded choices. The rollback drill is not done yet; its log is the last section of the runbook.
 * [ ] Harden the default-branch ruleset once the CI workflows run reliably (it currently requires a pull request, squash merges only, no bypass, conversation resolution and the `checks` status check, with 0 approvals and code owner review off):
   * [x] Require the `checks` status check from `.github/workflows/ci.yml` (done, set not to require an up-to-date branch). Still to do: add the deploy workflow's checks once they exist; up-to-date branches stay off in favour of the merge queue item below.
   * [x] Turn on "Require conversation resolution before merging", so unresolved review threads, including the Codex app's findings, block the merge. Done.
