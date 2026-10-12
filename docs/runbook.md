@@ -63,15 +63,26 @@ Notes:
 Only for an emergency, with `winmetta-admin` (`aws sso login --profile winmetta-admin` first) and `gh` signed in. Build with the values the `production` environment uses, so the live indexing state does not change, then upload in the same order as the workflow and invalidate:
 
 ```bash
-export AWS_PROFILE=winmetta-admin AWS_PAGER="" AWS_REGION=us-east-1
-prod_var() { gh variable get "$1" --env production; }   # reads the production environment variables
-SITE_URL="$(prod_var SITE_URL)" PUBLIC_ALLOW_INDEXING="$(prod_var PUBLIC_ALLOW_INDEXING)" npm run build
-B="$(prod_var SITE_BUCKET)"; D=apps/web/dist
-aws s3 sync $D/_astro "s3://$B/_astro" --cache-control "public, max-age=31536000, immutable" --size-only
-aws s3 sync $D/library-data "s3://$B/library-data" --cache-control "public, max-age=31536000, immutable" --size-only
-aws s3 sync $D "s3://$B" --exclude "*.html" --exclude "_astro/*" --exclude "library-data/*" --delete --cache-control "public, max-age=3600"
-aws s3 sync $D "s3://$B" --exclude "*" --include "*.html" --delete --cache-control "public, max-age=0, must-revalidate"
-aws cloudfront create-invalidation --distribution-id "$(prod_var CLOUDFRONT_DISTRIBUTION_ID)" --paths "/*"
+(
+  # A subshell with strict mode: any failure stops everything below and leaves your shell open.
+  set -euo pipefail
+  export AWS_PROFILE=winmetta-admin AWS_PAGER="" AWS_REGION=us-east-1
+  prod_var() { gh variable get "$1" --env production; }   # reads the production environment variables
+  site_url="$(prod_var SITE_URL)"; indexing="$(prod_var PUBLIC_ALLOW_INDEXING)"
+  bucket="$(prod_var SITE_BUCKET)"; dist_id="$(prod_var CLOUDFRONT_DISTRIBUTION_ID)"
+  for v in "$site_url" "$indexing" "$bucket" "$dist_id"; do
+    [ -n "$v" ] || { echo "a production environment variable is empty" >&2; exit 1; }
+  done
+  rm -rf apps/web/dist   # a failed build must never leave an old copy that gets uploaded
+  SITE_URL="$site_url" PUBLIC_ALLOW_INDEXING="$indexing" npm run build
+  [ -f apps/web/dist/index.html ] || { echo "the build produced no site" >&2; exit 1; }
+  D=apps/web/dist; B="$bucket"
+  aws s3 sync $D/_astro "s3://$B/_astro" --cache-control "public, max-age=31536000, immutable" --size-only
+  aws s3 sync $D/library-data "s3://$B/library-data" --cache-control "public, max-age=31536000, immutable" --size-only
+  aws s3 sync $D "s3://$B" --exclude "*.html" --exclude "_astro/*" --exclude "library-data/*" --delete --cache-control "public, max-age=3600"
+  aws s3 sync $D "s3://$B" --exclude "*" --include "*.html" --delete --cache-control "public, max-age=0, must-revalidate"
+  aws cloudfront create-invalidation --distribution-id "$dist_id" --paths "/*"
+)
 ```
 
 Because `SITE_URL` and `PUBLIC_ALLOW_INDEXING` come from the environment variables, an emergency publish after launch keeps indexing on, and before launch keeps it off. Do not type them by hand.
@@ -89,7 +100,11 @@ Because `SITE_URL` and `PUBLIC_ALLOW_INDEXING` come from the environment variabl
 
 Needs `winmetta-admin`, a clone of this repository with `mise` active, and the DreamHost panel. Never put the account ID in a file. Sign in with `aws sso login --profile winmetta-admin` and run `export AWS_PROFILE=winmetta-admin AWS_REGION=us-east-1` in the shell you use for every step below.
 
-This is for a new account, or after the Pulumi state or its KMS key is lost. If the state bucket and the KMS key still exist and only the infrastructure is gone, skip steps 1 and 2: log in to the state bucket and run steps 4 to 8 against the existing stack.
+Which case are you in?
+
+- **A new account, or nothing exists:** follow steps 1 to 8.
+- **The state bucket and the KMS key exist, but resources were deleted outside Pulumi:** skip steps 1 and 2. Log in to the state bucket, run `pulumi refresh --stack production` first (it writes to the state, so confirm before running it; it removes the missing resources from the state), then follow steps 4 to 8 and check that the preview shows them as creates. Without the refresh, Pulumi still believes they exist and the apply fails.
+- **The Pulumi state or its KMS key is lost, but the AWS resources still exist:** do **not** follow these steps. A blank stack would collide with the live resources (the bucket and the IAM roles have fixed names). Either import each surviving resource into a new stack (`pulumi import`, see Pulumi's import documentation), or delete the old resources first. Deleting the site bucket is safe because the site is rebuilt from git. Deleting the Route 53 zone changes its name servers, so the delegation in DreamHost must then be redone. This case is rare, so do it with another maintainer if you can, and write down what you did here.
 
 1. **Bootstrap** (once per account): `AWS_PROFILE=winmetta-admin ./infra/bootstrap/bootstrap.sh` is a dry run. Read it, then add `--apply`. It creates the state bucket, the KMS key and the GitHub OIDC provider. If the bucket name is taken, rerun with `BUCKET=<other name>`, and then use that name everywhere the default `winmetta-pulumi-state` appears: in `pulumi login s3://<other name>` below, in `pulumi config set stateBucketName <other name>` (the preview role reads that bucket), and in the `cloud-url` of `.github/workflows/pulumi-preview.yml`. Commit the workflow change in a pull request.
 2. **Stack:** in `infra/pulumi`, run `npm install`, `pulumi login s3://winmetta-pulumi-state`, then `pulumi stack init production --secrets-provider "awskms://alias/winmetta-pulumi?region=us-east-1"`. Before `stack init`, remove the committed `infra/pulumi/Pulumi.production.yaml` (`git rm`): it belongs to the old stack. Its encrypted data key can only be opened with the old KMS key, and it already says `delegationConfirmed: "true"`, which would skip the staged apply below. `stack init` writes a new file. Commit it; it has no secrets.
