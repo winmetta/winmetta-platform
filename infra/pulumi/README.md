@@ -116,10 +116,15 @@ has two stages. `pulumi up` changes AWS: a maintainer runs it by hand, after rea
 The deploy role trusts GitHub's OIDC token only when its `sub` claim equals
 `<githubSubjectPrefix>:environment:production`. This repository uses GitHub's
 **immutable subject**, so the prefix is `repo:winmetta@<org id>/winmetta-platform@<repo id>`:
-the numeric IDs of the `winmetta` organization and of this repository, not the names.
-IDs cannot change, whereas a renamed or recreated repository could otherwise be
-mistaken for this one. Both IDs are public and are not secrets. The AWS account ID is a
-different thing and stays out of the repository.
+the names **and** the numeric IDs of the `winmetta` organization and of this repository.
+The IDs are the part that cannot be faked: a new repository that reuses this one's name
+after it is deleted gets a different ID, so its tokens do not match and it cannot assume
+the role. Both IDs are public and are not secrets. The AWS account ID is a different
+thing and stays out of the repository.
+
+The names are still in the string and the trust policy matches it exactly, so renaming
+the organization or the repository changes the subject and deploys fail (safely) until
+the prefix is refreshed, see below.
 
 If the trust policy uses the name form instead, the deploy fails at "Sign in to AWS with
 the deploy role" with `Not authorized to perform sts:AssumeRoleWithWebIdentity`. To read
@@ -129,8 +134,9 @@ the value GitHub uses:
 gh api repos/winmetta/winmetta-platform/actions/oidc/customization/sub --jq .sub_claim_prefix
 ```
 
-Set it with `pulumi config set githubSubjectPrefix <value>` and apply. After a repository
-transfer or re-creation the repository ID changes, so repeat this.
+Set it with `pulumi config set githubSubjectPrefix <value>` and apply. Repeat this after
+any of: renaming the organization, renaming the repository, transferring it, or deleting
+and re-creating it (the last two also change the repository ID).
 
 ## Config
 
