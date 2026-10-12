@@ -1,6 +1,6 @@
 # infra/pulumi
 
-Pulumi (TypeScript) program for `app.winmetta.org`: a private S3 bucket behind
+Pulumi (TypeScript) program for `app.winmetta.org` (day-to-day operation is in the [runbook](../../docs/runbook.md)): a private S3 bucket behind
 CloudFront (origin access control), an ACM certificate, a Route 53 zone and the
 GitHub OIDC deploy role. One stack, `production`, all in `us-east-1`. Design:
 [tech-architecture.md](../../docs/tech-architecture.md) §6-§8. Plan:
@@ -142,7 +142,7 @@ and re-creating it (the last two also change the repository ID).
 ## Pull request previews
 
 `.github/workflows/pulumi-preview.yml` runs `pulumi preview` on pull requests that touch
-`infra/pulumi/` and shows the result in the run's summary. It assumes the
+`infra/pulumi/` and shows the diff in the log of its `Pulumi preview` step. It assumes the
 `winmetta-app-pulumi-preview` role through GitHub OIDC. A pull request has no
 environment, so the role trusts the subject `<githubSubjectPrefix>:pull_request` (see the
 section above). The role can only:
@@ -168,8 +168,10 @@ role ARNs from it (`arn:aws:iam::<account id>:role/winmetta-app-pulumi-preview` 
 gh secret set AWS_ACCOUNT_ID --body "$(aws sts get-caller-identity --query Account --output text)"
 ```
 
-A Pulumi diff in the run summary can still show an ARN when a change touches an IAM
-resource. Summaries are not masked, so check a diff before sharing it.
+The workflow does not put the Pulumi diff in the run summary (it only writes a one-line
+note when there is nothing to preview). GitHub masks secrets in logs but not in summaries,
+and a diff that touches an IAM resource shows ARNs with the account ID, so the diff is
+read in the log of the `Pulumi preview` step, where `AWS_ACCOUNT_ID` is masked.
 
 The preview does not refresh from AWS, so it shows code changes, not drift made by
 hand. It also needs no write access to the state: without `--refresh` it takes no stack

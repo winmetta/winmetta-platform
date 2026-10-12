@@ -108,7 +108,7 @@ Most work needs no AWS access. You need it only for `npm run library:manifest` a
 
 5. Use it per command (`AWS_PROFILE=winmetta-ro npm run library:manifest`) or for the shell session (`export AWS_PROFILE=winmetta-ro`).
 
-If `aws configure sso` also created a profile named like `ReadOnlyAccess-<account id>`, delete that section from `~/.aws/config`; it duplicates `winmetta-ro`. Maintainers who run the one-time bootstrap or `pulumi up` use a separate write-access profile named `winmetta-admin` (the `AdministratorAccess` role), set up the same way with `aws configure sso --profile winmetta-admin` and `aws sso login --profile winmetta-admin`. Use it only for those tasks, and confirm before any command that changes AWS resources.
+If `aws configure sso` also created a profile named like `ReadOnlyAccess-<account id>`, delete that section from `~/.aws/config`; it duplicates `winmetta-ro`. The [runbook](runbook.md) covers deploying, rolling back and changing the infrastructure. Maintainers who run the one-time bootstrap or `pulumi up` use a separate write-access profile named `winmetta-admin` (the `AdministratorAccess` role), set up the same way with `aws configure sso --profile winmetta-admin` and `aws sso login --profile winmetta-admin`. Use it only for those tasks, and confirm before any command that changes AWS resources.
 
 ## 5. Configuration
 
