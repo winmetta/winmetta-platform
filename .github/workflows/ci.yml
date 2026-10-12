@@ -17,16 +17,70 @@ jobs:
       TURBO_TELEMETRY_DISABLED: '1'
     steps:
       - uses: actions/checkout@v7
+        with:
+          # gitleaks scans the history, and the commit check reads the PR's commits.
+          fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            infra/pulumi/package-lock.json
       - name: Use the declared npm version
         run: npm install --global "$(node -p "require('./package.json').packageManager")"
       - run: npm ci
+      # The tools the local git hooks (lefthook.yml) use, pinned to the latest stable
+      # versions as of 2026-10-11. To update: look up each version (mise latest <tool>),
+      # change it here, and let the checks run on the PR.
+      - name: Install the hook tools
+        uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
+        with:
+          mise_toml: |
+            [tools]
+            actionlint = "1.7.12"
+            gitleaks = "8.30.1"
+            lefthook = "2.2.1"
+            shellcheck = "0.11.0"
+            shfmt = "3.14.1"
+      # The same checks as the pre-commit hook, on every file, so a skipped hook or a
+      # contributor without the bootstrap script cannot get past them. eslint and prettier
+      # already run in `npm run lint` below.
+      - name: Run the pre-commit hooks on every file
+        env:
+          LEFTHOOK_EXCLUDE: eslint,prettier
+        run: lefthook run pre-commit --all-files
+      # The hook only scans what is staged, so scan the whole history here.
+      - name: Scan the git history for secrets
+        run: gitleaks git --redact --no-banner
+      # The PR title becomes the commit subject when the PR is squash-merged.
+      - name: PR title follows Conventional Commits
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: scripts/conventional-commit.sh -s "$PR_TITLE"
+      - name: Commit messages follow Conventional Commits
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git log --format=%s "$BASE_SHA..$HEAD_SHA" | while IFS= read -r subject; do
+            scripts/conventional-commit.sh -s "$subject"
+          done
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
+      # infra/pulumi is not an npm workspace (the root commands skip it), so check it here.
+      - name: Install the Pulumi program's dependencies
+        run: npm ci
+        working-directory: infra/pulumi
+      - name: Typecheck the Pulumi program
+        run: npm run typecheck
+        working-directory: infra/pulumi
+      - name: Test the CloudFront function
+        run: npm test
+        working-directory: infra/pulumi
       - run: npm run build
       # Lets reviewers download and open a PR's built site (there is no hosted preview).
       - name: Upload the built site

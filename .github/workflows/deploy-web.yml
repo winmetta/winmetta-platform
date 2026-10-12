@@ -1,0 +1,115 @@
+name: Deploy web
+
+# Publishes the site to app.winmetta.org (S3 + CloudFront, see docs/tech-architecture.md
+# §7 and docs/implementation-plan.md §4 step 5).
+#
+# Runs after the CI workflow succeeds on a push to main, and by hand (Run workflow) with
+# any ref, which is how you roll back: deploy an earlier commit. The job waits for a
+# reviewer on the GitHub `production` environment, and AWS access comes from GitHub's
+# OIDC token for that environment only (no stored keys).
+#
+# One-time setup, in Settings > Environments > production: a required reviewer and these
+# variables (none is secret; the role ARN contains the account ID, so keep it out of the
+# repository):
+#   SITE_URL                    https://app.winmetta.org
+#   PUBLIC_ALLOW_INDEXING       false until the launch gates pass, then true
+#   AWS_DEPLOY_ROLE_ARN         the `deployRole` stack output (pulumi stack output deployRole)
+#   SITE_BUCKET                 the `siteBucket` stack output
+#   CLOUDFRONT_DISTRIBUTION_ID  the `distributionId` stack output
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch, tag or commit SHA to deploy (an earlier commit rolls back)
+        required: true
+        default: main
+
+permissions:
+  contents: read
+
+# Deploys run one at a time and are never cancelled half way.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # workflow_run also fires for pull requests (a fork's branch can be called main), so
+    # require a successful run for a push to this repository's main.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      ASTRO_TELEMETRY_DISABLED: '1'
+      TURBO_TELEMETRY_DISABLED: '1'
+      SITE_URL: ${{ vars.SITE_URL }}
+      PUBLIC_ALLOW_INDEXING: ${{ vars.PUBLIC_ALLOW_INDEXING }}
+      SITE_BUCKET: ${{ vars.SITE_BUCKET }}
+      DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || inputs.ref }}
+      - name: Check the environment variables
+        run: |
+          for name in SITE_URL PUBLIC_ALLOW_INDEXING SITE_BUCKET DISTRIBUTION_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error::The production environment variable for $name is not set"
+              exit 1
+            fi
+          done
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Use the declared npm version
+        run: npm install --global "$(node -p "require('./package.json').packageManager")"
+      - run: npm ci
+      # The build bakes in SITE_URL (canonical links, sitemap) and PUBLIC_ALLOW_INDEXING
+      # (the noindex tag and robots.txt), the only switch for indexing.
+      - run: npm run build
+      - name: Sign in to AWS with the deploy role
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+      # `aws s3 sync` sets no Cache-Control, so upload in passes. Hashed files are never
+      # deleted: a tab opened before a deploy would 404 on its lazy search index or scripts
+      # if the old ones vanished (they are pruned separately). Pages and other plain files
+      # ARE deleted when the build no longer has them, so a removed page stops being served
+      # and a rollback removes the pages the bad release added. Versioning keeps the old
+      # objects recoverable. Each --delete only sees the files its own filters include.
+      - name: Upload hashed files (immutable for a year)
+        run: |
+          aws s3 sync apps/web/dist/_astro "s3://$SITE_BUCKET/_astro" --cache-control "public, max-age=31536000, immutable" --size-only --only-show-errors
+          aws s3 sync apps/web/dist/library-data "s3://$SITE_BUCKET/library-data" --cache-control "public, max-age=31536000, immutable" --size-only --only-show-errors
+      - name: Upload icons, robots.txt and sitemaps (one hour)
+        run: aws s3 sync apps/web/dist "s3://$SITE_BUCKET" --exclude "*.html" --exclude "_astro/*" --exclude "library-data/*" --delete --cache-control "public, max-age=3600" --only-show-errors
+      # HTML last, so a page never points at a file that is not uploaded yet.
+      - name: Upload HTML (always revalidate)
+        run: aws s3 sync apps/web/dist "s3://$SITE_BUCKET" --exclude "*" --include "*.html" --delete --cache-control "public, max-age=0, must-revalidate" --only-show-errors
+      - name: Invalidate the CloudFront cache
+        run: |
+          id="$(aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*" --query Invalidation.Id --output text)"
+          aws cloudfront wait invalidation-completed --distribution-id "$DISTRIBUTION_ID" --id "$id"
+      # The smoke tests run against the live site (BASE_URL), as the post-deploy check.
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+        working-directory: apps/web
+      - name: Smoke test the live site
+        run: npm run test:smoke
+        env:
+          BASE_URL: ${{ vars.SITE_URL }}
+      - name: Summary
+        run: |
+          echo "Deployed $(git rev-parse --short HEAD) to $SITE_URL (indexing: $PUBLIC_ALLOW_INDEXING)" >> "$GITHUB_STEP_SUMMARY"

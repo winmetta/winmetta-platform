@@ -1,0 +1,2 @@
+# False positive: prose in an old AGENTS.md line ("secrets from env vars"), not a secret.
+419b6fd2fefac93be26088f878656a2e2b41f4ad:AGENTS.md:generic-api-key:74

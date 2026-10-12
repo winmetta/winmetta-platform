@@ -1,0 +1,5 @@
+# Tool versions for this repo, read by mise (https://mise.jdx.dev/). The org
+# bootstrap (../.github/bootstrap-dev-env.sh) installs mise; ./scripts/setup-local-dev.sh
+# installs the tools below. Keep the Node major in step with .nvmrc, which CI reads.
+[tools]
+node = "24"

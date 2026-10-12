@@ -1,0 +1,12 @@
+# gitleaks configuration (https://github.com/gitleaks/gitleaks). Keep the default rules
+# and allow only the one known false positive below.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "The Pulumi stack's data key (encryptedkey in infra/pulumi/Pulumi.production.yaml) is encrypted with AWS KMS. Pulumi designs it to be committed; it cannot be used without the KMS key."
+# Match the secret itself, not the file: a path entry would make gitleaks skip the whole
+# file, hiding any real credential added to it. A KMS ciphertext blob always starts with
+# AQICAH and is far longer than an AWS secret key (40 characters), so this cannot match
+# a real credential.
+regexes = ['''^AQICAH[A-Za-z0-9+/=]{40,}$''']
