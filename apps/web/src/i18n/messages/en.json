@@ -60,7 +60,7 @@
   "privacyStoredTitle": "What your browser stores",
   "privacyStored": "If you choose a language, your browser remembers it on your device so the site can offer it next time. It is not sent anywhere. If your browser blocks this storage, the site works the same and you can still change language.",
   "privacyHostingTitle": "Hosting and downloads",
-  "privacyHosting": "This site's pages and PDF files are delivered by hosting and content delivery providers (currently bunny.net for PDF files). Like any web service, they process technical information such as your IP address and which pages and files you request, in order to deliver them and keep them secure. We do not use this information to identify or profile visitors.",
+  "privacyHosting": "This site's pages and PDF files are delivered by hosting and content delivery providers (currently Amazon Web Services CloudFront for pages and bunny.net for PDF files). Like any web service, they process technical information such as your IP address and which pages and files you request, in order to deliver them and keep them secure. We do not use this information to identify or profile visitors.",
   "privacyLinksTitle": "Other websites",
   "privacyLinks": "Some links lead to other websites, such as winmetta.org. Their privacy practices are their own.",
   "privacyContactTitle": "Questions",

@@ -131,7 +131,7 @@ Which case are you in? The two recovery cases are guidance that has not been tri
 
 ## 8. Switch indexing on (launch)
 
-Only after the launch gates in [implementation-plan.md](implementation-plan.md) pass. Indexing is controlled in one place, the build variable, and nothing else (CloudFront adds no robots header).
+Done on 2026-10-23, before the launch reviews (see the future todo list in [implementation-plan.md](implementation-plan.md)); repeat this procedure after rebuilding from nothing. Indexing is controlled in one place, the build variable, and nothing else (CloudFront adds no robots header).
 
 1. Set the `production` environment variable `PUBLIC_ALLOW_INDEXING` to exactly `true` (any other value keeps `noindex`).
 2. Run the deploy (§3) so the site is rebuilt: the `noindex` meta tag disappears and `robots.txt` gains the sitemap line.

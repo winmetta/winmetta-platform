@@ -35,7 +35,7 @@ bunny.net CDN (existing pull zone dhamma-library.b-cdn.net)
         v
 AWS S3 bucket dhamma-library (existing)
 
-Later: new media buckets and a cdn.app.winmetta.org hostname (Phase 3, see §6).
+Later: new media buckets and a cdn.app.winmetta.org hostname (a future phase, see §6).
 
 Future (tentative, see §10): Fastify API + PostgreSQL on AWS (container hosting + RDS),
 accounts (Google sign-in, email link via SendGrid), offline/PWA, native shells.
@@ -61,7 +61,7 @@ Phase 2 tooling, checked against npm and GitHub releases on 2026-10-07 (re-check
 | Content & schemas | **Astro content collections** with **Zod** | — | Zod is Astro's built-in schema layer and the most popular TypeScript validator. Content lives in the repo as Markdown/JSON. |
 | Styling / UI | **Tailwind CSS + shadcn/ui** | Tailwind ^4.3 | Widely used; components are copied into the repo, so no dependency abandonment risk. |
 | Static hosting | **AWS S3 + CloudFront** | Private S3 bucket with origin access control behind CloudFront; ACM certificates | Cheap and low-maintenance: the site is small, CloudFront on pay-as-you-go pricing should cost well under a dollar a month at this size (chosen 2026-10-10 over the flat-rate plans, which can stop serving at their limit; see implementation-plan.md §4), and it sits in the AWS account that already holds the media. Everything can be defined in code with Pulumi. |
-| Media | **AWS S3** + **bunny.net CDN** | Existing library bucket and pull zone in Phase 2; new media infrastructure in Phase 3 | S3 is the most widely used, best-documented object store, with an S3-compatible API that keeps media portable; bunny.net serves and caches media cheaply so most reads never hit S3 egress (§6). |
+| Media | **AWS S3** + **bunny.net CDN** | Existing library bucket and pull zone in Phase 2; new media infrastructure in a future phase | S3 is the most widely used, best-documented object store, with an S3-compatible API that keeps media portable; bunny.net serves and caches media cheaply so most reads never hit S3 egress (§6). |
 | DNS | **AWS Route 53** | One hosted zone for `app.winmetta.org` (about $0.50/month) | Delegated from DreamHost, which keeps `winmetta.org` itself. Holds the app and ACM validation records (more names, such as a CDN or staging host, are added when needed), all managed by Pulumi. |
 | Analytics | **Deferred beyond v1** | — | No analytics service or learner-event collection in Phase 0–2; see §4.4. |
 | Infra as code | **Pulumi (TypeScript)** | — | The same language as the app, so one toolchain, editor setup and test runner for the volunteer team; covers AWS natively and other providers through bridged providers; see §8. |
@@ -104,7 +104,7 @@ winmetta-platform/
 ├── infra/                     # deployment/infrastructure definitions (Phase 2)
 │   └── pulumi/
 │       ├── index.ts               # reads the stack config and creates the platform component
-│       ├── platform.ts            # ComponentResource: site, DNS (media is added in Phase 3)
+│       ├── platform.ts            # ComponentResource: site, DNS (media is added in a future phase)
 │       └── Pulumi.production.yaml
 ├── content/                   # optional future independent curated content
 ├── docs/
@@ -143,7 +143,7 @@ Classes and Dhamma Library are the two main navigation groups; discovery lives u
 
 **Budgets** (verified in a prototype before the UI is built, recorded here): serialized index at most about 400 KB gzipped, a query in well under 50 ms on a mid-range phone, results rendered in pages and never all at once. If Burmese relevance or the budget fails, reduce n-gram size or fall back to a substring-plus-tiers matcher behind a flag. A Burmese-speaker-reviewed golden-query suite (partial words, typos, spaced and unspaced queries, digits, ဥ/ဉ variants) runs in CI against the real manifest.
 
-Represent the query, tag and page in URL parameters so deep links, history and locale switching preserve discovery state. Provide counts, active filters, reset and empty states. Translate UI labels using stable keys. Full-text search inside PDFs, OCR and transcription remain Phase 4.
+Represent the query, tag and page in URL parameters so deep links, history and locale switching preserve discovery state. Provide counts, active filters, reset and empty states. Translate UI labels using stable keys. Full-text search inside PDFs, OCR and transcription remain future work.
 
 **Known limitation: search queries must be typed in Unicode.** The index holds Unicode text (Zawgyi filenames are converted by the generator), so a query typed on a Zawgyi keyboard or font finds nothing, even for a book that is listed. Supporting Zawgyi-typed queries is a possible future improvement with no scheduled phase or date (see §10).
 
@@ -151,13 +151,13 @@ Represent the query, tag and page in URL parameters so deep links, history and l
 
 **Phase 1: generate, don't hand-edit.** A script in `scripts/` lists the bucket with `aws s3api list-objects-v2` using a read-only profile (for example an IAM Identity Center profile) and writes the manifest, so builds and CI never need AWS credentials. It skips zero-byte objects, reports non-PDF files, detects duplicates by normalized path, name and size (for example the nine files that exist both with and without U+200B under `၉။ ပေမူများ`) and indexes each work once, fails on keys that do not round-trip through URL encoding, and sorts its output deterministically so PR diffs stay small. Files are served from the existing CDN base URL (`PUBLIC_LIBRARY_CDN_BASE`, currently `https://dhamma-library.b-cdn.net`). The bucket has versioning enabled with a lifecycle rule that expires noncurrent versions after 90 days.
 
-**Phase 4: adding new PDFs.**
+**Future: adding new PDFs.**
 
 1. A maintainer uploads PDFs with the AWS CLI (`aws s3 cp` or `sync`) into the correct numbered folder using a write-capable profile. An upload helper refuses names that need fixing (zero-width characters, non-NFC text, Zawgyi filenames, duplicates of an indexed file).
 2. Replacing an existing file relies on S3 versioning for recovery and a Bunny cache purge for the changed paths.
 3. The maintainer, or a manually triggered or scheduled GitHub Actions job using an OIDC role with read-only S3 access, re-runs the generator and opens a PR containing the manifest diff: added, changed and removed files, a duplicate report and new tags.
 4. CI validates the schemas, the golden queries and the index size budget. A Burmese-speaking reviewer checks titles, tags, new folders and every Zawgyi conversion in `zawgyi-review.json`, recording corrections in `overrides.json`. Golden search tests that name a book removed or renamed in S3 are updated to a title that still exists, never loosened. Merging to `main` deploys.
-5. The generator is the only way new files appear on the site; there is no hand-edited listing HTML. Full-text and OCR indexing, transcripts and the class archive are separate Phase 4 work.
+5. The generator is the only way new files appear on the site; there is no hand-edited listing HTML. Full-text and OCR indexing, transcripts and the class archive are separate future work.
 
 ### Curriculum naming
 
@@ -179,7 +179,7 @@ The word "lesson" is fine as a generic content-unit term in code (e.g. `lesson.t
 
 ### 4.1. Content delivery
 
-Pages (library, class directory, curriculum pages) are pre-rendered at build time from repo content. Library PDFs (and, from Phase 3, other media) are served from a bunny.net pull zone, which fetches cache misses from a private AWS S3 bucket (§6). Application code only ever references the public CDN URL. No API call is needed to read or learn anything.
+Pages (library, class directory, curriculum pages) are pre-rendered at build time from repo content. Library PDFs (and, later, other media) are served from a bunny.net pull zone, which fetches cache misses from a private AWS S3 bucket (§6). Application code only ever references the public CDN URL. No API call is needed to read or learn anything.
 
 ### Class schedule timezones
 
@@ -240,7 +240,7 @@ Permanent hosting and media both live in **AWS**, where Win Metta already has an
 | `winmetta.org` (+ `www`) | Existing WordPress hosting | Blog/news, About, existing pages — untouched. |
 | `app.winmetta.org` | AWS CloudFront (production) | This platform's frontend. `app.` chosen as the most understandable label for less tech-fluent users. |
 | `dhamma-library.b-cdn.net` | Existing bunny.net pull zone | Library PDFs, backed by the existing `dhamma-library` S3 bucket. Unchanged in Phase 2. |
-| `staging.app.winmetta.org`, `cdn.app.winmetta.org` (later, not Phase 2) | CloudFront staging; bunny.net pull zone (CNAME) | Staging arrives with the first API or backend; the CDN hostname with new platform media in Phase 3. |
+| `staging.app.winmetta.org`, `cdn.app.winmetta.org` (later, not Phase 2) | CloudFront staging; bunny.net pull zone (CNAME) | Staging arrives with the first API or backend; the CDN hostname with new platform media in a future phase. |
 
 `winmetta.org` stays on DreamHost's name servers, because DreamHost's free nonprofit shared hosting requires it, so its DNS is managed in the DreamHost panel. The platform's names live in a separate **Route 53** hosted zone for `app.winmetta.org`, delegated once by adding four NS records for `app` in DreamHost's panel (confirm the panel accepts NS records for a subdomain before building on it). The zone, the production alias records and the ACM validation CNAMEs are then created in Route 53 by Pulumi; later hosts are added to the same zone. Delegation must be live before ACM can validate the certificate, so the first apply is staged (zone, then NS records in DreamHost, then certificate and distribution; see implementation-plan.md §4). Check delegation by resolving a record that exists only in the new zone, because DreamHost notes that subdomain NS records may not show up in public `dig` NS lookups. Existing WordPress records stay intact. WordPress navigation can link to `app.winmetta.org`, and the app can link back for blog/news.
 
@@ -248,7 +248,7 @@ Permanent hosting and media both live in **AWS**, where Win Metta already has an
 | --- | --- | --- |
 | Astro build output | **AWS S3 + CloudFront** | SSL (ACM), CDN, custom domain through a Route 53 alias record. |
 | Library PDFs | Existing **AWS S3** bucket `dhamma-library` + **bunny.net** CDN | S3 charges internet egress (about $0.09/GB beyond a small free allowance), so all public traffic goes through bunny.net, which caches and pulls from S3 only on cache misses. bunny.net is already used this way for the Dhamma Library PDFs and as a cache in front of the WordPress site. Check whether AWS nonprofit credit programs apply. |
-| New audio, video, images (Phase 3) | **AWS S3** origin + **bunny.net** CDN | Same pattern, set up when a phase needs it (see "Media delivery"). |
+| New audio, video, images (future) | **AWS S3** origin + **bunny.net** CDN | Same pattern, set up when a phase needs it (see "Media delivery"). |
 
 ### Static site delivery
 
@@ -260,10 +260,10 @@ Permanent hosting and media both live in **AWS**, where Win Metta already has an
 * **Headers:** a response headers policy adds security headers. Indexing is controlled only by the build variable `PUBLIC_ALLOW_INDEXING` (meta tag and `robots.txt`), never by a CloudFront header, so the two cannot disagree.
 * **Compression:** enable CloudFront automatic compression for text, including the JSON search index.
 
-### Media delivery (existing library now, new media in Phase 3)
+### Media delivery (existing library now, new media in a future phase)
 
 * **Current state (Phase 1 source, unchanged in Phase 2):** the existing bucket `dhamma-library` (us-east-2) and the Bunny pull zone `dhamma-library.b-cdn.net` already serve the library. They are not imported into Pulumi and not migrated; builds use the default `PUBLIC_LIBRARY_CDN_BASE`. Moving to `cdn.app.winmetta.org` later is a change to that one variable plus a Bunny hostname, and needs its own decision (about 115 GiB). Do not record the AWS account number in this public repo.
-* **New media (Phase 3 design):** a separate S3 bucket for platform media (and a staging one once staging exists), with all public access blocked, served by a bunny.net pull zone on the custom hostname `cdn.app.winmetta.org` with a certificate for that exact hostname.
+* **New media (future design):** a separate S3 bucket for platform media (and a staging one once staging exists), with all public access blocked, served by a bunny.net pull zone on the custom hostname `cdn.app.winmetta.org` with a certificate for that exact hostname.
 * **Origin access:** keep the bucket private and use Bunny's S3 origin authentication with a dedicated IAM user whose policy is read-only (`s3:GetObject`) on that bucket only. Set the pull zone's origin region to match the bucket. This means the raw S3 URL cannot bypass the CDN. **Verify Bunny's S3 authentication against your bucket's region before relying on it.**
 * **Credentials:** AWS access keys and Bunny API keys live in secret configuration only, never in client code or committed files. Use separate IAM credentials for the read-only Bunny origin user and for maintainer uploads (write access, e.g. via the AWS CLI `aws s3 sync`).
 * Use versioned object paths for replaced media. Public access requires no learner account or token.
@@ -281,13 +281,13 @@ Deliberately small, for a volunteer team. Rollout by phase:
 * **Phase 0:** local development plus `ci.yml` (lint, typecheck, tests, build). No deploy.
 * **Phase 1:** no deployment. Pages are built and reviewed locally, and `ci.yml` keeps checking every PR.
 * **Phase 2:** add the deploy workflow (`deploy-web.yml`), static hosting on S3 + CloudFront, Pulumi, the custom domain and one production environment, labelled Beta.
-* **With the first API or backend (Phase 5, §10):** add a staging environment with its own stack, database and integration tests, and consider a PR preview host.
+* **With the first API or backend (§10):** add a staging environment with its own stack, database and integration tests, and consider a PR preview host.
 
 | Environment | Where | Purpose |
 | --- | --- | --- |
 | **Local** | `npm run dev` | Development. No Docker, no database. |
 | **PR builds** | Workflow artifact from `ci.yml` (added in Phase 2) | Per-pull-request check of the built site; no hosted preview in Phase 2. |
-| **Production** | `app.winmetta.org` (Phase 2) | Live site. The first deploy is unindexed and not linked from winmetta.org so reviewers can run the launch gates (implementation-plan.md §4); launch switches indexing on and links to it. |
+| **Production** | `app.winmetta.org` (Phase 2) | Live site, open to search engines since 2026-10-23 (implementation-plan.md §4). |
 
 **Why no staging yet:** the site is static with no backend or database, so a second environment would add a bucket, certificate, role and stack without testing much, and the staging bytes could not be promoted anyway because `SITE_URL` and `PUBLIC_ALLOW_INDEXING` are baked in at build time. The safety nets are the required-reviewer approval on the `production` GitHub environment, a post-deploy smoke test against the live site, and rollback by redeploying an earlier ref. Stack parameters are per stack, so adding `staging` later is a new config file and `pulumi up`.
 
@@ -297,7 +297,7 @@ Deliberately small, for a volunteer team. Rollout by phase:
 2. **Merge to `main`** → `deploy-web.yml` waits for a required reviewer to approve the `production` environment, builds with the production variables, syncs to S3, invalidates CloudFront and runs the Playwright smoke test against the live URL.
 3. **Rollback** is a manual run of the same workflow (`workflow_dispatch`) with an earlier ref. A bad deploy goes straight to production, so keep the smoke test and the approval step.
 
-Until launch, the production environment variable `PUBLIC_ALLOW_INDEXING` is `false`, so every page sends `noindex`. `robots.txt` stays allow-all but leaves out the sitemap: a `Disallow` would stop crawlers from fetching the pages, so they would never see the `noindex` tag. Launch sets it to `true` and redeploys. CI authenticates to AWS only through GitHub OIDC (§8), and fork pull requests get no AWS access.
+When the production environment variable `PUBLIC_ALLOW_INDEXING` is not `true` (it has been `true` since 2026-10-23), every page sends `noindex`. `robots.txt` stays allow-all but leaves out the sitemap: a `Disallow` would stop crawlers from fetching the pages, so they would never see the `noindex` tag. Setting it to `true` and redeploying turns indexing on. CI authenticates to AWS only through GitHub OIDC (§8), and fork pull requests get no AWS access.
 
 Enable GitHub secret scanning and push protection on the repo (free for public repos) in Phase 0.
 
@@ -305,7 +305,7 @@ Enable GitHub secret scanning and push protection on the repo (free for public r
 
 ## 8. Infrastructure Provisioning
 
-**Pulumi in TypeScript**, not manual console clicks. The infrastructure is ordinary TypeScript, so the team keeps one language, one package manager, one editor setup and Vitest for infrastructure tests. The Phase 2 footprint is small (a site bucket with a CloudFront distribution and ACM certificate, a CloudFront Function, the Route 53 zone and records, and the deploy role), so a first pass can be done by hand and codified right after. Pulumi covers AWS natively; for bunny.net in Phase 3 use a bridged provider (`pulumi package add terraform-provider …`) if one covers the needed resources, otherwise document the manual Bunny steps. A future host move changes the provider calls in one component, not the workflow. Confirm the team is comfortable before committing to it.
+**Pulumi in TypeScript**, not manual console clicks. The infrastructure is ordinary TypeScript, so the team keeps one language, one package manager, one editor setup and Vitest for infrastructure tests. The Phase 2 footprint is small (a site bucket with a CloudFront distribution and ACM certificate, a CloudFront Function, the Route 53 zone and records, and the deploy role), so a first pass can be done by hand and codified right after. Pulumi covers AWS natively; for bunny.net later use a bridged provider (`pulumi package add terraform-provider …`) if one covers the needed resources, otherwise document the manual Bunny steps. A future host move changes the provider calls in one component, not the workflow. Confirm the team is comfortable before committing to it.
 
 ```
 infra/pulumi/
@@ -332,7 +332,7 @@ Not needed for v1. If a concrete learning-outcome question arises (e.g. does one
 
 *Everything here is a starting idea, not a design. Revisit and rewrite when the relevant phase begins.*
 
-### Backend & database (likely Phase 5)
+### Backend & database (likely a future phase)
 
 When a feature needs server state (accounts, progress sync, dynamic content), add:
 
@@ -341,7 +341,7 @@ When a feature needs server state (accounts, progress sync, dynamic content), ad
 * `api.winmetta.org` as a sibling subdomain; a staging environment with its own separate database and integration tests at that point (Phase 2 has production only, §7).
 * Local dev against a native Postgres at `localhost:5432/winmetta_dev`.
 
-### Accounts & progress sync (likely Phase 5)
+### Accounts & progress sync (likely a future phase)
 
 * Core content stays fully usable with no login; accounts are optional and only for syncing progress/bookmarks across devices. Existing IndexedDB data migrates into the account on first sign-in.
 * Passwordless. Candidate implementation: **Better Auth** inside the Fastify app, storing users in the same Postgres.
@@ -356,6 +356,6 @@ Library search assumes Unicode input (see "Known limitation" in §3). Learners o
 
 Offline use (downloaded curriculum content, audio and library files) is desirable but not a v1 requirement. When taken up, a PWA (service worker + cache) is the lowest-friction starting point. Don't design v1 pages around it beyond keeping assets cacheable.
 
-### Native apps (Phase 6)
+### Native apps (future)
 
 Electron desktop and Capacitor mobile builds may wrap the web app later. Notes for then: Google and Apple block OAuth in embedded webviews, so native apps must hand sign-in off to the system browser and catch the redirect via a custom URI scheme (`app.setAsDefaultProtocolClient` in Electron; `@capacitor/app` `appUrlOpen` in Capacitor). Desktop auto-update can use `electron-builder` + `electron-updater` against GitHub Releases.

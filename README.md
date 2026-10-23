@@ -6,7 +6,7 @@ The first phases deliver a foundation app (Phase 0), bilingual pages — Home, A
 
 ## Status
 
-This public repo currently contains **planning documentation only** — decisions are recorded ahead of implementation, and future-phase notes are tentative. `apps/` hasn't been scaffolded yet (see [docs/implementation-plan.md](docs/implementation-plan.md) for the Phase 0–2 plan).
+Phases 0–2 are done: the site is live at [app.winmetta.org](https://app.winmetta.org) (labelled Beta), built from `apps/web` and deployed with the Pulumi program in `infra/pulumi/` and the workflows in `.github/workflows/`. Later work is not numbered or scheduled, and future-phase notes in the docs are tentative. The open items are in the future todo list in [docs/implementation-plan.md](docs/implementation-plan.md) §4. To run the site locally, see [docs/developer-guide.md](docs/developer-guide.md).
 
 ## Docs
 
@@ -14,10 +14,10 @@ This public repo currently contains **planning documentation only** — decision
 | --- | --- |
 | [docs/prd.md](docs/prd.md) | Product scope, target audience, feature specs, funding plan, success metrics, phased roadmap |
 | [docs/tech-architecture.md](docs/tech-architecture.md) | Stack, hosting/domains, environments & CI/CD, infrastructure provisioning; deferred analytics and tentative future directions (backend, accounts, offline) |
-| [docs/implementation-plan.md](docs/implementation-plan.md) | Phases 0–2: foundation code, bilingual pages, infrastructure & deployment; checklists and macOS setup |
+| [docs/implementation-plan.md](docs/implementation-plan.md) | Phases 0–2 (done): foundation code, bilingual pages, infrastructure & deployment; checklists and macOS setup |
 | [AGENTS.md](AGENTS.md) | Quick-reference conventions for contributors and AI coding agents working in this repo — **read this before making changes**, especially §2 on this repo being public |
 
-Phase 1 introduces Home, About, Privacy, Classes (with Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library for online Zoom students and anonymous independent learners worldwide. Content will be concise and curated from the existing site, with an original mobile/desktop design. Classes and Dhamma Library are the two main page groups; the library indexes every PDF in the project's S3 bucket (about 3,000 mostly Burmese books) with folder-style tag browsing and fuzzy, Burmese-aware search, plus curated links such as blog posts and apps.
+Phase 1 delivered Home, About, Privacy, Classes (with Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library for online Zoom students and anonymous independent learners worldwide. Content is concise and curated from the existing site, with an original mobile/desktop design. Classes and Dhamma Library are the two main page groups; the library indexes every PDF in the project's S3 bucket (about 3,000 mostly Burmese books) with folder-style tag browsing and fuzzy, Burmese-aware search, plus curated links such as blog posts and apps.
 
 ## Core Principles
 
@@ -28,7 +28,7 @@ Phase 1 introduces Home, About, Privacy, Classes (with Sayadaws, Dhamma Study Gr
 - **Low cost, low maintenance** — this is a volunteer-run nonprofit; v1 is a static site with no server to run. We prefer free nonprofit programs but will pay for tools when worthwhile.
 - **Popular, well-supported tools** — widely used stacks with strong communities, so volunteers can learn them easily.
 
-## Tech Stack (planned)
+## Tech Stack
 
 Astro (with React islands) · TypeScript · Tailwind · Turborepo/npm workspaces · AWS S3 + CloudFront hosting · bunny.net library CDN over S3 · Route 53 DNS (subdomain delegated from DreamHost). A Fastify/PostgreSQL backend is a possible future addition. See [docs/tech-architecture.md](docs/tech-architecture.md) for versions and the reasoning behind each choice.
 
