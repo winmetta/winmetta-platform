@@ -218,7 +218,7 @@ Do the steps in this order; each one lists what it needs first and how to tell i
 * [x] `robots.txt` and a sitemap, built from `SITE_URL` and `PUBLIC_ALLOW_INDEXING`: allow all plus the sitemap URL when indexing is on, allow all without the sitemap while it is off (a `Disallow` would stop crawlers from fetching pages and seeing their `noindex` tag). The build variable stays the single switch for indexing (meta tag and sitemap line); CloudFront adds security headers but no `X-Robots-Tag`, so the two cannot disagree. **Done:** `src/pages/robots.txt.ts` (allow all, plus the sitemap URL only when indexing is on) and `@astrojs/sitemap` (`sitemap-index.xml`, 256 pages, each with its other-language alternate; the root chooser and 404 are excluded), covered by `pages.spec.ts`.
 * [x] PR builds as artifacts: **Done:** `ci.yml` uploads `apps/web/dist` as `site-build` on pull requests (7 days), so reviewers can download a PR's build.
 * [x] `BASE_URL` option in `apps/web/playwright.config.ts`: **Done:** `BASE_URL=https://… npm run test:smoke` runs the suite against a deployed site and starts no local server. The robots and 404 checks work for both indexing states.
-* [ ] Privacy page, in the launch PR (step 7), not before: the `privacyHosting` text names only bunny.net for PDF files, so name AWS CloudFront for the pages once they are served from there (`en` and `my`, Burmese reviewed), and change the page's last-updated date and the test that expects it.
+* [x] Privacy page: **Done 2026-10-23:** `privacyHosting` now names Amazon Web Services CloudFront for pages and bunny.net for PDF files (`en` and `my`), with the last-updated date changed.
 
 **Step 2: bootstrap**
 
@@ -273,6 +273,14 @@ This is step 7 above. Reviewers need a real environment, so these run on the fir
 * [ ] The 11 Zawgyi conversions and 3 suspicious titles in `zawgyi-review.json`, recording corrections in `overrides.json`.
 * [ ] The golden-query suite (partial words, typos, spaced and unspaced queries, digits, ဥ/ဉ variants), then record the index size and query-time budgets.
 * [ ] All Burmese interface text on the Classes, Dhamma Study Groups, Retreats, Sayadaws and Zoom help pages, the schedule table, the time zone names, and the draft English biographies (set a teacher's English `reviewed` to `true` only after this).
+
+### Future todo (deferred)
+
+Decided 2026-10-23: indexing was switched on (`PUBLIC_ALLOW_INDEXING=true` in the `production` environment) without waiting for the items below. They are still wanted, with no date. Do them when time allows and tick them here.
+
+* [ ] Rollback drill (step 6): a maintainer who did not build the deploy redeploys an earlier ref and rolls back using only `docs/runbook.md`.
+* [ ] Class host review (see "Before launch: class host review" above): class times, Zoom IDs and the public passcode, live-streamed flags, class languages, the About text and the retreat details.
+* [ ] Sayadaw review: each Sayadaw confirms they are comfortable with their portrait and biography on the public site and in the repo (remove them on request, per AGENTS.md §2).
 
 Out of scope for Phases 0–2 (future work): a staging environment and PR preview host (planned with the first API or backend), new media buckets and the `cdn.app.winmetta.org` hostname (Phase 3), interactive LLB lessons, the repeatable upload-and-reindex pipeline for new library files (outlined in §5), full-text/OCR/transcript search inside PDFs, unified class archive, additional locales beyond English/Burmese, product analytics/metric collection, profile timezone preferences, backend API, database, accounts, offline/PWA, `apps/desktop`, `apps/mobile`. Excluded entirely: standalone blog publishing/automatic feeds, copying the existing site UI, bulk website migration.
 
