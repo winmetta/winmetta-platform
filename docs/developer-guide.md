@@ -115,7 +115,7 @@ If `aws configure sso` also created a profile named like `ReadOnlyAccess-<accoun
 `.env.example` documents the variables. For local overrides copy it to `.env.local` at the repo root (ignored by git) and restart the dev server.
 
 - `SITE_URL`: origin for canonical and alternate-language URLs. Defaults to `http://localhost:4321`.
-- `PUBLIC_ALLOW_INDEXING`: only the public production build sets this to `true` (after the launch gates). Every other build sends `noindex`.
+- `PUBLIC_ALLOW_INDEXING`: only the public production build sets this to `true` (set in the `production` environment since 2026-10-23). Every other build sends `noindex`.
 - `PUBLIC_LIBRARY_CDN_BASE`: public origin that serves library PDFs. Defaults to the existing bunny.net pull zone.
 
 Never put secrets in `PUBLIC_*` variables, because they can appear in the generated site. Don't add `.env.staging` or `.env.production`; the deployed environment (`production`) uses GitHub environment variables and secrets.
