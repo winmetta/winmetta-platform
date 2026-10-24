@@ -283,6 +283,34 @@ test.describe('Dhamma posts', () => {
     );
   });
 
+  test('share on the posts index includes the active search, and only there', async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'share', { value: undefined });
+    });
+    const copied = () => page.evaluate(() => navigator.clipboard.readText());
+    await page.goto('/en/dhamma-posts/?lang=my,en');
+    // Share right after typing: leaving the box writes the query to the address first.
+    await page.getByLabel('Search posts').fill('kamma');
+    await page.locator('[data-share]').click();
+    await expect
+      .poll(copied)
+      .toBe(`${siteOrigin}/en/dhamma-posts/?q=kamma&lang=my,en`);
+    // Cleared search: the plain page again.
+    await page.getByRole('button', { name: 'Clear search' }).click();
+    await page.locator('[data-share]').click();
+    await expect.poll(copied).toBe(`${siteOrigin}/en/dhamma-posts/?lang=my,en`);
+    // Tag and post pages have no search, so a stray ?q= is not shared.
+    await page.goto('/en/dhamma-posts/tags/lobha/?q=kamma&lang=en');
+    await page.locator('[data-share]').click();
+    await expect
+      .poll(copied)
+      .toBe(`${siteOrigin}/en/dhamma-posts/tags/lobha/?lang=en`);
+  });
+
   test('share copies the post address', async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await page.addInitScript(() => {

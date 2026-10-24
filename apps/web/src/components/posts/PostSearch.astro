@@ -204,7 +204,17 @@ const { version } = await postSearchData();
     });
     input.addEventListener('input', () => {
       window.clearTimeout(timer);
-      timer = window.setTimeout(() => void run(input.value), 200);
+      timer = window.setTimeout(() => {
+        timer = undefined;
+        void run(input.value);
+      }, 200);
+    });
+    // Leaving the box (for example to press Share) writes a pending query to the address now.
+    input.addEventListener('blur', () => {
+      if (timer === undefined) return;
+      window.clearTimeout(timer);
+      timer = undefined;
+      void run(input.value);
     });
     input.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && input.value) {
@@ -217,6 +227,7 @@ const { version } = await postSearchData();
       ?.addEventListener('submit', (event) => {
         event.preventDefault();
         window.clearTimeout(timer);
+        timer = undefined;
         void run(input.value);
       });
     root.querySelector('[data-search-reset]')?.addEventListener('click', () => {

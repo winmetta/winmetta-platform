@@ -1,7 +1,8 @@
 ---
 // Share (posts and tag pages) and Print (posts). Share opens the phone's share sheet where there
 // is one, and otherwise copies the page's address, always with the "Read in" languages
-// (?lang=en,zh) so the link opens in the same languages. Print prints only the chosen languages,
+// (?lang=en,zh) so the link opens in the same languages, and, on the posts index, the active
+// search (?q=…) so it opens with the same results. Print prints only the chosen languages,
 // without the site header and footer (print styles in global.css).
 import { t } from '../../i18n/messages';
 import type { Locale } from '../../i18n/locales';
@@ -11,8 +12,10 @@ interface Props {
   url: string;
   title: string;
   print?: boolean;
+  /** Posts index: also share the active search (?q=) from the address. */
+  shareSearch?: boolean;
 }
-const { locale, url, title, print = false } = Astro.props;
+const { locale, url, title, print = false, shareSearch = false } = Astro.props;
 ---
 
 <div class="js-only no-print flex flex-wrap items-center gap-2">
@@ -21,6 +24,7 @@ const { locale, url, title, print = false } = Astro.props;
     class="btn btn-outline"
     data-share
     data-url={url}
+    data-share-search={shareSearch ? '' : undefined}
     data-title={title}
     data-copied={t(locale, 'postShareCopied')}
     data-failed={t(locale, 'postShareFailed')}
@@ -71,6 +75,7 @@ const { locale, url, title, print = false } = Astro.props;
 
 <script>
   import { isPostLanguage, withLangParam } from '../../lib/posts/languages';
+  import { readQuery, withQuery } from '../../lib/posts/search-url';
   const share = document.querySelector<HTMLButtonElement>('[data-share]');
   const toast = document.querySelector<HTMLElement>('[data-share-status]');
   let hideTimer: number | undefined;
@@ -90,7 +95,16 @@ const { locale, url, title, print = false } = Astro.props;
     const langs = (document.documentElement.dataset.postLangs ?? '')
       .split(' ')
       .filter(isPostLanguage);
-    const url = withLangParam(share.dataset.url ?? window.location.href, langs);
+    const page = withLangParam(
+      share.dataset.url ?? window.location.href,
+      langs,
+    );
+    // The search box keeps ?q= in the address while results show; blank means no search.
+    const query =
+      share.dataset.shareSearch === undefined
+        ? ''
+        : readQuery(window.location.search);
+    const url = query.trim() ? withQuery(page, query) : page;
     say();
     // Phones: the system share sheet (messages, chat apps). Desktop: copy the link.
     if (navigator.share && matchMedia('(pointer: coarse)').matches) {
