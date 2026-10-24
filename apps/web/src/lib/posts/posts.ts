@@ -6,6 +6,8 @@ export interface PostSection {
   lang: PostLanguage;
   title: string;
   html: string;
+  /** Plain text, for the search index. */
+  text: string;
 }
 
 export interface Post {

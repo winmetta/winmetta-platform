@@ -1,0 +1,236 @@
+---
+// Search box on the posts index: finds posts by title, topic name or body text in Burmese,
+// English or Chinese (Traditional queries are converted to Simplified). The search code and its
+// data (pages/post-data/) download on first focus, typing or a page opened with ?q=, never on a
+// plain page view. While a query is active, results replace the topics and lists
+// ([data-post-browse]); results use the list's card markup, so "Read in" applies to them too.
+// Without JavaScript only a note shows and browsing works as before.
+import PostCard from './PostCard.astro';
+import { t, type MessageKey } from '../../i18n/messages';
+import { locales, type Locale } from '../../i18n/locales';
+import { postSearchData } from '../../lib/posts/search-data';
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const text = (key: MessageKey) => t(locale, key);
+const { version } = await postSearchData();
+---
+
+<section
+  class="no-print space-y-4"
+  data-post-search
+  data-index-url={`/post-data/index.${version}.json`}
+  data-records-url={`/post-data/records.${version}.json`}
+  data-post-base={`/${locale}/dhamma-posts/`}
+  data-format-locale={locales[locale].formatLocale}
+  data-date-template={text('postCreated')}
+  data-label-loading={text('searchLoading')}
+  data-label-error={text('searchError')}
+  data-label-results={text('results')}
+  data-label-none={text('postsNoResults')}
+>
+  <form role="search" class="js-only space-y-2" data-search-form>
+    <label id="post-search-label" for="post-search" class="font-semibold"
+      >{text('postsSearchLabel')}</label
+    >
+    <span class="field-wrap block">
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="m20 20-3.5-3.5"></path>
+      </svg>
+      <input
+        id="post-search"
+        type="search"
+        name="q"
+        class="field"
+        autocomplete="off"
+        placeholder={text('postsSearchPlaceholder')}
+        data-search-input
+      />
+    </span>
+  </form>
+  <noscript><p class="muted">{text('searchNeedsJs')}</p></noscript>
+  <div class="space-y-4" data-search-results hidden>
+    <div class="flex flex-wrap items-center gap-3">
+      <p class="font-semibold" role="status" data-search-status></p>
+      <button type="button" class="btn btn-outline" data-search-retry hidden>
+        {text('searchRetry')}
+      </button>
+      <button type="button" class="btn btn-outline" data-search-reset>
+        {text('resetSearch')}
+      </button>
+    </div>
+    <ol class="grid gap-4" data-search-exact></ol>
+    <h3 class="text-xl font-bold" data-search-similar-title hidden>
+      {text('postsSimilar')}
+    </h3>
+    <ol class="grid gap-4" data-search-similar></ol>
+  </div>
+  <template data-search-card><PostCard locale={locale} /></template>
+</section>
+
+<script>
+  import { formatPostDate } from '../../lib/posts/posts';
+  import type { PostSearch, PostSearchHit } from '../../lib/posts/search';
+  import type { PostSearchRecord } from '../../lib/posts/search';
+  import { readQuery, withQuery } from '../../lib/posts/search-url';
+
+  const root = document.querySelector<HTMLElement>('[data-post-search]');
+  const input = root?.querySelector<HTMLInputElement>('[data-search-input]');
+  if (root && input) {
+    const data = root.dataset;
+    const results = root.querySelector<HTMLElement>('[data-search-results]');
+    const status = root.querySelector<HTMLElement>('[data-search-status]');
+    const retry = root.querySelector<HTMLButtonElement>('[data-search-retry]');
+    const exactList = root.querySelector<HTMLElement>('[data-search-exact]');
+    const similarList = root.querySelector<HTMLElement>(
+      '[data-search-similar]',
+    );
+    const similarTitle = root.querySelector<HTMLElement>(
+      '[data-search-similar-title]',
+    );
+    const template = root.querySelector<HTMLTemplateElement>(
+      'template[data-search-card]',
+    );
+    const browse = document.querySelectorAll<HTMLElement>('[data-post-browse]');
+    const formatLocale = data.formatLocale ?? 'en-US';
+    const count = (value: number) =>
+      new Intl.NumberFormat(formatLocale, { numberingSystem: 'latn' }).format(
+        value,
+      );
+
+    let engine: Promise<PostSearch> | undefined;
+    const load = (): Promise<PostSearch> => {
+      engine ??= (async () => {
+        const fetchOk = async (url: string | undefined) => {
+          const response = await fetch(url ?? '');
+          if (!response.ok) throw new Error(String(response.status));
+          return response;
+        };
+        const [module, convert, index, records] = await Promise.all([
+          import('../../lib/posts/search'),
+          import('../../lib/posts/simplified'),
+          fetchOk(data.indexUrl).then((r) => r.text()),
+          fetchOk(data.recordsUrl).then(
+            (r) => r.json() as Promise<PostSearchRecord[]>,
+          ),
+        ]);
+        return module.PostSearch.load(records, index, convert.toSimplified);
+      })();
+      // A failed download can be retried.
+      engine.catch(() => {
+        engine = undefined;
+      });
+      return engine;
+    };
+
+    const card = (hit: PostSearchHit): Node | undefined => {
+      const item = template?.content.firstElementChild?.cloneNode(true);
+      if (!(item instanceof HTMLElement)) return undefined;
+      const { record } = hit;
+      item.dataset.id = record.id;
+      item.dataset.created = record.created;
+      item
+        .querySelector('[data-card-link]')
+        ?.setAttribute('href', `${data.postBase ?? '/'}${record.id}/`);
+      item
+        .querySelectorAll<HTMLElement>('[data-card-title]')
+        .forEach((span) => {
+          const lang = span.dataset.cardTitle as keyof typeof record.titles;
+          span.textContent = record.titles[lang] ?? '';
+        });
+      const date = item.querySelector('[data-card-date]');
+      if (date)
+        date.textContent = (data.dateTemplate ?? '{date}').replace(
+          '{date}',
+          formatPostDate(record.created, formatLocale),
+        );
+      return item;
+    };
+
+    const showBrowse = (on: boolean) => {
+      browse.forEach((element) => (element.hidden = !on));
+      if (results) results.hidden = on;
+    };
+
+    let latest = 0;
+    const run = async (query: string) => {
+      const ticket = ++latest;
+      history.replaceState(
+        history.state,
+        '',
+        withQuery(window.location.href, query),
+      );
+      if (!query.trim()) {
+        showBrowse(true);
+        return;
+      }
+      showBrowse(false);
+      if (retry) retry.hidden = true;
+      if (status) status.textContent = data.labelLoading ?? '';
+      try {
+        const search = await load();
+        if (ticket !== latest) return;
+        const { exact, similar } = search.search(query);
+        exactList?.replaceChildren(...exact.flatMap((h) => card(h) ?? []));
+        similarList?.replaceChildren(...similar.flatMap((h) => card(h) ?? []));
+        if (similarTitle) similarTitle.hidden = similar.length === 0;
+        if (status)
+          status.textContent =
+            exact.length === 0 && similar.length === 0
+              ? (data.labelNone ?? '')
+              : `${data.labelResults ?? ''}: ${count(exact.length)}`;
+      } catch {
+        if (ticket !== latest) return;
+        exactList?.replaceChildren();
+        similarList?.replaceChildren();
+        if (similarTitle) similarTitle.hidden = true;
+        if (status) status.textContent = data.labelError ?? '';
+        if (retry) retry.hidden = false;
+      }
+    };
+
+    let timer: number | undefined;
+    input.addEventListener('focus', () => void load().catch(() => {}), {
+      once: true,
+    });
+    input.addEventListener('input', () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => void run(input.value), 200);
+    });
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && input.value) {
+        input.value = '';
+        void run('');
+      }
+    });
+    root
+      .querySelector('[data-search-form]')
+      ?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        window.clearTimeout(timer);
+        void run(input.value);
+      });
+    root.querySelector('[data-search-reset]')?.addEventListener('click', () => {
+      input.value = '';
+      void run('');
+      input.focus();
+    });
+    retry?.addEventListener('click', () => void run(input.value));
+
+    // A shared or reloaded link with ?q= searches right away.
+    const initial = readQuery(window.location.search);
+    if (initial.trim()) {
+      input.value = initial;
+      void run(initial);
+    }
+  }
+</script>

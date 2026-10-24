@@ -328,6 +328,114 @@ test.describe('Dhamma posts', () => {
     await context.close();
   });
 
+  test.describe('search', () => {
+    const resultIds = (page: Page) =>
+      page
+        .locator('[data-search-exact] > li')
+        .evaluateAll((items) =>
+          items.map((item) => (item as HTMLElement).dataset.id),
+        );
+
+    test('loads nothing until the box is used', async ({ page }) => {
+      const requests: string[] = [];
+      page.on('request', (request) => requests.push(request.url()));
+      await page.goto('/en/dhamma-posts/');
+      await page.waitForLoadState('networkidle');
+      expect(requests.filter((url) => url.includes('/post-data/'))).toEqual([]);
+      await page.getByLabel('Search posts').focus();
+      await expect
+        .poll(
+          () => requests.filter((url) => url.includes('/post-data/')).length,
+        )
+        .toBe(2);
+    });
+
+    test('shows results instead of the lists, in the Read-in languages, and keeps ?lang=', async ({
+      page,
+    }) => {
+      await page.goto('/en/dhamma-posts/?lang=en,zh');
+      await page.getByLabel('Search posts').fill('Sekkha');
+      await expect(page.locator('[data-search-status]')).toHaveText(
+        'Results: 1',
+      );
+      expect(await resultIds(page)).toEqual([other]);
+      await expect(page.locator('[data-post-browse]').first()).toBeHidden();
+      await expect(page).toHaveURL(/\?q=Sekkha&lang=en,zh$/);
+      const titles = page.locator(
+        '[data-search-exact] [data-post-lang]:visible',
+      );
+      expect(
+        await titles.evaluateAll((spans) =>
+          spans.map((span) => span.getAttribute('lang')),
+        ),
+      ).toEqual(['en', 'zh-Hans']);
+      await expect(
+        page.locator('[data-search-exact] a[data-card-link]'),
+      ).toHaveAttribute('href', `/en/dhamma-posts/${other}/`);
+      // Changing "Read in" keeps the search in the address.
+      await page.locator('[data-post-lang-toggle="my"]').click();
+      await expect(page).toHaveURL(/\?q=Sekkha&lang=my,en,zh$/);
+    });
+
+    test('a link with ?q= searches on load, and the language switch keeps it', async ({
+      page,
+    }) => {
+      await page.goto('/my/dhamma-posts/?q=%E8%B2%AA');
+      await expect(page.getByLabel('ဆောင်းပါးများ ရှာဖွေရန်')).toHaveValue(
+        '貪',
+      );
+      // Traditional 貪 finds the Simplified 贪 in every Lobha post.
+      await expect
+        .poll(async () => (await resultIds(page)).length)
+        .toBeGreaterThanOrEqual(5);
+      await page.locator('a[data-locale="en"]').click();
+      await expect(page).toHaveURL(/\/en\/dhamma-posts\/\?q=%E8%B2%AA$/);
+      await expect(page.getByLabel('Search posts')).toHaveValue('貪');
+    });
+
+    test('Clear search and Escape bring the lists back', async ({ page }) => {
+      await page.goto('/en/dhamma-posts/?q=lobha');
+      await expect(
+        page.locator('[data-search-exact] > li').first(),
+      ).toBeVisible();
+      await page.getByRole('button', { name: 'Clear search' }).click();
+      await expect(page.locator('[data-post-browse]').first()).toBeVisible();
+      await expect(page.locator('[data-search-results]')).toBeHidden();
+      await expect(page).toHaveURL(/\/en\/dhamma-posts\/$/);
+      const box = page.getByLabel('Search posts');
+      await box.fill('kamma');
+      await expect(page.locator('[data-search-results]')).toBeVisible();
+      await box.press('Escape');
+      await expect(page.locator('[data-search-results]')).toBeHidden();
+    });
+
+    test('says so when nothing matches', async ({ page }) => {
+      await page.goto('/en/dhamma-posts/?q=zzqqxx');
+      await expect(page.locator('[data-search-status]')).toHaveText(
+        /^No posts found/,
+      );
+    });
+
+    test('without JavaScript the box is replaced by a note', async ({
+      browser,
+    }) => {
+      const context = await browser.newContext({ javaScriptEnabled: false });
+      const noJs = await context.newPage();
+      await noJs.goto('/en/dhamma-posts/');
+      await expect(noJs.locator('[data-search-form]')).toBeHidden();
+      // Playwright stops scripts but still parses <noscript> as if scripting were on, so check
+      // the note is in the page rather than that it renders.
+      expect(
+        await noJs
+          .locator('noscript')
+          .first()
+          .evaluate((el) => el.innerHTML),
+      ).toContain('Search needs JavaScript');
+      await expect(noJs.locator('[data-post-list] > li').first()).toBeVisible();
+      await context.close();
+    });
+  });
+
   test('post pages do not scroll sideways', async ({ page }) => {
     await page.addInitScript(() =>
       localStorage.setItem(
@@ -339,6 +447,7 @@ test.describe('Dhamma posts', () => {
       `/my/dhamma-posts/${post}/`,
       '/my/dhamma-posts/2026-10-11-synonyms-of-lobha-greed-attachment/',
       '/my/dhamma-posts/',
+      '/my/dhamma-posts/?q=%E1%80%9C%E1%80%B1%E1%80%AC%E1%80%98',
     ]) {
       await page.goto(path);
       expect(

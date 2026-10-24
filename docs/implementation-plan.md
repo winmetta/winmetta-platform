@@ -264,6 +264,7 @@ The site went public on 2026-10-23: `PUBLIC_ALLOW_INDEXING=true` is set in the `
 * **Tags:** one registry (`apps/web/src/content/post-tags.json`). Each tag has a permanent slug (its URL), an English name (the main tag) and Burmese and Chinese aliases; posts may list any of them. No name or slug may belong to two tags.
 * **Reading languages are separate from the interface language:** the "Read in" choice defaults to the interface language, keeps at least one language, always shows my → en → zh, is remembered in localStorage and is carried in links as `?lang=my,en,zh`; a link's languages become the reader's choice.
 * **Pages:** `/<locale>/dhamma-posts/` (topics, then all posts), one page per tag (with related topics), one page per post; 50 posts per list page, newest or oldest first, all as static URLs. The `oldest/` lists are `noindex` and not in the sitemap. The home page shows the three latest posts.
+* **Search:** a box on the posts index searches titles, topic names and body text in every language (Traditional Chinese queries are converted to Simplified) and shows results in the Read-in languages; it downloads its index only when used.
 * **Share and print:** Share (index, tag and post pages) copies the address with the current languages, or opens the phone's share sheet. Print (posts) prints only the chosen languages, without the site header and footer.
 * **Checks in one place:** `apps/web/src/lib/posts/` (parser, validator, tag registry, staged-change check) is used by the content loader (so the build fails), `npm run posts:validate`, the `dhamma-posts` pre-commit hook, a CI step and the unit tests. It checks file names and dates, the language sections and headings, raw HTML and unsafe links, Zawgyi in Burmese and Traditional characters in Chinese (OpenCC), and that a changed post gets a new `updated` date.
 * **No new infrastructure:** the posts are static pages in the existing build and deploy; no Pulumi or workflow change beyond the CI check.
@@ -278,6 +279,7 @@ The site went public on 2026-10-23: `PUBLIC_ALLOW_INDEXING=true` is set in the `
 * [x] Trilingual tag registry (`post-tags.json`): each tag has a permanent slug (its URL) and English, Burmese and Chinese names; the English name is the main tag and the others are aliases; no name or slug may belong to two tags. Each language section shows its own tag names above its title.
 * [x] Pagination (50 per page) for the index and tag pages as static URLs, with newest/oldest order as its own URL (`…/oldest/`, `…/page/2/`), so both work without JavaScript and can be shared.
 * [x] "Read in" languages in the address (`?lang=en,zh`): set by the buttons, applied (and remembered) when a page opens with it; Share on the posts index, tag pages and post pages copies the address with the current languages.
+* [x] Full-text search on the posts index: titles, topic names and body text in all three languages, the library's MiniSearch approach (shared tokenizer `apps/web/src/lib/search-text.ts`, which now also splits Chinese into characters and character pairs), Traditional-Chinese queries converted to Simplified, results as list cards in the Read-in languages, the query in the address (`?q=`, kept with `?lang=`), loaded only on first use from `post-data/*.<hash>.json` (deployed as immutable, like `library-data/`). Golden queries in `apps/web/src/lib/posts/search.test.ts`; the index is about 6.6 KB gzipped per post (budget 10 KB per post and 400 KB in total).
 * [ ] Review: a Chinese reader checks the converted Chinese section (`2026-10-11-the-four-characteristics-tetrad-of-greed-lobha.md`) and the Chinese tag names; a Burmese speaker checks the new interface text and the Burmese tag names in `post-tags.json`.
 * [x] Docs: AGENTS.md §1 and §7 (how to add a post, the rules, adding a language), the Prettier-from-the-repo-root rule (AGENTS.md §6), prd.md §4.3 and §7, developer-guide.md, CONTRIBUTING.md.
 * [x] Commit the work on `feat/dhamma-posts` (`3a13f3e`).
@@ -290,7 +292,7 @@ The site went public on 2026-10-23: `PUBLIC_ALLOW_INDEXING=true` is set in the `
 
 ### Out of scope for Phase 3
 
-RSS/Atom feeds, posts in the site search index, comments or reactions, an author field, a CMS or teacher-facing editor, more post languages (the steps are in AGENTS.md §7), and importing posts from WordPress.
+RSS/Atom feeds, posts in the Dhamma Library search (posts have their own search), comments or reactions, an author field, a CMS or teacher-facing editor, more post languages (the steps are in AGENTS.md §7), and importing posts from WordPress.
 
 ---
 
@@ -360,7 +362,7 @@ Acceptance: a maintainer who has never touched the repo adds one new PDF followi
 
 ### 6.3 Not planned in Phases 0–3
 
-Candidates for future phases, with no date: a staging environment and PR preview host (planned with the first API or backend), new media buckets and the `cdn.app.winmetta.org` hostname (when something needs them), interactive LLB lessons, the repeatable upload-and-reindex pipeline for new library files (§6.2), full-text/OCR/transcript search inside PDFs, a unified class archive, additional interface locales beyond English/Burmese, product analytics/metric collection, profile timezone preferences, a backend API, a database, accounts, offline/PWA, `apps/desktop` and `apps/mobile`. For Dhamma Posts: RSS/Atom feeds, posts in the search index and more post languages (§5).
+Candidates for future phases, with no date: a staging environment and PR preview host (planned with the first API or backend), new media buckets and the `cdn.app.winmetta.org` hostname (when something needs them), interactive LLB lessons, the repeatable upload-and-reindex pipeline for new library files (§6.2), full-text/OCR/transcript search inside PDFs, a unified class archive, additional interface locales beyond English/Burmese, product analytics/metric collection, profile timezone preferences, a backend API, a database, accounts, offline/PWA, `apps/desktop` and `apps/mobile`. For Dhamma Posts: RSS/Atom feeds, joining posts and library books in one search, and more post languages (§5).
 
 Excluded entirely: automatic feeds of WordPress content, copying the existing site UI and bulk website migration.
 

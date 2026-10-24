@@ -1,40 +1,17 @@
 ---
 // A list of posts, newest first: each post's title in the reader's chosen post languages, and its
-// date. Tags are shown on the post page, not here. Order and paging come from the page's URL
-// (PostSort.astro, Pager.astro).
-import { t, format } from '../../i18n/messages';
-import { locales, type Locale } from '../../i18n/locales';
-import { postRoute } from '../../i18n/routes';
-import { formatPostDate, type Post } from '../../lib/posts/posts';
+// date (PostCard). Tags are shown on the post page, not here. Order and paging come from the
+// page's URL (PostSort.astro, Pager.astro).
+import PostCard from './PostCard.astro';
+import type { Locale } from '../../i18n/locales';
+import type { Post } from '../../lib/posts/posts';
 interface Props {
   locale: Locale;
   posts: Post[];
 }
 const { locale, posts } = Astro.props;
-const formatLocale = locales[locale].formatLocale;
 ---
 
 <ol class="grid gap-4" data-post-list>
-  {
-    posts.map((post) => (
-      <li
-        class="card card-link space-y-3"
-        data-created={post.created}
-        data-id={post.id}
-      >
-        <a class="post-titles" href={postRoute(locale, post.id)}>
-          {post.sections.map((section) => (
-            <span lang={section.lang} data-post-lang={section.lang}>
-              {section.title}
-            </span>
-          ))}
-        </a>
-        <p class="muted text-sm">
-          {format(t(locale, 'postCreated'), {
-            date: formatPostDate(post.created, formatLocale),
-          })}
-        </p>
-      </li>
-    ))
-  }
+  {posts.map((post) => <PostCard locale={locale} post={post} />)}
 </ol>

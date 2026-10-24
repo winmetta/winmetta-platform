@@ -4,6 +4,7 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import type { Loader, LoaderContext } from 'astro/loaders';
+import { plainText } from './search-docs.ts';
 import { toSimplified } from './simplified.ts';
 import { parseTagRegistry } from './tags.ts';
 import { checkPost, formatIssues, postTagSlugs } from './validate.ts';
@@ -43,6 +44,7 @@ async function sync(context: LoaderContext, posts: URL, tagsFile: URL) {
         title: section.title,
         html: (await context.renderMarkdown(section.body, { fileURL: fileUrl }))
           .html,
+        text: plainText(section.body),
       })),
     );
     const data = await context.parseData({

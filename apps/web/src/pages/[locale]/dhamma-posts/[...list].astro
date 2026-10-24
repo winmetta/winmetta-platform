@@ -5,6 +5,7 @@
 import Shell from '../../../layouts/Shell.astro';
 import Pager from '../../../components/posts/Pager.astro';
 import PostList from '../../../components/posts/PostList.astro';
+import PostSearch from '../../../components/posts/PostSearch.astro';
 import PostSort from '../../../components/posts/PostSort.astro';
 import ReadInToolbar from '../../../components/posts/ReadInToolbar.astro';
 import TopicChips from '../../../components/posts/TopicChips.astro';
@@ -57,11 +58,12 @@ const title =
     <p class="lead">{text('postsIntro')}</p>
     <ReadInToolbar locale={locale} url={url} title={title} />
   </header>
-  <section class="space-y-4" aria-labelledby="topics">
+  <PostSearch locale={locale} />
+  <section class="space-y-4" aria-labelledby="topics" data-post-browse>
     <h2 id="topics" class="text-2xl font-bold">{text('postsTags')}</h2>
     <TopicChips locale={locale} topics={topics} />
   </section>
-  <section class="space-y-4" aria-labelledby="all">
+  <section class="space-y-4" aria-labelledby="all" data-post-browse>
     <div class="flex flex-wrap items-center justify-between gap-3">
       <h2 id="all" class="text-2xl font-bold">{text('postsAll')}</h2>
       <PostSort locale={locale} sort={listing.sort} />

@@ -261,6 +261,8 @@ export const postSchema = z.object({
         lang: z.enum(postLanguages),
         title: text,
         html: z.string().min(1),
+        /** Plain text of the section, for the search index (lib/posts/search-docs.ts). */
+        text: z.string(),
       }),
     )
     .length(postLanguages.length),

@@ -230,5 +230,9 @@
   "postCreated": "Posted {date}",
   "postUpdated": "Updated {date}",
   "postSource": "Source",
-  "postsRelatedTags": "Related topics"
+  "postsRelatedTags": "Related topics",
+  "postsSearchLabel": "Search posts",
+  "postsSearchPlaceholder": "A word in Burmese, English or Chinese",
+  "postsSimilar": "Similar posts",
+  "postsNoResults": "No posts found. Check the spelling, try a shorter word, or browse the topics."
 }
