@@ -111,13 +111,15 @@ test.describe('Dhamma posts', () => {
     await expect(page).toHaveURL(
       /\/my\/dhamma-posts\/tags\/kusala\/\?lang=my,zh$/,
     );
-    expect(
-      await page
-        .locator('[data-post-lang-toggle]')
-        .evaluateAll((buttons) =>
-          buttons.map((button) => button.getAttribute('aria-pressed')),
-        ),
-    ).toEqual(['true', 'false', 'true']);
+    // Wait for the new page's picker script to mark the buttons (a one-off read can run first).
+    for (const [lang, pressed] of [
+      ['my', 'true'],
+      ['en', 'false'],
+      ['zh-Hans', 'true'],
+    ] as const)
+      await expect(
+        page.locator(`[data-post-lang-toggle="${lang}"]`),
+      ).toHaveAttribute('aria-pressed', pressed);
   });
 
   test('a tag page lists only posts with that tag', async ({ page }) => {
