@@ -69,6 +69,7 @@ No account is required to set or use these preferences — they are stored local
 * **Classes and Dhamma Library are the two main page groups**, primarily serving online students and independent learners respectively, with access open to both. Class pages link to relevant library resources.
 * **Dhamma Resources is part of Dhamma Library**, not a separate top-level page. The unified library supports books, PDF files, mobile/desktop app URLs, audio, video, images, slides, blog posts and other curated links.
 * Phase 1 **indexes every PDF in the existing S3 bucket** (about 3,000 files, mostly Burmese books; already public via winmetta.org). Most visitors type Burmese words and do not know a title or author, so search is **fuzzy** and surfaces similar books, built on MiniSearch with Burmese-aware normalization (ဥ/ဉ and Burmese/ASCII digits treated as equal). Folders become **tags** (number prefix removed; each path segment is a tag) used for folder-style browsing and filtering, with clear filters, empty states and shareable query/tag URLs. Apps, blog links and other non-S3 items stay curated. Details: tech-architecture.md §3.
+* **Dhamma Posts** (Phase 3): short teachings and explanations of Pāḷi terms, suttas and Abhidhamma ideas, each in Burmese, English and Simplified Chinese, curated in the repo by volunteers on the teachers' behalf. Readers browse all posts in chronological order (newest first) and by topic (tags, each with related topics drawn from its posts), choose any of the three languages to read independently of the interface language, share a short permanent link to a post or a topic that opens in the languages they chose, and print a post in those languages. Long lists are split into pages. No author field, feed, comments or engagement features. Format and workflow: AGENTS.md §7.
 * Keep subject categories, resource types, file formats and app platforms distinct. A book can have a PDF download, and an app can have mobile/desktop links within one entry. Preserve source language and attribution. Full-text indexing inside PDFs, OCR and transcripts are future work.
 * A unified class archive: recordings and descriptions per teacher/series pulled together from YouTube and Facebook into one browsable, searchable timeline (e.g., "Paṭṭhāna course episode 115") so students aren't hunting across three platforms.
 * **Link out to, rather than rebuild, existing best-in-class Tipiṭaka reader apps** (e.g., Tipitaka.app, tipitakapali.org) for full canonical-text search — that problem is already well solved.
@@ -137,7 +138,7 @@ Metric collection is deferred beyond v1. Do not instrument these outcomes or add
 
 ## 7. Phased Roadmap
 
-Phases 0, 1 and 2 are done. Everything after them is a **future phase**: it is not numbered or scheduled, and the maintainer decides the order and scope as the work comes. The list below is a set of candidate directions, not a plan.
+Phases 0, 1 and 2 are done, and Phase 3 (Dhamma Posts) is built and in review. Everything after them is a **future phase**: it is not numbered or scheduled, and the maintainer decides the order and scope as the work comes. The list below is a set of candidate directions, not a plan.
 
 ```
 +---------------------------------------------------------------------------------------+
@@ -155,6 +156,12 @@ Phases 0, 1 and 2 are done. Everything after them is a **future phase**: it is n
 +---------------------------------------------------------------------------------------+
 | Phase 2 (done): Infrastructure & Deployment                                            |
 | Pulumi, domains, AWS hosting, one production environment (Beta), public launch      |
++---------------------------------------------------------------------------------------+
+                                           |
+                                           v
++---------------------------------------------------------------------------------------+
+| Phase 3 (built, in review): Dhamma Posts                                               |
+| Short posts in Burmese, English and Chinese; tags, sharing, print; markdown in repo    |
 +---------------------------------------------------------------------------------------+
                                            |
                                            v
@@ -185,6 +192,7 @@ Phases 0, 1 and 2 are done. Everything after them is a **future phase**: it is n
 * **Phase 0 — Foundation Code (done):** Public MIT-licensed repo, tooling, basic CI, and an Astro app with all needed libraries and English/Burmese localization support. No real pages or content and no deployment. See implementation-plan.md §2.
 * **Phase 1 — Bilingual Pages (done):** Home, About, Privacy, the Classes group (classes with a weekly schedule, Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library (the whole S3 PDF library with tag browsing and fuzzy Burmese search) in English and Burmese, with an original mobile/desktop design, serving online class students and independent learners worldwide. No hosting or deployment yet. See implementation-plan.md §3.
 * **Phase 2 — Infrastructure & Deployment (done 2026-10-23):** Pulumi (TypeScript), domains (`app.winmetta.org`), AWS hosting (S3 + CloudFront), the existing S3 + bunny.net setup for the Dhamma Library PDFs (new media infrastructure waits until something needs it), Route 53 DNS for `app.winmetta.org`, and a single production environment labelled Beta in the UI (staging comes with the first API or backend). The site becomes public here. See implementation-plan.md §4. No backend or database.
+* **Phase 3 — Dhamma Posts (built 2026-10-23, in review):** short teachings and explanations of Pāḷi terms, suttas and Abhidhamma ideas, each in Burmese, English and Simplified Chinese (§4.3), kept as markdown files in the repo and published as static pages: post, topic and paginated list pages, a "Read in" choice of languages that shared links carry, and print. Still no backend or database. See implementation-plan.md §5.
 * **Future — LLB Pilot:** The flagship learning deliverable. Digitizes the LLB curriculum, proven and already-tested; piloted directly with the existing "Let's Learn Burmese" class roster (currently taught by Ven. U Garudhamma) before wider release.
 * **Future — Library & Class Archive Expansion:** Defines the repeatable pipeline for adding PDFs to S3 and refreshing the index and pages (generator, review PR, CI checks, deploy; see tech-architecture.md §3), plus a unified class timeline and deeper content indexing (full-text, OCR, transcripts) when needed.
 * **Future — Optional Accounts & Progress Sync:** Cross-device sync for learners who want it, opt-in only. This is likely where a backend and database are first introduced (tentative; see tech-architecture.md §10).
@@ -194,7 +202,7 @@ Phases 0, 1 and 2 are done. Everything after them is a **future phase**: it is n
 
 ## 8. Future Plan: Personas & Adaptive Experience
 
-*Deferred; revisit when the adaptive experience (§4.1) is designed. Not a Phase 0–2 requirement.*
+*Deferred; revisit when the adaptive experience (§4.1) is designed. Not a Phase 0–3 requirement.*
 
 * **Principle — Meet Learners Where They Are:** The same platform must serve a tech-fluent diaspora teenager and a non-tech-fluent elder in Myanmar equally well — via adaptive onboarding, not a one-size-fits-all interface.
 * **Personas** illustrating needs within the two primary user groups (they don't restrict who the platform is for):

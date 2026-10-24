@@ -1,0 +1,7 @@
+# Backstop for Prettier runs started inside apps/web: Prettier reads .prettierignore only from the
+# current directory, so the root list does not apply here. Run Prettier from the repo root
+# (AGENTS.md §6); these generated files must never be reformatted.
+src/library/manifest.json
+src/library/zawgyi-review.json
+dist
+.astro

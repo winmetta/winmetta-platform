@@ -5,14 +5,20 @@ import { locales, localeCodes, type Locale } from '../i18n/locales';
 import { pagePaths, route, type PageId } from '../i18n/routes';
 import { t } from '../i18n/messages';
 import { allowIndexing, isBeta } from '../lib/site';
+import {
+  defaultPostLanguage,
+  postLanguagesHeadScript,
+} from '../lib/posts/languages';
 interface Props {
   locale: Locale;
   title: string;
   page?: PageId;
   /** Path after the locale for pages that are not in pagePaths, e.g. dhamma-library/folders/f001/. */
   path?: string;
+  /** Keep a page out of search results (it repeats another page), while following its links. */
+  noindex?: boolean;
 }
-const { locale, title, page = 'home', path } = Astro.props;
+const { locale, title, page = 'home', path, noindex = false } = Astro.props;
 const href = (code: Locale) => (path ? `/${code}/${path}` : route(code, page));
 const canonical = new URL(href(locale), Astro.site);
 // Only built pages are listed here; add Classes, Study groups, Retreats and Teachers as they land.
@@ -27,9 +33,14 @@ const navItems = [
   },
   { page: 'studyGroups', label: 'navStudyGroups' },
   { page: 'library', label: 'navLibrary' },
+  { page: 'posts', label: 'navPosts' },
 ] as const;
 const inLibrary =
   page === 'library' || Boolean(path?.startsWith('dhamma-library/'));
+const inPosts = page === 'posts' || Boolean(path?.startsWith('dhamma-posts/'));
+// Dhamma post languages ("Read in"): ?lang= first, then the saved choice, then the interface
+// language; applied before paint (lib/posts/languages.ts).
+const postLanguageScript = postLanguagesHeadScript(defaultPostLanguage(locale));
 ---
 
 <!doctype html>
@@ -37,7 +48,13 @@ const inLibrary =
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    {!allowIndexing && <meta name="robots" content="noindex" />}
+    {
+      !allowIndexing ? (
+        <meta name="robots" content="noindex" />
+      ) : (
+        noindex && <meta name="robots" content="noindex, follow" />
+      )
+    }
     <title>{title} · {t(locale, 'brand')}</title>
     <link rel="canonical" href={canonical} />
     {
@@ -56,6 +73,7 @@ const inLibrary =
     <script is:inline>
       document.documentElement.classList.add('js');
     </script>
+    <script is:inline set:html={postLanguageScript} />
   </head>
   <body class="flex min-h-screen flex-col">
     <a href="#main" class="skip-link">{t(locale, 'skip')}</a>
@@ -93,7 +111,8 @@ const inLibrary =
               const current = (target: string) =>
                 page === target
                   ? 'page'
-                  : target === 'library' && inLibrary
+                  : (target === 'library' && inLibrary) ||
+                      (target === 'posts' && inPosts)
                     ? 'true'
                     : target === 'classes' && path?.startsWith('classes/')
                       ? 'true'

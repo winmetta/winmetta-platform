@@ -1,0 +1,30 @@
+---
+// Tag chips with post counts, each named in the reader's chosen post languages. Used for all
+// topics on the posts index and for related topics on a tag page.
+import type { Locale } from '../../i18n/locales';
+import { postTagRoute } from '../../i18n/routes';
+import { postLanguages } from '../../lib/posts/languages';
+import type { PostTag } from '../../lib/posts/tags';
+interface Props {
+  locale: Locale;
+  topics: { tag: PostTag; count: number }[];
+}
+const { locale, topics } = Astro.props;
+---
+
+<ul class="flex flex-wrap gap-2">
+  {
+    topics.map(({ tag, count }) => (
+      <li>
+        <a class="chip gap-2" href={postTagRoute(locale, tag.slug)}>
+          {postLanguages.map((lang) => (
+            <span lang={lang} data-post-lang={lang}>
+              {tag.names[lang]}
+            </span>
+          ))}
+          <span class="badge bg-white">{count}</span>
+        </a>
+      </li>
+    ))
+  }
+</ul>

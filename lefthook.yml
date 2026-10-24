@@ -28,6 +28,13 @@ pre-commit:
     actionlint:
       glob: '.github/workflows/*.{yml,yaml}'
       run: actionlint {staged_files}
+    # Dhamma post format and tags (AGENTS.md "Dhamma Posts"), checked on the staged files.
+    # Also fails when a changed post keeps its old "updated" date.
+    dhamma-posts:
+      glob:
+        - 'apps/web/src/content/posts/*.md'
+        - 'apps/web/src/content/post-tags.json'
+      run: node scripts/validate-posts.mjs --staged
     # Block commits that contain secrets (tokens, keys, passwords). Config: .gitleaks.toml.
     gitleaks:
       run: gitleaks git --staged --redact

@@ -10,6 +10,7 @@ export const pagePaths = {
   teachers: 'classes/sayadaws/',
   zoomHelp: 'zoom-help/',
   library: 'dhamma-library/',
+  posts: 'dhamma-posts/',
 } as const;
 export type PageId = keyof typeof pagePaths;
 export function route(locale: Locale, page: PageId = 'home'): string {
@@ -26,6 +27,29 @@ export function retreatRoute(locale: Locale, id: string): string {
 /** Teacher bio page. */
 export function teacherRoute(locale: Locale, id: string): string {
   return `/${locale}/classes/sayadaws/${id}/`;
+}
+/** Dhamma post page; the id is the file name without .md (YYYY-MM-DD-slug). */
+export function postRoute(locale: Locale, id: string): string {
+  return `/${locale}/dhamma-posts/${id}/`;
+}
+/** Posts with one tag. */
+export function postTagRoute(locale: Locale, tag: string): string {
+  return `/${locale}/dhamma-posts/tags/${tag}/`;
+}
+/**
+ * One page of a post listing (all posts, or one tag): …/, …/page/2/, …/oldest/, …/oldest/page/2/.
+ * Page 1 has no page segment.
+ */
+export function postListRoute(
+  locale: Locale,
+  {
+    tag,
+    sort = 'newest',
+    page = 1,
+  }: { tag?: string; sort?: 'newest' | 'oldest'; page?: number },
+): string {
+  const base = tag ? postTagRoute(locale, tag) : `/${locale}/dhamma-posts/`;
+  return `${base}${sort === 'oldest' ? 'oldest/' : ''}${page > 1 ? `page/${page}/` : ''}`;
 }
 export function switchLocale(url: URL, locale: Locale): string {
   const parts = url.pathname.split('/');

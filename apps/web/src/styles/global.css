@@ -70,6 +70,13 @@
     line-height: 1.6;
     letter-spacing: 0;
   }
+  /* Simplified Chinese (Dhamma posts): system CJK fonts, no font download. */
+  :lang(zh-Hans) {
+    font-family:
+      system-ui, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+      'Noto Sans CJK SC', 'Noto Sans SC', sans-serif;
+    line-height: 1.9;
+  }
   a {
     color: inherit;
     text-decoration: none;
@@ -433,5 +440,142 @@
   }
   .pager a[aria-current] {
     @apply bg-foreground text-primary-foreground hover:bg-foreground;
+  }
+
+  /* Dhamma posts. The reader picks post languages (html[data-post-langs], set in Shell.astro);
+     sections and titles in other languages are hidden. Without JavaScript all of them show. */
+  html.js:not([data-post-langs~='my']) [data-post-lang='my'],
+  html.js:not([data-post-langs~='en']) [data-post-lang='en'],
+  html.js:not([data-post-langs~='zh-Hans']) [data-post-lang='zh-Hans'] {
+    display: none;
+  }
+  html:not(.js) .js-only {
+    display: none;
+  }
+  .segmented button {
+    @apply inline-flex min-h-11 cursor-pointer items-center rounded-full px-4 font-medium transition-colors hover:bg-white/70;
+  }
+  .segmented button[aria-pressed='true'] {
+    @apply bg-white font-semibold shadow-sm;
+  }
+  .segmented button[aria-pressed='true']::before {
+    content: '✓';
+    @apply me-1.5 text-brand;
+  }
+  .segmented button[aria-disabled='true'] {
+    @apply cursor-not-allowed;
+  }
+  /* Three language chips fit a phone; they wrap rather than overflow on narrower screens. */
+  .post-picker .segmented {
+    @apply max-w-full flex-wrap rounded-3xl;
+  }
+  .post-picker .segmented button {
+    @apply px-3;
+  }
+  .post-toolbar {
+    @apply flex flex-wrap items-start justify-between gap-4 rounded-2xl bg-sand/60 p-4;
+  }
+  .post-titles {
+    @apply grid gap-1 text-lg font-semibold text-brand transition-colors hover:text-brand-strong;
+  }
+  .post-tags {
+    @apply flex flex-wrap gap-2;
+  }
+  /* Tag links sit above the stretched card link. */
+  .tag {
+    @apply relative z-10 inline-flex min-h-9 items-center rounded-full bg-sky px-3 text-sm font-medium transition-colors hover:bg-mist;
+  }
+  .post-section {
+    @apply max-w-prose space-y-3 border-t border-stone pt-8;
+  }
+  .post-title {
+    @apply text-2xl font-bold sm:text-3xl;
+  }
+  .post-body {
+    @apply space-y-4;
+  }
+  .post-body :is(h2, h3, h4) {
+    @apply pt-2 font-bold;
+  }
+  .post-body h2 {
+    @apply text-xl;
+  }
+  .post-body :is(h3, h4) {
+    @apply text-lg;
+  }
+  .post-body ul {
+    @apply list-disc space-y-2 ps-6;
+  }
+  .post-body ol {
+    @apply list-decimal space-y-2 ps-6;
+  }
+  .post-body li > :is(ul, ol) {
+    @apply mt-2;
+  }
+  .post-body li > p + p {
+    @apply mt-2;
+  }
+  .post-body blockquote {
+    @apply rounded-e-xl border-s-4 border-mist bg-sky/40 px-4 py-2;
+  }
+  .post-body a {
+    @apply font-semibold text-brand hover:text-brand-strong hover:underline;
+  }
+  .post-body hr {
+    @apply border-stone;
+  }
+  .post-body table {
+    @apply block w-full overflow-x-auto border-collapse text-start;
+  }
+  .post-body :is(th, td) {
+    @apply border border-stone px-3 py-2 align-top;
+  }
+  .post-body code {
+    @apply rounded bg-sand px-1 text-[0.9em];
+  }
+  .print-only {
+    display: none;
+  }
+  /* Temporary notice (e.g. "Link copied"), bottom center, above the content. */
+  .toast {
+    @apply pointer-events-none invisible fixed bottom-6 left-1/2 z-50 max-w-[calc(100vw-2.5rem)] -translate-x-1/2 translate-y-2 rounded-full bg-foreground px-5 py-3 text-center text-sm font-semibold text-white opacity-0 shadow-lg transition-all duration-200;
+  }
+  .toast[data-show] {
+    @apply visible translate-y-0 opacity-100;
+  }
+}
+
+/* Printing a Dhamma post (or any page): content only, in the chosen languages. */
+@media print {
+  .site-header,
+  .site-footer,
+  .skip-link,
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block;
+  }
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 11pt;
+  }
+  .page {
+    max-width: none;
+    padding: 0;
+  }
+  .post-section {
+    max-width: none;
+    border-color: #999;
+  }
+  :is(h1, h2, h3, h4, .eyebrow) {
+    break-after: avoid;
+  }
+  .post-body blockquote {
+    background: none;
+  }
+  @page {
+    margin: 18mm 16mm;
   }
 }

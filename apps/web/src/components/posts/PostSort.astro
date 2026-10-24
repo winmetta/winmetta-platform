@@ -1,0 +1,40 @@
+---
+// Newest/oldest order for a post listing: two links to page 1 of each order (static pages, so
+// they work without JavaScript and can be shared).
+import { t } from '../../i18n/messages';
+import type { Locale } from '../../i18n/locales';
+import { postListRoute } from '../../i18n/routes';
+import type { PostSort } from '../../lib/posts/posts';
+interface Props {
+  locale: Locale;
+  sort: PostSort;
+  /** Tag slug, for a tag page's listing. */
+  tag?: string | undefined;
+}
+const { locale, sort, tag } = Astro.props;
+const options = [
+  { sort: 'newest', label: 'postsSortNewest' },
+  { sort: 'oldest', label: 'postsSortOldest' },
+] as const;
+---
+
+<nav
+  class="no-print flex flex-wrap items-center gap-x-3 gap-y-2"
+  aria-labelledby="post-sort-label"
+>
+  <span class="font-semibold" id="post-sort-label"
+    >{t(locale, 'postsSort')}</span
+  >
+  <div class="segmented">
+    {
+      options.map((option) => (
+        <a
+          href={postListRoute(locale, { tag, sort: option.sort })}
+          aria-current={option.sort === sort ? 'page' : undefined}
+        >
+          {t(locale, option.label)}
+        </a>
+      ))
+    }
+  </div>
+</nav>

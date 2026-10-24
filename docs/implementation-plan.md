@@ -1,14 +1,15 @@
-# Implementation Plan: Phases 0–2 (done) and future work
+# Implementation Plan: Phases 0–3 and future work
 
-The first three phases, all done, took the project from an empty repo to a public, bilingual site running in production (labelled Beta). Each phase has one purpose so a small volunteer team can finish and review it before starting the next.
+The first three phases, all done, took the project from an empty repo to a public, bilingual site running in production (labelled Beta). Phase 3 adds Dhamma Posts, the first new content section after launch. Each phase has one purpose so a small volunteer team can finish and review it before starting the next.
 
 | Phase | Goal | Deployed? |
 | --- | --- | --- |
 | **0 — Foundation code** | Repo scaffold: a basic Astro app with all the libraries, tooling and English/Burmese (`en`/`my`) support the site needs. No real pages or content, no deploy. | No (local only) |
 | **1 — Bilingual pages** | Home, About, Privacy, the Classes group (classes with a weekly schedule, Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library (the whole S3 PDF library, tag browsing and fuzzy Burmese search), in English and Burmese, with curated public content. Reviewed from local builds; no deployment. | No (local only) |
 | **2 — Infrastructure & deployment** | Pulumi (TypeScript), domains, AWS hosting (S3 + CloudFront), Route 53 DNS, a CI deploy workflow, a Beta label and a single production environment. New media infrastructure and staging come later. | Yes (public) |
+| **3 — Dhamma Posts** | Short trilingual (Burmese, English, Simplified Chinese) Dhamma posts kept as markdown files in the repo: post, tag and paginated list pages, a "Read in" language choice that links can carry, share and print, and format checks in the hook, CI and build. Built 2026-10-23 on `feat/dhamma-posts`; not merged yet. | Yes, when merged (the normal deploy) |
 
-Later work (LLB lessons, the library upload pipeline, accounts, native apps) is not numbered or scheduled; see §5 and [prd.md](prd.md) §7. Scope per [prd.md](prd.md) (§4.7, §7) and [tech-architecture.md](tech-architecture.md) (§0): one static Astro web app designed for mobile and desktop — no backend, no database, no desktop/mobile apps.
+Later work (LLB lessons, the library upload pipeline, accounts, native apps) is not numbered or scheduled; see §6 and [prd.md](prd.md) §7. Scope per [prd.md](prd.md) (§4.7, §7) and [tech-architecture.md](tech-architecture.md) (§0): one static Astro web app designed for mobile and desktop — no backend, no database, no desktop/mobile apps.
 
 ## 1. Baseline Toolchain
 
@@ -34,7 +35,7 @@ PostgreSQL and Fastify are **not** part of these phases (see [tech-architecture.
 
 ### Scope
 
-* Repo governance, tooling and dev environment (checklist below; config in §6–§8).
+* Repo governance, tooling and dev environment (checklist below; config in §7–§9).
 * `apps/web` scaffolded with Astro, React, Tailwind, shadcn/ui, and Zod content-collection schemas.
 * Internationalization machinery (below).
 * Responsive layout shell (header, footer, language switcher) for mobile and desktop with touch and keyboard support and Unicode Burmese font loading.
@@ -289,13 +290,52 @@ No dates. Do them when time allows and tick them here.
 * [ ] All Burmese interface text on the Classes, Dhamma Study Groups, Retreats, Sayadaws and Zoom help pages, the schedule table, the time zone names, and the draft English biographies (set a teacher's English `reviewed` to `true` only after this).
 * [ ] Remove the Beta label once the reviews above are done or consciously accepted (set `isBeta` to `false` in `apps/web/src/lib/site.ts`).
 
-Out of scope for Phases 0–2 (future work): a staging environment and PR preview host (planned with the first API or backend), new media buckets and the `cdn.app.winmetta.org` hostname (when something needs them), interactive LLB lessons, the repeatable upload-and-reindex pipeline for new library files (outlined in §5), full-text/OCR/transcript search inside PDFs, unified class archive, additional locales beyond English/Burmese, product analytics/metric collection, profile timezone preferences, backend API, database, accounts, offline/PWA, `apps/desktop`, `apps/mobile`. Excluded entirely: standalone blog publishing/automatic feeds, copying the existing site UI, bulk website migration.
+Out of scope for Phases 0–2 (future work): a staging environment and PR preview host (planned with the first API or backend), new media buckets and the `cdn.app.winmetta.org` hostname (when something needs them), interactive LLB lessons, the repeatable upload-and-reindex pipeline for new library files (outlined in §6), full-text/OCR/transcript search inside PDFs, unified class archive, additional locales beyond English/Burmese, product analytics/metric collection, profile timezone preferences, backend API, database, accounts, offline/PWA, `apps/desktop`, `apps/mobile`. Excluded entirely: automatic feeds, copying the existing site UI, bulk website migration. (Short curated Dhamma Posts, kept as markdown files in the repo, are Phase 3; see §5.)
 
 ---
 
-## 5. Future phases (not scheduled)
+## 5. Phase 3 — Dhamma Posts
 
-Phases 0, 1 and 2 are done. Nothing below is numbered, dated or committed to: the maintainer decides the order and scope as the work comes, and each item gets its own plan when it starts. Product reasoning is in [prd.md](prd.md) §7; tentative technical notes are in [tech-architecture.md](tech-architecture.md) §10.
+**Goal:** a free, calm place for short Dhamma teachings: explanations of Pāḷi words and phrases, sutta and Abhidhamma ideas, and questions, each readable in Burmese, English and Simplified Chinese, alone or side by side, and easy to share and print. Content comes from the teachers and is added by volunteers as markdown files in the repo; no CMS, backend or account. How to add a post: [AGENTS.md](../AGENTS.md) §7. Started and built 2026-10-23 on the `feat/dhamma-posts` branch.
+
+### Scope and decisions
+
+* **One file per post, every language in it:** `apps/web/src/content/posts/YYYY-MM-DD-english-title-slug.md` with `created`, `updated` and `tags` frontmatter and one `<!-- lang: … -->` section per language (my, en, zh-Hans; all required, in that order). No author field. The dated file name is the permanent URL, so titles can change and two similar titles on different dates never clash.
+* **Tags:** one registry (`apps/web/src/content/post-tags.json`). Each tag has a permanent slug (its URL), an English name (the main tag) and Burmese and Chinese aliases; posts may list any of them. No name or slug may belong to two tags.
+* **Reading languages are separate from the interface language:** the "Read in" choice defaults to the interface language, keeps at least one language, always shows my → en → zh, is remembered in localStorage and is carried in links as `?lang=my,en,zh`; a link's languages become the reader's choice.
+* **Pages:** `/<locale>/dhamma-posts/` (topics, then all posts), one page per tag (with related topics), one page per post; 50 posts per list page, newest or oldest first, all as static URLs. The `oldest/` lists are `noindex` and not in the sitemap. The home page shows the three latest posts.
+* **Share and print:** Share (index, tag and post pages) copies the address with the current languages, or opens the phone's share sheet. Print (posts) prints only the chosen languages, without the site header and footer.
+* **Checks in one place:** `apps/web/src/lib/posts/` (parser, validator, tag registry, staged-change check) is used by the content loader (so the build fails), `npm run posts:validate`, the `dhamma-posts` pre-commit hook, a CI step and the unit tests. It checks file names and dates, the language sections and headings, raw HTML and unsafe links, Zawgyi in Burmese and Traditional characters in Chinese (OpenCC), and that a changed post gets a new `updated` date.
+* **No new infrastructure:** the posts are static pages in the existing build and deploy; no Pulumi or workflow change beyond the CI check.
+
+### Phase 3 checklist
+
+* [x] One markdown file per post with every language (Burmese, English, Simplified Chinese; all required, in that order), `created`/`updated` and tags (by English name) in frontmatter; dated file names (`YYYY-MM-DD-english-slug.md`) are the permanent URLs, so titles can change.
+* [x] Shared parser and validator (`apps/web/src/lib/posts/`) used by a custom content loader, `npm run posts:validate`, the `dhamma-posts` pre-commit hook, a CI step and a golden test. Chinese is checked for Traditional characters with OpenCC; Burmese for Zawgyi markers.
+* [x] Pages: index (topics, then all posts, newest first, with a newest/oldest toggle), one page per tag (its posts and related topics: the other tags on those posts, most shared first), one page per post; a home-page block with the three latest posts.
+* [x] Post language picker separate from the interface language (defaults to the interface language, at least one, fixed my → en → zh order, remembered in localStorage), share (share sheet on phones, copy link elsewhere) and print without the site header and footer.
+* [x] The nine starter posts from the maintainer's drafts, formatting only; one Chinese section was converted from Traditional to Simplified by OpenCC.
+* [x] Trilingual tag registry (`post-tags.json`): each tag has a permanent slug (its URL) and English, Burmese and Chinese names; the English name is the main tag and the others are aliases; no name or slug may belong to two tags. Each language section shows its own tag names above its title.
+* [x] Pagination (50 per page) for the index and tag pages as static URLs, with newest/oldest order as its own URL (`…/oldest/`, `…/page/2/`), so both work without JavaScript and can be shared.
+* [x] "Read in" languages in the address (`?lang=en,zh`): set by the buttons, applied (and remembered) when a page opens with it; Share on the posts index, tag pages and post pages copies the address with the current languages.
+* [ ] Review: a Chinese reader checks the converted Chinese section (`2026-10-11-the-four-characteristics-tetrad-of-greed-lobha.md`) and the Chinese tag names; a Burmese speaker checks the new interface text and the Burmese tag names in `post-tags.json`.
+* [x] Docs: AGENTS.md §1 and §7 (how to add a post, the rules, adding a language), the Prettier-from-the-repo-root rule (AGENTS.md §6), prd.md §4.3 and §7, developer-guide.md, CONTRIBUTING.md.
+* [ ] Commit `feat/dhamma-posts`, open the pull request, merge after CI passes; the normal deploy publishes the pages.
+
+### Phase 3 acceptance
+
+* A volunteer who has not touched the repo starts a post with `npm run posts:new -- "English title"`, fills the three sections and tags from AGENTS.md §7, and `npm run posts:validate`, the pre-commit hook and CI pass; a broken file (missing language, unknown tag, Traditional Chinese, old `updated` date) is rejected with a message that says what to fix.
+* On the live site, a reader can open a post, choose one to three languages, share a link that opens in those languages, print it without the site chrome, browse by topic and related topics, and page through the lists newest or oldest first, on a phone and a desktop, with no account.
+
+### Out of scope for Phase 3
+
+RSS/Atom feeds, posts in the site search index, comments or reactions, an author field, a CMS or teacher-facing editor, more post languages (the steps are in AGENTS.md §7), and importing posts from WordPress.
+
+---
+
+## 6. Future phases (not scheduled)
+
+Phases 0, 1 and 2 are done and Phase 3 (§5) is built. Nothing below is numbered, dated or committed to: the maintainer decides the order and scope as the work comes, and each item gets its own plan when it starts. Product reasoning is in [prd.md](prd.md) §7; tentative technical notes are in [tech-architecture.md](tech-architecture.md) §10.
 
 Candidate directions, in no fixed order:
 
@@ -319,7 +359,7 @@ Acceptance: a maintainer who has never touched the repo adds one new PDF followi
 
 ---
 
-## 6. Reference: Monorepo Configuration
+## 7. Reference: Monorepo Configuration
 
 The root configuration lives in the repo and is the source of truth; this plan no longer copies it, because the copies drifted (workspaces, engines and scripts changed after Phase 0). Read these files instead:
 
@@ -331,12 +371,12 @@ Pin npm consistently in local setup and CI using the root `packageManager` decla
 
 ---
 
-## 7. Reference: macOS Setup Script
+## 8. Reference: macOS Setup Script
 
 Shared developer tooling (mise and the tools it manages, git settings, shell, editors, AI CLIs) is installed by `bootstrap.sh` in the [`bootstrap-dev-env` repo](https://github.com/winmetta/bootstrap-dev-env); the org [`.github` repo](https://github.com/winmetta/.github#developer-setup) provides `link-workspace.sh`. This repo's own `scripts/setup-local-dev.sh` then installs Node from `mise.toml` (through mise), the pinned npm, locked dependencies and the Playwright browser.
 
 ---
 
-## 8. Agent & Contributor Docs
+## 9. Agent & Contributor Docs
 
 [AGENTS.md](../AGENTS.md) is the single source of truth for conventions used by contributors and AI coding agents. It is not duplicated here — read that file rather than a copy in this plan. `CLAUDE.md` is a symlink to it (`ln -s AGENTS.md CLAUDE.md`).

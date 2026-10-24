@@ -32,7 +32,8 @@ need separate configuration.
 ## Checks
 
 Run `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build`.
-Use `npm run format` to format code. Browser checks run after a build:
+Use `npm run format` from the repo root to format code (Prettier reads `.prettierignore`
+only from the directory it runs in). Browser checks run after a build:
 `npx playwright install chromium` then `npm run test:smoke`.
 CI runs all these checks on pull requests; it does not deploy.
 
@@ -45,6 +46,9 @@ Phase 0 collections load only `src/fixtures`. Synthetic examples use reserved do
 Schedule weekdays use ISO Monday=1 through Sunday=7. Nonexistent daylight-saving times
 are rejected; repeated times resolve to the earlier instant. Display both Pacific and
 Myanmar dates using the occurrence instant, independently of UI language.
+
+Dhamma posts are markdown files in `apps/web/src/content/posts/`; the format, tags and
+`npm run posts:new` / `npm run posts:validate` are described in AGENTS.md §7.
 
 Propose code or content changes in a pull request explaining the purpose and checks.
 Use Conventional Commit titles. Never include secrets, private meeting details, or

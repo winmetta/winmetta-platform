@@ -45,10 +45,10 @@ jobs:
             shfmt = "3.14.1"
       # The same checks as the pre-commit hook, on every file, so a skipped hook or a
       # contributor without the bootstrap script cannot get past them. eslint and prettier
-      # already run in `npm run lint` below.
+      # already run in `npm run lint` below, and the Dhamma post check in its own step.
       - name: Run the pre-commit hooks on every file
         env:
-          LEFTHOOK_EXCLUDE: eslint,prettier
+          LEFTHOOK_EXCLUDE: eslint,prettier,dhamma-posts
         run: lefthook run pre-commit --all-files
       # The hook only scans what is staged, so scan the whole history here.
       - name: Scan the git history for secrets
@@ -69,6 +69,9 @@ jobs:
             scripts/conventional-commit.sh -s "$subject"
           done
       - run: npm run lint
+      # Post files and tags (AGENTS.md "Dhamma Posts"); the build and unit tests also fail on them.
+      - name: Validate Dhamma posts
+        run: npm run posts:validate
       - run: npm run typecheck
       - run: npm test
       # infra/pulumi is not an npm workspace (the root commands skip it), so check it here.

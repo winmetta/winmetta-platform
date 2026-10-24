@@ -1,0 +1,101 @@
+---
+import Shell from '../../../layouts/Shell.astro';
+import PostTags from '../../../components/posts/PostTags.astro';
+import ReadInToolbar from '../../../components/posts/ReadInToolbar.astro';
+import { locales, localeCodes, type Locale } from '../../../i18n/locales';
+import { format, t, type MessageKey } from '../../../i18n/messages';
+import { postRoute, route } from '../../../i18n/routes';
+import { loadPosts, loadPostTags } from '../../../lib/posts/catalog';
+import {
+  defaultPostLanguage,
+  postLanguageNames,
+} from '../../../lib/posts/languages';
+import { formatPostDate, sectionIn, type Post } from '../../../lib/posts/posts';
+import type { PostTag } from '../../../lib/posts/tags';
+export async function getStaticPaths() {
+  const [posts, tags] = [await loadPosts(), loadPostTags()];
+  return localeCodes.flatMap((locale) =>
+    posts.map((post) => ({
+      params: { locale, id: post.id },
+      props: { locale, post, tags },
+    })),
+  );
+}
+interface Props {
+  locale: Locale;
+  post: Post;
+  tags: PostTag[];
+}
+const { locale, post, tags } = Astro.props;
+const text = (key: MessageKey) => t(locale, key);
+const formatLocale = locales[locale].formatLocale;
+const main = sectionIn(post, defaultPostLanguage(locale)) ?? post.sections[0];
+if (!main) throw new Error(`Post ${post.id} has no sections`);
+const path = postRoute(locale, post.id);
+const url = new URL(path, Astro.site).href;
+const created = formatPostDate(post.created, formatLocale);
+const updated = formatPostDate(post.updated, formatLocale);
+---
+
+<Shell
+  locale={locale}
+  title={main.title}
+  path={path.slice(`/${locale}/`.length)}
+>
+  <nav aria-label={text('breadcrumb')} class="no-print">
+    <ol class="crumbs">
+      <li><a href={route(locale, 'posts')}>{text('postsTitle')}</a></li>
+      <li class="flex items-center gap-x-1">
+        <span aria-hidden="true" class="muted">›</span>
+        <span aria-current="page" lang={main.lang}>{main.title}</span>
+      </li>
+    </ol>
+  </nav>
+  <article class="post space-y-8">
+    <header class="space-y-4">
+      <h1 class="sr-only" lang={main.lang}>{main.title}</h1>
+      <p class="muted flex flex-wrap gap-x-4 text-sm">
+        <span>{format(text('postCreated'), { date: created })}</span>
+        {
+          post.updated !== post.created && (
+            <span>{format(text('postUpdated'), { date: updated })}</span>
+          )
+        }
+      </p>
+      <ReadInToolbar locale={locale} url={url} title={main.title} print />
+    </header>
+    {
+      post.sections.map((section) => (
+        <section
+          class="post-section"
+          lang={section.lang}
+          data-post-lang={section.lang}
+          aria-labelledby={`title-${section.lang}`}
+        >
+          <p class="eyebrow" lang={locale}>
+            {text(postLanguageNames[section.lang])}
+          </p>
+          <PostTags
+            locale={locale}
+            lang={section.lang}
+            slugs={post.tags}
+            tags={tags}
+          />
+          <h2 id={`title-${section.lang}`} class="post-title">
+            {section.title}
+          </h2>
+          <div class="post-body" set:html={section.html} />
+        </section>
+      ))
+    }
+    <p class="print-only muted text-sm">
+      {text('postSource')}: {url} · {
+        format(text('postCreated'), { date: created })
+      }
+      {
+        post.updated !== post.created &&
+          ` · ${format(text('postUpdated'), { date: updated })}`
+      }
+    </p>
+  </article>
+</Shell>
