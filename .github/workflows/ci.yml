@@ -70,8 +70,12 @@ jobs:
           done
       - run: npm run lint
       # Post files and tags (AGENTS.md "Dhamma Posts"); the build and unit tests also fail on them.
+      # Compared with the base (the PR's base, or the previous main commit), it also rejects a
+      # removed tag slug that has a published page and an edited post with an old "updated" date.
       - name: Validate Dhamma posts
-        run: npm run posts:validate
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: npm run posts:validate -- --base "$BASE_SHA"
       - run: npm run typecheck
       - run: npm test
       # infra/pulumi is not an npm workspace (the root commands skip it), so check it here.

@@ -157,6 +157,22 @@ describe('checkPost', () => {
   ])('rejects section %#', (sections, message) => {
     expect(messages(post(sections)).join('\n')).toContain(message);
   });
+  it.each([
+    ['<p\nstyle="color: red">text</p>', '<p'],
+    ['Intro\n\n<div\n  class="x"\n>', '<div'],
+    ['<!--\nhidden\n-->', '<!--'],
+  ])('rejects raw HTML split over lines: %j', (body, start) => {
+    const raw = post({ en: `# Greed\n\n${body}` });
+    const issue = checkPost('2026-10-11-greed.md', raw, options).issues.find(
+      (i) => i.message.includes('Raw HTML'),
+    );
+    // Reported on the line where the tag starts.
+    expect(raw.split('\n')[(issue?.line ?? 0) - 1]).toBe(start);
+  });
+  it('does not join text across a blank line or a code fence into a tag', () => {
+    const en = '# Greed\n\nA <b and\n\nc> d.\n\n<i\n```\ncode\n```\nx> y.';
+    expect(messages(post({ en }))).toEqual([]);
+  });
   it('allows headings, HTML and autolinks inside code and links', () => {
     const en =
       '# Greed\n\n## Part\n\nSee <https://example.org> and `<b>`.\n\n```\n# not a heading\n<div>\n```';
@@ -169,6 +185,8 @@ describe('checkPost', () => {
     '[x](javascript&colon;alert(1))',
     '<javascript:alert(1)>',
     '[ref]: vbscript:msgbox',
+    '[x](\njavascript:alert(1))',
+    '[ref]:\n  javascript:alert(1)',
   ])('rejects the unsafe link %s', (line) => {
     expect(messages(post({ en: `# Greed\n\n${line}` })).join('\n')).toContain(
       'is not allowed; use an http(s), mailto or relative link',

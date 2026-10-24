@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { parseNameStatus, stagedPostProblems } from './staged';
+import {
+  parseNameStatus,
+  publishedTagSlugs,
+  removedTagSlugProblems,
+  stagedPostProblems,
+} from './staged';
+import { buildTagRegistry } from './tags';
 
 const dir = 'apps/web/src/content/posts';
 const file = (updated: string, body = 'Body') =>
@@ -86,5 +92,59 @@ describe('stagedPostProblems', () => {
       `${b}: renamed. Its URL (/…/dhamma-posts/2026-10-11-b/) stops working; links already shared will break.`,
     ]);
     expect(errors).toHaveLength(1);
+  });
+});
+
+describe('published tag slugs', () => {
+  const tagsPath = 'apps/web/src/content/post-tags.json';
+  const registry = [
+    { slug: 'lobha', en: 'Lobha', my: 'လောဘ', 'zh-Hans': '贪' },
+    { slug: 'kamma', en: 'Kamma', my: 'ကံ', 'zh-Hans': '业' },
+    { slug: 'unused', en: 'Unused', my: 'မသုံး', 'zh-Hans': '未用' },
+  ];
+  const postsThen = [
+    {
+      name: '2026-10-11-a.md',
+      raw: file('2026-10-11').replace('[Lobha]', '[လောဘ]'),
+    },
+    {
+      name: '2026-10-11-b.md',
+      raw: file('2026-10-11').replace('[Lobha]', '[kamma]'),
+    },
+  ];
+  const next = (records: typeof registry) =>
+    buildTagRegistry(records, (text) => text);
+  it('are the slugs the posts used, whatever name they listed', () => {
+    expect([...publishedTagSlugs(registry, postsThen)].sort()).toEqual([
+      'kamma',
+      'lobha',
+    ]);
+  });
+  it('fail when a used slug is renamed or removed', () => {
+    const published = publishedTagSlugs(registry, postsThen);
+    const renamed = registry.map((tag) =>
+      tag.slug === 'lobha' ? { ...tag, slug: 'greed' } : tag,
+    );
+    expect(removedTagSlugProblems(published, next(renamed), tagsPath)).toEqual([
+      expect.stringContaining('tag slug "lobha" is gone'),
+    ]);
+    expect(
+      removedTagSlugProblems(
+        published,
+        next(registry.filter((tag) => tag.slug !== 'kamma')),
+        tagsPath,
+      ),
+    ).toEqual([expect.stringContaining('tag slug "kamma" is gone')]);
+  });
+  it('allow renaming names, and removing a tag no post used', () => {
+    const published = publishedTagSlugs(registry, postsThen);
+    const edited = registry
+      .filter((tag) => tag.slug !== 'unused')
+      .map((tag) =>
+        tag.slug === 'lobha' ? { ...tag, en: 'Greed (Lobha)' } : tag,
+      );
+    expect(removedTagSlugProblems(published, next(edited), tagsPath)).toEqual(
+      [],
+    );
   });
 });

@@ -1,7 +1,10 @@
-// Checks on a commit's changes to post files (the `dhamma-posts` pre-commit hook, run by
-// scripts/validate-posts.mjs --staged): a changed post must have a new "updated" date, and a
-// renamed or deleted post breaks its published URL. Pure: the script supplies the git data.
+// Checks on a change compared with an earlier version (the `dhamma-posts` pre-commit hook and
+// the CI step, both run by scripts/validate-posts.mjs): a changed post must have a new "updated"
+// date, a renamed or deleted post breaks its published URL (a warning), and a used tag slug must
+// never disappear (an error). Pure: the script supplies the git data.
 import { parsePost } from './parse.ts';
+import { parseTagRegistry, type TagRegistry } from './tags.ts';
+import { postTagSlugs } from './validate.ts';
 
 export interface PostChange {
   /** git status letter(s): M, A, D, R100, … */
@@ -57,4 +60,41 @@ export function stagedPostProblems(
       );
   }
   return { errors, warnings };
+}
+
+/**
+ * Tag slugs that have a published tag page in a past version of the repo: slugs some post there
+ * uses (only used tags get pages). `registry` is that version's post-tags.json, `posts` its post
+ * files.
+ */
+export function publishedTagSlugs(
+  registry: unknown,
+  posts: readonly { name: string; raw: string }[],
+): Set<string> {
+  // Only the slugs matter here, so the Chinese check needs no converter.
+  const tags = parseTagRegistry(registry, (text) => text);
+  return new Set(
+    posts.flatMap(({ name, raw }) =>
+      postTagSlugs(parsePost(name, raw).post, tags),
+    ),
+  );
+}
+
+/**
+ * A tag slug is a permanent URL (/<locale>/dhamma-posts/tags/<slug>/): removing or renaming one
+ * that has a page breaks links already shared. Names may change; slugs may not.
+ */
+export function removedTagSlugProblems(
+  published: ReadonlySet<string>,
+  next: TagRegistry,
+  tagsPath: string,
+): string[] {
+  const kept = new Set(next.tags.map((tag) => tag.slug));
+  return [...published]
+    .filter((slug) => !kept.has(slug))
+    .sort()
+    .map(
+      (slug) =>
+        `${tagsPath}: tag slug "${slug}" is gone, but it has a published page (/…/dhamma-posts/tags/${slug}/) and shared links to it would break. Keep the entry with slug "${slug}"; change only its names.`,
+    );
 }

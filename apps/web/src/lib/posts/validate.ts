@@ -24,20 +24,22 @@ const allowedKeys = ['created', 'updated', 'tags'];
 const isoDate = /^\d{4}-\d{2}-\d{2}$/;
 const myanmar = /[\u1000-\u109F]/;
 const han = /\p{Script=Han}/u;
-// Raw HTML tags and comments; markdown autolinks (<https://…>) are fine.
-const rawHtml = /<!--|<\/?[A-Za-z][\w-]*(?:\s[^>]*)?\/?>/;
+// Raw HTML tags and comments; markdown autolinks (<https://…>) are fine. A tag may run over
+// several lines (`<p` then `style="…">`) but not across a blank line, where markdown ends it.
+const rawHtml =
+  /<!--|<\/?[A-Za-z][\w-]*(?:(?:[ \t]|\n(?![ \t]*\n))(?:[^>\n]|\n(?![ \t]*\n))*)?\/?>/g;
 const titleMarkup = /[*`<>[\]]|(^|\s)_|_($|\s|[),.;:])/;
 
-/** Link and image targets on a line: [text](url), [ref]: url and <scheme:…> autolinks. */
-const linkTargets = (text: string): string[] => [
-  ...[...text.matchAll(/\]\(\s*<?([^)\s>]+)/g)].map((m) => m[1] ?? ''),
-  ...[...text.matchAll(/^\s*\[[^\]]+\]:\s*<?([^\s>]+)/g)].map(
-    (m) => m[1] ?? '',
-  ),
-  ...[...text.matchAll(/<([A-Za-z][A-Za-z0-9+.-]*:[^>\s]*)>/g)].map(
-    (m) => m[1] ?? '',
-  ),
-];
+/**
+ * Link and image targets with their offsets: [text](url), [ref]: url and <scheme:…> autolinks.
+ * Markdown allows a line break before the target, so this runs on the whole prose text.
+ */
+const linkTargets = (text: string): { url: string; at: number }[] =>
+  [
+    ...text.matchAll(/\]\(\s*<?([^)\s>]+)/g),
+    ...text.matchAll(/^[ \t]*\[[^\]\n]+\]:\s*<?([^\s>]+)/gm),
+    ...text.matchAll(/<([A-Za-z][A-Za-z0-9+.-]*:[^>\s]*)>/g),
+  ].map((m) => ({ url: m[1] ?? '', at: m.index }));
 /**
  * Only web, mail and relative links. Markdown passes link targets through to the page, so a
  * `javascript:` (or entity-disguised) target would run script when clicked.
@@ -100,14 +102,27 @@ function checkSection(
     const previous = prose[i - 1];
     if (/^=+\s*$/.test(text) && previous && previous.text.trim() !== '')
       add(line, 'Setext "===" headings are not allowed; use ## or ###');
-    if (rawHtml.test(text)) add(line, 'Raw HTML is not allowed; use markdown');
-    for (const url of linkTargets(text))
-      if (!safeLink(url))
-        add(
-          line,
-          `Link "${url.slice(0, 40)}" is not allowed; use an http(s), mailto or relative link`,
-        );
   });
+  // Raw HTML and links can span lines, so scan the section's prose as one text (fenced code is
+  // left out; a gap where it was counts as a blank line) and report each find on its own line.
+  let joined = '';
+  const starts: { at: number; line: number }[] = [];
+  prose.forEach(({ line, text }, i) => {
+    const previous = prose[i - 1];
+    if (previous) joined += previous.line + 1 === line ? '\n' : '\n\n';
+    starts.push({ at: joined.length, line });
+    joined += text;
+  });
+  const lineAt = (offset: number): number =>
+    starts.findLast((start) => start.at <= offset)?.line ?? section.bodyLine;
+  for (const match of joined.matchAll(rawHtml))
+    add(lineAt(match.index), 'Raw HTML is not allowed; use markdown');
+  for (const { url, at } of linkTargets(joined))
+    if (!safeLink(url))
+      add(
+        lineAt(at),
+        `Link "${url.slice(0, 40)}" is not allowed; use an http(s), mailto or relative link`,
+      );
 
   const all = `${section.title}\n${section.body}`;
   if (section.lang === 'my') {
