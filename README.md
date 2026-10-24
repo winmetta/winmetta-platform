@@ -6,7 +6,7 @@ The first phases deliver a foundation app (Phase 0), bilingual pages — Home, A
 
 ## Status
 
-Phases 0–2 are done: the site is live at [app.winmetta.org](https://app.winmetta.org) (labelled Beta), built from `apps/web` and deployed with the Pulumi program in `infra/pulumi/` and the workflows in `.github/workflows/`. Phase 3 (Dhamma Posts) is built and in review ([docs/implementation-plan.md](docs/implementation-plan.md) §5). Later work is not numbered or scheduled, and future-phase notes in the docs are tentative. The open items are in the future todo list in [docs/implementation-plan.md](docs/implementation-plan.md) §4. To run the site locally, see [docs/developer-guide.md](docs/developer-guide.md).
+Phases 0–2 are done: the site is live at [app.winmetta.org](https://app.winmetta.org) (labelled Beta), built from `apps/web` and deployed with the Pulumi program in `infra/pulumi/` and the workflows in `.github/workflows/`. Phase 3 (Dhamma Posts) is built and in review ([docs/implementation-plan.md](docs/implementation-plan.md) §5). Later work is not numbered or scheduled, and future-phase notes in the docs are tentative. The open todos and future phases are in the backlog in [docs/implementation-plan.md](docs/implementation-plan.md) §6. To run the site locally, see [docs/developer-guide.md](docs/developer-guide.md).
 
 ## Docs
 
@@ -14,7 +14,7 @@ Phases 0–2 are done: the site is live at [app.winmetta.org](https://app.winmet
 | --- | --- |
 | [docs/prd.md](docs/prd.md) | Product scope, target audience, feature specs, funding plan, success metrics, phased roadmap |
 | [docs/tech-architecture.md](docs/tech-architecture.md) | Stack, hosting/domains, environments & CI/CD, infrastructure provisioning; deferred analytics and tentative future directions (backend, accounts, offline) |
-| [docs/implementation-plan.md](docs/implementation-plan.md) | Phases 0–2 (done): foundation code, bilingual pages, infrastructure & deployment; Phase 3: Dhamma Posts; checklists and macOS setup |
+| [docs/implementation-plan.md](docs/implementation-plan.md) | Phases 0–3 (0–2 done, 3 built): foundation code, bilingual pages, infrastructure & deployment, Dhamma Posts; the backlog of open todos and future phases; checklists and macOS setup |
 | [AGENTS.md](AGENTS.md) | Quick-reference conventions for contributors and AI coding agents working in this repo — **read this before making changes**, especially §2 on this repo being public |
 
 Phase 1 delivered Home, About, Privacy, Classes (with Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library for online Zoom students and anonymous independent learners worldwide. Content is concise and curated from the existing site, with an original mobile/desktop design. Classes and Dhamma Library are the two main page groups; the library indexes every PDF in the project's S3 bucket (about 3,000 mostly Burmese books) with folder-style tag browsing and fuzzy, Burmese-aware search, plus curated links such as blog posts and apps.
