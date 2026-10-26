@@ -1,13 +1,13 @@
 # Implementation Plan: Phases 0–3 and backlog
 
-The first three phases, all done, took the project from an empty repo to a public, bilingual site running in production (labelled Beta). Phase 3 adds Dhamma Posts, the first new content section after launch. Each phase has one purpose so a small volunteer team can finish and review it before starting the next.
+The first three phases, all done, took the project from an empty repo to a public, bilingual site running in production (labelled Beta). Phase 3, merged on 2026-10-25, added Dhamma Posts, the first new content section after launch. Each phase has one purpose so a small volunteer team can finish and review it before starting the next.
 
 | Phase | Goal | Deployed? |
 | --- | --- | --- |
 | **0 — Foundation code** | Repo scaffold: a basic Astro app with all the libraries, tooling and English/Burmese (`en`/`my`) support the site needs. No real pages or content, no deploy. | No (local only) |
 | **1 — Bilingual pages** | Home, About, Privacy, the Classes group (classes with a weekly schedule, Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library (the whole S3 PDF library, tag browsing and fuzzy Burmese search), in English and Burmese, with curated public content. Reviewed from local builds; no deployment. | No (local only) |
 | **2 — Infrastructure & deployment** | Pulumi (TypeScript), domains, AWS hosting (S3 + CloudFront), Route 53 DNS, a CI deploy workflow, a Beta label and a single production environment. New media infrastructure and staging come later. | Yes (public) |
-| **3 — Dhamma Posts** | Short trilingual (Burmese, English, Simplified Chinese) Dhamma posts kept as markdown files in the repo: post, tag and paginated list pages, a "Read in" language choice that links can carry, share and print, and format checks in the hook, CI and build. Built 2026-10-23 on `feat/dhamma-posts`; not merged yet. | Yes, when merged (the normal deploy) |
+| **3 — Dhamma Posts** | Short trilingual (Burmese, English, Simplified Chinese) Dhamma posts kept as markdown files in the repo: post, tag and paginated list pages, a "Read in" language choice that links can carry, share and print, and format checks in the hook, CI and build. Built 2026-10-23 and merged into `main` on 2026-10-25 (PR #10). | Yes (the normal deploy after the merge) |
 
 Everything not yet scheduled is in the **backlog (§6)**: the open todos left from the finished phases (reviews, the launch announcement, operations) and the candidate future phases (LLB lessons, the library upload pipeline, accounts, native apps; see also [prd.md](prd.md) §7). Reading order: toolchain (§1), Phases 0–3 (§2–§5), backlog (§6), then reference material (§7–§9). Scope per [prd.md](prd.md) (§4.7, §7) and [tech-architecture.md](tech-architecture.md) (§0): one static Astro web app designed for mobile and desktop — no backend, no database, no desktop/mobile apps.
 
@@ -256,7 +256,7 @@ The site went public on 2026-10-23: `PUBLIC_ALLOW_INDEXING=true` is set in the `
 
 ## 5. Phase 3 — Dhamma Posts
 
-**Goal:** a free, calm place for short Dhamma teachings: explanations of Pāḷi words and phrases, sutta and Abhidhamma ideas, and questions, each readable in Burmese, English and Simplified Chinese, alone or side by side, and easy to share and print. Content comes from the teachers and is added by volunteers as markdown files in the repo; no CMS, backend or account. How to add a post: [AGENTS.md](../AGENTS.md) §7. Started and built 2026-10-23 on the `feat/dhamma-posts` branch.
+**Goal:** a free, calm place for short Dhamma teachings: explanations of Pāḷi words and phrases, sutta and Abhidhamma ideas, and questions, each readable in Burmese, English and Simplified Chinese, alone or side by side, and easy to share and print. Content comes from the teachers and is added by volunteers as markdown files in the repo; no CMS, backend or account. How to add a post: [AGENTS.md](../AGENTS.md) §7. Built 2026-10-23 on the `feat/dhamma-posts` branch and merged into `main` on 2026-10-25 (PR #10).
 
 ### Scope and decisions
 
@@ -282,8 +282,8 @@ The site went public on 2026-10-23: `PUBLIC_ALLOW_INDEXING=true` is set in the `
 * [x] Full-text search on the posts index: titles, topic names and body text in all three languages, the library's MiniSearch approach (shared tokenizer `apps/web/src/lib/search-text.ts`, which now also splits Chinese into characters and character pairs), Traditional-Chinese queries converted to Simplified, results as list cards in the Read-in languages, the query in the address (`?q=`, kept with `?lang=`), loaded only on first use from `post-data/*.<hash>.json` (deployed as immutable, like `library-data/`). Golden queries in `apps/web/src/lib/posts/search.test.ts`; the index is about 6.6 KB gzipped per post (budget 10 KB per post and 400 KB in total).
 * [ ] Review: a Chinese reader checks the converted Chinese section (`2026-10-11-the-four-characteristics-tetrad-of-greed-lobha.md`) and the Chinese tag names; a Burmese speaker checks the new interface text and the Burmese tag names in `post-tags.json`.
 * [x] Docs: AGENTS.md §1 and §7 (how to add a post, the rules, adding a language), the Prettier-from-the-repo-root rule (AGENTS.md §6), prd.md §4.3 and §7, developer-guide.md, CONTRIBUTING.md.
-* [x] Commit the work on `feat/dhamma-posts` (`3a13f3e`).
-* [ ] Open the pull request and merge it after CI passes; the normal deploy publishes the pages.
+* [x] Commit the work on `feat/dhamma-posts` and open PR #10; CI passed, the two automated review findings were fixed, and it was squash-merged on 2026-10-25 (`39d1169`).
+* [ ] Approve the production deploy of the merge and run the acceptance checks below on the live site.
 
 ### Phase 3 acceptance
 
@@ -298,7 +298,7 @@ RSS/Atom feeds, posts in the Dhamma Library search (posts have their own search)
 
 ## 6. Backlog (not scheduled)
 
-Phases 0–2 are done and Phase 3 (§5) is built. Everything else lives here, in two groups: **open todos** left from the finished phases, and **future phases**, which are candidate directions rather than commitments. Nothing here is dated: the maintainer decides the order and scope as the work comes, and a future phase gets its own numbered section (like §5) when it starts. Product reasoning is in [prd.md](prd.md) §7; tentative technical notes are in [tech-architecture.md](tech-architecture.md) §10.
+Phases 0–2 are done and Phase 3 (§5) is merged. Everything else lives here, in two groups: **open todos** left from the finished phases, and **future phases**, which are candidate directions rather than commitments. Nothing here is dated: the maintainer decides the order and scope as the work comes, and a future phase gets its own numbered section (like §5) when it starts. Product reasoning is in [prd.md](prd.md) §7; tentative technical notes are in [tech-architecture.md](tech-architecture.md) §10.
 
 ### 6.1 Open todos from Phases 1–2
 
