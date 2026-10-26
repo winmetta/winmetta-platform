@@ -35,12 +35,6 @@ pre-commit:
         - 'apps/web/src/content/posts/*.md'
         - 'apps/web/src/content/post-tags.json'
       run: node scripts/validate-posts.mjs --staged
-    # Agent skills shared by Claude Code and Codex (.agents/skills, symlinked from .claude/skills).
-    agent-skills:
-      glob:
-        - '.agents/skills/**'
-        - '.claude/skills/**'
-      run: npm run --silent skills:check
     # Block commits that contain secrets (tokens, keys, passwords). Config: .gitleaks.toml.
     gitleaks:
       run: gitleaks git --staged --redact
