@@ -1,0 +1,17 @@
+---
+// A list of posts, newest first: each post's title in the reader's chosen post languages, and its
+// date (PostCard). Tags are shown on the post page, not here. Order and paging come from the
+// page's URL (PostSort.astro, Pager.astro).
+import PostCard from './PostCard.astro';
+import type { Locale } from '../../i18n/locales';
+import type { Post } from '../../lib/posts/posts';
+interface Props {
+  locale: Locale;
+  posts: Post[];
+}
+const { locale, posts } = Astro.props;
+---
+
+<ol class="grid gap-4" data-post-list>
+  {posts.map((post) => <PostCard locale={locale} post={post} />)}
+</ol>

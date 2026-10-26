@@ -1,0 +1,44 @@
+---
+// One post in a list: its title in each post language (the "Read in" CSS shows the chosen ones)
+// and its date. Used by PostList and, with no post, as the <template> PostSearch fills in the
+// browser, so search results and lists share one markup.
+import { t, format } from '../../i18n/messages';
+import { locales, type Locale } from '../../i18n/locales';
+import { postRoute } from '../../i18n/routes';
+import { postLanguages } from '../../lib/posts/languages';
+import { formatPostDate, type Post } from '../../lib/posts/posts';
+interface Props {
+  locale: Locale;
+  /** Omitted for the search-result template: empty fields marked for filling. */
+  post?: Pick<Post, 'id' | 'created' | 'sections'>;
+}
+const { locale, post } = Astro.props;
+const titleIn = (lang: string) =>
+  post?.sections.find((section) => section.lang === lang)?.title ?? '';
+const date = post
+  ? format(t(locale, 'postCreated'), {
+      date: formatPostDate(post.created, locales[locale].formatLocale),
+    })
+  : '';
+---
+
+<li
+  class="card card-link space-y-3"
+  data-created={post?.created}
+  data-id={post?.id}
+>
+  <a
+    class="post-titles"
+    href={post ? postRoute(locale, post.id) : undefined}
+    data-card-link
+  >
+    {
+      postLanguages.map((lang) => (
+        <span lang={lang} data-post-lang={lang} data-card-title={lang}>
+          {titleIn(lang)}
+        </span>
+      ))
+    }
+  </a>
+  <p class="muted text-sm" data-card-date>{date}</p>
+</li>

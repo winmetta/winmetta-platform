@@ -1,8 +1,11 @@
 ---
 import Shell from '../../layouts/Shell.astro';
 import { localeCodes, type Locale } from '../../i18n/locales';
-import { route } from '../../i18n/routes';
+import { postRoute, route } from '../../i18n/routes';
 import { t } from '../../i18n/messages';
+import { loadPosts } from '../../lib/posts/catalog';
+import { defaultPostLanguage } from '../../lib/posts/languages';
+import { recentPosts, sectionIn } from '../../lib/posts/posts';
 export function getStaticPaths() {
   return localeCodes.map((locale) => ({
     params: { locale },
@@ -19,9 +22,17 @@ const paths = [
   { page: 'classes', title: 'classesTitle', text: 'classesIntro' },
   { page: 'retreats', title: 'retreatsTitle', text: 'retreatsIntro' },
   { page: 'library', title: 'libraryTitle', text: 'homeLibraryText' },
+  { page: 'posts', title: 'postsTitle', text: 'homePostsText' },
   { page: 'about', title: 'aboutTitle', text: 'homeAboutText' },
   { page: 'privacy', title: 'privacyTitle', text: 'homePrivacyText' },
 ] as const;
+// The home page names recent posts in the interface language only.
+const latest = recentPosts(await loadPosts(), 3).flatMap((post) => {
+  const section = sectionIn(post, defaultPostLanguage(locale));
+  return section
+    ? [{ id: post.id, title: section.title, lang: section.lang }]
+    : [];
+});
 ---
 
 <Shell locale={locale} title={text('homeTitle')} page="home">
@@ -60,5 +71,28 @@ const paths = [
         ))
       }
     </ul>
+  </section>
+  <section class="space-y-4" aria-labelledby="recent-posts">
+    <h2 id="recent-posts" class="text-2xl font-bold">
+      {text('postsRecent')}
+    </h2>
+    <ul class="grid gap-3">
+      {
+        latest.map((post) => (
+          <li class="card card-link">
+            <a
+              class="link text-lg"
+              href={postRoute(locale, post.id)}
+              lang={post.lang}
+            >
+              {post.title}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <p>
+      <a class="link" href={route(locale, 'posts')}>{text('postsAllLink')}</a>
+    </p>
   </section>
 </Shell>

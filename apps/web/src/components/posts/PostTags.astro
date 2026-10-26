@@ -1,0 +1,33 @@
+---
+// A post's tags named in one post language, shown above that language's title. Every name links
+// to the same tag page, whose URL uses the English name's slug.
+import { t } from '../../i18n/messages';
+import type { Locale } from '../../i18n/locales';
+import { postTagRoute } from '../../i18n/routes';
+import type { PostLanguage } from '../../lib/posts/languages';
+import { tagName, type PostTag } from '../../lib/posts/tags';
+interface Props {
+  locale: Locale;
+  lang: PostLanguage;
+  /** Tag slugs in the post's order. */
+  slugs: string[];
+  tags: PostTag[];
+}
+const { locale, lang, slugs, tags } = Astro.props;
+const bySlug = new Map(tags.map((tag) => [tag.slug, tag]));
+const shown = slugs.flatMap((slug) => bySlug.get(slug) ?? []);
+---
+
+{
+  shown.length > 0 && (
+    <ul class="post-tags" lang={lang} aria-label={t(locale, 'postsTags')}>
+      {shown.map((tag) => (
+        <li>
+          <a class="tag" href={postTagRoute(locale, tag.slug)}>
+            {tagName(tag, lang)}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { DateTime, IANAZone } from 'luxon';
+import { postLanguages } from './posts/languages.ts';
 const id = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 const text = z.string().trim().min(1);
 const language = text.refine((value) => {
@@ -240,3 +241,31 @@ export type FolderEntry = z.infer<typeof folderEntrySchema>;
 export type LibraryFile = z.infer<typeof libraryFileSchema>;
 export type Resource = z.infer<typeof resourceSchema>;
 export type Recurrence = z.infer<typeof recurrenceSchema>;
+// Dhamma posts: one markdown file per post (src/content/posts/, checked by lib/posts/validate.ts)
+// and a tag registry with interface labels (src/content/post-tags.json).
+// One tag: a permanent URL slug and its name in every post language. The English name is the
+// main tag; the others are aliases (lib/posts/tags.ts).
+export const postTagSchema = z.strictObject({
+  slug: text,
+  en: text,
+  my: text,
+  'zh-Hans': text,
+});
+export const postSchema = z.object({
+  created: date,
+  updated: date,
+  tags: z.array(id).min(1),
+  sections: z
+    .array(
+      z.object({
+        lang: z.enum(postLanguages),
+        title: text,
+        html: z.string().min(1),
+        /** Plain text of the section, for the search index (lib/posts/search-docs.ts). */
+        text: z.string(),
+      }),
+    )
+    .length(postLanguages.length),
+});
+export type PostTagRecord = z.infer<typeof postTagSchema>;
+export type PostRecord = z.infer<typeof postSchema>;

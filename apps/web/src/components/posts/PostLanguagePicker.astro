@@ -1,0 +1,94 @@
+---
+// Which post languages to read: any of Burmese, English and Chinese, at least one. Separate from
+// the interface language switcher. The choice is kept in localStorage and in the address
+// (?lang=en,zh, so a shared link opens in the same languages) and applies to every post list and
+// post; Shell.astro applies it before the page paints, so the buttons follow the address. Without JavaScript the picker is
+// hidden and every language shows.
+import { t } from '../../i18n/messages';
+import type { Locale } from '../../i18n/locales';
+import { postLanguageNames, postLanguages } from '../../lib/posts/languages';
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const hintId = 'post-languages-hint';
+---
+
+<div class="post-picker js-only no-print">
+  <fieldset class="flex flex-wrap items-center gap-x-3 gap-y-2">
+    <legend class="sr-only">{t(locale, 'postLanguages')}</legend>
+    <span class="font-semibold" aria-hidden="true"
+      >{t(locale, 'postLanguages')}</span
+    >
+    <div class="segmented" role="group" aria-describedby={hintId}>
+      {
+        postLanguages.map((lang) => (
+          <button
+            type="button"
+            aria-pressed="false"
+            data-post-lang-toggle={lang}
+          >
+            {t(locale, postLanguageNames[lang])}
+          </button>
+        ))
+      }
+    </div>
+  </fieldset>
+  <p id={hintId} class="muted mt-1 text-sm">
+    {t(locale, 'postLanguagesHint')}
+  </p>
+</div>
+
+<script>
+  import {
+    isPostLanguage,
+    postLanguages,
+    postLanguagesStorageKey,
+    withLangParam,
+    type PostLanguage,
+  } from '../../lib/posts/languages';
+  const root = document.documentElement;
+  const current = (): PostLanguage[] =>
+    (root.dataset.postLangs ?? '').split(' ').filter(isPostLanguage);
+  const buttons = document.querySelectorAll<HTMLButtonElement>(
+    '[data-post-lang-toggle]',
+  );
+  const render = () => {
+    const selected = current();
+    buttons.forEach((button) => {
+      const on = selected.includes(
+        button.dataset.postLangToggle as PostLanguage,
+      );
+      button.setAttribute('aria-pressed', String(on));
+      // The last selected language cannot be turned off.
+      button.setAttribute('aria-disabled', String(on && selected.length === 1));
+    });
+  };
+  buttons.forEach((button) =>
+    button.addEventListener('click', () => {
+      const lang = button.dataset.postLangToggle;
+      if (!lang || !isPostLanguage(lang)) return;
+      const selected = current();
+      const next = selected.includes(lang)
+        ? selected.filter((code) => code !== lang)
+        : [...selected, lang];
+      if (next.length === 0) return;
+      // Stored and shown in the fixed order (Burmese, English, Chinese).
+      const ordered = postLanguages.filter((code) => next.includes(code));
+      root.dataset.postLangs = ordered.join(' ');
+      try {
+        localStorage.setItem(postLanguagesStorageKey, JSON.stringify(ordered));
+      } catch {
+        /* Preference storage is optional. */
+      }
+      // The address says which languages are shown (?lang=en,zh), so it can be shared.
+      history.replaceState(
+        history.state,
+        '',
+        withLangParam(window.location.href, ordered),
+      );
+      render();
+    }),
+  );
+  render();
+</script>

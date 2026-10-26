@@ -1,0 +1,28 @@
+---
+// The "Read in" box on the posts index, tag pages and post pages: the post language picker,
+// Share and (posts) Print.
+import PostLanguagePicker from './PostLanguagePicker.astro';
+import PostTools from './PostTools.astro';
+import type { Locale } from '../../i18n/locales';
+interface Props {
+  locale: Locale;
+  /** Canonical address of the page, shared with the current ?lang=. */
+  url: string;
+  title: string;
+  print?: boolean;
+  /** Posts index: Share also keeps the active search (?q=). */
+  shareSearch?: boolean;
+}
+const { locale, url, title, print = false, shareSearch = false } = Astro.props;
+---
+
+<div class="post-toolbar no-print">
+  <PostLanguagePicker locale={locale} />
+  <PostTools
+    locale={locale}
+    url={url}
+    title={title}
+    print={print}
+    shareSearch={shareSearch}
+  />
+</div>

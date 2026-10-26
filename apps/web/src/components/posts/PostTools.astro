@@ -1,0 +1,129 @@
+---
+// Share (posts and tag pages) and Print (posts). Share opens the phone's share sheet where there
+// is one, and otherwise copies the page's address, always with the "Read in" languages
+// (?lang=en,zh) so the link opens in the same languages, and, on the posts index, the active
+// search (?q=…) so it opens with the same results. Print prints only the chosen languages,
+// without the site header and footer (print styles in global.css).
+import { t } from '../../i18n/messages';
+import type { Locale } from '../../i18n/locales';
+interface Props {
+  locale: Locale;
+  /** Canonical address of the page; the current ?lang= is added when sharing. */
+  url: string;
+  title: string;
+  print?: boolean;
+  /** Posts index: also share the active search (?q=) from the address. */
+  shareSearch?: boolean;
+}
+const { locale, url, title, print = false, shareSearch = false } = Astro.props;
+---
+
+<div class="js-only no-print flex flex-wrap items-center gap-2">
+  <button
+    type="button"
+    class="btn btn-outline"
+    data-share
+    data-url={url}
+    data-share-search={shareSearch ? '' : undefined}
+    data-title={title}
+    data-copied={t(locale, 'postShareCopied')}
+    data-failed={t(locale, 'postShareFailed')}
+  >
+    <svg
+      class="link-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"></path>
+      <path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"></path>
+    </svg>
+    {t(locale, 'postShare')}
+  </button>
+  {
+    print && (
+      <button type="button" class="btn btn-outline" data-print>
+        <svg
+          class="link-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M6 9V3h12v6" />
+          <rect x="3" y="9" width="18" height="8" rx="2" />
+          <path d="M6 14h12v7H6z" />
+        </svg>
+        {t(locale, 'postPrint')}
+      </button>
+    )
+  }
+</div>
+<!-- A short-lived toast at the bottom of the screen; always in the page so screen readers
+     announce each new message. -->
+<p class="toast no-print" role="status" aria-live="polite" data-share-status>
+</p>
+
+<script>
+  import { isPostLanguage, withLangParam } from '../../lib/posts/languages';
+  import { readQuery, withQuery } from '../../lib/posts/search-url';
+  const share = document.querySelector<HTMLButtonElement>('[data-share]');
+  const toast = document.querySelector<HTMLElement>('[data-share-status]');
+  let hideTimer: number | undefined;
+  /** Shows a toast for a few seconds; longer messages stay a little longer. */
+  const say = (message = '', ms = 2500) => {
+    if (!toast) return;
+    window.clearTimeout(hideTimer);
+    toast.textContent = message;
+    toast.toggleAttribute('data-show', message !== '');
+    if (message)
+      hideTimer = window.setTimeout(() => {
+        toast.removeAttribute('data-show');
+        toast.textContent = '';
+      }, ms);
+  };
+  share?.addEventListener('click', async () => {
+    const langs = (document.documentElement.dataset.postLangs ?? '')
+      .split(' ')
+      .filter(isPostLanguage);
+    const page = withLangParam(
+      share.dataset.url ?? window.location.href,
+      langs,
+    );
+    // The search box keeps ?q= in the address while results show; blank means no search.
+    const query =
+      share.dataset.shareSearch === undefined
+        ? ''
+        : readQuery(window.location.search);
+    const url = query.trim() ? withQuery(page, query) : page;
+    say();
+    // Phones: the system share sheet (messages, chat apps). Desktop: copy the link.
+    if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+      try {
+        await navigator.share({ title: share.dataset.title ?? '', url });
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError')
+          return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      say(share.dataset.copied);
+    } catch {
+      say(share.dataset.failed, 6000);
+    }
+  });
+  document
+    .querySelector('[data-print]')
+    ?.addEventListener('click', () => window.print());
+</script>

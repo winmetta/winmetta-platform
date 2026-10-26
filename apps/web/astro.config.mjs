@@ -21,9 +21,12 @@ export default defineConfig({
     // Lists every built page with its other-language alternate; robots.txt links to it only when indexing is on.
     sitemap({
       i18n: { defaultLocale: 'en', locales: { en: 'en', my: 'my' } },
-      // The root language chooser and the 404 page are not content pages.
+      // The root language chooser and the 404 page are not content pages. "Oldest first" post
+      // listings repeat the newest-first pages in reverse (they are also noindex).
       filter: (page) =>
-        !page.endsWith('/404/') && new URL(page).pathname !== '/',
+        !page.endsWith('/404/') &&
+        new URL(page).pathname !== '/' &&
+        !/\/dhamma-posts\/(?:tags\/[^/]+\/)?oldest\//.test(page),
     }),
   ],
   vite: {

@@ -107,8 +107,9 @@ jobs:
         run: |
           aws s3 sync apps/web/dist/_astro "s3://$SITE_BUCKET/_astro" --cache-control "public, max-age=31536000, immutable" --size-only --only-show-errors
           aws s3 sync apps/web/dist/library-data "s3://$SITE_BUCKET/library-data" --cache-control "public, max-age=31536000, immutable" --size-only --only-show-errors
+          aws s3 sync apps/web/dist/post-data "s3://$SITE_BUCKET/post-data" --cache-control "public, max-age=31536000, immutable" --size-only --only-show-errors
       - name: Upload icons, robots.txt and sitemaps (one hour)
-        run: aws s3 sync apps/web/dist "s3://$SITE_BUCKET" --exclude "*.html" --exclude "_astro/*" --exclude "library-data/*" --delete --cache-control "public, max-age=3600" --only-show-errors
+        run: aws s3 sync apps/web/dist "s3://$SITE_BUCKET" --exclude "*.html" --exclude "_astro/*" --exclude "library-data/*" --exclude "post-data/*" --delete --cache-control "public, max-age=3600" --only-show-errors
       # HTML last, so a page never points at a file that is not uploaded yet.
       - name: Upload HTML (always revalidate)
         run: aws s3 sync apps/web/dist "s3://$SITE_BUCKET" --exclude "*" --include "*.html" --delete --cache-control "public, max-age=0, must-revalidate" --only-show-errors

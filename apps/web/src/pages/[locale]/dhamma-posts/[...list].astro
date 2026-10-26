@@ -1,0 +1,79 @@
+---
+// All Dhamma posts: topics, then the posts, POSTS_PAGE_SIZE per page, newest or oldest first.
+// URLs: /<locale>/dhamma-posts/, …/page/2/, …/oldest/, …/oldest/page/2/ (post ids start with a
+// date, so they never collide with these).
+import Shell from '../../../layouts/Shell.astro';
+import Pager from '../../../components/posts/Pager.astro';
+import PostList from '../../../components/posts/PostList.astro';
+import PostSearch from '../../../components/posts/PostSearch.astro';
+import PostSort from '../../../components/posts/PostSort.astro';
+import ReadInToolbar from '../../../components/posts/ReadInToolbar.astro';
+import TopicChips from '../../../components/posts/TopicChips.astro';
+import { locales, localeCodes, type Locale } from '../../../i18n/locales';
+import { t, type MessageKey } from '../../../i18n/messages';
+import { postListRoute } from '../../../i18n/routes';
+import { formatCount } from '../../../lib/library-url';
+import { loadPosts, loadPostTags } from '../../../lib/posts/catalog';
+import {
+  listingPages,
+  listingSegment,
+  usedTags,
+  type ListingPage,
+  type Post,
+} from '../../../lib/posts/posts';
+export async function getStaticPaths() {
+  const posts = await loadPosts();
+  return localeCodes.flatMap((locale) =>
+    listingPages(posts).map((listing) => ({
+      params: { locale, list: listingSegment(listing.sort, listing.page) },
+      props: { locale, listing },
+    })),
+  );
+}
+interface Props {
+  locale: Locale;
+  listing: ListingPage<Post>;
+}
+const { locale, listing } = Astro.props;
+const text = (key: MessageKey) => t(locale, key);
+const topics = usedTags(loadPostTags(), await loadPosts());
+const first = listing.sort === 'newest' && listing.page === 1;
+const listPath = postListRoute(locale, listing);
+const path = listPath.slice(`/${locale}/`.length);
+const url = new URL(listPath, Astro.site).href;
+const title =
+  listing.page > 1
+    ? `${text('postsTitle')} · ${text('pageWord')} ${formatCount(listing.page, locales[locale].formatLocale)}`
+    : text('postsTitle');
+---
+
+<Shell
+  locale={locale}
+  title={title}
+  noindex={listing.sort === 'oldest'}
+  {...first ? { page: 'posts' } : { path }}
+>
+  <header class="space-y-4">
+    <h1 class="text-3xl font-bold sm:text-4xl">{text('postsTitle')}</h1>
+    <p class="lead">{text('postsIntro')}</p>
+    <ReadInToolbar locale={locale} url={url} title={title} shareSearch />
+  </header>
+  <PostSearch locale={locale} />
+  <section class="space-y-4" aria-labelledby="topics" data-post-browse>
+    <h2 id="topics" class="text-2xl font-bold">{text('postsTags')}</h2>
+    <TopicChips locale={locale} topics={topics} />
+  </section>
+  <section class="space-y-4" aria-labelledby="all" data-post-browse>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <h2 id="all" class="text-2xl font-bold">{text('postsAll')}</h2>
+      <PostSort locale={locale} sort={listing.sort} />
+    </div>
+    <PostList locale={locale} posts={listing.items} />
+    <Pager
+      locale={locale}
+      sort={listing.sort}
+      page={listing.page}
+      pages={listing.pages}
+    />
+  </section>
+</Shell>

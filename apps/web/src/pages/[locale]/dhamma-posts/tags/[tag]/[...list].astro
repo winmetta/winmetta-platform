@@ -1,0 +1,112 @@
+---
+// One tag: its names, related topics and posts, POSTS_PAGE_SIZE per page, newest or oldest
+// first. URLs: /<locale>/dhamma-posts/tags/<slug>/, …/page/2/, …/oldest/, …/oldest/page/2/.
+// Only tags that have posts get pages.
+import Shell from '../../../../../layouts/Shell.astro';
+import Pager from '../../../../../components/posts/Pager.astro';
+import PostList from '../../../../../components/posts/PostList.astro';
+import PostSort from '../../../../../components/posts/PostSort.astro';
+import ReadInToolbar from '../../../../../components/posts/ReadInToolbar.astro';
+import TopicChips from '../../../../../components/posts/TopicChips.astro';
+import { locales, localeCodes, type Locale } from '../../../../../i18n/locales';
+import { format, t, type MessageKey } from '../../../../../i18n/messages';
+import { postListRoute, route } from '../../../../../i18n/routes';
+import { formatCount } from '../../../../../lib/library-url';
+import { loadPosts, loadPostTags } from '../../../../../lib/posts/catalog';
+import { postLanguages } from '../../../../../lib/posts/languages';
+import {
+  listingPages,
+  listingSegment,
+  postsWithTag,
+  relatedTags,
+  usedTags,
+  type ListingPage,
+  type Post,
+} from '../../../../../lib/posts/posts';
+import { tagName, type PostTag } from '../../../../../lib/posts/tags';
+export async function getStaticPaths() {
+  const [posts, tags] = [await loadPosts(), loadPostTags()];
+  return localeCodes.flatMap((locale) =>
+    usedTags(tags, posts).flatMap(({ tag }) => {
+      const related = relatedTags(tags, posts, tag.slug);
+      return listingPages(postsWithTag(posts, tag.slug)).map((listing) => ({
+        params: {
+          locale,
+          tag: tag.slug,
+          list: listingSegment(listing.sort, listing.page),
+        },
+        props: { locale, tag, related, listing },
+      }));
+    }),
+  );
+}
+interface Props {
+  locale: Locale;
+  tag: PostTag;
+  /** Other tags on this tag's posts, with shared-post counts. */
+  related: { tag: PostTag; count: number }[];
+  listing: ListingPage<Post>;
+}
+const { locale, tag, related, listing } = Astro.props;
+const text = (key: MessageKey) => t(locale, key);
+const label = tagName(tag, locale);
+const heading = format(text('postsTagTitle'), { tag: label });
+const title =
+  listing.page > 1
+    ? `${heading} · ${text('pageWord')} ${formatCount(listing.page, locales[locale].formatLocale)}`
+    : heading;
+const listPath = postListRoute(locale, { tag: tag.slug, ...listing });
+const url = new URL(listPath, Astro.site).href;
+---
+
+<Shell
+  locale={locale}
+  title={title}
+  noindex={listing.sort === 'oldest'}
+  path={listPath.slice(`/${locale}/`.length)}
+>
+  <nav aria-label={text('breadcrumb')}>
+    <ol class="crumbs">
+      <li><a href={route(locale, 'posts')}>{text('postsTitle')}</a></li>
+      <li class="flex items-center gap-x-1">
+        <span aria-hidden="true" class="muted">›</span>
+        <span aria-current="page">{label}</span>
+      </li>
+    </ol>
+  </nav>
+  <header class="space-y-4">
+    <h1 class="text-3xl font-bold sm:text-4xl">{heading}</h1>
+    <p class="muted flex flex-wrap gap-x-3">
+      {
+        postLanguages.map((lang) => (
+          <span lang={lang}>{tagName(tag, lang)}</span>
+        ))
+      }
+    </p>
+    <ReadInToolbar locale={locale} url={url} title={heading} />
+  </header>
+  {
+    related.length > 0 && (
+      <section class="space-y-3" aria-labelledby="related-topics">
+        <h2 id="related-topics" class="text-xl font-bold">
+          {text('postsRelatedTags')}
+        </h2>
+        <TopicChips locale={locale} topics={related} />
+      </section>
+    )
+  }
+  <section class="space-y-4" aria-labelledby="tag-posts">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <h2 id="tag-posts" class="sr-only">{heading}</h2>
+      <PostSort locale={locale} sort={listing.sort} tag={tag.slug} />
+    </div>
+    <PostList locale={locale} posts={listing.items} />
+    <Pager
+      locale={locale}
+      sort={listing.sort}
+      page={listing.page}
+      pages={listing.pages}
+      tag={tag.slug}
+    />
+  </section>
+</Shell>

@@ -1,0 +1,54 @@
+---
+// Page links for a post listing, within its current order. Same markup and messages as the
+// Dhamma Library folder pager. Hidden when everything fits on one page.
+import { t } from '../../i18n/messages';
+import { locales, type Locale } from '../../i18n/locales';
+import { postListRoute } from '../../i18n/routes';
+import { formatCount } from '../../lib/library-url';
+import type { PostSort } from '../../lib/posts/posts';
+interface Props {
+  locale: Locale;
+  sort: PostSort;
+  page: number;
+  pages: number;
+  tag?: string | undefined;
+}
+const { locale, sort, page, pages, tag } = Astro.props;
+const href = (n: number) => postListRoute(locale, { tag, sort, page: n });
+const count = (value: number) =>
+  formatCount(value, locales[locale].formatLocale);
+---
+
+{
+  pages > 1 && (
+    <nav aria-label={t(locale, 'pagination')} class="no-print">
+      <ul class="pager">
+        {page > 1 && (
+          <li>
+            <a href={href(page - 1)} rel="prev">
+              {t(locale, 'previousPage')}
+            </a>
+          </li>
+        )}
+        {Array.from({ length: pages }, (_, i) => i + 1).map((n) => (
+          <li>
+            <a
+              href={href(n)}
+              aria-current={n === page ? 'page' : undefined}
+              aria-label={`${t(locale, 'pageWord')} ${count(n)}`}
+            >
+              {count(n)}
+            </a>
+          </li>
+        ))}
+        {page < pages && (
+          <li>
+            <a href={href(page + 1)} rel="next">
+              {t(locale, 'nextPage')}
+            </a>
+          </li>
+        )}
+      </ul>
+    </nav>
+  )
+}
