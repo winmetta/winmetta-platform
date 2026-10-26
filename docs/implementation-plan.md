@@ -304,7 +304,7 @@ RSS/Atom feeds, posts in the Dhamma Library search (posts have their own search)
 ### Decisions (2026-10-26)
 
 * **Cookieless, aggregate only.** No cookie, no localStorage, no persistent visitor ID. Visitors are counted per day; the same person returning on another day cannot be recognized. An opt-in returning-visitor ID is a separate later decision.
-* **Umami, self-hosted**, on one small instance in the existing AWS account, defined in Pulumi, with Caddy and Let's Encrypt for HTTPS (no load balancer).
+* **Umami, self-hosted**, on one AWS Lightsail VM (PostgreSQL on the same VM) in the existing AWS account, defined in Pulumi, with Caddy and Let's Encrypt for HTTPS (no load balancer, no RDS). Rough cost $10–15 a month; alternatives (RDS, Azure grant, Umami Cloud) are weighed in analytics.md §5.
 * **Host `stats.app.winmetta.org`**, a record in the existing `app.winmetta.org` Route 53 zone: no new hosted zone, and the WordPress DNS at DreamHost is untouched.
 * Scope is `winmetta-platform` only.
 
@@ -313,7 +313,7 @@ RSS/Atom feeds, posts in the Dhamma Library search (posts have their own search)
 Each stage is reviewed and merged before the next starts. A stage that changes cloud resources needs the maintainer's explicit go-ahead before `pulumi up`.
 
 * [ ] **1. Docs only (no code, no infrastructure).** Write [analytics.md](analytics.md); update prd.md (§4.7, §6, §7), tech-architecture.md (§2, §4.4, §6, §9), AGENTS.md (§1, §5, §6, §9, §11) and this plan so they say Phase 4 is planned and nothing is collected until stage 4. The Privacy page keeps saying "no analytics" until stage 4.
-* [ ] **2. Infrastructure.** Pulumi component for the instance, static IP, security group (80 and 443 only), the `stats` record in the `app.winmetta.org` zone, secrets, backup bucket; Caddy and Umami install and the runbook entries (deploy, upgrade, backup, restore). Verify the salt rotation setting (analytics.md §4.2) on the running server.
+* [ ] **2. Infrastructure.** Pulumi component for the Lightsail VM, static IP, firewall (80 and 443; SSH restricted), the `stats` record in the `app.winmetta.org` zone, secrets, automatic snapshots and the S3 dump bucket; Caddy and Umami install and the runbook entries (deploy, upgrade, backup, restore). Verify the salt rotation setting (analytics.md §4.2) on the running server.
 * [ ] **3. Tracker and events (behind a build flag).** Add the Umami script to the shared layout (`apps/web/src/layouts/Shell.astro`), off in dev and tests, with Do Not Track honored and the path reported without query strings; add the `track()` helper (`apps/web/src/lib/analytics.ts`) and the events in analytics.md §3. Tests: no tracker in dev, no `?q=` in reported URLs, no cookie or storage key, events carry no free text.
 * [ ] **4. Go live and update the Privacy page.** In one PR: turn the flag on, change the English and Burmese Privacy text (`apps/web/src/i18n/messages/en.json`, `my.json`) and its "last updated" date, update AGENTS.md and the docs from "planned" to "live", and have a Burmese speaker review the Burmese text. Check cookies and storage on the live site.
 * [ ] **5. Review after one month.** Read the numbers, drop events nobody uses, check the server cost, and decide whether the opt-in returning-visitor ID is still wanted.

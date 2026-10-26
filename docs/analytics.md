@@ -12,7 +12,7 @@
 | --- | --- | --- |
 | Identity model | **Cookieless, aggregate only** | No cookie, no localStorage, no fingerprinting script, no persistent visitor ID. Decided 2026-10-26. |
 | Tool | **Umami, self-hosted** | MIT license, light to run (Node.js + PostgreSQL), custom events, no cookies by default. |
-| Hosting | One small instance in the existing AWS account, defined in Pulumi | Host `stats.app.winmetta.org`, a record in the existing `app.winmetta.org` Route 53 zone (no new zone). |
+| Hosting | One **AWS Lightsail** VM in the existing AWS account, defined in Pulumi, with PostgreSQL on the same VM | Host `stats.app.winmetta.org`, a record in the existing `app.winmetta.org` Route 53 zone (no new zone). Decided 2026-10-26; alternatives in section 5. |
 | HTTPS | **Caddy** on the instance, Let's Encrypt | Not an Application Load Balancer (about $16 a month, more than the server) and not nginx + certbot (same result, more parts). |
 | Scope | `winmetta-platform` only | The retreat apps and `learn_burmese` are out of scope. |
 
@@ -79,7 +79,7 @@ Visitor's browser (app.winmetta.org)
 stats.app.winmetta.org (Route 53 record in the app.winmetta.org zone, static IP)
    |
    v
-One small instance (Lightsail or EC2)
+One Lightsail VM (1-2 GB RAM, Linux, static IP attached)
    - Caddy: HTTPS with Let's Encrypt, ports 80 and 443 only, reverse proxy
    - Umami (Node.js) on localhost
    - PostgreSQL on localhost or the container network
@@ -87,10 +87,22 @@ One small instance (Lightsail or EC2)
 
 * Defined in Pulumi under `infra/pulumi`, reviewed with `pulumi preview`; **`pulumi up` is a manual maintainer step and needs explicit confirmation** (cloud write).
 * Secrets (Umami app secret, database password, admin password) are set with `pulumi config set --secret` or come from the environment, never committed.
-* Backups: nightly database dump to a private S3 bucket with a lifecycle rule; restore is rehearsed once and written in the runbook.
-* Updates: pin the Umami image or version, upgrade monthly, record in the runbook. Estimated cost is about $5–10 a month plus the dump bucket.
+* Lightsail specifics: pick a plan with at least 1 GB RAM (512 MB is too tight for Umami plus PostgreSQL; 2 GB if the database grows); attach a Lightsail static IP; open only ports 80 and 443 (and SSH restricted to maintainers, or use the browser SSH and keep port 22 closed otherwise) in the Lightsail firewall; enable automatic snapshots as a second, whole-machine recovery path.
+* Backups: nightly `pg_dump` to a private S3 bucket with a lifecycle rule (a snapshot alone is not enough); restore is rehearsed once and written in the runbook.
+* Updates: pin the Umami image or version, upgrade monthly, apply OS security updates (unattended upgrades), record in the runbook.
+* Estimated cost (rough, from memory of AWS pricing; verify before building): about $10–15 a month, or $120–180 a year: Lightsail VM about $7–12, static IP free while attached, backups under $1, Route 53 record and Let's Encrypt $0, data transfer negligible. Plus about 1–2 volunteer hours a month for updates and backup checks.
 * If a CloudFront cache or DDoS cushion is wanted later, put it in front of the instance; not needed at launch.
 * An ad blocker will hide some visitors, so counts are a floor, not a census. Proxying the script through the main domain is a later option.
+
+### Hosting alternatives considered (2026-10-26)
+
+| Option | Rough monthly cost | Why not now |
+| --- | --- | --- |
+| **Lightsail VM, Postgres on the same VM (chosen)** | $10–15 | Cheapest, simplest, stays in the AWS account that already holds the site. |
+| Lightsail or EC2 + Amazon RDS PostgreSQL | $20–25 | About double the cost for managed backups and patching; analytics data is small and easy to rebuild, so nightly dumps are enough. A reasonable upgrade later by changing the database URL. |
+| Azure Container Apps + Azure Database for PostgreSQL (nonprofit grant) | $25–35, paid from the grant | The grant does not roll over and must be renewed yearly, and a second cloud adds credentials, a Pulumi provider and OIDC to maintain. Container Apps has built-in HTTPS, so no load balancer would be needed. Fallback if AWS spend becomes a concern. |
+| Umami Cloud (free Hobby, Pro about $20) | $0–20 | No server to own; data lives with the vendor. Fallback if no volunteer will own the VM. |
+| Application load balancer in front of any option | +$16 or more | Not needed for one VM; Caddy terminates HTTPS. |
 
 ## 6. Open questions
 
