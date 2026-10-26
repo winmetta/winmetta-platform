@@ -7,7 +7,7 @@ The first three phases, all done, took the project from an empty repo to a publi
 | **0 — Foundation code** | Repo scaffold: a basic Astro app with all the libraries, tooling and English/Burmese (`en`/`my`) support the site needs. No real pages or content, no deploy. | No (local only) |
 | **1 — Bilingual pages** | Home, About, Privacy, the Classes group (classes with a weekly schedule, Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library (the whole S3 PDF library, tag browsing and fuzzy Burmese search), in English and Burmese, with curated public content. Reviewed from local builds; no deployment. | No (local only) |
 | **2 — Infrastructure & deployment** | Pulumi (TypeScript), domains, AWS hosting (S3 + CloudFront), Route 53 DNS, a CI deploy workflow, a Beta label and a single production environment. New media infrastructure and staging come later. | Yes (public) |
-| **3 — Dhamma Posts** | Short trilingual (Burmese, English, Simplified Chinese) Dhamma posts kept as markdown files in the repo: post, tag and paginated list pages, a "Read in" language choice that links can carry, share and print, and format checks in the hook, CI and build. Built 2026-10-23 and merged into `main` on 2026-10-25 (PR #10). | Yes (the normal deploy after the merge) |
+| **3 — Dhamma Posts** | Short trilingual (Burmese, English, Simplified Chinese) Dhamma posts kept as markdown files in the repo: post, tag and paginated list pages, a "Read in" language choice that links can carry, share and print, and format checks in the hook, CI and build. Built 2026-10-23 and merged into `main` on 2026-10-25 (PR #10). | Pending: the production deploy of the merge (`39d1169`) is waiting for approval (§5 checklist) |
 
 Everything not yet scheduled is in the **backlog (§6)**: the open todos left from the finished phases (reviews, the launch announcement, operations) and the candidate future phases (LLB lessons, the library upload pipeline, accounts, native apps; see also [prd.md](prd.md) §7). Reading order: toolchain (§1), Phases 0–3 (§2–§5), backlog (§6), then reference material (§7–§9). Scope per [prd.md](prd.md) (§4.7, §7) and [tech-architecture.md](tech-architecture.md) (§0): one static Astro web app designed for mobile and desktop — no backend, no database, no desktop/mobile apps.
 
@@ -302,7 +302,7 @@ Phases 0–2 are done and Phase 3 (§5) is merged. Everything else lives here, i
 
 ### 6.1 Open todos from Phases 1–2
 
-Deferred when the site went public on 2026-10-23 (see "Launch status" in §4). Do them in this order when time allows, and tick them here. The open Phase 3 items (the Chinese and Burmese reviews, the pull request) stay in the Phase 3 checklist (§5) until that phase is merged.
+Deferred when the site went public on 2026-10-23 (see "Launch status" in §4). Do them in this order when time allows, and tick them here. Phase 3's open items (approving its production deploy, the acceptance checks on the live site, and the Chinese and Burmese reviews) are tracked in its own checklist (§5), not here.
 
 **1. Reviews and consent (most time-sensitive: the site is already indexed)**
 
