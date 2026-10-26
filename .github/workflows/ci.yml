@@ -48,7 +48,7 @@ jobs:
       # already run in `npm run lint` below, and the Dhamma post check in its own step.
       - name: Run the pre-commit hooks on every file
         env:
-          LEFTHOOK_EXCLUDE: eslint,prettier,dhamma-posts
+          LEFTHOOK_EXCLUDE: eslint,prettier,dhamma-posts,agent-skills
         run: lefthook run pre-commit --all-files
       # The hook only scans what is staged, so scan the whole history here.
       - name: Scan the git history for secrets
@@ -76,6 +76,15 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: npm run posts:validate -- --base "$BASE_SHA"
+      # Agent skills (.agents/skills): portable frontmatter, Codex openai.yaml and the
+      # .claude/skills symlinks, checked with skill-maintainer from a pinned agent-skills
+      # release (latest as of 2026-10-26). To update: change the tag and let the checks run.
+      - name: Check agent skills
+        env:
+          SKILL_MAINTAINER_DIR: ${{ runner.temp }}/agent-skills/skills/skill-maintainer
+        run: |
+          git -c advice.detachedHead=false clone --quiet --depth 1 --branch v0.3.0 https://github.com/winmetta/agent-skills.git "$RUNNER_TEMP/agent-skills"
+          npm run skills:check
       - run: npm run typecheck
       - run: npm test
       # infra/pulumi is not an npm workspace (the root commands skip it), so check it here.

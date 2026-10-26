@@ -1,0 +1,4 @@
+interface:
+  display_name: "Add Dhamma Post"
+  short_description: "Add or edit a trilingual Dhamma post with tags and checks"
+  default_prompt: "Use $add-dhamma-post to add this teaching as a new Dhamma post."

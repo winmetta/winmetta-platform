@@ -46,6 +46,7 @@ Don't group content by subject (e.g. a generic "Pāḷi" bucket), and always qua
 - `apps/` contains deployable applications. `infra/` contains deployment/infrastructure definitions, with the Pulumi (TypeScript) program under `infra/pulumi/`. A top-level `content/` is optional future work if curated content becomes independent; keep Astro collections in `apps/web` for now.
 - `packages/*` (for example `domain`, `i18n`, `ui`) are created only when sharing becomes real — start with code inside `apps/web`. This product has no "playlists" feature, don't reintroduce that naming.
 - Deferred, do not scaffold yet: `apps/api` (Fastify + PostgreSQL, likely a future phase), `apps/desktop` (Electron), `apps/mobile` (Capacitor).
+- **Agent skills** (shared by Claude Code and Codex, one copy): the real files live in `.agents/skills/<name>/` (`SKILL.md`, optional `agents/openai.yaml` for Codex, `references/`, `scripts/`, `assets/`), and `.claude/skills/<name>` is a relative symlink to `../../.agents/skills/<name>`. Never copy a skill into `.claude/skills/`. Only repo-specific skills live here (today `add-dhamma-post`, for §7). General skills come from the public [winmetta/agent-skills](https://github.com/winmetta/agent-skills) catalog and are installed per developer, not committed: create or change skills here with its `skill-maintainer` skill (`/skill-maintainer` in Claude Code, `$skill-maintainer` in Codex), installed globally with `npx skills@latest add winmetta/agent-skills --skill skill-maintainer -g -a claude-code -a codex`. `npm run skills:check` runs its checker from that global install (it skips with a hint when there is none); the pre-commit hook runs it, and CI runs it against a pinned agent-skills release. Keep repo rules in this file and link to them from skills instead of copying them.
 
 ## 5. Tech Stack & Versions
 
@@ -151,6 +152,7 @@ See prd.md §4.7 for full reasoning. Summary: product analytics/metric collectio
 - `npm run test:smoke` — runs Playwright browser smoke tests; run `npm run build` first (CI does this after the build).
 - `npm run posts:new -- "English title"` — starts a Dhamma post file (§7).
 - `npm run posts:validate` — checks every Dhamma post and the tag registry (§7).
+- `npm run skills:check` — checks every agent skill and its `.claude/skills` symlink, using a global `skill-maintainer` install (§4).
 
 ## 11. Where to Find More Detail
 
