@@ -12,7 +12,7 @@
 | --- | --- | --- |
 | Identity model | **Cookieless, aggregate only** | No cookie, no localStorage, no fingerprinting script, no persistent visitor ID. Decided 2026-10-26. |
 | Tool | **Umami, self-hosted** | MIT license, light to run (Node.js + PostgreSQL), custom events, no cookies by default. |
-| Hosting | One **AWS Lightsail** VM in the existing AWS account, defined in Pulumi, with PostgreSQL on the same VM | Host `stats.app.winmetta.org`, a record in the existing `app.winmetta.org` Route 53 zone (no new zone). Decided 2026-10-26; alternatives in section 5. |
+| Hosting | One **AWS EC2** instance (`t4g.small`, 2 GB) in the existing AWS account, defined in Pulumi, with PostgreSQL on the same instance. Changed from Lightsail on 2026-10-29 | Host `stats.app.winmetta.org`, a record in the existing `app.winmetta.org` Route 53 zone (no new zone). Decided 2026-10-26; alternatives in section 5. |
 | HTTPS | **Caddy** on the instance, Let's Encrypt | Not an Application Load Balancer (about $16 a month, more than the server) and not nginx + certbot (same result, more parts). |
 | Scope | `winmetta-platform` only | The retreat apps and `learn_burmese` are out of scope. |
 
@@ -76,10 +76,10 @@ Names, email addresses, IP addresses stored in readable form, search or form tex
 Visitor's browser (app.winmetta.org)
    | loads script.js and sends events (no cookie, no storage)
    v
-stats.app.winmetta.org (Route 53 record in the app.winmetta.org zone, static IP)
+stats.app.winmetta.org (Route 53 record in the app.winmetta.org zone, Elastic IP)
    |
    v
-One Lightsail VM (1-2 GB RAM, Linux, static IP attached)
+One EC2 instance (t4g.small, 2 GB RAM, Linux, Elastic IP attached, IAM instance role)
    - Caddy: HTTPS with Let's Encrypt, ports 80 and 443 only, reverse proxy
    - Umami (Node.js) on localhost
    - PostgreSQL on localhost or the container network
@@ -87,11 +87,11 @@ One Lightsail VM (1-2 GB RAM, Linux, static IP attached)
 
 * Defined in Pulumi under `infra/pulumi`, reviewed with `pulumi preview`; **`pulumi up` is a manual maintainer step and needs explicit confirmation** (cloud write).
 * Secrets (Umami app secret, database password, admin password) are set with `pulumi config set --secret` or come from the environment, never committed.
-* Region: `us-east-1` (N. Virginia, the same region as the site) for the VM, snapshots and backup bucket (decided 2026-10-29).
-* Lightsail specifics: pick a plan with at least 1 GB RAM (512 MB is too tight for Umami plus PostgreSQL; 2 GB if the database grows); attach a Lightsail static IP; open only ports 80 and 443 (and SSH restricted to maintainers, or use the browser SSH and keep port 22 closed otherwise) in the Lightsail firewall; enable automatic snapshots as a second, whole-machine recovery path.
+* Region: `us-east-1` (N. Virginia, the same region as the site) for the EC2 instance, snapshots and backup bucket (decided 2026-10-29).
+* EC2 specifics: `t4g.small` (ARM, 2 GB RAM; the Umami image supports arm64; use `t3.small` if an x86 image is ever needed) in the default VPC, a 20 GB encrypted gp3 volume, an Elastic IP, and a security group that opens only ports 80 and 443. There is **no SSH port**: maintainers use AWS Systems Manager Session Manager through IAM sign-in, which keeps an audit log. The instance has an IAM role that can write one S3 prefix for backups and read its own secrets from Systems Manager Parameter Store; no access key is stored on the machine. Daily EBS snapshots (Data Lifecycle Manager, keep 14) are a second, whole-machine recovery path.
 * Backups: nightly `pg_dump` to a private S3 bucket with a lifecycle rule (a snapshot alone is not enough); restore is rehearsed once and written in the runbook.
 * Updates: pin the Umami image or version, upgrade monthly, apply OS security updates (unattended upgrades), record in the runbook.
-* Estimated cost (rough, from memory of AWS pricing; verify before building): about $10–15 a month, or $120–180 a year: Lightsail VM about $7–12, static IP free while attached, backups under $1, Route 53 record and Let's Encrypt $0, data transfer negligible. Plus a small amount of maintenance time each month for updates and backup checks.
+* Estimated cost (rough, from memory of AWS pricing; verify before building): about $17–18 a month, or $200–220 a year: `t4g.small` about $12, 20 GB EBS about $2, public IPv4 address about $3.65 (AWS charges for every public IPv4), snapshots and backups a few dollars at most, Route 53 record and Let's Encrypt $0, data transfer negligible. Plus a small amount of maintenance time each month for updates and backup checks.
 * If a CloudFront cache or DDoS cushion is wanted later, put it in front of the instance; not needed at launch.
 * An ad blocker will hide some visitors, so counts are a floor, not a census. Proxying the script through the main domain is a later option.
 
@@ -99,11 +99,12 @@ One Lightsail VM (1-2 GB RAM, Linux, static IP attached)
 
 | Option | Rough monthly cost | Why not now |
 | --- | --- | --- |
-| **Lightsail VM, Postgres on the same VM (chosen)** | $10–15 | Cheapest, simplest, stays in the AWS account that already holds the site. |
-| Lightsail or EC2 + Amazon RDS PostgreSQL | $20–25 | About double the cost for managed backups and patching; analytics data is small and easy to rebuild, so nightly dumps are enough. A reasonable upgrade later by changing the database URL. |
+| **EC2 `t4g.small`, Postgres on the same instance (chosen)** | $17–18 | Instance role means no stored backup key, Session Manager means no SSH port, and it matches how the rest of the AWS account is managed. |
+| Lightsail VM (2 GB), Postgres on the same VM | $12 | About $5 cheaper with transfer and IPv4 bundled, but it cannot use an IAM role (so a backup access key would live on the machine) and has its own separate permission model. Fallback if cost matters more. |
+| EC2 + Amazon RDS PostgreSQL | $20–25 | About double the cost for managed backups and patching; analytics data is small and easy to rebuild, so nightly dumps are enough. A reasonable upgrade later by changing the database URL. |
 | Azure Container Apps + Azure Database for PostgreSQL (nonprofit grant) | $25–35, paid from the grant | The grant does not roll over and must be renewed yearly, and a second cloud adds credentials, a Pulumi provider and OIDC to maintain. Container Apps has built-in HTTPS, so no load balancer would be needed. Fallback if AWS spend becomes a concern. |
 | Umami Cloud (free Hobby, Pro about $20) | $0–20 | No server to own; data lives with the vendor. Fallback if self-hosting stops being practical. |
-| Application load balancer in front of any option | +$16 or more | Not needed for one VM; Caddy terminates HTTPS. |
+| Application load balancer in front of any option | +$16 or more | Not needed for one instance; Caddy terminates HTTPS. |
 
 ## 6. Decisions
 
@@ -111,7 +112,7 @@ Decided 2026-10-29:
 
 * **No public dashboard.** Numbers are visible only to authorized maintainers who have a login.
 * **Retention:** raw events are kept at most 13 months, then deleted.
-* **AWS region:** `us-east-1`, the same region as the site and the Pulumi state, so the same AWS provider covers the Lightsail VM, its snapshots and the S3 backup bucket. Route 53 is global. Changed from `us-west-2` on 2026-10-29 for simplicity.
+* **AWS region:** `us-east-1`, the same region as the site and the Pulumi state, so the same AWS provider covers the EC2 instance, its snapshots and the S3 backup bucket. Route 53 is global. Changed from `us-west-2` on 2026-10-29 for simplicity.
 * **Opt-in returning-visitor ID:** not now; it may be added in a future phase if a real need appears (section 1). It would need its own decision, a consent banner, a Privacy page change and a new legal check.
 * **Legal review: done, low risk accepted.** See section 7.
 
@@ -158,7 +159,7 @@ Items found in a review of this plan. The stage that must settle each is in brac
 ### Must settle first
 
 1. **Daily salt** [stage 2]: Umami's session salt defaults to monthly. Set `SALT_ROTATION=day` and prove it on the running server: the same browser on two different days must give two different sessions. Until proven, the Privacy wording about a daily-changing hash is not true. The salt is computed from the date and the app secret and is not stored, so the app secret stays private and is never committed.
-2. **Backup credentials** [stage 2]: a Lightsail VM cannot assume an AWS role. The nightly `pg_dump` therefore needs an IAM user access key on the VM. Limit it to writing one bucket prefix with no delete or read permission, keep it out of git and out of Pulumi user data (user data is readable in the AWS console; fetch the key from an encrypted Pulumi secret or Systems Manager Parameter Store at install time), and write a rotation step in the runbook.
+2. **Backup permissions** [stage 2]: the EC2 instance role may write one prefix of the backup bucket (no delete, no read of other objects) and read only its own Parameter Store secrets. No access key is created or stored. Keep secrets out of git and out of Pulumi user data (user data is readable in the AWS console); the install script fetches them from Parameter Store at boot. Write the restore steps in the runbook.
 3. **Retention mechanism** [stage 2]: confirm whether Umami deletes old events by itself. If not, add a scheduled job that deletes events older than 13 months, and an S3 lifecycle rule that expires dumps on the same schedule. Check it works with a test row.
 4. **Dashboard login** [stage 2]: Umami has no two-factor sign-in and the login page is on the public internet. Change the default admin account at first boot, use a long generated password, rate-limit logins in Caddy, and apply Umami and OS security updates promptly.
 
@@ -166,11 +167,11 @@ Items found in a review of this plan. The stage that must settle each is in brac
 
 5. **Test and preview traffic** [stage 3]: the Playwright smoke tests run against the live site after each deploy. Restrict the tracker with `data-domains="app.winmetta.org"`, keep it off in dev, preview and CI builds (build flag), and check that Umami ignores headless-browser traffic or the tests add events.
 6. **Duplicate page views** [stage 3]: the library and posts pages change the address (`?q=`, `?lang=`) without reloading. With query strings excluded, check that a search or filter does not count as a new page view.
-7. **Pulumi permissions** [stage 2]: the read-only preview role used by pull requests needs Lightsail read access or `pulumi-preview` fails; `pulumi up` stays a manual run with the admin profile. Put the analytics stack in its own file (`infra/pulumi/index.ts` is already about 500 lines).
-8. **VM size** [stage 2]: 1 GB RAM is tight for Umami and PostgreSQL; plan for 2 GB and confirm the price.
+7. **Pulumi permissions** [stage 2]: the read-only preview role used by pull requests needs read access to the EC2, EBS, Elastic IP, security group and Systems Manager resources it will describe, or `pulumi-preview` fails; `pulumi up` stays a manual run with the admin profile. Put the analytics stack in its own file (`infra/pulumi/index.ts` is already about 500 lines).
+8. **Instance size** [stage 2]: 2 GB RAM (`t4g.small`) is the minimum for Umami and PostgreSQL; confirm the price and watch memory.
 9. **Fake events** [stage 2]: the collection endpoint is public, so anyone can send made-up events. Accept it, add Caddy rate limits, and treat the numbers as indicative.
 10. **Ad blockers** [stage 3]: the default script and endpoint names are on blocklists. They can be renamed with `TRACKER_SCRIPT_NAME` and `COLLECT_API_ENDPOINT`.
-11. **Monitoring** [stage 2]: an uptime check, certificate expiry, a check that snapshots and dumps ran, and an AWS budget alert for the new resources. Without them a stopped server loses events silently.
+11. **Monitoring** [stage 2]: an uptime check, certificate expiry, CloudWatch alarms for instance status and disk space, a check that snapshots and dumps ran, and an AWS budget alert for the new resources. Without them a stopped server loses events silently.
 12. **Content security policy** [later]: the site sends none today. If one is added, it must allow `stats.app.winmetta.org`.
 13. **Runbook** [stage 2 and 4]: add deploy, upgrade, backup, restore, retention and salt-check sections to `docs/runbook.md`, and have someone who did not build the server run the restore drill.
 14. **Rollout order** [stages 2 to 4]: deploy the server first and check it with a test site, then ship the tracker behind the build flag, and turn the flag on only in the same PR as the Privacy page change.
