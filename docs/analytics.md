@@ -52,7 +52,7 @@ Every event is a **name plus non-identifying properties**. Nothing the visitor t
 | Retreats | `retreat_link_click`: retreat id, `kind` (`register`, `zoom`, `info`, `external`); `retreat_archive_open`: retreat id |
 | Library | `library_search`: result count bucket, `script` (`my`, `latin`, `mixed`), `similar_shown` (true or false), `zawgyi_suspected` (true or false, decided in the browser; never the text); `library_result_click`: position bucket (1, 2–3, 4–10, more), `kind` (`exact`, `similar`); `library_tag_filter`: tag id; `library_folder_open`: folder id; `library_pdf_download`: book id, `from` (`search`, `folder`, `other`) |
 | Dhamma Posts | `post_open`: post id, `langs` (languages shown, for example `my,en`); `post_language_change`: new set; `post_filter`: tag slug; `post_search`: result count bucket, `script`; `post_result_click`: position bucket; `post_share`: `kind` (`index`, `tag`, `post`); `post_print`: post id; `post_end_reached`: post id (once, when the end of the post scrolls into view; optional) |
-| Reliability | `search_index_load`: `area` (`library`, `posts`), `ok` (true or false), time bucket (under 1 s, 1–3 s, 3–10 s, over 10 s); `page_not_found`: path without query string |
+| Reliability | `search_index_load`: `area` (`library`, `posts`), `ok` (true or false), time bucket (under 1 s, 1–3 s, 3–10 s, over 10 s); `page_not_found`: `section` (the first path segment only if it is a known section such as `classes`, `dhamma-library` or `dhamma-posts`, otherwise `other`; the requested path itself is never sent, because it is typed by the visitor or a link) |
 | General | `locale_switch`: from and to; `outbound_click`: destination domain only |
 
 Rules for this table: add an event only with a question it answers (section 3.1); no free-text properties; counts and times are bucketed (counts 0, 1–5, 6–20, more) so a rare query or a single visitor cannot be recognized; `zawgyi_suspected` and `script` are computed in the browser and only the label is sent; changes to the table are made here first, in a PR. The list is a starting point and is expected to change as questions are added or dropped.
@@ -92,14 +92,14 @@ Reporting rules: do not read or publish a rate when its denominator is under 30;
 | 21 | Do readers find posts by search? | Searches with results; `post_result_click` | All `post_search` events | |
 | 22 | Do readers share or print? | `post_share` and `post_print` VDs | `post_open` VDs | By `kind` |
 | **Site health** | | | | |
-| 23 | Are there broken links? | `page_not_found` by path | All VDs | Should be close to zero; find the referrer of each |
+| 23 | Are there broken links? | `page_not_found` by `section` and by referrer | All VDs | Should be close to zero. An internal referrer is the page that holds the broken link; the missing path is deliberately not recorded |
 | 24 | Are the outside channels used? | `outbound_click` by destination domain | All VDs | YouTube, Facebook, winmetta.org |
 
 **Not measurable by design** (no visitor ID across days): the same person returning, unique people per week or month, a visitor's path across days, and the prd.md §6 measures return-to-learn and bridge-to-community. If one becomes important, see the opt-in ID in section 1.
 
 ### Never collected
 
-Names, email addresses, IP addresses stored in readable form, search or form text, Zoom IDs or passcodes a visitor types, precise location, device fingerprints, cookies, localStorage values, session replays, heatmaps, and any ID that survives past the daily salt. No advertising or third-party scripts. Nothing is shared or sold. Do Not Track is honored.
+Names, email addresses, IP addresses stored in readable form, search or form text, Zoom IDs or passcodes a visitor types, precise location, device fingerprints, cookies, localStorage values, session replays, heatmaps, and any ID that survives past the daily salt. No advertising or third-party scripts. Nothing is shared or sold. Do Not Track is honored: the tracker script is not even loaded.
 
 ## 4. Privacy requirements
 
@@ -107,10 +107,12 @@ Names, email addresses, IP addresses stored in readable form, search or form tex
 2. **Daily salt rotation.** Umami's source (checked 2026-10-29) derives the session ID from the site, IP address, user agent and a salt that follows the `SALT_ROTATION` setting, which **defaults to monthly**. Set `SALT_ROTATION=day` explicitly and test it on the running server (the same IP and browser on two days must give two sessions); the default would let the same visitor be linked for a month and make the Privacy wording untrue. The salt is computed from the date and the app secret, not stored, so keep the app secret private. Visits (not sessions) also use an hourly salt, which is harmless.
 3. **First-party only.** The tracker script and the data both live on `stats.app.winmetta.org`, and the data is used only by Win Metta.
 4. **URLs without search words.** The library and posts keep the search in `?q=`. The tracker must report the path without query strings (`data-exclude-search="true"`), so search words never reach analytics. This also closes the gap the Privacy page already warns about for CDN logs.
-5. **Retention.** Keep raw events at most 13 months, then delete (decided 2026-10-29).
+5. **Retention.** No copy of an event outlives 13 months, **backups included** (decided 2026-10-29, backups added 2026-10-30): delete live events older than 12 months, expire database dumps after 30 days and EBS snapshots after 14 days. Deleting live data at 13 months and keeping 13-month-old dumps would stretch real retention to about 26 months and make the Privacy statement false.
 6. **Honest wording.** Update the Privacy page (English and Burmese, with the "last updated" date) in the same PR that ships the tracker, saying what is counted and what is not. Draft wording, and the rule that the Burmese must match the English in meaning with some terms intentionally left in English, are in section 8.
 7. **Private dashboard.** The dashboard has logins for authorized maintainers only; there is no public or shared read-only link (decided 2026-10-29). Every account requires two-factor sign-in. Who has access and how accounts are requested, created and removed is internal information kept in the private companion repo (section 10).
-8. **Not a metric goal.** No streaks, DAU targets, rankings or engagement scores ([prd.md](prd.md) §3); this data is read by humans to improve content and fix problems.
+8. **No free text in paths or properties.** The visitor or a link controls what a URL path says (for example an email address or a reset token typed after the domain). The 404 page therefore reports a constant path (`/404/`) for its page view, using the tracker's before-send hook (verify the name in the pinned Umami version), and `page_not_found` sends only a known section label. Any new event that would carry a path or ID is checked against this rule.
+9. **Do Not Track is respected before loading.** Umami's `data-do-not-track` option stops tracking but the script is still requested. The layout checks the browser's Do Not Track signal and injects the script only when it is off (no cookie or storage needed for the check); the option stays on as a second layer.
+10. **Not a metric goal.** No streaks, DAU targets, rankings or engagement scores ([prd.md](prd.md) §3); this data is read by humans to improve content and fix problems.
 
 ## 5. Architecture
 
@@ -131,7 +133,7 @@ One EC2 instance (t4g.small, 2 GB RAM, Linux, Elastic IP attached, IAM instance 
 * Secrets (Umami app secret, database password, admin password) are set with `pulumi config set --secret` or come from the environment, never committed.
 * Region: `us-east-1` (N. Virginia, the same region as the site) for the EC2 instance, snapshots and backup bucket (decided 2026-10-29).
 * EC2 specifics: `t4g.small` (ARM, 2 GB RAM; the Umami image supports arm64; use `t3.small` if an x86 image is ever needed) in the default VPC, a 20 GB encrypted gp3 volume, an Elastic IP, and a security group that opens only ports 80 and 443. There is **no SSH port**: maintainers use AWS Systems Manager Session Manager through IAM sign-in, which keeps an audit log. The instance has an IAM role that can write one S3 prefix for backups and read its own secrets from Systems Manager Parameter Store; no access key is stored on the machine. Daily EBS snapshots (Data Lifecycle Manager, keep 14) are a second, whole-machine recovery path.
-* Backups: nightly `pg_dump` to a private S3 bucket with a lifecycle rule (a snapshot alone is not enough); restore is rehearsed once and written in the runbook.
+* Backups: nightly `pg_dump` to a private S3 bucket with a lifecycle rule that expires each dump after 30 days (a snapshot alone is not enough; snapshots are kept 14 days, see retention in section 4); restore is rehearsed once and written in the runbook.
 * Updates: pin the Umami image or version, upgrade monthly, apply OS security updates (unattended upgrades), record in the runbook.
 * Estimated cost (rough, from memory of AWS pricing; verify before building): about $17–18 a month, or $200–220 a year: `t4g.small` about $12, 20 GB EBS about $2, public IPv4 address about $3.65 (AWS charges for every public IPv4), snapshots and backups a few dollars at most, Route 53 record and Let's Encrypt $0, data transfer negligible. Plus a small amount of maintenance time each month for updates and backup checks.
 * If a CloudFront cache or DDoS cushion is wanted later, put it in front of the instance; not needed at launch.
@@ -153,7 +155,7 @@ One EC2 instance (t4g.small, 2 GB RAM, Linux, Elastic IP attached, IAM instance 
 Decided 2026-10-29:
 
 * **No public dashboard.** Numbers are visible only to authorized maintainers who have a login.
-* **Retention:** raw events are kept at most 13 months, then deleted.
+* **Retention:** no copy of an event, including backups, outlives 13 months: live events are deleted after 12 months, dumps expire after 30 days and snapshots after 14 days.
 * **AWS region:** `us-east-1`, the same region as the site and the Pulumi state, so the same AWS provider covers the EC2 instance, its snapshots and the S3 backup bucket. Route 53 is global. Changed from `us-west-2` on 2026-10-29 for simplicity.
 * **Internal information lives in the private companion repo** `winmetta/winmetta-platform-private` (decided 2026-10-30): who maintains the server, dashboard login process, alert routing and similar organization details are documented there, not here (section 10).
 * **Alerts:** all alerts from the analytics server and AWS go to one organization admin group mailbox (details in the private repo), so no alert depends on one person.
@@ -171,7 +173,7 @@ Review of the design, with the residual risks accepted as low. This is our own r
 2. **GDPR and UK GDPR:** the daily hash is built from IP address, user agent and a salt, and regulators may treat an IP-derived value as personal data while the salt exists. Accepted position: legitimate interest (Article 6(1)(f)) for running the site; raw IPs are not stored; the salt rotates daily (`SALT_ROTATION=day`) so a value cannot be linked across days or back to a person without the app secret.
 3. **Transparency:** the Privacy page, in English and Burmese, states what is counted and why, the daily hash, the 13-month retention and a contact (`contact@winmetta.org`), changing in the same PR as the tracker (section 8).
 4. **Objection:** Do Not Track is honored. No separate opt-out page, because it would itself need storage.
-5. **Retention:** 13 months for raw events (decided).
+5. **Retention:** 13 months at most for any copy of an event, backups included (live events 12 months, dumps 30 days, snapshots 14 days).
 6. **Processor and region:** the data stays in Win Metta's own AWS account in `us-east-1`; AWS is the only processor and no analytics company receives the data.
 7. **California (CCPA/CPRA):** no sale or sharing, no advertising use, nothing linked to a person.
 8. **Myanmar and other countries:** counts are aggregate and non-identifying, so exposure is low.
@@ -205,10 +207,10 @@ Items found in a review of this plan. The stage that must settle each is in brac
 
 1. **Daily salt** [stage 2]: Umami's session salt defaults to monthly. Set `SALT_ROTATION=day` and prove it on the running server: the same browser on two different days must give two different sessions. Until proven, the Privacy wording about a daily-changing hash is not true. The salt is computed from the date and the app secret and is not stored, so the app secret stays private and is never committed.
 2. **Backup permissions** [stage 2]: the EC2 instance role may write one prefix of the backup bucket (no delete, no read of other objects) and read only its own Parameter Store secrets. No access key is created or stored. Keep secrets out of git and out of Pulumi user data (user data is readable in the AWS console); the install script fetches them from Parameter Store at boot. Write the restore steps in the runbook.
-3. **Retention mechanism** [stage 2]: confirm whether Umami deletes old events by itself. If not, add a scheduled job that deletes events older than 13 months, and an S3 lifecycle rule that expires dumps on the same schedule. Check it works with a test row.
+3. **Retention mechanism** [stage 2]: confirm whether Umami deletes old events by itself. If not, add a scheduled job that deletes live events older than 12 months, and an S3 lifecycle rule that expires dumps after 30 days (EBS snapshots after 14), so no copy outlives 13 months. Check it works with a test row.
 4. **Dashboard login** [stage 2]: the login page is on the public internet, so harden it (decided 2026-10-30):
    * **Mandatory two-factor sign-in for every account.** Umami v3.3.0 or later supports authenticator-app (TOTP) 2FA and lets an administrator require it globally. Pin Umami to at least that version, set the global requirement before any reader account exists, and test that an account without 2FA is blocked.
-   * **`TWO_FACTOR_ENCRYPTION_KEY`** (64 hex characters, unique to this installation) must be set on the server or nobody can enrol. Store it in AWS Parameter Store and **preserve it in backups and recovery**: if it is lost or changed, stored 2FA secrets become unreadable and every user must re-enrol. A sealed copy is kept by the administrators (private repo).
+   * **`TWO_FACTOR_ENCRYPTION_KEY`** (64 hex characters, unique to this installation) must be set on the server or nobody can enrol. Store it in AWS Parameter Store. **It is not in the database dump or the data volume**, so a database restore alone does not bring it back: the recovery procedure has an explicit step that restores the sealed copy (kept by the administrators, private repo) into Parameter Store before anyone's code is tested. If the key is lost or changed, stored 2FA secrets become unreadable and every user must re-enrol.
    * **Individual, least-privilege accounts:** readers are View Only members of a team that owns the website (a new account sees nothing otherwise); two named administrators with separate credentials; no shared logins; no public share links.
    * **Harden the public login:** change the default administrator credentials before the server is reachable, rate-limit authentication in Caddy (Umami also locks 2FA attempts for 15 minutes after five failures), and apply Umami and OS security updates promptly.
    * **Option for later:** make the dashboard reachable only over a private network (Tailscale), leaving only the tracker script and collection endpoints public. It needs the dashboard users to install Tailscale, so it is revisited after launch ([Tailscale Serve](https://tailscale.com/docs/features/tailscale-serve)).
@@ -224,7 +226,7 @@ Items found in a review of this plan. The stage that must settle each is in brac
 10. **Ad blockers** [stage 3]: the default script and endpoint names are on blocklists. They can be renamed with `TRACKER_SCRIPT_NAME` and `COLLECT_API_ENDPOINT`.
 11. **Monitoring** [stage 2]: all alerts go to the organization admin group mailbox (set-up and subscription steps are in the private repo, section 10). An uptime check, certificate expiry, CloudWatch alarms for instance status and disk space, a check that snapshots and dumps ran, and an AWS budget alert for the new resources. Without them a stopped server loses events silently.
 12. **Content security policy** [later]: the site sends none today. If one is added, it must allow `stats.app.winmetta.org`.
-13. **Runbook** [stage 2 and 4]: add deploy, upgrade, backup, restore, retention and salt-check sections to `docs/runbook.md`, and have someone who did not build the server run the restore drill.
+13. **Runbook** [stage 2 and 4]: add deploy, upgrade, backup, restore, retention and salt-check sections to `docs/runbook.md`, and have someone who did not build the server run the restore drill, including restoring the sealed 2FA key into Parameter Store as its own step.
 14. **Rollout order** [stages 2 to 4]: deploy the server first and check it with a test site, then ship the tracker behind the build flag, and turn the flag on only in the same PR as the Privacy page change and only after the restore drill has passed.
 
 ## 10. Internal information (private companion repo)

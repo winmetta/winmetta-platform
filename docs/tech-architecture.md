@@ -205,7 +205,7 @@ LLB practice progress, spaced-repetition state, and library bookmarks are stored
 
 Phases 0–3 collect no analytics: no SDK, no learner events, no collection service. Phase 4 (planned 2026-10-26, not built; checklist in implementation-plan.md §5A) adds **cookieless, aggregate** activity counts with self-hosted **Umami**. The full design, tool comparison, event list and privacy rules are in [analytics.md](analytics.md); the summary:
 
-* The tracker writes no cookie and no localStorage or sessionStorage key, sends no free text (search words never leave the page), reports URLs without query strings, honors Do Not Track, and uses a daily-rotating salt, so the same visitor on a different day cannot be recognized. An opt-in returning-visitor ID is a separate, undecided, later option.
+* The tracker writes no cookie and no localStorage or sessionStorage key, sends no free text (search words never leave the page), reports URLs without query strings, does not load the tracker when Do Not Track is on, and uses a daily-rotating salt, so the same visitor on a different day cannot be recognized. An opt-in returning-visitor ID is a separate, undecided, later option.
 * Umami runs on one AWS EC2 instance in the AWS account (Pulumi, Caddy with Let's Encrypt, PostgreSQL on the same instance) at `stats.app.winmetta.org` (§6). It adds the app's first server, but it is analytics-only: the site stays static and no learner data touches it.
 * IndexedDB progress and review state remain local features for learners, not telemetry. The measures in [prd.md](prd.md) §6 that need the same learner recognized across days are not measurable by this design.
 * Hosting/CDN operational logs are separate from product analytics and are not a promise of zero provider-side logging.
