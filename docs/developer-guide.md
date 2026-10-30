@@ -12,32 +12,18 @@ How to set up, change and submit code for `winmetta-platform`. [CONTRIBUTING.md]
 
 Start with the org-wide [developer setup](https://github.com/winmetta/.github#developer-setup) (workspace layout and required tools), which points to the [`bootstrap-dev-env`](https://github.com/winmetta/bootstrap-dev-env) repo for the shared tooling script.
 
-**macOS:** this repo is one of several cloned side by side under the workspace root (usually `~/winmetta`), next to the org [`.github`](https://github.com/winmetta/.github) repo, which owns the shared setup. Run these once, in order, from the workspace root:
+**macOS:** this repo is one of several cloned side by side under the workspace root (usually `~/winmetta`), next to the org [`.github`](https://github.com/winmetta/.github) repo, which owns the shared setup. Install `git` and `gh` (`gh auth login`), then run, from the workspace root:
 
-1. Clone `.github` if you have not already (`gh repo clone winmetta/.github`), then link the shared workspace files (`AGENTS.md`, `CLAUDE.md`, `.editorconfig`, `.markdownlint.json` and the VS Code workspace) into the workspace root:
+```bash
+gh repo clone winmetta/.github
+./.github/bootstrap-winmetta-dev.sh
+```
 
-   ```bash
-   ./.github/link-workspace.sh
-   ```
+That one script links the shared workspace files (`AGENTS.md`, `CLAUDE.md`, `.editorconfig`, `.markdownlint.json`), clones this repo and the related ones (`agent-skills`, `bootstrap-dev-env`, and `winmetta-platform-private` if you have access), runs [`bootstrap-dev-env`](https://github.com/winmetta/bootstrap-dev-env) (mise and the CLI tools, shared git settings, the shell prompt and helpers, editors and the terminal profile), and then runs this repo's own `./scripts/setup-local-dev.sh`. That installs Node 24 with mise (pinned in `mise.toml`, which must match `.nvmrc`), the npm version pinned in `package.json`, locked dependencies and the Playwright Chromium browser, then installs the git hooks (`lefthook install`). It also checks that this repo's agent skills (`add-dhamma-post` and `bash-scripting`) are installed. If it asks you to finish the Command Line Tools installer, do that and rerun it. Open a new terminal afterwards so mise is active. The [`bootstrap-dev-env` README](https://github.com/winmetta/bootstrap-dev-env#readme) lists what it installs and how to learn the tools (`explain-tools`).
 
-2. Clone the shared setup repo, [`bootstrap-dev-env`](https://github.com/winmetta/bootstrap-dev-env) (it is not specific to Win Metta), and run it once per machine. It installs mise and the CLI tools it manages, shared git settings, the shell prompt and helpers, editors and the terminal profile:
+To set up only this repo once the machine is ready, run `./scripts/setup-local-dev.sh` from its root, or `./.github/bootstrap-winmetta-dev.sh --skip-tools` from the workspace root.
 
-   ```bash
-   gh repo clone winmetta/bootstrap-dev-env
-   ./bootstrap-dev-env/bootstrap.sh
-   ```
-
-   If it asks you to finish the Command Line Tools installer, do that and rerun it. Open a new terminal afterwards so mise is active. Its [README](https://github.com/winmetta/bootstrap-dev-env#readme) lists what it installs and how to learn the tools (`explain-tools`).
-
-3. Set up this repo from its root:
-
-   ```bash
-   ./scripts/setup-local-dev.sh
-   ```
-
-   It installs Node 24 with mise (pinned in `mise.toml`, which must match `.nvmrc`), the npm version pinned in `package.json`, locked dependencies and the Playwright Chromium browser, then installs the git hooks (`lefthook install`).
-
-All three scripts are safe to re-run. The root `AGENTS.md` (from step 1) holds the organization-wide rules for people and AI agents; this repo's `AGENTS.md` and this guide override it.
+The scripts are safe to re-run. The root `AGENTS.md` (linked by `bootstrap-winmetta-dev.sh`) holds the organization-wide rules for people and AI agents; this repo's `AGENTS.md` and this guide override it.
 
 **Other systems:** install Node 24 (see `mise.toml` and `.nvmrc`), install the npm version in the `packageManager` field of `package.json`, then run `npm ci`.
 
