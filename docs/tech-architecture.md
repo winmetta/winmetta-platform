@@ -1,6 +1,6 @@
 # Technical Architecture
 
-**Status:** Phases 0–3 (foundation code, bilingual pages, infrastructure & deployment, Dhamma Posts; Phase 3 merged on 2026-10-25) are specified in detail in [implementation-plan.md](implementation-plan.md); the Dhamma Posts content format and checks are in [AGENTS.md](../AGENTS.md) §7. Everything under "Future" is a *tentative direction* recorded so ideas aren't lost — it is **not** a source of truth and will be redesigned when that phase is actually planned.
+**Status:** Phases 0–3 (foundation code, bilingual pages, infrastructure & deployment, Dhamma Posts; Phase 3 merged on 2026-10-25) are specified in detail in [implementation-plan.md](implementation-plan.md), and Phase 4 (analytics, planned) in §4.4 and [analytics.md](analytics.md); the Dhamma Posts content format and checks are in [AGENTS.md](../AGENTS.md) §7. Everything under "Future" is a *tentative direction* recorded so ideas aren't lost — it is **not** a source of truth and will be redesigned when that phase is actually planned.
 
 **Guiding principle:** pick popular, well-documented tools with large communities, easy learning curves for volunteers, and good long-term support. Prefer free programs offered to nonprofits, but paying for tooling is fine when it saves volunteer time or reduces risk — donations may fund tech development and maintenance (see [prd.md](prd.md) §5).
 
@@ -63,7 +63,7 @@ Phase 2 tooling, checked against npm and GitHub releases on 2026-10-07 (re-check
 | Static hosting | **AWS S3 + CloudFront** | Private S3 bucket with origin access control behind CloudFront; ACM certificates | Cheap and low-maintenance: the site is small, CloudFront on pay-as-you-go pricing should cost well under a dollar a month at this size (chosen 2026-10-10 over the flat-rate plans, which can stop serving at their limit; see implementation-plan.md §4), and it sits in the AWS account that already holds the media. Everything can be defined in code with Pulumi. |
 | Media | **AWS S3** + **bunny.net CDN** | Existing library bucket and pull zone in Phase 2; new media infrastructure in a future phase | S3 is the most widely used, best-documented object store, with an S3-compatible API that keeps media portable; bunny.net serves and caches media cheaply so most reads never hit S3 egress (§6). |
 | DNS | **AWS Route 53** | One hosted zone for `app.winmetta.org` (about $0.50/month) | Delegated from DreamHost, which keeps `winmetta.org` itself. Holds the app and ACM validation records (more names, such as a CDN or staging host, are added when needed), all managed by Pulumi. |
-| Analytics | **Deferred beyond v1** | — | No analytics service or learner-event collection in Phase 0–2; see §4.4. |
+| Analytics | **Umami, self-hosted** (Phase 4, planned, not built) | — | Cookieless, aggregate only, MIT license, light to run. Nothing is collected in Phases 0–3; see §4.4 and [analytics.md](analytics.md). |
 | Infra as code | **Pulumi (TypeScript)** | — | The same language as the app, so one toolchain, editor setup and test runner for the volunteer team; covers AWS natively and other providers through bridged providers; see §8. |
 | CI/CD | **GitHub Actions** | — | Free for public repos. |
 
@@ -201,11 +201,14 @@ Volunteers edit Markdown/JSON in the repo via pull request. If a non-technical e
 
 LLB practice progress, spaced-repetition state, and library bookmarks are stored in the browser with **IndexedDB** (via a small wrapper library such as `idb`). No account needed, nothing leaves the device. Cross-device sync is a future feature (§10).
 
-### 4.4. Analytics and metrics (deferred)
+### 4.4. Analytics and metrics (Phase 4, planned)
 
-Product analytics and metric collection are deferred beyond v1 (Phase 0–2). Do not install an analytics SDK, send learner events, or add a collection service. IndexedDB progress and review state remain local features for learners, not telemetry.
+Phases 0–3 collect no analytics: no SDK, no learner events, no collection service. Phase 4 (planned 2026-10-26, not built; checklist in implementation-plan.md §5A) adds **cookieless, aggregate** activity counts with self-hosted **Umami**. The full design, tool comparison, event list and privacy rules are in [analytics.md](analytics.md); the summary:
 
-The measures in [prd.md](prd.md) §6 are future candidates only. Revisit measurement feasibility, privacy, and service selection when collection is explicitly in scope; no vendor is selected now. In particular, aggregate counts alone cannot measure the same learner returning across days. Hosting/CDN operational logs are separate from product analytics and are not a promise of zero provider-side logging.
+* The tracker writes no cookie and no localStorage or sessionStorage key, sends no free text (search words never leave the page), reports URLs without query strings, does not load the tracker when Do Not Track is on, and uses a daily-rotating salt, so the same visitor on a different day cannot be recognized. An opt-in returning-visitor ID is a separate, undecided, later option.
+* Umami runs on one AWS EC2 instance in the AWS account (Pulumi, Caddy with Let's Encrypt, PostgreSQL on the same instance) at `stats.app.winmetta.org` (§6). It adds the app's first server, but it is analytics-only: the site stays static and no learner data touches it.
+* IndexedDB progress and review state remain local features for learners, not telemetry. The measures in [prd.md](prd.md) §6 that need the same learner recognized across days are not measurable by this design.
+* Hosting/CDN operational logs are separate from product analytics and are not a promise of zero provider-side logging.
 
 ---
 
@@ -240,6 +243,7 @@ Permanent hosting and media both live in **AWS**, where Win Metta already has an
 | `winmetta.org` (+ `www`) | Existing WordPress hosting | Blog/news, About, existing pages — untouched. |
 | `app.winmetta.org` | AWS CloudFront (production) | This platform's frontend. `app.` chosen as the most understandable label for less tech-fluent users. |
 | `dhamma-library.b-cdn.net` | Existing bunny.net pull zone | Library PDFs, backed by the existing `dhamma-library` S3 bucket. Unchanged in Phase 2. |
+| `stats.app.winmetta.org` (Phase 4, planned) | AWS EC2 instance running Umami behind Caddy; a record in the `app.winmetta.org` zone | First-party analytics collection and dashboard ([analytics.md](analytics.md)). |
 | `staging.app.winmetta.org`, `cdn.app.winmetta.org` (later, not Phase 2) | CloudFront staging; bunny.net pull zone (CNAME) | Staging arrives with the first API or backend; the CDN hostname with new platform media in a future phase. |
 
 `winmetta.org` stays on DreamHost's name servers, because DreamHost's free nonprofit shared hosting requires it, so its DNS is managed in the DreamHost panel. The platform's names live in a separate **Route 53** hosted zone for `app.winmetta.org`, delegated once by adding four NS records for `app` in DreamHost's panel (confirm the panel accepts NS records for a subdomain before building on it). The zone, the production alias records and the ACM validation CNAMEs are then created in Route 53 by Pulumi; later hosts are added to the same zone. Delegation must be live before ACM can validate the certificate, so the first apply is staged (zone, then NS records in DreamHost, then certificate and distribution; see implementation-plan.md §4). Check delegation by resolving a record that exists only in the new zone, because DreamHost notes that subdomain NS records may not show up in public `dig` NS lookups. Existing WordPress records stay intact. WordPress navigation can link to `app.winmetta.org`, and the app can link back for blog/news.
@@ -324,7 +328,7 @@ infra/pulumi/
 
 ## 9. Experimentation (Future)
 
-Not needed for v1. If a concrete learning-outcome question arises (e.g. does one practice-pacing approach improve return-to-learn?), evaluate lightweight options at that time (self-hosted GrowthBook is one candidate). Experiments should measure learning outcomes, not engagement — see the Calm by Default principle in [prd.md](prd.md) §3 — and must establish an appropriate privacy and measurement design when analytics is introduced (§4.4).
+Not needed for v1. If a concrete learning-outcome question arises (e.g. does one practice-pacing approach improve return-to-learn?), evaluate lightweight options at that time (self-hosted GrowthBook is one candidate). Experiments should measure learning outcomes, not engagement — see the Calm by Default principle in [prd.md](prd.md) §3 — and must establish an appropriate privacy and measurement design beyond the cookieless aggregate analytics of Phase 4 (§4.4).
 
 ---
 

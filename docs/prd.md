@@ -104,7 +104,7 @@ Explicitly deferred, not abandoned:
 * **Community submissions & moderated reflections queue.**
 * **Native mobile apps** (Electron/Capacitor builds). v1 targets a single responsive web app designed for mobile and desktop; native wrappers are evaluated only after the web app validates real usage.
 * **Zawgyi legacy encoding support** — see §4.5 and tech-architecture.md. This includes searching the library with Zawgyi-typed queries: v1 search assumes Unicode input, and supporting Zawgyi input is a future improvement with no scheduled phase or date (tech-architecture.md §10).
-* **Product analytics and metric collection** — deferred beyond v1; no analytics scripts or learner-event collection in Phase 0–2. Local progress remains available for the learner.
+* **Learner-level analytics and cross-visit tracking** — not planned. Phases 0–3 collect no analytics. Phase 4 (planned 2026-10-26, not built) adds only cookieless, aggregate activity counts (see [analytics.md](analytics.md)); it cannot recognize the same visitor across days. Local progress remains on the learner's device.
 * **A/B testing / experimentation tooling** — deferred until there's a concrete, mission-aligned question worth testing (not for engagement optimization, which conflicts with Calm by Default). Tentative notes in tech-architecture.md §9 for when it's needed.
 
 ---
@@ -126,7 +126,7 @@ Explicitly deferred, not abandoned:
 
 ## 6. Mission-Appropriate Success Metrics (Future)
 
-Metric collection is deferred beyond v1. Do not instrument these outcomes or add an analytics service in Phase 0–2. The following are candidate future measures, not release requirements. Before introducing collection, define feasible measurements, privacy constraints, and denominators; cross-session outcomes cannot be inferred from unrelated aggregate event counts. DAU, session counts, and streaks are not product goals. See tech-architecture.md §4.4. Candidate measures:
+No metrics are collected in Phases 0–3. Phase 4 (planned, [analytics.md](analytics.md)) measures only aggregate, cookieless activity such as page, class, library and post use by day; it does not instrument the learner outcomes below. The following are candidate future measures, not release requirements, and those that need the same person recognized across days (return-to-learn, bridge-to-community) cannot be measured by Phase 4 and would need local-only counters or an opt-in design. Before introducing collection, define feasible measurements, privacy constraints, and denominators; cross-session outcomes cannot be inferred from unrelated aggregate event counts. DAU, session counts, and streaks are not product goals. See tech-architecture.md §4.4. Candidate measures:
 
 * **Literacy progress:** % of learners completing Grade 1 / Grade 2 equivalent LLB lessons; number of learners who reach "can read a short Pāḷi passage in Burmese script unaided."
 * **Bridge-to-community rate:** number of self-paced learners who go on to join a live Zoom class (opt-in, self-reported or signup-linked).
@@ -138,7 +138,7 @@ Metric collection is deferred beyond v1. Do not instrument these outcomes or add
 
 ## 7. Phased Roadmap
 
-Phases 0, 1 and 2 are done, and Phase 3 (Dhamma Posts) was merged on 2026-10-25. Everything after them is a **future phase**: it is not numbered or scheduled, and the maintainer decides the order and scope as the work comes. The list below is a set of candidate directions, not a plan.
+Phases 0, 1 and 2 are done, and Phase 3 (Dhamma Posts) was merged on 2026-10-25. Phase 4 (Analytics) is planned. Everything after it is a **future phase**: it is not numbered or scheduled, and the maintainer decides the order and scope as the work comes. The list below is a set of candidate directions, not a plan.
 
 ```
 +---------------------------------------------------------------------------------------+
@@ -162,6 +162,12 @@ Phases 0, 1 and 2 are done, and Phase 3 (Dhamma Posts) was merged on 2026-10-25.
 +---------------------------------------------------------------------------------------+
 | Phase 3 (merged 2026-10-25): Dhamma Posts                                              |
 | Short posts in Burmese, English and Chinese; tags, sharing, print; markdown in repo    |
++---------------------------------------------------------------------------------------+
+                                           |
+                                           v
++---------------------------------------------------------------------------------------+
+| Phase 4 (planned): Analytics                                                           |
+| Cookieless, aggregate activity counts; self-hosted Umami; no direct identifiers       |
 +---------------------------------------------------------------------------------------+
                                            |
                                            v
@@ -193,6 +199,7 @@ Phases 0, 1 and 2 are done, and Phase 3 (Dhamma Posts) was merged on 2026-10-25.
 * **Phase 1 — Bilingual Pages (done):** Home, About, Privacy, the Classes group (classes with a weekly schedule, Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library (the whole S3 PDF library with tag browsing and fuzzy Burmese search) in English and Burmese, with an original mobile/desktop design, serving online class students and independent learners worldwide. No hosting or deployment yet. See implementation-plan.md §3.
 * **Phase 2 — Infrastructure & Deployment (done 2026-10-23):** Pulumi (TypeScript), domains (`app.winmetta.org`), AWS hosting (S3 + CloudFront), the existing S3 + bunny.net setup for the Dhamma Library PDFs (new media infrastructure waits until something needs it), Route 53 DNS for `app.winmetta.org`, and a single production environment labelled Beta in the UI (staging comes with the first API or backend). The site becomes public here. See implementation-plan.md §4. No backend or database.
 * **Phase 3 — Dhamma Posts (merged 2026-10-25):** short teachings and explanations of Pāḷi terms, suttas and Abhidhamma ideas, each in Burmese, English and Simplified Chinese (§4.3), kept as markdown files in the repo and published as static pages: post, topic and paginated list pages, a "Read in" choice of languages that shared links carry, and print. Still no backend or database. See implementation-plan.md §5.
+* **Phase 4 — Analytics (planned 2026-10-26, not built):** privacy-first activity measurement so volunteers can see which classes, retreats, library folders, books and posts are used and in which languages. Cookieless and aggregate only, self-hosted Umami at `stats.app.winmetta.org`, no direct identifiers or stored IP addresses, no cross-day visitor recognition, and an honest Privacy page update in the same change. See [analytics.md](analytics.md) and implementation-plan.md §5A.
 * **Future — LLB Pilot:** The flagship learning deliverable. Digitizes the LLB curriculum, proven and already-tested; piloted directly with the existing "Let's Learn Burmese" class roster (currently taught by Ven. U Garudhamma) before wider release.
 * **Future — Library & Class Archive Expansion:** Defines the repeatable pipeline for adding PDFs to S3 and refreshing the index and pages (generator, review PR, CI checks, deploy; see tech-architecture.md §3), plus a unified class timeline and deeper content indexing (full-text, OCR, transcripts) when needed.
 * **Future — Optional Accounts & Progress Sync:** Cross-device sync for learners who want it, opt-in only. This is likely where a backend and database are first introduced (tentative; see tech-architecture.md §10).

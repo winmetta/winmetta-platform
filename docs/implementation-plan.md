@@ -8,6 +8,7 @@ The first three phases, all done, took the project from an empty repo to a publi
 | **1 — Bilingual pages** | Home, About, Privacy, the Classes group (classes with a weekly schedule, Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library (the whole S3 PDF library, tag browsing and fuzzy Burmese search), in English and Burmese, with curated public content. Reviewed from local builds; no deployment. | No (local only) |
 | **2 — Infrastructure & deployment** | Pulumi (TypeScript), domains, AWS hosting (S3 + CloudFront), Route 53 DNS, a CI deploy workflow, a Beta label and a single production environment. New media infrastructure and staging come later. | Yes (public) |
 | **3 — Dhamma Posts** | Short trilingual (Burmese, English, Simplified Chinese) Dhamma posts kept as markdown files in the repo: post, tag and paginated list pages, a "Read in" language choice that links can carry, share and print, and format checks in the hook, CI and build. Built 2026-10-23, merged into `main` on 2026-10-25 (PR #10) and deployed to production on 2026-10-26. | Yes (public) |
+| **4 — Analytics** | Privacy-first, cookieless, aggregate activity measurement with self-hosted Umami at `stats.app.winmetta.org`. Planned 2026-10-26; stage 1 (docs) only, no code or infrastructure yet. See §5A and [analytics.md](analytics.md). | Not yet |
 
 Everything not yet scheduled is in the **backlog (§6)**: the open todos left from the finished phases (reviews, the launch announcement, operations) and the candidate future phases (LLB lessons, the library upload pipeline, accounts, native apps; see also [prd.md](prd.md) §7). Reading order: toolchain (§1), Phases 0–3 (§2–§5), backlog (§6), then reference material (§7–§9). Scope per [prd.md](prd.md) (§4.7, §7) and [tech-architecture.md](tech-architecture.md) (§0): one static Astro web app designed for mobile and desktop — no backend, no database, no desktop/mobile apps.
 
@@ -296,6 +297,39 @@ RSS/Atom feeds, posts in the Dhamma Library search (posts have their own search)
 
 ---
 
+## 5A. Phase 4 — Analytics (planned 2026-10-26)
+
+**Goal:** let volunteers see which classes, retreats, library folders, books and posts are used, in which languages, without direct identifiers, stored IP addresses or any identifier that links visits across days. (The daily hash is still handled conservatively, because some regulators may treat an IP-derived value as personal data; see [analytics.md](analytics.md) §7.) The design, tool comparison, event list and privacy rules are in [analytics.md](analytics.md); this section is the checklist. It is numbered 5A so the backlog keeps its §6 number, which other documents link to.
+
+### Decisions (2026-10-26)
+
+* **Cookieless, aggregate only.** No cookie, no localStorage, no persistent visitor ID. Visitors are counted per day; the same person returning on another day cannot be recognized. An opt-in returning-visitor ID is a separate later decision.
+* **Umami, self-hosted**, on one AWS EC2 `t4g.small` instance (PostgreSQL on the same instance, IAM instance role, Session Manager instead of SSH) in the existing AWS account, defined in Pulumi, with Caddy and Let's Encrypt for HTTPS (no load balancer, no RDS). Region `us-east-1` (same as the site), 13-month retention, legal review done (low risk accepted, analytics.md §7). Rough cost $17–18 a month; alternatives (Lightsail, RDS, Azure grant, Umami Cloud) are weighed in analytics.md §5.
+* **Host `stats.app.winmetta.org`**, a record in the existing `app.winmetta.org` Route 53 zone: no new hosted zone, and the WordPress DNS at DreamHost is untouched.
+* Scope is `winmetta-platform` only.
+* **Internal information is kept in the private companion repo** `winmetta/winmetta-platform-private` (2026-10-30): who maintains the server, the dashboard login process, alert routing (all alerts go to one organization admin group mailbox) and org-side todos. This public plan only points to it. Both repos' `AGENTS.md` explain the split.
+
+### Stages
+
+Each stage is reviewed and merged before the next starts. A stage that changes cloud resources needs the maintainer's explicit go-ahead before `pulumi up`.
+
+* [x] **1. Docs only (no code, no infrastructure).** **Done 2026-10-29** on the `docs/phase-4-analytics` branch. Write [analytics.md](analytics.md); update prd.md (§4.7, §6, §7), tech-architecture.md (§2, §4.4, §6, §9), AGENTS.md (§1, §5, §6, §9, §11) and this plan so they say Phase 4 is planned and nothing is collected until stage 4. The Privacy page keeps saying "no analytics" until stage 4.
+* [ ] **2. Infrastructure.** Pulumi component for the EC2 instance in `us-east-1` (the existing AWS provider): Elastic IP, security group (80 and 443 only, no SSH), IAM instance role, Systems Manager access, Parameter Store secrets, the `stats` record in the `app.winmetta.org` zone, daily EBS snapshots, the S3 dump bucket, and the alert path (an SNS topic subscribed to the organization admin group mailbox, plus AWS Budgets notices; the group address and the steps to confirm the subscription are in the private repo); Caddy and Umami install and the runbook entries (deploy, upgrade, backup, restore). Settle analytics.md §9 items 1–4, 7–9, 11 and 13 here (including inspecting the installed schema and testing the server-level 2FA reset for the all-administrators-locked-out case): set and prove `SALT_ROTATION=day`, backup permissions limited to one bucket prefix through the instance role, the retention jobs (live events 12 months, dumps 30 days, snapshots 14 days, so no copy outlives 13 months), dashboard login hardening (mandatory 2FA with `TWO_FACTOR_ENCRYPTION_KEY` in Parameter Store and kept through restores, least-privilege accounts), Pulumi preview permissions, VM size, rate limits and monitoring.
+* [ ] **3. Tracker and events (behind a build flag).** Add the Umami script to the shared layout (`apps/web/src/layouts/Shell.astro`), off in dev and tests, loaded only when the browser's Do Not Track signal is off (an inline check before injecting the script, with `data-do-not-track` as a second layer), the path reported without query strings, the 404 page reporting a constant path and `page_not_found` sending only a section label, never the requested path; add the `track()` helper (`apps/web/src/lib/analytics.ts`) and the events in analytics.md §3. Settle analytics.md §9 items 5, 6 and 10 here (smoke-test traffic, duplicate page views, script and endpoint names). Settle analytics.md §9 item 15 here (the dimensions Umami stores, referrer sanitized in the before-send hook, screen size, region and city removed). Tests: no tracker in dev, no `?q=` in reported URLs or referrers, no cookie or storage key, events carry no free text.
+* [ ] **4. Go live and update the Privacy page.** First check that the restore drill has passed (a person who did not build the server restored a backup using only the runbook) and that every Privacy statement is true of the running system (analytics.md §8, §9 item 14). In one PR: turn the flag on, change the English and Burmese Privacy text (`apps/web/src/i18n/messages/en.json`, `my.json`) and its "last updated" date, update AGENTS.md and the docs from "planned" to "live", and publish the Burmese text as drafted (its review is a backlog item, §6.1 group 5, not a blocker). Check cookies and storage on the live site.
+* [ ] **5. Review after one month.** Read the numbers, drop events nobody uses, check the server cost, and decide whether the opt-in returning-visitor ID is still wanted.
+
+### Acceptance
+
+* The live site writes no cookie and no localStorage or sessionStorage key from the tracker, and, when Do Not Track is on, does not load the tracker script and sends no collection request.
+* A search never sends its words: neither the event nor the page URL carries the query.
+* A maintainer who did not build the server restores it from backup, and upgrades Umami, using only the runbook.
+* An account without two-factor sign-in cannot reach the dashboard, and a restored server still accepts existing users' codes after the sealed encryption key is restored into Parameter Store as its own step (the key is not in the database dump).
+* A new dashboard user can be added, and a leaver removed, by following only the private repo's process; and a test alert sent to the organization admin group reaches its members.
+* The Privacy page, in both languages, matches what is collected.
+
+---
+
 ## 6. Backlog (not scheduled)
 
 Phases 0–3 are done. Everything else lives here, in two groups: **open todos** left from the finished phases, and **future phases**, which are candidate directions rather than commitments. Nothing here is dated: the maintainer decides the order and scope as the work comes, and a future phase gets its own numbered section (like §5) when it starts. Product reasoning is in [prd.md](prd.md) §7; tentative technical notes are in [tech-architecture.md](tech-architecture.md) §10.
@@ -336,6 +370,7 @@ Deferred when the site went public on 2026-10-23 (see "Launch status" in §4). D
 * [ ] The 11 Zawgyi conversions and 3 suspicious titles in `zawgyi-review.json`, recording corrections in `overrides.json`.
 * [ ] The golden-query suite (partial words, typos, spaced and unspaced queries, digits, ဥ/ဉ variants), then record the index size and query-time budgets.
 * [ ] All Burmese interface text on the Classes, Dhamma Study Groups, Retreats, Sayadaws and Zoom help pages, the schedule table, the time zone names, and the draft English biographies (set a teacher's English `reviewed` to `true` only after this).
+* [ ] The Burmese Privacy wording for the analytics section and the changed `privacyNone` sentence (drafts in [analytics.md](analytics.md) §8; added 2026-10-30, to be reviewed after Phase 4 goes live; the Burmese must keep the same meaning as the English, with some terms deliberately left in English). Assign the reviewer in the private repo.
 * [ ] Remove the Beta label once the reviews above are done or consciously accepted (set `isBeta` to `false` in `apps/web/src/lib/site.ts`).
 
 **6. Review by native readers (Dhamma Posts)**
@@ -367,7 +402,7 @@ Acceptance: a maintainer who has never touched the repo adds one new PDF followi
 
 ### 6.3 Not planned in Phases 0–3
 
-Candidates for future phases, with no date: a staging environment and PR preview host (planned with the first API or backend), new media buckets and the `cdn.app.winmetta.org` hostname (when something needs them), interactive LLB lessons, the repeatable upload-and-reindex pipeline for new library files (§6.2), full-text/OCR/transcript search inside PDFs, a unified class archive, additional interface locales beyond English/Burmese, product analytics/metric collection, profile timezone preferences, a backend API, a database, accounts, offline/PWA, `apps/desktop` and `apps/mobile`. For Dhamma Posts: RSS/Atom feeds, joining posts and library books in one search, and more post languages (§5).
+Candidates for future phases, with no date: a staging environment and PR preview host (planned with the first API or backend), new media buckets and the `cdn.app.winmetta.org` hostname (when something needs them), interactive LLB lessons, the repeatable upload-and-reindex pipeline for new library files (§6.2), full-text/OCR/transcript search inside PDFs, a unified class archive, additional interface locales beyond English/Burmese, product analytics/metric collection, profile timezone preferences (product analytics is now Phase 4, §5A), a backend API, a database, accounts, offline/PWA, `apps/desktop` and `apps/mobile`. For Dhamma Posts: RSS/Atom feeds, joining posts and library books in one search, and more post languages (§5).
 
 Excluded entirely: automatic feeds of WordPress content, copying the existing site UI and bulk website migration.
 
