@@ -47,13 +47,55 @@ Every event is a **name plus non-identifying properties**. Nothing the visitor t
 
 | Area | Events (name: properties) |
 | --- | --- |
-| All pages | Automatic page view: path, referrer, interface locale (`en`, `my`) |
-| Library | `library_search`: result count bucket only (never the query text); `library_tag_filter`: folder id; `library_folder_open`: folder id; `library_pdf_download`: book id |
-| Dhamma Posts | `post_open`: post id; `post_language_change`: chosen set (for example `my,en`); `post_filter`: tag slug; `post_search`: result count bucket only; `post_share`, `post_print`: post id |
-| Classes and retreats | `class_zoom_join_click`: class id; `class_timezone_view`: none; `retreat_view`, `retreat_archive_open`: retreat id |
+| All pages | Automatic page view: path (no query string), referrer, interface locale (`en`, `my`), plus what Umami derives itself: country, device type, browser, browser language, time of day |
+| Classes | `class_zoom_join_click`: class id, `source` (`schedule`, `next`, `class_page`); `class_detail_open`: class id (only if a class opens in a panel; separate pages are covered by page views); `class_timezone_change`: zone (only while the schedule has a time-zone control) |
+| Retreats | `retreat_link_click`: retreat id, `kind` (`register`, `zoom`, `info`, `external`); `retreat_archive_open`: retreat id |
+| Library | `library_search`: result count bucket, `script` (`my`, `latin`, `mixed`), `similar_shown` (true or false), `zawgyi_suspected` (true or false, decided in the browser; never the text); `library_result_click`: position bucket (1, 2–3, 4–10, more), `kind` (`exact`, `similar`); `library_tag_filter`: tag id; `library_folder_open`: folder id; `library_pdf_download`: book id, `from` (`search`, `folder`, `other`) |
+| Dhamma Posts | `post_open`: post id, `langs` (languages shown, for example `my,en`); `post_language_change`: new set; `post_filter`: tag slug; `post_search`: result count bucket, `script`; `post_result_click`: position bucket; `post_share`: `kind` (`index`, `tag`, `post`); `post_print`: post id; `post_end_reached`: post id (once, when the end of the post scrolls into view; optional) |
+| Reliability | `search_index_load`: `area` (`library`, `posts`), `ok` (true or false), time bucket (under 1 s, 1–3 s, 3–10 s, over 10 s); `page_not_found`: path without query string |
 | General | `locale_switch`: from and to; `outbound_click`: destination domain only |
 
-Rules for this table: add an event only with a question it answers; no free-text properties; counts are bucketed (0, 1–5, 6–20, more) so a rare query cannot be recognized; changes to the table are made here first, in a PR.
+Rules for this table: add an event only with a question it answers (section 3.1); no free-text properties; counts and times are bucketed (counts 0, 1–5, 6–20, more) so a rare query or a single visitor cannot be recognized; `zawgyi_suspected` and `script` are computed in the browser and only the label is sent; changes to the table are made here first, in a PR. The list is a starting point and is expected to change as questions are added or dropped.
+
+### 3.1 Questions and denominators
+
+Without a visitor ID, the unit of counting is the **visitor-day (VD)**: one Umami session in one UTC day. A week's "visitors" is the sum of VDs, not the number of different people. Rates compare VDs that did something with VDs that could have: the share of VDs that viewed a page and then used a feature on it, or the share of events with a given outcome. "Page VD" below means the VDs that viewed that page or section.
+
+Reporting rules: do not read or publish a rate when its denominator is under 30; do not report a breakdown with a group under 10; compare periods of the same length; report trends, not single days. Add a question here before adding an event for it, and drop events nobody reads.
+
+| # | Question | Numerator | Denominator | Notes |
+| --- | --- | --- | --- | --- |
+| **Reach and audience** | | | | |
+| 1 | How many people use the site, and is it growing? | VDs per day and week | Previous period | Weekly total is visitor-days, not unique people |
+| 2 | Where do visitors come from, and does the link from winmetta.org work? | VDs by referrer | All VDs | Referrer `winmetta.org` is the link in the WordPress menu |
+| 3 | Which language do visitors use? | VDs by interface locale and by browser language | All VDs | Shows how many Burmese-language browsers reach the site |
+| 4 | Is the default language wrong for some visitors? | `locale_switch` VDs, by direction | All VDs, split by browser language | For example `en` to `my` among Burmese browsers |
+| 5 | Mobile or desktop, which countries, which hours? | VDs by device, country, hour | All VDs | Plan class announcements, maintenance windows and layout work |
+| **Classes and retreats** | | | | |
+| 6 | Do visitors who look at classes find how to join? | VDs with `class_zoom_join_click` | Classes-page VDs | |
+| 7 | Which classes get the most join clicks? | Join clicks by class id | All join clicks | |
+| 8 | Is the "next class" shortcut used more than the full schedule? | Join clicks by `source` | All join clicks | |
+| 9 | Do visitors need the Zoom help page? | Zoom-help page VDs | Classes-page VDs | |
+| 10 | Do retreat pages lead anywhere? | VDs with `retreat_link_click`, by `kind` | Retreat-page VDs | Archive use: `retreat_archive_open` VDs over Retreats-page VDs |
+| 11 | Are the Sayadaw and study group pages visited? | Page VDs per page | Classes-group VDs | |
+| **Library** | | | | |
+| 12 | Do searches succeed? | Searches with at least one result | All `library_search` events | Split by `script`; zero-result rate is the opposite |
+| 13 | Do people open a result after searching? | `library_result_click` VDs | VDs with a search that had results | Share of clicks at position 1 shows whether ranking puts the best match first |
+| 14 | Are "Similar books" (fuzzy matches) useful? | Result clicks with `kind=similar` | All result clicks | Also searches where `similar_shown` is true |
+| 15 | Do Zawgyi-typed queries matter? | Searches with `zawgyi_suspected` true | All searches with `script=my` | Decides whether the Zawgyi search item in the backlog is worth doing |
+| 16 | Do people browse folders or search? | Folder opens plus tag filters | Searches plus folder opens plus tag filters | Per library-page VD |
+| 17 | Which books are downloaded? | `library_pdf_download` by book id and `from` | Library-page VDs | Counts clicks; real file delivery is in CDN logs |
+| 18 | Does search work on slow connections? | `search_index_load` with `ok` true, by time bucket | All `search_index_load` events | Split by country and device; the weak-connection promise in prd.md §3 |
+| **Dhamma Posts** | | | | |
+| 19 | Which posts and topics are read? | `post_open` by post id; tag filters | Posts-section VDs | `post_end_reached` over `post_open` shows reading to the end |
+| 20 | Which language combinations do readers choose? | `post_open` by `langs`; `post_language_change` VDs | `post_open` VDs | Includes how many readers add Chinese |
+| 21 | Do readers find posts by search? | Searches with results; `post_result_click` | All `post_search` events | |
+| 22 | Do readers share or print? | `post_share` and `post_print` VDs | `post_open` VDs | By `kind` |
+| **Site health** | | | | |
+| 23 | Are there broken links? | `page_not_found` by path | All VDs | Should be close to zero; find the referrer of each |
+| 24 | Are the outside channels used? | `outbound_click` by destination domain | All VDs | YouTube, Facebook, winmetta.org |
+
+**Not measurable by design** (no visitor ID across days): the same person returning, unique people per week or month, a visitor's path across days, and the prd.md §6 measures return-to-learn and bridge-to-community. If one becomes important, see the opt-in ID in section 1.
 
 ### Never collected
 
@@ -67,7 +109,7 @@ Names, email addresses, IP addresses stored in readable form, search or form tex
 4. **URLs without search words.** The library and posts keep the search in `?q=`. The tracker must report the path without query strings (`data-exclude-search="true"`), so search words never reach analytics. This also closes the gap the Privacy page already warns about for CDN logs.
 5. **Retention.** Keep raw events at most 13 months, then delete (decided 2026-10-29).
 6. **Honest wording.** Update the Privacy page (English and Burmese, with the "last updated" date) in the same PR that ships the tracker, saying what is counted and what is not. Draft wording, and the rule that the Burmese must match the English in meaning with some terms intentionally left in English, are in section 8.
-7. **Private dashboard.** The dashboard has logins for authorized maintainers only; there is no public or shared read-only link (decided 2026-10-29).
+7. **Private dashboard.** The dashboard has logins for authorized maintainers only; there is no public or shared read-only link (decided 2026-10-29). Every account requires two-factor sign-in. Who has access and how accounts are requested, created and removed is internal information kept in the private companion repo (section 10).
 8. **Not a metric goal.** No streaks, DAU targets, rankings or engagement scores ([prd.md](prd.md) §3); this data is read by humans to improve content and fix problems.
 
 ## 5. Architecture
@@ -113,6 +155,9 @@ Decided 2026-10-29:
 * **No public dashboard.** Numbers are visible only to authorized maintainers who have a login.
 * **Retention:** raw events are kept at most 13 months, then deleted.
 * **AWS region:** `us-east-1`, the same region as the site and the Pulumi state, so the same AWS provider covers the EC2 instance, its snapshots and the S3 backup bucket. Route 53 is global. Changed from `us-west-2` on 2026-10-29 for simplicity.
+* **Internal information lives in the private companion repo** `winmetta/winmetta-platform-private` (decided 2026-10-30): who maintains the server, dashboard login process, alert routing and similar organization details are documented there, not here (section 10).
+* **Alerts:** all alerts from the analytics server and AWS go to one organization admin group mailbox (details in the private repo), so no alert depends on one person.
+* **Burmese Privacy wording review is a future todo** (decided 2026-10-30): the Burmese text in section 8 is published as drafted and reviewed by a Burmese speaker afterwards ([implementation-plan.md](implementation-plan.md) §6.1, group 5). The rule that it must match the English in meaning still applies.
 * **Opt-in returning-visitor ID:** not now; it may be added in a future phase if a real need appears (section 1). It would need its own decision, a consent banner, a Privacy page change and a new legal check.
 * **Legal review: done, low risk accepted.** See section 7.
 
@@ -136,7 +181,7 @@ Review of the design, with the residual risks accepted as low. This is our own r
 
 Drafts only. The live Privacy page keeps saying "no analytics" until the tracker ships (implementation-plan.md §5A, stage 4). Before publishing, check each statement is true of the running system (no IP stored, daily salt, 13-month deletion, storage empty).
 
-> **Translation rule.** The Burmese Privacy text must mean exactly the same as the English text. Some terms are deliberately left in English (for example Umami, analytics, server, IP, hash, cookie, Do Not Track) because a Burmese rendering risks changing the meaning, or the Burmese word is not settled or not widely understood. Do not "fix" these by translating them. If the two versions ever differ in meaning, the English wording is checked first and the Burmese is corrected to match. Use the same Burmese nouns the site already uses elsewhere (for example for classes and retreats in `apps/web/src/i18n/messages/my.json`). A Burmese speaker reviews the final text before release.
+> **Translation rule.** The Burmese Privacy text must mean exactly the same as the English text. Some terms are deliberately left in English (for example Umami, analytics, server, IP, hash, cookie, Do Not Track) because a Burmese rendering risks changing the meaning, or the Burmese word is not settled or not widely understood. Do not "fix" these by translating them. If the two versions ever differ in meaning, the English wording is checked first and the Burmese is corrected to match. Use the same Burmese nouns the site already uses elsewhere (for example for classes and retreats in `apps/web/src/i18n/messages/my.json`). A Burmese speaker reviews the published text afterwards; that review is a future todo ([implementation-plan.md](implementation-plan.md) §6.1, group 5), so the Burmese must be written carefully to match the English the first time.
 
 **Replacement for `privacyNone`** (the first sentence changes; the rest stays):
 
@@ -161,7 +206,13 @@ Items found in a review of this plan. The stage that must settle each is in brac
 1. **Daily salt** [stage 2]: Umami's session salt defaults to monthly. Set `SALT_ROTATION=day` and prove it on the running server: the same browser on two different days must give two different sessions. Until proven, the Privacy wording about a daily-changing hash is not true. The salt is computed from the date and the app secret and is not stored, so the app secret stays private and is never committed.
 2. **Backup permissions** [stage 2]: the EC2 instance role may write one prefix of the backup bucket (no delete, no read of other objects) and read only its own Parameter Store secrets. No access key is created or stored. Keep secrets out of git and out of Pulumi user data (user data is readable in the AWS console); the install script fetches them from Parameter Store at boot. Write the restore steps in the runbook.
 3. **Retention mechanism** [stage 2]: confirm whether Umami deletes old events by itself. If not, add a scheduled job that deletes events older than 13 months, and an S3 lifecycle rule that expires dumps on the same schedule. Check it works with a test row.
-4. **Dashboard login** [stage 2]: Umami has no two-factor sign-in and the login page is on the public internet. Change the default admin account at first boot, use a long generated password, rate-limit logins in Caddy, and apply Umami and OS security updates promptly.
+4. **Dashboard login** [stage 2]: the login page is on the public internet, so harden it (decided 2026-10-30):
+   * **Mandatory two-factor sign-in for every account.** Umami v3.3.0 or later supports authenticator-app (TOTP) 2FA and lets an administrator require it globally. Pin Umami to at least that version, set the global requirement before any reader account exists, and test that an account without 2FA is blocked.
+   * **`TWO_FACTOR_ENCRYPTION_KEY`** (64 hex characters, unique to this installation) must be set on the server or nobody can enrol. Store it in AWS Parameter Store and **preserve it in backups and recovery**: if it is lost or changed, stored 2FA secrets become unreadable and every user must re-enrol. A sealed copy is kept by the administrators (private repo).
+   * **Individual, least-privilege accounts:** readers are View Only members of a team that owns the website (a new account sees nothing otherwise); two named administrators with separate credentials; no shared logins; no public share links.
+   * **Harden the public login:** change the default administrator credentials before the server is reachable, rate-limit authentication in Caddy (Umami also locks 2FA attempts for 15 minutes after five failures), and apply Umami and OS security updates promptly.
+   * **Option for later:** make the dashboard reachable only over a private network (Tailscale), leaving only the tracker script and collection endpoints public. It needs the dashboard users to install Tailscale, so it is revisited after launch ([Tailscale Serve](https://tailscale.com/docs/features/tailscale-serve)).
+   The account and 2FA process is in the private repo (section 10).
 
 ### Settle during the build
 
@@ -171,7 +222,20 @@ Items found in a review of this plan. The stage that must settle each is in brac
 8. **Instance size** [stage 2]: 2 GB RAM (`t4g.small`) is the minimum for Umami and PostgreSQL; confirm the price and watch memory.
 9. **Fake events** [stage 2]: the collection endpoint is public, so anyone can send made-up events. Accept it, add Caddy rate limits, and treat the numbers as indicative.
 10. **Ad blockers** [stage 3]: the default script and endpoint names are on blocklists. They can be renamed with `TRACKER_SCRIPT_NAME` and `COLLECT_API_ENDPOINT`.
-11. **Monitoring** [stage 2]: an uptime check, certificate expiry, CloudWatch alarms for instance status and disk space, a check that snapshots and dumps ran, and an AWS budget alert for the new resources. Without them a stopped server loses events silently.
+11. **Monitoring** [stage 2]: all alerts go to the organization admin group mailbox (set-up and subscription steps are in the private repo, section 10). An uptime check, certificate expiry, CloudWatch alarms for instance status and disk space, a check that snapshots and dumps ran, and an AWS budget alert for the new resources. Without them a stopped server loses events silently.
 12. **Content security policy** [later]: the site sends none today. If one is added, it must allow `stats.app.winmetta.org`.
 13. **Runbook** [stage 2 and 4]: add deploy, upgrade, backup, restore, retention and salt-check sections to `docs/runbook.md`, and have someone who did not build the server run the restore drill.
-14. **Rollout order** [stages 2 to 4]: deploy the server first and check it with a test site, then ship the tracker behind the build flag, and turn the flag on only in the same PR as the Privacy page change.
+14. **Rollout order** [stages 2 to 4]: deploy the server first and check it with a test site, then ship the tracker behind the build flag, and turn the flag on only in the same PR as the Privacy page change and only after the restore drill has passed.
+
+## 10. Internal information (private companion repo)
+
+Information about people and how Win Metta is run is **not** kept in this public repo. It lives in the private companion repo `winmetta/winmetta-platform-private` (cloned next to this one; access on request). Rule: facts about the system and rules for contributors are public; names, mailboxes, access lists and how the organization or its volunteers are run are private. See `AGENTS.md` §2 in both repos.
+
+What the private repo holds for this phase:
+
+* **Roles and contacts:** who maintains the analytics server, who administers the dashboard, who is in the alert group (`winmetta-platform-private/docs/roles-and-contacts.md`).
+* **Dashboard logins:** who may have an account, the request, creation, review and removal process, and the first-boot administrator steps (`winmetta-platform-private/docs/analytics-operations.md`, section 1).
+* **Alerts:** where they go, how the email subscription is confirmed, what the group must allow, a quarterly test, and what to do on arrival (`winmetta-platform-private/docs/analytics-operations.md`, section 2).
+* **Decisions and org-side todos** such as the Burmese-wording reviewer (`winmetta-platform-private/docs/decisions.md`, `winmetta-platform-private/docs/todo.md`).
+
+Scripts for private operations, if any are needed, go in `winmetta-platform-private/scripts/`. Never put a password, key or token in either repo; say where it lives (the organization's password manager, AWS Parameter Store).
