@@ -62,7 +62,7 @@ Names, email addresses, IP addresses stored in readable form, search or form tex
 ## 4. Privacy requirements
 
 1. **No device storage.** The tracker must write no cookie and no localStorage or sessionStorage key. This keeps us outside the consent requirement of ePrivacy Article 5(3) and avoids a cookie banner. Verified in the browser's storage panel before launch and after any Umami upgrade.
-2. **Daily salt rotation.** Sources disagree on Umami's default (daily or monthly). Set it explicitly to daily and test it; a longer salt would let the same IP and browser be linked for weeks.
+2. **Daily salt rotation.** Umami's source (checked 2026-10-29) derives the session ID from the site, IP address, user agent and a salt that follows the `SALT_ROTATION` setting, which **defaults to monthly**. Set `SALT_ROTATION=day` explicitly and test it on the running server (the same IP and browser on two days must give two sessions); the default would let the same visitor be linked for a month and make the Privacy wording untrue. The salt is computed from the date and the app secret, not stored, so keep the app secret private. Visits (not sessions) also use an hourly salt, which is harmless.
 3. **First-party only.** The tracker script and the data both live on `stats.app.winmetta.org`, and the data is used only by Win Metta.
 4. **URLs without search words.** The library and posts keep the search in `?q=`. The tracker must report the path without query strings (`data-exclude-search="true"`), so search words never reach analytics. This also closes the gap the Privacy page already warns about for CDN logs.
 5. **Retention.** Keep raw events at most 13 months, then delete (decided 2026-10-29).
@@ -122,7 +122,7 @@ How Win Metta is organized or run (who maintains the server, who administers wha
 Review of the design, with the residual risks accepted as low. This is our own reading, not legal advice.
 
 1. **Consent for device access (EU/UK ePrivacy, Article 5(3)):** applies only when information is stored on or read from the visitor's device. The design stores nothing and reads nothing from the device, so no consent or cookie banner is required. Kept true by checking storage before launch and after every Umami upgrade (section 4.1).
-2. **GDPR and UK GDPR:** the daily hash is built from IP address, user agent and a salt, and regulators may treat an IP-derived value as personal data while the salt exists. Accepted position: legitimate interest (Article 6(1)(f)) for running the site; raw IPs are not stored; the salt rotates daily so a value cannot be linked across days or back to a person.
+2. **GDPR and UK GDPR:** the daily hash is built from IP address, user agent and a salt, and regulators may treat an IP-derived value as personal data while the salt exists. Accepted position: legitimate interest (Article 6(1)(f)) for running the site; raw IPs are not stored; the salt rotates daily (`SALT_ROTATION=day`) so a value cannot be linked across days or back to a person without the app secret.
 3. **Transparency:** the Privacy page, in English and Burmese, states what is counted and why, the daily hash, the 13-month retention and a contact (`contact@winmetta.org`), changing in the same PR as the tracker (section 8).
 4. **Objection:** Do Not Track is honored. No separate opt-out page, because it would itself need storage.
 5. **Retention:** 13 months for raw events (decided).
@@ -150,3 +150,27 @@ Drafts only. The live Privacy page keeps saying "no analytics" until the tracker
 * Burmese: "မည်သည့်စာမျက်နှာများ၊ သင်တန်းများ၊ တရားစခန်းများ၊ စာကြည့်တိုက်ဖိုလ်ဒါများ၊ စာအုပ်များနှင့် ဓမ္မဆောင်းပါးများကို မည်သည့်ဘာသာစကားဖြင့် အသုံးပြုသည်ကို သိနိုင်ရန် ကျွန်ုပ်တို့သည် လာရောက်မှုများကို ရေတွက်ပါသည်။ ကျွန်ုပ်တို့သည် Umami ဟူသော ဆော့ဖ်ဝဲကို ကျွန်ုပ်တို့၏ကိုယ်ပိုင် server ပေါ်တွင် (အမေရိကန်ပြည်ထောင်စုရှိ Amazon Web Services တွင် ဟိုစ်တင်း) ကိုယ်တိုင်လည်ပတ်စေသဖြင့် analytics ကုမ္ပဏီတစ်ခုခုက ဤအချက်အလက်ကို မရရှိပါ။ ရေတွက်ရာတွင် ကွတ်ကီး (cookie) မသုံးဘဲ သင့်စက်ထဲတွင် မည်သည့်အရာမျှ မသိမ်းဆည်းပါ။ သင့်အမည်၊ အီးမေးလ်လိပ်စာ၊ ရှာဖွေသည့်စကားလုံးများ သို့မဟုတ် သင်ရိုက်ထည့်သည့် မည်သည့်အရာကိုမျှ မစုဆောင်းပါ။ သင့် IP လိပ်စာကို မသိမ်းပါ။ နေ့စဉ်ပြောင်းလဲသော hash (မူလလိပ်စာသို့ ပြန်မဖော်နိုင်သည့် ရောထွေးကုဒ်) တစ်ခု ပြုလုပ်ရန်သာ အသုံးပြုသဖြင့် လာရောက်သူတစ်ဦးကို တစ်နေ့လျှင် တစ်ကြိမ်သာ ရေတွက်နိုင်ပြီး အခြားနေ့တွင် တူညီသူကို မသိနိုင်ပါ။ ရေတွက်ထားသည့် အရေအတွက်များကို အများဆုံး ၁၃ လ သိမ်းထားပါသည်။ သင့်ဘရောက်ဇာက Do Not Track ပို့လျှင် သင့်လာရောက်မှုကို မရေတွက်ပါ။"
 
 Also update on the Privacy page: `privacyHosting` should list the stats server's host (`stats.app.winmetta.org`, Amazon Web Services) among the providers that see technical information such as IP address; word it the same way in both languages.
+
+## 9. Before implementing (review 2026-10-29)
+
+Items found in a review of this plan. The stage that must settle each is in brackets (implementation-plan.md §5A).
+
+### Must settle first
+
+1. **Daily salt** [stage 2]: Umami's session salt defaults to monthly. Set `SALT_ROTATION=day` and prove it on the running server: the same browser on two different days must give two different sessions. Until proven, the Privacy wording about a daily-changing hash is not true. The salt is computed from the date and the app secret and is not stored, so the app secret stays private and is never committed.
+2. **Backup credentials** [stage 2]: a Lightsail VM cannot assume an AWS role. The nightly `pg_dump` therefore needs an IAM user access key on the VM. Limit it to writing one bucket prefix with no delete or read permission, keep it out of git and out of Pulumi user data (user data is readable in the AWS console; fetch the key from an encrypted Pulumi secret or Systems Manager Parameter Store at install time), and write a rotation step in the runbook.
+3. **Retention mechanism** [stage 2]: confirm whether Umami deletes old events by itself. If not, add a scheduled job that deletes events older than 13 months, and an S3 lifecycle rule that expires dumps on the same schedule. Check it works with a test row.
+4. **Dashboard login** [stage 2]: Umami has no two-factor sign-in and the login page is on the public internet. Change the default admin account at first boot, use a long generated password, rate-limit logins in Caddy, and apply Umami and OS security updates promptly.
+
+### Settle during the build
+
+5. **Test and preview traffic** [stage 3]: the Playwright smoke tests run against the live site after each deploy. Restrict the tracker with `data-domains="app.winmetta.org"`, keep it off in dev, preview and CI builds (build flag), and check that Umami ignores headless-browser traffic or the tests add events.
+6. **Duplicate page views** [stage 3]: the library and posts pages change the address (`?q=`, `?lang=`) without reloading. With query strings excluded, check that a search or filter does not count as a new page view.
+7. **Pulumi permissions** [stage 2]: the read-only preview role used by pull requests needs Lightsail read access or `pulumi-preview` fails; `pulumi up` stays a manual run with the admin profile. Put the analytics stack in its own file (`infra/pulumi/index.ts` is already about 500 lines).
+8. **VM size** [stage 2]: 1 GB RAM is tight for Umami and PostgreSQL; plan for 2 GB and confirm the price.
+9. **Fake events** [stage 2]: the collection endpoint is public, so anyone can send made-up events. Accept it, add Caddy rate limits, and treat the numbers as indicative.
+10. **Ad blockers** [stage 3]: the default script and endpoint names are on blocklists. They can be renamed with `TRACKER_SCRIPT_NAME` and `COLLECT_API_ENDPOINT`.
+11. **Monitoring** [stage 2]: an uptime check, certificate expiry, a check that snapshots and dumps ran, and an AWS budget alert for the new resources. Without them a stopped server loses events silently.
+12. **Content security policy** [later]: the site sends none today. If one is added, it must allow `stats.app.winmetta.org`.
+13. **Runbook** [stage 2 and 4]: add deploy, upgrade, backup, restore, retention and salt-check sections to `docs/runbook.md`, and have someone who did not build the server run the restore drill.
+14. **Rollout order** [stages 2 to 4]: deploy the server first and check it with a test site, then ship the tracker behind the build flag, and turn the flag on only in the same PR as the Privacy page change.
