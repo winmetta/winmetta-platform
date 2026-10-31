@@ -17,6 +17,7 @@ GitHub OIDC deploy role. One stack, `production`, all in `us-east-1`. Design:
 | Alias records (A and AAAA)             | `app.winmetta.org` to the distribution.                                                                        |
 | IAM role `winmetta-app-pulumi-preview` | GitHub OIDC for pull requests of this repo; read-only on the Pulumi state plus `kms:Decrypt` on the stack key. |
 | IAM role `winmetta-app-deploy`         | GitHub OIDC, `production` environment of this repo only; sync the bucket and invalidate.                       |
+| Analytics server (`analytics.ts`)      | Off unless the stack config `analyticsEnabled` is true: EC2 + VPC, data volume, snapshots, backup bucket, SNS topic and one status alarm. See the runbook §12 and `../analytics/`. |
 
 The `winmetta-app-pulumi-preview` role (below) lets the `Pulumi preview` workflow run `pulumi preview` on pull requests.
 

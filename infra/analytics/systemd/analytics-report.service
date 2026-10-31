@@ -1,0 +1,8 @@
+[Unit]
+Description=Analytics: daily health report
+After=analytics-caddy.service analytics-maintenance.service analytics-backup.service analytics-os-update.service
+
+[Service]
+Type=oneshot
+TimeoutStartSec=600
+ExecStart=/opt/analytics/bin/health-report.sh

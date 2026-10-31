@@ -13,6 +13,8 @@ import * as path from 'node:path';
 import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
 
+import { createAnalytics } from './analytics';
+
 const config = new pulumi.Config();
 const domain = config.get('domain') ?? 'app.winmetta.org';
 const githubRepo = config.get('githubRepo') ?? 'winmetta/winmetta-platform';
@@ -498,6 +500,15 @@ new aws.iam.RolePolicy(
           Resource: stateKey.arn,
         },
         {
+          // The analytics program (analytics.ts) reads the public Amazon Linux AMI
+          // parameter to pick the image; a preview of a stack with analyticsEnabled needs it.
+          Sid: 'ReadPublicAmiParameter',
+          Effect: 'Allow',
+          Action: 'ssm:GetParameter',
+          Resource:
+            'arn:aws:ssm:us-east-1::parameter/aws/service/ami-amazon-linux-latest/*',
+        },
+        {
           Sid: 'ReadCloudFrontCachePolicies',
           Effect: 'Allow',
           Action: ['cloudfront:GetCachePolicy', 'cloudfront:ListCachePolicies'],
@@ -509,6 +520,13 @@ new aws.iam.RolePolicy(
   opts,
 );
 export const previewRoleArn = previewRole.arn;
+
+// --- Analytics server (Phase 4): off until `analyticsEnabled` is true --------------------
+// Defined in analytics.ts. See docs/analytics.md and docs/runbook.md (analytics section).
+const analyticsEnabled = config.getBoolean('analyticsEnabled') ?? false;
+export const analytics = analyticsEnabled
+  ? createAnalytics({ zone, domain, tags })
+  : 'not created (analyticsEnabled is false)';
 
 const pending = 'not created yet (delegationConfirmed is false)';
 export const distributionId = distribution ? distribution.id : pending;

@@ -1,0 +1,8 @@
+[Unit]
+Description=Analytics: Daily retention delete and scrub
+Requires=analytics-postgres.service
+After=analytics-postgres.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/analytics/bin/maintenance.sh

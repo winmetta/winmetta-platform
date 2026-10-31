@@ -1,0 +1,10 @@
+[Unit]
+Description=Analytics: Daily retention delete and scrub
+
+[Timer]
+# Before the 02:00 backup, so every dump is taken after the scrub.
+OnCalendar=*-*-* 01:30:00 UTC
+Persistent=true
+
+[Install]
+WantedBy=timers.target

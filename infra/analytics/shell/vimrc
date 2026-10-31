@@ -1,0 +1,45 @@
+" Vim settings for the analytics server (installed to /etc/analytics/vimrc and loaded from
+" /etc/vimrc by bin/setup-shell.sh). Shell scripts get live ShellCheck warnings and shfmt
+" formatting through the ALE plugin, installed system-wide by the same script.
+set nocompatible
+syntax on
+filetype plugin indent on
+
+set encoding=utf-8
+set number ruler showcmd laststatus=2 wildmenu
+set hlsearch incsearch ignorecase smartcase
+set expandtab shiftwidth=4 softtabstop=4 tabstop=4 autoindent
+set backspace=indent,eol,start
+set scrolloff=5 nowrap hidden
+set background=dark
+" Terminals over Session Manager do not forward the mouse well; keep it off.
+set mouse=
+" Keep swap files out of /opt/analytics, where the config sync would delete them.
+set nobackup nowritebackup directory=/var/tmp//
+set viminfo='100,<50,s10,h
+" F2 toggles paste mode, so pasted text is not auto-indented.
+set pastetoggle=<F2>
+" Show tabs and trailing spaces.
+set list listchars=tab:>-,trail:~
+
+" Reopen a file where you left it.
+autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+
+autocmd FileType sh,bash setlocal shiftwidth=4 softtabstop=4 expandtab
+autocmd FileType yaml,json setlocal shiftwidth=2 softtabstop=2 expandtab
+autocmd FileType make setlocal noexpandtab
+
+" ALE (https://github.com/dense-analysis/ale): ShellCheck while you edit, shfmt on demand.
+"   ]e / [e  next / previous problem      \f  format the file with shfmt      :ALEDetail  explain
+let g:ale_linters = {'sh': ['shellcheck'], 'bash': ['shellcheck']}
+let g:ale_fixers = {'sh': ['shfmt'], 'bash': ['shfmt']}
+let g:ale_sh_shellcheck_options = '-x'
+let g:ale_sh_shfmt_options = '-i 4'
+let g:ale_fix_on_save = 0
+let g:ale_lint_on_text_changed = 'normal'
+let g:ale_lint_on_insert_leave = 1
+let g:ale_sign_error = 'E>'
+let g:ale_sign_warning = 'W>'
+nmap <silent> ]e <Plug>(ale_next_wrap)
+nmap <silent> [e <Plug>(ale_previous_wrap)
+nmap <silent> <leader>f <Plug>(ale_fix)

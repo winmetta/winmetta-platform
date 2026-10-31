@@ -3,3 +3,4 @@ encryptedkey: AQICAHiSkgpqWBq/Wpbhfxv7eV5eKQiojJqZYuVvguCVzk9pGgFbigBVkre7Rfr3FE
 config:
   winmetta-platform:delegationConfirmed: "true"
   winmetta-platform:githubSubjectPrefix: repo:winmetta@325823115/winmetta-platform@1391779321
+  winmetta-platform:analyticsEnabled: "true"

@@ -1,0 +1,19 @@
+[Unit]
+Description=Analytics PostgreSQL (Umami database)
+Requires=docker.service
+After=docker.service
+RequiresMountsFor=/data
+
+[Service]
+EnvironmentFile=/opt/analytics/versions.env
+Restart=always
+RestartSec=5
+ExecStartPre=-/usr/bin/docker rm -f analytics-postgres
+ExecStart=/usr/bin/docker run --rm --name analytics-postgres --network analytics \
+  --env-file /etc/analytics/postgres.env --memory 600m --shm-size 128m \
+  -v /data/postgres:/var/lib/postgresql ${POSTGRES_IMAGE} \
+  -c shared_buffers=128MB -c max_connections=30
+ExecStop=/usr/bin/docker stop -t 30 analytics-postgres
+
+[Install]
+WantedBy=multi-user.target
