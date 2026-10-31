@@ -164,6 +164,20 @@ if [ -n "$oldest_dump" ]; then
     [ "$dump_days" -gt 23 ] && warn "A database dump is ${dump_days} days old: dumps must be gone after 21 days (retention). Check the bucket lifecycle rule and delete it with an admin profile"
 fi
 
+# Snapshots are deleted by age (14 days) by the data lifecycle policy. Check that one is made
+# every day and that none outlived the limit, so retention does not depend on the policy working.
+snapshots=$(aws ec2 describe-snapshots --region "$AWS_REGION" --owner-ids self \
+    --filters "Name=volume-id,Values=${DATA_VOLUME_ID}" --query 'Snapshots[].StartTime' --output text 2>/dev/null | tr '\t' '\n' | sort)
+if [ -n "$snapshots" ]; then
+    newest_days=$((($(date +%s) - $(date -d "$(tail -1 <<<"$snapshots")" +%s)) / 86400))
+    oldest_days=$((($(date +%s) - $(date -d "$(head -1 <<<"$snapshots")" +%s)) / 86400))
+    note "Snapshots of the data volume: newest ${newest_days} day(s), oldest ${oldest_days} day(s)"
+    [ "$newest_days" -gt 1 ] && warn "No snapshot of the data volume for ${newest_days} days: check the data lifecycle policy"
+    [ "$oldest_days" -gt 16 ] && warn "A snapshot of the data volume is ${oldest_days} days old (limit 14): it must be deleted for the retention promise (admin profile)"
+else
+    warn "Could not list snapshots of the data volume (or there are none yet)"
+fi
+
 sql() { docker exec -i analytics-postgres psql -U umami -d umami -At -c "$1" 2>/dev/null; }
 oldest=$(sql "SELECT COALESCE(floor(extract(epoch FROM now() - min(created_at)) / 86400)::int, 0) FROM website_event")
 if [ -n "$oldest" ]; then

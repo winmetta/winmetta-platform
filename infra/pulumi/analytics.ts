@@ -385,6 +385,14 @@ export function createAnalytics({ zone, domain, tags }: AnalyticsArgs) {
             Condition: { StringLike: { 's3:prefix': ['dumps/*', 'dumps'] } },
           },
           {
+            // Read-only metadata (the API cannot be limited by resource): lets the daily report
+            // check that snapshots are being made and none is older than the retention limit.
+            Sid: 'ReadSnapshotAges',
+            Effect: 'Allow',
+            Action: 'ec2:DescribeSnapshots',
+            Resource: '*',
+          },
+          {
             Sid: 'OwnSecrets',
             Effect: 'Allow',
             Action: ['ssm:GetParameter', 'ssm:PutParameter'],
@@ -408,7 +416,7 @@ export function createAnalytics({ zone, domain, tags }: AnalyticsArgs) {
     opts,
   );
 
-  // --- Storage: a separate encrypted data volume, snapshotted daily (14 kept) ----------
+  // --- Storage: a separate encrypted data volume, snapshotted daily (kept 14 days) ----------
   const dataVolume = new aws.ebs.Volume(
     'analytics-data',
     {
@@ -449,7 +457,8 @@ export function createAnalytics({ zone, domain, tags }: AnalyticsArgs) {
   new aws.dlm.LifecyclePolicy(
     'analytics',
     {
-      description: 'Daily snapshots of the analytics data volume - 14 kept',
+      description:
+        'Daily snapshots of the analytics data volume - kept 14 days',
       executionRoleArn: dlmRole.arn,
       state: 'ENABLED',
       policyDetails: {
@@ -459,7 +468,9 @@ export function createAnalytics({ zone, domain, tags }: AnalyticsArgs) {
           {
             name: 'daily',
             createRule: { interval: 24, intervalUnit: 'HOURS', times: '04:00' },
-            retainRule: { count: 14 },
+            // By age, not by count: a count rule deletes the oldest snapshot only when a new one
+            // is made, so if creation ever stopped the last 14 would stay forever.
+            retainRule: { interval: 14, intervalUnit: 'DAYS' },
             copyTags: true,
           },
         ],
