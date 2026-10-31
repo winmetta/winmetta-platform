@@ -26,25 +26,25 @@ apply=false
 # CLI from blocking the script on a "less" prompt.
 export AWS_REGION="$REGION" AWS_DEFAULT_REGION="$REGION" AWS_PAGER=""
 [ -n "${AWS_PROFILE:-}" ] || {
-	echo "Set AWS_PROFILE (winmetta-admin) first." >&2
-	exit 1
+    echo "Set AWS_PROFILE (winmetta-admin) first." >&2
+    exit 1
 }
 [ "$AWS_PROFILE" = "winmetta-admin" ] || echo "note: expected AWS_PROFILE=winmetta-admin, got $AWS_PROFILE" >&2
 
 # Run a changing command, or only print it in a dry run.
 run() {
-	if $apply; then
-		echo "+ $*"
-		"$@"
-	else
-		echo "[dry run] $*"
-	fi
+    if $apply; then
+        echo "+ $*"
+        "$@"
+    else
+        echo "[dry run] $*"
+    fi
 }
 
 # Read-only calls always run, so the dry run shows what already exists.
 identity="$(aws sts get-caller-identity --query '[Arn,Account]' --output text)" || {
-	echo "Not signed in. Run: aws sso login --profile $AWS_PROFILE" >&2
-	exit 1
+    echo "Not signed in. Run: aws sso login --profile $AWS_PROFILE" >&2
+    exit 1
 }
 caller="${identity%%$'\t'*}"
 account_id="${identity##*$'\t'}"
@@ -56,55 +56,55 @@ echo
 # 1. State bucket ---------------------------------------------------------------
 head_err=""
 if head_err="$(aws s3api head-bucket --bucket "$BUCKET" 2>&1)"; then
-	echo "ok       bucket $BUCKET exists (settings below are re-applied, which is harmless)"
+    echo "ok       bucket $BUCKET exists (settings below are re-applied, which is harmless)"
 else
-	# A 403 means the name exists but belongs to someone else (bucket names are global).
-	case "$head_err" in
-	*403* | *Forbidden*) echo "error: bucket name $BUCKET is taken by another account; rerun with BUCKET=<another name>" >&2 && exit 1 ;;
-	esac
-	# us-east-1 takes no LocationConstraint. The bucket is private from the start.
-	run aws s3api create-bucket --bucket "$BUCKET" --region "$REGION" --object-ownership BucketOwnerEnforced
+    # A 403 means the name exists but belongs to someone else (bucket names are global).
+    case "$head_err" in
+    *403* | *Forbidden*) echo "error: bucket name $BUCKET is taken by another account; rerun with BUCKET=<another name>" >&2 && exit 1 ;;
+    esac
+    # us-east-1 takes no LocationConstraint. The bucket is private from the start.
+    run aws s3api create-bucket --bucket "$BUCKET" --region "$REGION" --object-ownership BucketOwnerEnforced
 fi
 run aws s3api put-public-access-block --bucket "$BUCKET" \
-	--public-access-block-configuration BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
+    --public-access-block-configuration BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
 run aws s3api put-bucket-versioning --bucket "$BUCKET" --versioning-configuration Status=Enabled
 run aws s3api put-bucket-encryption --bucket "$BUCKET" \
-	--server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"},"BucketKeyEnabled":true}]}'
+    --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"},"BucketKeyEnabled":true}]}'
 # Refuse plain-HTTP access. This replaces any existing bucket policy, which is fine
 # for a bucket this script created and owns.
 run aws s3api put-bucket-policy --bucket "$BUCKET" --policy "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"DenyInsecureTransport\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:*\",\"Resource\":[\"arn:aws:s3:::$BUCKET\",\"arn:aws:s3:::$BUCKET/*\"],\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]}"
 # Keep old state versions for 90 days (rollback), then expire them, and clean up
 # abandoned uploads.
 run aws s3api put-bucket-lifecycle-configuration --bucket "$BUCKET" \
-	--lifecycle-configuration '{"Rules":[{"ID":"expire-old-state-versions","Status":"Enabled","Filter":{},"NoncurrentVersionExpiration":{"NoncurrentDays":90},"AbortIncompleteMultipartUpload":{"DaysAfterInitiation":7}}]}'
+    --lifecycle-configuration '{"Rules":[{"ID":"expire-old-state-versions","Status":"Enabled","Filter":{},"NoncurrentVersionExpiration":{"NoncurrentDays":90},"AbortIncompleteMultipartUpload":{"DaysAfterInitiation":7}}]}'
 
 # 2. KMS key for Pulumi secrets -------------------------------------------------
 if aws kms describe-key --key-id "$KMS_ALIAS" >/dev/null 2>&1; then
-	echo "ok       KMS key $KMS_ALIAS exists"
+    echo "ok       KMS key $KMS_ALIAS exists"
 else
-	if $apply; then
-		key_id="$(aws kms create-key --description "Win Metta Pulumi secrets provider" --query KeyMetadata.KeyId --output text)"
-		echo "+ aws kms create-key ... -> $key_id"
-		# If a later step fails, a rerun would create a second key (the alias is what it
-		# looks for), so say which key is left over.
-		trap 'echo "error: key $key_id was created but is not finished. Fix the error, then run: aws kms enable-key-rotation --key-id $key_id; aws kms create-alias --alias-name $KMS_ALIAS --target-key-id $key_id (or schedule it for deletion) before rerunning." >&2' ERR
-		run aws kms enable-key-rotation --key-id "$key_id"
-		run aws kms create-alias --alias-name "$KMS_ALIAS" --target-key-id "$key_id"
-		trap - ERR
-	else
-		echo "[dry run] aws kms create-key --description \"Win Metta Pulumi secrets provider\""
-		echo "[dry run] aws kms enable-key-rotation --key-id <new key id>"
-		echo "[dry run] aws kms create-alias --alias-name $KMS_ALIAS --target-key-id <new key id>"
-	fi
+    if $apply; then
+        key_id="$(aws kms create-key --description "Win Metta Pulumi secrets provider" --query KeyMetadata.KeyId --output text)"
+        echo "+ aws kms create-key ... -> $key_id"
+        # If a later step fails, a rerun would create a second key (the alias is what it
+        # looks for), so say which key is left over.
+        trap 'echo "error: key $key_id was created but is not finished. Fix the error, then run: aws kms enable-key-rotation --key-id $key_id; aws kms create-alias --alias-name $KMS_ALIAS --target-key-id $key_id (or schedule it for deletion) before rerunning." >&2' ERR
+        run aws kms enable-key-rotation --key-id "$key_id"
+        run aws kms create-alias --alias-name "$KMS_ALIAS" --target-key-id "$key_id"
+        trap - ERR
+    else
+        echo "[dry run] aws kms create-key --description \"Win Metta Pulumi secrets provider\""
+        echo "[dry run] aws kms enable-key-rotation --key-id <new key id>"
+        echo "[dry run] aws kms create-alias --alias-name $KMS_ALIAS --target-key-id <new key id>"
+    fi
 fi
 
 # 3. GitHub Actions OIDC identity provider ---------------------------------------
 provider_arn="arn:aws:iam::${account_id}:oidc-provider/${OIDC_URL}"
 if aws iam get-open-id-connect-provider --open-id-connect-provider-arn "$provider_arn" >/dev/null 2>&1; then
-	echo "ok       OIDC provider $OIDC_URL exists"
+    echo "ok       OIDC provider $OIDC_URL exists"
 else
-	# AWS validates GitHub's certificate against its trusted CAs, so no thumbprint is needed.
-	run aws iam create-open-id-connect-provider --url "https://$OIDC_URL" --client-id-list sts.amazonaws.com
+    # AWS validates GitHub's certificate against its trusted CAs, so no thumbprint is needed.
+    run aws iam create-open-id-connect-provider --url "https://$OIDC_URL" --client-id-list sts.amazonaws.com
 fi
 
 echo

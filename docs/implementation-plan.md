@@ -422,7 +422,7 @@ Pin npm consistently in local setup and CI using the root `packageManager` decla
 
 ## 8. Reference: macOS Setup Script
 
-Shared developer tooling (mise and the tools it manages, git settings, shell, editors, AI CLIs) is installed by `bootstrap.sh` in the [`bootstrap-dev-env` repo](https://github.com/winmetta/bootstrap-dev-env); the org [`.github` repo](https://github.com/winmetta/.github#developer-setup) provides `link-workspace.sh`. This repo's own `scripts/setup-local-dev.sh` then installs Node from `mise.toml` (through mise), the pinned npm, locked dependencies and the Playwright browser.
+Shared developer tooling (mise and the tools it manages, git settings, shell, editors, AI CLIs) is installed by `bootstrap.sh` in the [`bootstrap-dev-env` repo](https://github.com/winmetta/bootstrap-dev-env); the org [`.github` repo](https://github.com/winmetta/.github#developer-setup) provides `bootstrap-winmetta-dev.sh`, which runs it together with the workspace links, the repo clones and this repo's setup. This repo's own `scripts/setup-local-dev.sh` then installs Node from `mise.toml` (through mise), the pinned npm, locked dependencies and the Playwright browser.
 
 ---
 
