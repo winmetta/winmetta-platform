@@ -1,6 +1,6 @@
 # infra/pulumi
 
-Pulumi (TypeScript) program for `app.winmetta.org` (day-to-day operation is in the [runbook](../../docs/runbook.md)): a private S3 bucket behind
+Pulumi (TypeScript) program for `app.winmetta.org` (day-to-day operation is in the runbook, now in the private repository; see [docs/runbook.md](../../docs/runbook.md)): a private S3 bucket behind
 CloudFront (origin access control), an ACM certificate, a Route 53 zone and the
 GitHub OIDC deploy role. One stack, `production`, all in `us-east-1`. Design:
 [tech-architecture.md](../../docs/tech-architecture.md) §6-§8. Plan:
