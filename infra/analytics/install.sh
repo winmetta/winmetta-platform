@@ -9,6 +9,8 @@ set -euo pipefail
 # shellcheck source=/dev/null
 source /etc/analytics/instance.env # AWS_REGION BUCKET STATS_DOMAIN INSTANCE_NAME DATA_VOLUME_ID PARAM_PREFIX
 export AWS_DEFAULT_REGION=$AWS_REGION
+# Fingerprint of this installer as it is running, to notice if the sync below replaces it.
+SELF_HASH=$(sha256sum <"${BASH_SOURCE[0]}" | cut -d' ' -f1)
 
 log() { echo "[analytics-install] $*"; }
 
@@ -70,6 +72,17 @@ mount_data_volume() {
 sync_config() {
     aws s3 sync "s3://${BUCKET}/config/" /opt/analytics/ --delete --only-show-errors
     chmod +x /opt/analytics/install.sh /opt/analytics/bin/*.sh
+}
+
+# This script was loaded before the sync could replace it, so when the sync brought a newer
+# installer, hand over to it (once) instead of finishing with the old functions.
+reexec_if_installer_changed() {
+    local now
+    now=$(sha256sum </opt/analytics/install.sh | cut -d' ' -f1)
+    if [ "$now" != "$SELF_HASH" ] && [ -z "${ANALYTICS_INSTALL_REEXEC:-}" ]; then
+        log "the installer changed; continuing with the new one"
+        ANALYTICS_INSTALL_REEXEC=1 exec bash /opt/analytics/install.sh "$@"
+    fi
 }
 
 # Secrets are created once on the instance and kept in Parameter Store, never in git, in
@@ -246,6 +259,7 @@ set_hostname
 ensure_swap
 mount_data_volume
 sync_config
+reexec_if_installer_changed "$@"
 write_env_files
 prepare_images
 install_units
