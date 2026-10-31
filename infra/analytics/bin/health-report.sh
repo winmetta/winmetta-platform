@@ -157,7 +157,13 @@ fi
 
 # Dumps are deleted by an S3 lifecycle rule after 21 days, which S3 carries out with some delay.
 # Check that none is older than the deadline (docs/analytics.md section 4, retention).
-oldest_dump=$(aws s3 ls "s3://${BUCKET}/dumps/" --region "$AWS_REGION" 2>/dev/null | awk '{ print $1 }' | sort | head -1)
+# `aws s3 ls` exits 1 for an empty prefix too, so tell that from a real failure by its error text.
+list_error=$(mktemp)
+oldest_dump=$(aws s3 ls "s3://${BUCKET}/dumps/" --region "$AWS_REGION" 2>"$list_error" | awk '{ print $1 }' | sort | head -1)
+if [ -s "$list_error" ]; then
+    warn "Could not list the database dumps to check their age: $(head -c 200 "$list_error")"
+fi
+rm -f "$list_error"
 if [ -n "$oldest_dump" ]; then
     dump_days=$((($(date +%s) - $(date -d "$oldest_dump" +%s)) / 86400))
     note "Oldest database dump: ${dump_days} day(s)"

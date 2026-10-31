@@ -116,6 +116,26 @@ SQL
     check "the default password no longer works" login_is 401 umami
 }
 
+json_field() { python3 -c 'import json,sys; print(json.load(sys.stdin).get(sys.argv[1]))' "$1"; }
+
+# install.sh requires 2FA for everyone before Caddy starts; Umami must then report it as required.
+test_global_2fa() {
+    log "1b. global two-factor requirement"
+    local pw token status
+    pw=$(openssl rand -hex 24)
+    docker exec -i "${PREFIX}-pg" psql -U umami -d umami -v ON_ERROR_STOP=1 -v hash="$(docker run --rm "$CADDY_IMAGE" caddy hash-password --plaintext "$pw")" >/dev/null <<'SQL'
+UPDATE "user" SET password = :'hash' WHERE username = 'admin';
+SQL
+    token=$(curl -s -X POST "http://localhost:${UMAMI_PORT}/api/auth/login" -H 'Content-Type: application/json' \
+        -d "{\"username\":\"admin\",\"password\":\"$pw\"}" | json_field token)
+    status=$(curl -s -H "Authorization: Bearer $token" "http://localhost:${UMAMI_PORT}/api/2fa/status")
+    check "before the setting, 2FA is not required" test "$(json_field isRequired <<<"$status")" = False
+    check "enable-global-2fa.sql runs" run_sql_file "$ROOT/sql/enable-global-2fa.sql"
+    check "it can run twice" run_sql_file "$ROOT/sql/enable-global-2fa.sql"
+    status=$(curl -s -H "Authorization: Bearer $token" "http://localhost:${UMAMI_PORT}/api/2fa/status")
+    check "Umami now requires 2FA for everyone (reason: global)" test "$(json_field isRequired <<<"$status")/$(json_field requiredReason <<<"$status")" = True/global
+}
+
 test_maintenance() {
     log "2. maintenance.sql"
     psql_db <"$HERE/seed.sql" >/dev/null
@@ -192,6 +212,7 @@ main() {
     start_umami
     build_caddy
     test_admin_password
+    test_global_2fa
     test_maintenance
     test_reset_2fa
     test_caddy

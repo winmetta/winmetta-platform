@@ -221,6 +221,19 @@ setup_shell() {
     fi
 }
 
+# Require two-factor sign-in for every account before the dashboard is public. The key in
+# umami.env only makes enrolment possible; this is the installation-wide requirement (the
+# setting behind Admin > Security), set directly in the database and checked.
+require_global_2fa() {
+    docker exec -i analytics-postgres psql -U umami -d umami -v ON_ERROR_STOP=1 </opt/analytics/sql/enable-global-2fa.sql >/dev/null
+    local value
+    value=$(docker exec analytics-postgres psql -U umami -d umami -At -c "SELECT value FROM app_setting WHERE key = 'twoFactorRequiredGlobal'")
+    [ "$value" = "true" ] || {
+        log "could not enable the global 2FA requirement; not starting Caddy"
+        exit 1
+    }
+}
+
 # Caddy is what puts the dashboard on the internet, so it starts last.
 start_public_services() {
     systemctl enable --now analytics-caddy analytics-backup.timer analytics-maintenance.timer \
@@ -238,6 +251,7 @@ install_units
 systemctl enable --now analytics-postgres analytics-umami
 restart_changed_services
 secure_admin_account
+require_global_2fa
 start_public_services
 setup_shell
 log "done"
