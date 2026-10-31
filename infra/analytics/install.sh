@@ -62,9 +62,10 @@ mount_data_volume() {
         exit 1
     }
     # Only format a blank volume; an existing filesystem (a reattached volume) is kept.
-    blkid "$dev" >/dev/null 2>&1 || mkfs.xfs -L analytics-data "$dev"
+    # An XFS label may be at most 12 characters ("analytics-data" was 14 and made mkfs fail).
+    blkid "$dev" >/dev/null 2>&1 || mkfs.xfs -L analytics "$dev"
     mkdir -p /data
-    grep -q 'LABEL=analytics-data' /etc/fstab || echo 'LABEL=analytics-data /data xfs defaults,nofail 0 2' >>/etc/fstab
+    grep -q 'LABEL=analytics' /etc/fstab || echo 'LABEL=analytics /data xfs defaults,nofail 0 2' >>/etc/fstab
     mount /data
     mkdir -p /data/postgres /data/caddy /data/tmp
 }
