@@ -5,7 +5,7 @@ The operations runbook for `app.winmetta.org` and the analytics server (deploy, 
 What stays here, in public:
 
 - **How the site is built and deployed:** [tech-architecture.md](tech-architecture.md) §6-§8 and the workflows in `.github/workflows/`. Merging to `main` builds the site and, after a maintainer approves the `production` environment, publishes it.
-- **The infrastructure code and its README:** [`infra/pulumi/`](../infra/pulumi/README.md) and `infra/analytics/`.
+- **The infrastructure code and its README:** [`infra/pulumi/`](../infra/pulumi/README.md).
 - **The analytics design and rules:** [analytics.md](analytics.md).
 - **Local development:** [developer-guide.md](developer-guide.md).
 
