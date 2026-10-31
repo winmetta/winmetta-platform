@@ -7,13 +7,14 @@ RequiresMountsFor=/data
 [Service]
 EnvironmentFile=/opt/analytics/versions.env
 EnvironmentFile=/etc/analytics/instance.env
+EnvironmentFile=/etc/analytics/caddy-image
 Restart=always
 RestartSec=5
 ExecStartPre=-/usr/bin/docker rm -f analytics-caddy
 ExecStart=/usr/bin/docker run --rm --name analytics-caddy --network analytics --memory 200m \
   -p 80:80 -p 443:443 -e STATS_DOMAIN=${STATS_DOMAIN} \
   -v /opt/analytics/caddy/Caddyfile:/etc/caddy/Caddyfile:ro -v /data/caddy:/data \
-  analytics-caddy:${CADDY_VERSION}
+  ${CADDY_IMAGE}
 ExecStop=/usr/bin/docker stop -t 10 analytics-caddy
 
 [Install]

@@ -116,11 +116,18 @@ prepare_images() {
     docker network inspect analytics >/dev/null 2>&1 || docker network create analytics
     docker pull "$POSTGRES_IMAGE"
     docker pull "$UMAMI_IMAGE"
-    if ! docker image inspect "analytics-caddy:${CADDY_VERSION}" >/dev/null 2>&1; then
+    # The tag carries a fingerprint of the build inputs (Dockerfile and rate-limit module
+    # revision), so changing either makes a new tag, a rebuild and, below, a restart.
+    CADDY_IMAGE="analytics-caddy:${CADDY_VERSION}-$({
+        cat /opt/analytics/caddy/Dockerfile
+        printf '%s' "$CADDY_RATELIMIT_REF"
+    } | sha256sum | cut -c1-12)"
+    printf 'CADDY_IMAGE=%s\n' "$CADDY_IMAGE" >/etc/analytics/caddy-image
+    if ! docker image inspect "$CADDY_IMAGE" >/dev/null 2>&1; then
         # Free the memory for the build; the services start again below.
         systemctl stop analytics-caddy analytics-umami 2>/dev/null || true
         docker build --build-arg "CADDY_VERSION=${CADDY_VERSION}" --build-arg "RATELIMIT_REF=${CADDY_RATELIMIT_REF}" \
-            -t "analytics-caddy:${CADDY_VERSION}" /opt/analytics/caddy
+            -t "$CADDY_IMAGE" /opt/analytics/caddy
     fi
 }
 
@@ -129,24 +136,47 @@ install_units() {
     systemctl daemon-reload
 }
 
-# A running container keeps using the image it started from, so after new images are pulled
-# (an upgrade in versions.env, or a patched tag) the services whose image changed are
-# restarted. Nothing is restarted on a first boot or when nothing changed.
+# A running container keeps using the image and settings it started with, and
+# `systemctl enable --now` does not restart a unit that is already active. So after an
+# update the services are restarted when (a) a pulled image differs from the running one, or
+# (b) the runtime configuration changed: the Caddyfile, a unit, versions.env or an env file
+# (compared by fingerprint, so the secrets themselves are never stored). Nothing restarts on
+# a first boot or when nothing changed.
+config_fingerprint() {
+    {
+        cat /opt/analytics/caddy/Caddyfile /opt/analytics/versions.env /etc/analytics/*.env
+        cat /opt/analytics/systemd/*.service /opt/analytics/systemd/*.timer
+    } 2>/dev/null | sha256sum | cut -d' ' -f1
+}
+
 restart_changed_services() {
     # shellcheck source=/dev/null
     source /opt/analytics/versions.env
-    local pair unit container image running wanted
-    for pair in "analytics-postgres:${POSTGRES_IMAGE}" "analytics-umami:${UMAMI_IMAGE}" "analytics-caddy:analytics-caddy:${CADDY_VERSION}"; do
+    # shellcheck source=/dev/null
+    source /etc/analytics/caddy-image
+    local pair unit image running wanted restart_all=0 now stored
+    local stamp=/var/lib/analytics/status/config.sha256
+    now=$(config_fingerprint)
+    stored=$(cat "$stamp" 2>/dev/null || true)
+    if [ -n "$stored" ] && [ "$stored" != "$now" ]; then
+        log "runtime configuration changed; restarting the services"
+        restart_all=1
+    fi
+    for pair in "analytics-postgres:${POSTGRES_IMAGE}" "analytics-umami:${UMAMI_IMAGE}" "analytics-caddy:${CADDY_IMAGE}"; do
         unit=${pair%%:*}
         image=${pair#*:}
-        container=$unit
-        running=$(docker inspect -f '{{.Image}}' "$container" 2>/dev/null || true)
+        if [ "$restart_all" = 1 ]; then
+            systemctl restart "$unit"
+            continue
+        fi
+        running=$(docker inspect -f '{{.Image}}' "$unit" 2>/dev/null || true)
         wanted=$(docker image inspect -f '{{.Id}}' "$image" 2>/dev/null || true)
         if [ -n "$running" ] && [ -n "$wanted" ] && [ "$running" != "$wanted" ]; then
             log "$unit runs an older image; restarting it"
             systemctl restart "$unit"
         fi
     done
+    printf '%s\n' "$now" >"$stamp"
 }
 
 # Umami installs a well-known administrator login (admin / umami). Nothing listens on the
@@ -170,7 +200,9 @@ secure_admin_account() {
         sleep 5
     done
     pw=$(openssl rand -hex 24)
-    hash=$(docker run --rm "analytics-caddy:${CADDY_VERSION}" caddy hash-password --plaintext "$pw")
+    # shellcheck source=/dev/null
+    source /etc/analytics/caddy-image
+    hash=$(docker run --rm "$CADDY_IMAGE" caddy hash-password --plaintext "$pw")
     docker exec -i analytics-postgres psql -U umami -d umami -v ON_ERROR_STOP=1 -v hash="$hash" <<'SQL'
 UPDATE "user" SET password = :'hash' WHERE username = 'admin';
 SQL
