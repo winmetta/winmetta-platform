@@ -176,6 +176,25 @@ SQL
     expect_sql "bob is untouched" "1|1|1|1" "SELECT (SELECT count(*) FROM two_factor_auth WHERE user_id = '00000000-0000-0000-0000-0000000000e2') || '|' || (SELECT count(*) FROM two_factor_backup_code WHERE user_id = '00000000-0000-0000-0000-0000000000e2') || '|' || (SELECT count(*) FROM two_factor_otp_used WHERE user_id = '00000000-0000-0000-0000-0000000000e2') || '|' || (SELECT count(*) FROM two_factor_rate_limit WHERE user_id = '00000000-0000-0000-0000-0000000000e2')"
 }
 
+restore_dump() { docker exec -i "${PREFIX}-pg" pg_restore -U umami -d umami --single-transaction --exit-on-error --clean --if-exists --no-owner; }
+
+# The flags of restore-dump.sh: a damaged dump must leave the database as it was, a good one
+# must bring the dumped state back.
+test_restore() {
+    log "3b. restore (the pg_restore flags of restore-dump.sh)"
+    local good=/tmp/${PREFIX}-good.dump bad=/tmp/${PREFIX}-bad.dump
+    docker exec "${PREFIX}-pg" pg_dump -U umami -d umami --format=custom >"$good"
+    head -c "$(($(wc -c <"$good") / 2))" "$good" >"$bad"
+    psql_db -c "UPDATE website SET name = 'changed' WHERE website_id = '00000000-0000-0000-0000-0000000000a1'" >/dev/null
+    if restore_dump <"$bad" >/dev/null 2>&1; then fail "a damaged dump was accepted"; else pass "a damaged dump is rejected"; fi
+    expect_sql "the database is unchanged after the failed restore" "changed" \
+        "SELECT name FROM website WHERE website_id = '00000000-0000-0000-0000-0000000000a1'"
+    check "a good dump restores" restore_dump <"$good"
+    expect_sql "the dumped state is back" "test" \
+        "SELECT name FROM website WHERE website_id = '00000000-0000-0000-0000-0000000000a1'"
+    rm -f "$good" "$bad"
+}
+
 caddy_validates() {
     docker run --rm -e STATS_DOMAIN=stats.example.test -v "$ROOT/caddy/Caddyfile:/etc/caddy/Caddyfile:ro" \
         "$CADDY_IMAGE" caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile >/dev/null 2>&1
@@ -215,6 +234,7 @@ main() {
     test_global_2fa
     test_maintenance
     test_reset_2fa
+    test_restore
     test_caddy
     log "done: ${failures} failure(s)"
     [[ $failures -eq 0 ]]

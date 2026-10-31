@@ -9,7 +9,14 @@ set -euo pipefail
 source /etc/analytics/instance.env
 dump=${1:?usage: restore-dump.sh <dump file name under dumps/>}
 file="/data/tmp/restore.dump"
-trap 'rm -f "$file"' EXIT
+
+# Umami is stopped for the restore and ALWAYS started again, on success and on any failure
+# (with a failed restore the database is unchanged, see below).
+cleanup() {
+    rm -f "$file"
+    systemctl start analytics-umami || true
+}
+trap cleanup EXIT
 
 refresh_two_factor_key() {
     local twofa
@@ -25,9 +32,12 @@ refresh_two_factor_key() {
 aws s3 cp "s3://${BUCKET}/dumps/${dump}" "$file" --region "$AWS_REGION" --only-show-errors
 refresh_two_factor_key
 systemctl stop analytics-umami
-docker exec -i analytics-postgres pg_restore -U umami -d umami --clean --if-exists --no-owner <"$file"
+# One transaction that stops at the first error: an incompatible schema or a damaged dump
+# rolls everything back (including the DROPs of --clean) instead of leaving a half-restored
+# database.
+docker exec -i analytics-postgres pg_restore -U umami -d umami --single-transaction --exit-on-error \
+    --clean --if-exists --no-owner <"$file"
 # The restored database already holds the real administrator accounts: never let the
 # installer's first-boot step replace the admin password again.
 touch /data/.admin-bootstrapped
-systemctl start analytics-umami
 echo "Restored ${dump}."
