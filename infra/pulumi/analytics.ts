@@ -465,8 +465,11 @@ export function createAnalytics({ zone, domain, tags }: AnalyticsArgs) {
     },
     opts,
   );
+  // AWS cannot change a count-based snapshot policy into an age-based one in place (the first
+  // version of this policy counted snapshots), so the age-based policy has its own name: Pulumi
+  // creates it and deletes the old one. Snapshots that already exist age out by themselves.
   new aws.dlm.LifecyclePolicy(
-    'analytics',
+    'analytics-age',
     {
       description:
         'Daily snapshots of the analytics data volume - kept 14 days',
@@ -487,7 +490,10 @@ export function createAnalytics({ zone, domain, tags }: AnalyticsArgs) {
         ],
       },
     },
-    { provider, dependsOn: [dlmAttachment] },
+    {
+      provider,
+      dependsOn: [dlmAttachment],
+    },
   );
 
   // --- The instance ----------------------------------------------------------------------
