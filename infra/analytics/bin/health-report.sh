@@ -112,12 +112,18 @@ else
 fi
 
 # --- Updates ---------------------------------------------------------------------------
-# dnf check-update exits 100 when updates exist, 0 when none.
+# dnf check-update exits 100 when updates exist, 0 when none, and anything else when it
+# could not check (repository down, DNS, broken metadata): that must not look like "no updates".
 sec=$(dnf check-update --security --quiet 2>/dev/null)
-if [ $? -eq 100 ]; then
+dnf_status=$?
+case $dnf_status in
+0) ;;
+100)
     count=$(echo "$sec" | grep -c '^[A-Za-z0-9]' || true)
     warn "$count security update(s) are waiting (dnf-automatic installs them; check why not)"
-fi
+    ;;
+*) warn "Could not check for security updates (dnf check-update exited $dnf_status: a repository, DNS or metadata problem)" ;;
+esac
 if command -v needs-restarting >/dev/null 2>&1; then
     needs-restarting -r >/dev/null 2>&1 || warn "A reboot is needed to finish updates: sudo reboot (see runbook, routine)"
 else
@@ -147,10 +153,18 @@ if [ -n "$oldest" ]; then
 else
     warn "Could not query the database"
 fi
-unscrubbed=$(sql "SELECT count(*) FROM session WHERE created_at < now() - interval '3 hours' AND (screen IS NOT NULL OR region IS NOT NULL OR city IS NOT NULL OR distinct_id IS NOT NULL)")
-[ "${unscrubbed:-0}" -gt 0 ] && warn "$unscrubbed session(s) still hold screen, region, city or distinct id: the scrub job is not working"
-queries=$(sql "SELECT count(*) FROM website_event WHERE created_at < now() - interval '3 hours' AND (url_query IS NOT NULL OR referrer_query IS NOT NULL)")
-[ "${queries:-0}" -gt 0 ] && warn "$queries event(s) still hold a URL or referrer query string: check the tracker and the scrub job"
+# Only rows older than the last maintenance run can be expected to be scrubbed already; rows
+# created between that run and this report are scrubbed by the next one.
+maintenance_epoch=$(cat "$STATE/maintenance.ok" 2>/dev/null || true)
+if [[ $maintenance_epoch =~ ^[0-9]+$ ]]; then
+    cutoff="to_timestamp($maintenance_epoch) - interval '5 minutes'"
+    unscrubbed=$(sql "SELECT count(*) FROM session WHERE created_at < $cutoff AND (screen IS NOT NULL OR region IS NOT NULL OR city IS NOT NULL OR distinct_id IS NOT NULL)")
+    [ "${unscrubbed:-0}" -gt 0 ] && warn "$unscrubbed session(s) still hold screen, region, city or distinct id: the scrub job is not working"
+    queries=$(sql "SELECT count(*) FROM website_event WHERE created_at < $cutoff AND (url_query IS NOT NULL OR referrer_query IS NOT NULL)")
+    [ "${queries:-0}" -gt 0 ] && warn "$queries event(s) still hold a URL or referrer query string: check the tracker and the scrub job"
+else
+    note "Scrub check skipped: no maintenance run has been recorded yet"
+fi
 events=$(sql "SELECT count(*) FROM website_event WHERE created_at > now() - interval '24 hours'")
 last_events=$(cat "$STATE/events.last" 2>/dev/null || echo 0)
 echo "${events:-0}" >"$STATE/events.last"
