@@ -13,15 +13,16 @@ export AWS_DEFAULT_REGION=$AWS_REGION
 log() { echo "[analytics-install] $*"; }
 
 install_packages() {
-    dnf install -y docker dnf-automatic sysstat dnf-utils
+    dnf install -y docker sysstat dnf-utils
     mkdir -p /etc/docker
     cat >/etc/docker/daemon.json <<'JSON'
 { "log-driver": "json-file", "log-opts": { "max-size": "10m", "max-file": "3" } }
 JSON
     systemctl enable --now docker
-    # Security updates apply by themselves; reboot for kernel updates in the monthly maintenance.
-    sed -i 's/^apply_updates.*/apply_updates = yes/; s/^upgrade_type.*/upgrade_type = security/' /etc/dnf/automatic.conf
-    systemctl enable --now dnf-automatic-install.timer
+    # Updates: an AL2023 instance is locked to the repository version of its AMI, so dnf-automatic
+    # alone would only ever install updates from that old snapshot. analytics-os-update.timer
+    # (weekly) upgrades to the latest repository version instead; a kernel update needs a reboot,
+    # which the daily report asks for.
     # Keeps network and I/O history for the daily report; not essential, so do not stop the install.
     systemctl enable --now sysstat || log "sysstat not enabled; traffic history will be missing"
     mkdir -p /var/lib/analytics/status
@@ -223,7 +224,7 @@ setup_shell() {
 # Caddy is what puts the dashboard on the internet, so it starts last.
 start_public_services() {
     systemctl enable --now analytics-caddy analytics-backup.timer analytics-maintenance.timer \
-        analytics-report.timer
+        analytics-os-update.timer analytics-report.timer
 }
 
 install_packages

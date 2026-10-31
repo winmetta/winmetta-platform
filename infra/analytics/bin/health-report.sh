@@ -114,13 +114,13 @@ fi
 # --- Updates ---------------------------------------------------------------------------
 # dnf check-update exits 100 when updates exist, 0 when none, and anything else when it
 # could not check (repository down, DNS, broken metadata): that must not look like "no updates".
-sec=$(dnf check-update --security --quiet 2>/dev/null)
+sec=$(dnf --releasever=latest check-update --security --quiet 2>/dev/null)
 dnf_status=$?
 case $dnf_status in
 0) ;;
 100)
     count=$(echo "$sec" | grep -c '^[A-Za-z0-9]' || true)
-    warn "$count security update(s) are waiting (dnf-automatic installs them; check why not)"
+    warn "$count security update(s) are waiting in the latest release (analytics-os-update applies them weekly; check why not)"
     ;;
 *) warn "Could not check for security updates (dnf check-update exited $dnf_status: a repository, DNS or metadata problem)" ;;
 esac
@@ -144,6 +144,25 @@ for job in backup maintenance; do
         note "Nightly $job job finished ${hours} hours ago"
     fi
 done
+
+# The weekly OS update must have run in the last 9 days.
+hours=$(age_hours "$STATE/os-update.ok")
+if [ -z "$hours" ]; then
+    warn "The weekly operating system update has never finished"
+elif [ "$hours" -gt 216 ]; then
+    warn "The weekly operating system update last finished $((hours / 24)) days ago"
+else
+    note "Operating system update finished $((hours / 24)) day(s) ago"
+fi
+
+# Dumps are deleted by an S3 lifecycle rule after 21 days, which S3 carries out with some delay.
+# Check that none is older than the deadline (docs/analytics.md section 4, retention).
+oldest_dump=$(aws s3 ls "s3://${BUCKET}/dumps/" --region "$AWS_REGION" 2>/dev/null | awk '{ print $1 }' | sort | head -1)
+if [ -n "$oldest_dump" ]; then
+    dump_days=$((($(date +%s) - $(date -d "$oldest_dump" +%s)) / 86400))
+    note "Oldest database dump: ${dump_days} day(s)"
+    [ "$dump_days" -gt 23 ] && warn "A database dump is ${dump_days} days old: dumps must be gone after 21 days (retention). Check the bucket lifecycle rule and delete it with an admin profile"
+fi
 
 sql() { docker exec -i analytics-postgres psql -U umami -d umami -At -c "$1" 2>/dev/null; }
 oldest=$(sql "SELECT COALESCE(floor(extract(epoch FROM now() - min(created_at)) / 86400)::int, 0) FROM website_event")

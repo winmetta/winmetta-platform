@@ -119,7 +119,8 @@ alias a-net='sudo ss -tulpn'
 alias a-conns='ss -s'
 alias a-bandwidth='sar -n DEV 1 3'
 alias a-time='timedatectl; chronyc tracking 2>/dev/null | head -5'
-alias a-updates='dnf check-update --security; needs-restarting -r'
+alias a-updates='dnf --releasever=latest check-update --security; needs-restarting -r'
+alias a-run-os-update='sudo systemctl start analytics-os-update.service && sudo journalctl -u analytics-os-update -n 30 --no-pager'
 alias a-top='htop'
 
 # --- Scripts: lint and format (ShellCheck, shfmt), see also vim with ALE -----------------

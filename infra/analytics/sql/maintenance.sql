@@ -4,7 +4,7 @@
 \set ON_ERROR_STOP on
 BEGIN;
 
--- 1. Retention: live events are kept 12 months; dumps expire after 30 days and snapshots
+-- 1. Retention: live events are kept 12 months; dumps expire after 21 days and snapshots
 --    after 14, so no copy of an event outlives 13 months (docs/analytics.md section 4).
 --    Children are deleted THROUGH their parents, not by their own created_at: event_data
 --    and session_data have foreign keys to website_event and session, and a child row

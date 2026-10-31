@@ -1,0 +1,9 @@
+[Unit]
+Description=Analytics: weekly operating system updates (latest AL2023 release)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+TimeoutStartSec=1800
+ExecStart=/opt/analytics/bin/os-update.sh

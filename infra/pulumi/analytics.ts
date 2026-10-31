@@ -135,8 +135,8 @@ export function createAnalytics({ zone, domain, tags }: AnalyticsArgs) {
     opts,
   );
 
-  // --- Bucket: server config (config/) and database dumps (dumps/, expire in 30 days) ---
-  // Private and encrypted. Dumps expire after 30 days so that, with events deleted from the
+  // --- Bucket: server config (config/) and database dumps (dumps/, expire in 21 days) ---
+  // Private and encrypted. Dumps expire after 21 days (S3 deletes with some delay, and the daily report checks that none is older than 23 days) so that, with events deleted from the
   // live database after 12 months, no copy of an event outlives 13 months (analytics.md §4).
   const bucket = new aws.s3.Bucket(
     'analytics',
@@ -183,7 +183,7 @@ export function createAnalytics({ zone, domain, tags }: AnalyticsArgs) {
           id: 'expire-dumps',
           status: 'Enabled',
           filter: { prefix: 'dumps/' },
-          expiration: { days: 30 },
+          expiration: { days: 21 },
           abortIncompleteMultipartUpload: { daysAfterInitiation: 7 },
         },
       ],
