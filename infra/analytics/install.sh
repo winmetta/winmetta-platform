@@ -129,6 +129,26 @@ install_units() {
     systemctl daemon-reload
 }
 
+# A running container keeps using the image it started from, so after new images are pulled
+# (an upgrade in versions.env, or a patched tag) the services whose image changed are
+# restarted. Nothing is restarted on a first boot or when nothing changed.
+restart_changed_services() {
+    # shellcheck source=/dev/null
+    source /opt/analytics/versions.env
+    local pair unit container image running wanted
+    for pair in "analytics-postgres:${POSTGRES_IMAGE}" "analytics-umami:${UMAMI_IMAGE}" "analytics-caddy:analytics-caddy:${CADDY_VERSION}"; do
+        unit=${pair%%:*}
+        image=${pair#*:}
+        container=$unit
+        running=$(docker inspect -f '{{.Image}}' "$container" 2>/dev/null || true)
+        wanted=$(docker image inspect -f '{{.Id}}' "$image" 2>/dev/null || true)
+        if [ -n "$running" ] && [ -n "$wanted" ] && [ "$running" != "$wanted" ]; then
+            log "$unit runs an older image; restarting it"
+            systemctl restart "$unit"
+        fi
+    done
+}
+
 # Umami installs a well-known administrator login (admin / umami). Nothing listens on the
 # public ports until Caddy starts, so the password is replaced here first, and the new one
 # is left in Parameter Store for the maintainer to read once, change and delete
@@ -183,6 +203,7 @@ write_env_files
 prepare_images
 install_units
 systemctl enable --now analytics-postgres analytics-umami
+restart_changed_services
 secure_admin_account
 start_public_services
 setup_shell

@@ -1,6 +1,6 @@
 [Unit]
 Description=Analytics: daily health report
-After=analytics-caddy.service
+After=analytics-caddy.service analytics-maintenance.service analytics-backup.service
 
 [Service]
 Type=oneshot

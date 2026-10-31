@@ -270,6 +270,13 @@ export function createAnalytics({ zone, domain, tags }: AnalyticsArgs) {
               StringEquals: { 'aws:SourceAccount': account.accountId },
             },
           },
+          {
+            Sid: 'AllowEventBridge',
+            Effect: 'Allow',
+            Principal: { Service: 'events.amazonaws.com' },
+            Action: 'SNS:Publish',
+            Resource: topic.arn,
+          },
         ],
       }),
     },
@@ -363,11 +370,19 @@ export function createAnalytics({ zone, domain, tags }: AnalyticsArgs) {
             Condition: { StringLike: { 's3:prefix': ['config/*', 'config'] } },
           },
           {
-            // Write-only: the instance can add dumps but cannot read or delete them.
-            Sid: 'WriteDumps',
+            // Add and read dumps (bin/restore-dump.sh downloads one); never delete. A dump holds
+            // what the live database holds, and the instance already has that.
+            Sid: 'WriteAndReadDumps',
             Effect: 'Allow',
-            Action: 's3:PutObject',
+            Action: ['s3:PutObject', 's3:GetObject'],
             Resource: pulumi.interpolate`${bucket.arn}/dumps/*`,
+          },
+          {
+            Sid: 'ListDumps',
+            Effect: 'Allow',
+            Action: 's3:ListBucket',
+            Resource: bucket.arn,
+            Condition: { StringLike: { 's3:prefix': ['dumps/*', 'dumps'] } },
           },
           {
             Sid: 'OwnSecrets',
@@ -543,9 +558,45 @@ bash /opt/analytics/install.sh >>/var/log/analytics-install.log 2>&1
   // Monitoring is a script on the instance, not CloudWatch metrics, alarms or a Route 53
   // health check (docs/analytics.md §9 item 11): bin/health-report.sh checks the server and
   // the site once a night and emails one digest through the topic. A dead server cannot
-  // send a report, so a single alarm on EC2's own free status-check metric (about $0.10 a
-  // month) covers that. A stopped timer or a service that is down while the instance is up
+  // send a report, so an alarm on EC2's own free status-check metric (about $0.10 a month)
+  // and an EventBridge rule for stops and terminations cover that. A stopped timer or a service that is down while the instance is up
   // is only noticed by the next report (up to a day later), which was accepted on purpose.
+  // A stopped or terminated instance sends no status-check data at all, so that alarm cannot
+  // see it; EventBridge reports the state change itself. It is a free, immediate email.
+  const stateRule = new aws.cloudwatch.EventRule(
+    'instance-state',
+    {
+      name: `${NAME}-instance-state`,
+      description:
+        'The analytics EC2 instance stopped, is stopping or was terminated',
+      eventPattern: pulumi.jsonStringify({
+        source: ['aws.ec2'],
+        'detail-type': ['EC2 Instance State-change Notification'],
+        detail: {
+          'instance-id': [instance.id],
+          state: ['stopping', 'stopped', 'shutting-down', 'terminated'],
+        },
+      }),
+    },
+    opts,
+  );
+  new aws.cloudwatch.EventTarget(
+    'instance-state',
+    {
+      rule: stateRule.name,
+      arn: topic.arn,
+      inputTransformer: {
+        inputPaths: {
+          id: '$.detail.instance-id',
+          state: '$.detail.state',
+          time: '$.time',
+        },
+        inputTemplate:
+          '"The analytics server <id> is now <state> (<time>). If this was not planned, see the runbook, analytics section."',
+      },
+    },
+    { provider, dependsOn: [topicPolicy] },
+  );
   new aws.cloudwatch.MetricAlarm(
     'instance-status',
     {

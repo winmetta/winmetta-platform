@@ -78,7 +78,7 @@ alias a-whoami='aws sts get-caller-identity --output table'
 alias a-s3-config='aws s3 ls "s3://$BUCKET/config/" --recursive --human-readable'
 alias a-s3-diff='aws s3 sync "s3://$BUCKET/config/" /opt/analytics/ --delete --dryrun'
 alias a-s3-sync='sudo aws s3 sync "s3://$BUCKET/config/" /opt/analytics/ --delete && sudo chmod +x /opt/analytics/install.sh /opt/analytics/bin/*.sh'
-alias a-s3-dumps='aws s3 ls "s3://$BUCKET/dumps/" --human-readable || echo "This role can write dumps but not list them (by design). List them from your laptop with an admin profile."'
+alias a-s3-dumps='aws s3 ls "s3://$BUCKET/dumps/" --human-readable'
 alias a-ssm-names='aws ssm describe-parameters --parameter-filters "Key=Path,Values=$PARAM_PREFIX" --query "Parameters[].[Name,LastModifiedDate]" --output table'
 alias a-imds='TOKEN=$(curl -s -X PUT http://169.254.169.254/latest/api/token -H "X-aws-ec2-metadata-token-ttl-seconds: 60") && curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/dynamic/instance-identity/document'
 

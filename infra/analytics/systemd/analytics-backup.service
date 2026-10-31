@@ -1,7 +1,7 @@
 [Unit]
 Description=Analytics: Nightly database dump to S3
 Requires=analytics-postgres.service
-After=analytics-postgres.service
+After=analytics-postgres.service analytics-maintenance.service
 
 [Service]
 Type=oneshot
