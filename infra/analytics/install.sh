@@ -123,13 +123,14 @@ prepare_images() {
         cat /opt/analytics/caddy/Dockerfile
         printf '%s' "$CADDY_RATELIMIT_REF"
     } | sha256sum | cut -c1-12)"
-    printf 'CADDY_IMAGE=%s\n' "$CADDY_IMAGE" >/etc/analytics/caddy-image
+    # Build while the current services keep running (the 2 GB swap file makes room); if the
+    # build fails the installer stops here with nothing stopped and the unit's image file
+    # (/etc/analytics/caddy-image) still pointing at the image that is running.
     if ! docker image inspect "$CADDY_IMAGE" >/dev/null 2>&1; then
-        # Free the memory for the build; the services start again below.
-        systemctl stop analytics-caddy analytics-umami 2>/dev/null || true
         docker build --build-arg "CADDY_VERSION=${CADDY_VERSION}" --build-arg "RATELIMIT_REF=${CADDY_RATELIMIT_REF}" \
             -t "$CADDY_IMAGE" /opt/analytics/caddy
     fi
+    printf 'CADDY_IMAGE=%s\n' "$CADDY_IMAGE" >/etc/analytics/caddy-image
 }
 
 install_units() {
