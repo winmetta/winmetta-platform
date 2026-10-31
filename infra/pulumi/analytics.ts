@@ -268,6 +268,9 @@ export function createAnalytics({ zone, domain, tags }: AnalyticsArgs) {
             Resource: topic.arn,
             Condition: {
               StringEquals: { 'aws:SourceAccount': account.accountId },
+              ArnLike: {
+                'aws:SourceArn': pulumi.interpolate`arn:aws:budgets::${account.accountId}:*`,
+              },
             },
           },
           {
@@ -276,6 +279,14 @@ export function createAnalytics({ zone, domain, tags }: AnalyticsArgs) {
             Principal: { Service: 'events.amazonaws.com' },
             Action: 'SNS:Publish',
             Resource: topic.arn,
+            // Only this account's instance-state rule (its name is fixed below), not any
+            // EventBridge rule that names the topic.
+            Condition: {
+              StringEquals: { 'aws:SourceAccount': account.accountId },
+              ArnEquals: {
+                'aws:SourceArn': pulumi.interpolate`arn:aws:events:${REGION}:${account.accountId}:rule/${NAME}-instance-state`,
+              },
+            },
           },
         ],
       }),
