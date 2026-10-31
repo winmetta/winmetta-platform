@@ -479,7 +479,13 @@ export function createAnalytics({ zone, domain, tags }: AnalyticsArgs) {
   // `ignoreChanges` keeps a newer AMI from replacing a running server. Roll a new AMI in on
   // purpose (docs/runbook.md). User data is only a launcher: it fetches the real installer
   // from the config bucket, so it holds no secret and little logic.
-  const ami = aws.ssm.getParameterOutput({ name: amiParameter }, { provider });
+  // The lookup runs only when the stack is really updated. A preview (dry run) uses a
+  // placeholder: the AMI is ignored after creation anyway, and a pull request's preview role
+  // may not be allowed to read the public parameter until `pulumi up` has applied this
+  // very change to its policy.
+  const amiId = pulumi.runtime.isDryRun()
+    ? pulumi.output('ami-00000000000000000')
+    : aws.ssm.getParameterOutput({ name: amiParameter }, { provider }).value;
   const userData = pulumi.interpolate`#!/bin/bash
 set -euo pipefail
 mkdir -p /etc/analytics /opt/analytics
@@ -502,7 +508,7 @@ bash /opt/analytics/install.sh >>/var/log/analytics-install.log 2>&1
   const instance = new aws.ec2.Instance(
     'analytics',
     {
-      ami: ami.value,
+      ami: amiId,
       instanceType,
       subnetId: subnet.id,
       vpcSecurityGroupIds: [securityGroup.id],
