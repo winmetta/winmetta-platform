@@ -1,0 +1,10 @@
+[Unit]
+Description=Analytics: Nightly database dump to S3
+
+[Timer]
+# After the 01:30 retention and scrub job.
+OnCalendar=*-*-* 02:00:00 UTC
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,16 @@
+[Unit]
+Description=Analytics Umami
+Requires=analytics-postgres.service
+After=analytics-postgres.service
+
+[Service]
+EnvironmentFile=/opt/analytics/versions.env
+Restart=always
+RestartSec=10
+ExecStartPre=-/usr/bin/docker rm -f analytics-umami
+ExecStart=/usr/bin/docker run --rm --name analytics-umami --network analytics \
+  --env-file /etc/analytics/umami.env --memory 800m ${UMAMI_IMAGE}
+ExecStop=/usr/bin/docker stop -t 30 analytics-umami
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,17 @@
+# GNU screen settings for the analytics server (installed to /etc/analytics/screenrc and
+# loaded from /etc/screenrc by bin/setup-shell.sh).
+# Basics: screen -S name (start)  Ctrl-a d (detach)  screen -r name (reattach)  screen -ls
+# Windows: Ctrl-a c (new)  Ctrl-a n / p (next / previous)  Ctrl-a " (list)  Ctrl-a A (rename)
+# Scrollback: Ctrl-a [ (then arrows / PageUp, q to leave)   Help: Ctrl-a ?
+startup_message off
+defutf8 on
+defscrollback 10000
+vbell off
+autodetach on
+altscreen on
+defbce on
+term screen-256color
+shell -$SHELL
+# Bottom line: host name, load, window list, UTC date and time.
+hardstatus alwayslastline
+hardstatus string '%{= kw}%H %{= kG}%l %{= kw}| %-w%{= BW}%n %t%{-}%+w %=%{= kY}%Y-%m-%d %c UTC'
