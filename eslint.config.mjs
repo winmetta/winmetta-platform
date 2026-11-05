@@ -20,7 +20,11 @@ export default ts.config(
   ...astro.configs.recommended,
   {
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
-    rules: { '@typescript-eslint/no-explicit-any': 'error' },
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'error',
+      complexity: ['warn', 20],
+      'max-depth': ['warn', 5],
+    },
   },
   { files: ['**/*.tsx'], ...a11y.configs.recommended },
 );
