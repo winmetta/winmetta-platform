@@ -17,15 +17,14 @@ GitHub OIDC deploy role. One stack, `production`, all in `us-east-1`. Design:
 | Alias records (A and AAAA)             | `app.winmetta.org` to the distribution.                                                                        |
 | IAM role `winmetta-app-pulumi-preview` | GitHub OIDC for pull requests of this repo; read-only on the Pulumi state plus `kms:Decrypt` on the stack key. |
 | IAM role `winmetta-app-deploy`         | GitHub OIDC, `production` environment of this repo only; sync the bucket and invalidate.                       |
-| Analytics server (`analytics.ts`)      | Off unless the stack config `analyticsEnabled` is true: EC2 + VPC, data volume, snapshots, backup bucket, SNS topic and one status alarm. See the runbook §12 and `../analytics/`. |
+| Analytics server (`analytics.ts`)      | Off unless the stack config `analyticsEnabled` is true: EC2 + VPC, data volume, snapshots, backup bucket, SNS topic and one status alarm. Server code in `../analytics/`; operation in the private runbook. |
 
 The `winmetta-app-pulumi-preview` role (below) lets the `Pulumi preview` workflow run `pulumi preview` on pull requests.
 
 ## Prerequisites
 
-Do the one-time bootstrap first (`../bootstrap/bootstrap.sh`) and install the tools
-with `../../../bootstrap-dev-env/bootstrap.sh` (Pulumi comes from mise). Then, in this
-folder:
+Install the tools with `../../../bootstrap-dev-env/bootstrap.sh` (Pulumi comes from
+mise). Type checks and tests need no AWS access. In this folder:
 
 ```bash
 npm install
@@ -33,27 +32,14 @@ npm run typecheck
 npm test
 ```
 
-## Login
+## Operating the stack
 
-```bash
-aws sso login --profile winmetta-admin
-export AWS_PROFILE=winmetta-admin AWS_REGION=us-east-1
-pulumi login s3://winmetta-pulumi-state
-```
-
-If Pulumi reports "Failed to refresh cached SSO credentials", export temporary
-credentials for the shell instead:
-`eval "$(aws configure export-credentials --format env)"`.
-
-## Create the stack (once)
-
-This writes to the state bucket and creates a data key with KMS. Commit the resulting
-`Pulumi.production.yaml`: it holds no secrets (Phase 2 has none), only the stack
-settings and the encrypted data key.
-
-```bash
-pulumi stack init production --secrets-provider "awskms://alias/winmetta-pulumi?region=us-east-1"
-```
+Every step that signs in to AWS or changes the live account (the one-time bootstrap,
+creating the stack, the staged first apply with the DNS delegation, `pulumi up`,
+refreshing, rebuilding, and setting the repository secret) is in the operations runbook
+in the private companion repository `winmetta/winmetta-platform-private` (access on
+request). This README explains what the program defines and why. Only maintainers run
+`pulumi up`, after reading `pulumi preview`.
 
 ## Why `encryptedkey` is committed
 
@@ -69,7 +55,7 @@ ciphertext and safe to commit; Pulumi needs it to unlock the stack.
   decrypt the stack's secrets.
 - Reading the ciphertext in this public repo gives an attacker nothing: decrypting it
   needs `kms:Decrypt` on the `winmetta-pulumi` key, which only the allowed IAM roles have
-  (the `winmetta-admin` profile today, and the Pulumi preview role later). Keep that
+  (the administrators' SSO role today, and the Pulumi preview role later). Keep that
   access narrow.
 - Phase 2 has no secrets, so the key encrypts nothing yet. The KMS provider stays so
   adding a secret later needs no migration.
@@ -82,36 +68,14 @@ ciphertext and safe to commit; Pulumi needs it to unlock the stack.
   to the same file is still caught). Don't remove the line or silence the rule more
   widely.
 
-## Staged first apply
+## Why the first apply is staged
 
-ACM DNS validation needs the delegation from DreamHost to be live, so the first apply
-has two stages. `pulumi up` changes AWS: a maintainer runs it by hand, after reading
-`pulumi preview`.
-
-1. **Zone and supporting resources.** `delegationConfirmed` is unset (false):
-
-   ```bash
-   pulumi preview
-   pulumi up
-   pulumi stack output nameServers
-   ```
-
-2. **Delegate.** In the DreamHost DNS panel add four `NS` records for `app` with
-   those name servers. Check delegation by resolving a record that exists only in
-   the new zone (for example a temporary `TXT` record) through a public resolver,
-   not by looking up the `NS` records: DreamHost warns that subdomain `NS` records
-   may not show up in public `dig` lookups.
-
-3. **Certificate, distribution, records and deploy role:**
-
-   ```bash
-   pulumi config set delegationConfirmed true
-   pulumi preview
-   pulumi up
-   ```
-
-   Commit the changed `Pulumi.production.yaml`. The certificate validation can take a
-   few minutes, and a new distribution takes about 10 to 15 minutes to deploy.
+ACM validates the certificate through DNS, which only works once DreamHost delegates
+`app` to the new Route 53 zone. So the first apply runs with `delegationConfirmed` unset
+(zone, bucket and the CloudFront pieces that need no DNS), the delegation is added, and
+a second apply with `delegationConfirmed` set to `true` creates the certificate, the
+distribution, the alias records and the deploy role. Never unset the flag on a live
+stack: Pulumi would delete those resources.
 
 ## GitHub OIDC subject (why the config has numeric IDs)
 
@@ -129,16 +93,10 @@ the organization or the repository changes the subject and deploys fail (safely)
 the prefix is refreshed, see below.
 
 If the trust policy uses the name form instead, the deploy fails at "Sign in to AWS with
-the deploy role" with `Not authorized to perform sts:AssumeRoleWithWebIdentity`. To read
-the value GitHub uses:
-
-```bash
-gh api repos/winmetta/winmetta-platform/actions/oidc/customization/sub --jq .sub_claim_prefix
-```
-
-Set it with `pulumi config set githubSubjectPrefix <value>` and apply. Repeat this after
-any of: renaming the organization, renaming the repository, transferring it, or deleting
-and re-creating it (the last two also change the repository ID).
+the deploy role" with `Not authorized to perform sts:AssumeRoleWithWebIdentity`. The
+prefix must be refreshed in the stack config after any of: renaming the organization,
+renaming the repository, transferring it, or deleting and re-creating it (the last two
+also change the repository ID). How: the private operations runbook.
 
 ## Pull request previews
 
@@ -159,15 +117,10 @@ request from a branch of this repository can run it, even one that edits the wor
 so keep the role this small. That is acceptable while the stack has no secrets; revisit
 the trust before one is added.
 
-One-time setup, after the stack is applied: set the repository secret `AWS_ACCOUNT_ID`.
-This repository is public and GitHub never masks variables in the logs, so the account
-ID must be a secret, which GitHub masks wherever it appears. Both workflows build the
-role ARNs from it (`arn:aws:iam::<account id>:role/winmetta-app-pulumi-preview` and
-`.../winmetta-app-deploy`):
-
-```bash
-gh secret set AWS_ACCOUNT_ID --body "$(aws sts get-caller-identity --query Account --output text)"
-```
+Both workflows build the role ARNs from the repository secret `AWS_ACCOUNT_ID`
+(`arn:aws:iam::<account id>:role/winmetta-app-pulumi-preview` and
+`.../winmetta-app-deploy`). This repository is public and GitHub never masks variables in
+the logs, so the account ID must be a secret, which GitHub masks wherever it appears.
 
 The workflow does not put the Pulumi diff in the run summary (it only writes a one-line
 note when there is nothing to preview). GitHub masks secrets in logs but not in summaries,
@@ -194,6 +147,6 @@ then hold a lock and block `pulumi up`. Only maintainers run `pulumi up`, after 
 | `stateBucketName`     | `winmetta-pulumi-state` (the preview role reads it)         |
 | `stateKeyAlias`       | `alias/winmetta-pulumi` (the preview role decrypts with it) |
 | `siteBucketName`      | `winmetta-app-production-site`                              |
-| `delegationConfirmed` | `false` (set `true` for stage 3)                            |
+| `delegationConfirmed` | `false` (`true` once the DNS delegation works, see above)   |
 
 Never put the account ID, keys or other secrets in config or code.

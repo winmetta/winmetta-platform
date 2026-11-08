@@ -6,9 +6,10 @@
 #   3. the GitHub Actions OIDC identity provider
 # Safe to re-run: each step checks whether the resource already exists.
 #
-# Dry run by default (prints every command, changes nothing). To apply:
-#   aws sso login --profile winmetta-admin
-#   AWS_PROFILE=winmetta-admin ./infra/bootstrap/bootstrap.sh --apply
+# Dry run by default (prints every command, changes nothing). Sign in with an
+# administrator SSO profile and set AWS_PROFILE (steps in the private operations
+# runbook), then apply with:
+#   ./infra/bootstrap/bootstrap.sh --apply
 #
 # The account ID is never written to a file or printed; record the resource names it
 # prints (not the account ID) in the runbook. Works with bash 3.2 and AWS CLI v2.
@@ -26,10 +27,9 @@ apply=false
 # CLI from blocking the script on a "less" prompt.
 export AWS_REGION="$REGION" AWS_DEFAULT_REGION="$REGION" AWS_PAGER=""
 [ -n "${AWS_PROFILE:-}" ] || {
-    echo "Set AWS_PROFILE (winmetta-admin) first." >&2
+    echo "Set AWS_PROFILE to an administrator SSO profile first." >&2
     exit 1
 }
-[ "$AWS_PROFILE" = "winmetta-admin" ] || echo "note: expected AWS_PROFILE=winmetta-admin, got $AWS_PROFILE" >&2
 
 # Run a changing command, or only print it in a dry run.
 run() {
