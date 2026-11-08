@@ -104,7 +104,7 @@ Explicitly deferred, not abandoned:
 * **Community submissions & moderated reflections queue.**
 * **Native mobile apps** (Electron/Capacitor builds). v1 targets a single responsive web app designed for mobile and desktop; native wrappers are evaluated only after the web app validates real usage.
 * **Zawgyi legacy encoding support** — see §4.5 and tech-architecture.md. This includes searching the library with Zawgyi-typed queries: v1 search assumes Unicode input, and supporting Zawgyi input is a future improvement with no scheduled phase or date (tech-architecture.md §10).
-* **Learner-level analytics and cross-visit tracking** — not planned. Phases 0–3 collect no analytics. Phase 4 (planned 2026-10-26, not built) adds only cookieless, aggregate activity counts (see [analytics.md](analytics.md)); it cannot recognize the same visitor across days. Local progress remains on the learner's device.
+* **Learner-level analytics and cross-visit tracking** — not planned. Phases 0–3 collect no analytics. Phase 4 (in progress; the server runs, nothing is collected until its stage 4) adds only cookieless, aggregate activity counts (see [analytics.md](analytics.md)); it cannot recognize the same visitor across days. Local progress remains on the learner's device.
 * **A/B testing / experimentation tooling** — deferred until there's a concrete, mission-aligned question worth testing (not for engagement optimization, which conflicts with Calm by Default). Tentative notes in tech-architecture.md §9 for when it's needed.
 
 ---
@@ -138,7 +138,7 @@ No metrics are collected in Phases 0–3. Phase 4 (planned, [analytics.md](analy
 
 ## 7. Phased Roadmap
 
-Phases 0, 1 and 2 are done, and Phase 3 (Dhamma Posts) was merged on 2026-10-25. Phase 4 (Analytics) is planned. Everything after it is a **future phase**: it is not numbered or scheduled, and the maintainer decides the order and scope as the work comes. The list below is a set of candidate directions, not a plan.
+Phases 0, 1 and 2 are done, and Phase 3 (Dhamma Posts) was merged on 2026-10-25. Phase 4 (Analytics) is in progress: its server has run since stage 2 (done 2026-11-07), and nothing is collected until stage 4. Everything after it is a **future phase**: it is not numbered or scheduled, and the maintainer decides the order and scope as the work comes. The list below is a set of candidate directions, not a plan.
 
 ```
 +---------------------------------------------------------------------------------------+
@@ -166,7 +166,7 @@ Phases 0, 1 and 2 are done, and Phase 3 (Dhamma Posts) was merged on 2026-10-25.
                                            |
                                            v
 +---------------------------------------------------------------------------------------+
-| Phase 4 (planned): Analytics                                                           |
+| Phase 4 (in progress): Analytics                                                      |
 | Cookieless, aggregate activity counts; self-hosted Umami; no direct identifiers       |
 +---------------------------------------------------------------------------------------+
                                            |
@@ -199,7 +199,7 @@ Phases 0, 1 and 2 are done, and Phase 3 (Dhamma Posts) was merged on 2026-10-25.
 * **Phase 1 — Bilingual Pages (done):** Home, About, Privacy, the Classes group (classes with a weekly schedule, Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library (the whole S3 PDF library with tag browsing and fuzzy Burmese search) in English and Burmese, with an original mobile/desktop design, serving online class students and independent learners worldwide. No hosting or deployment yet. See implementation-plan.md §3.
 * **Phase 2 — Infrastructure & Deployment (done 2026-10-23):** Pulumi (TypeScript), domains (`app.winmetta.org`), AWS hosting (S3 + CloudFront), the existing S3 + bunny.net setup for the Dhamma Library PDFs (new media infrastructure waits until something needs it), Route 53 DNS for `app.winmetta.org`, and a single production environment labelled Beta in the UI (staging comes with the first API or backend). The site becomes public here. See implementation-plan.md §4. No backend or database.
 * **Phase 3 — Dhamma Posts (merged 2026-10-25):** short teachings and explanations of Pāḷi terms, suttas and Abhidhamma ideas, each in Burmese, English and Simplified Chinese (§4.3), kept as markdown files in the repo and published as static pages: post, topic and paginated list pages, a "Read in" choice of languages that shared links carry, and print. Still no backend or database. See implementation-plan.md §5.
-* **Phase 4 — Analytics (planned 2026-10-26, not built):** privacy-first activity measurement so volunteers can see which classes, retreats, library folders, books and posts are used and in which languages. Cookieless and aggregate only, self-hosted Umami at `stats.app.winmetta.org`, no direct identifiers or stored IP addresses, no cross-day visitor recognition, and an honest Privacy page update in the same change. See [analytics.md](analytics.md) and implementation-plan.md §5A.
+* **Phase 4 — Analytics (planned 2026-10-26, in progress; server running since stage 2, nothing collected yet):** privacy-first activity measurement so volunteers can see which classes, retreats, library folders, books and posts are used and in which languages. Cookieless and aggregate only, self-hosted Umami at `stats.app.winmetta.org`, no direct identifiers or stored IP addresses, no cross-day visitor recognition, and an honest Privacy page update in the same change. See [analytics.md](analytics.md) and implementation-plan.md §5A.
 * **Future — LLB Pilot:** The flagship learning deliverable. Digitizes the LLB curriculum, proven and already-tested; piloted directly with the existing "Let's Learn Burmese" class roster (currently taught by Ven. U Garudhamma) before wider release.
 * **Future — Library & Class Archive Expansion:** Defines the repeatable pipeline for adding PDFs to S3 and refreshing the index and pages (generator, review PR, CI checks, deploy; see tech-architecture.md §3), plus a unified class timeline and deeper content indexing (full-text, OCR, transcripts) when needed.
 * **Future — Optional Accounts & Progress Sync:** Cross-device sync for learners who want it, opt-in only. This is likely where a backend and database are first introduced (tentative; see tech-architecture.md §10).
