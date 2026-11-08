@@ -60,43 +60,9 @@ Keep code in `apps/web` until a second consumer needs it. Only then extract a pa
 
 CI runs all of these on every pull request and does not deploy. Run lint, typecheck, test and build locally before pushing.
 
-### AWS access (read-only profile)
+### AWS access
 
-Most work needs no AWS access. You need it only for `npm run library:manifest` and to inspect the account. Access goes through AWS IAM Identity Center (SSO) with short-lived credentials from a browser sign-in; never create or store long-lived access keys.
-
-1. Ask the AWS administrator to add you to Identity Center with the `ReadOnlyAccess` permission set, and for the **SSO start URL**, the **SSO region** and the **account ID**. Keep the account ID out of the repo, issues and PRs (this repository is public).
-2. Install AWS CLI v2 (`aws --version` must show 2.x), preferably with mise: `mise use -g aws-cli`.
-3. Create the profile with the standard name `winmetta-ro`, so scripts and docs work on every machine:
-
-   ```bash
-   aws configure sso
-   ```
-
-   Answer the prompts: SSO session name `winmetta-ro`, the start URL and region from step 1, scopes `sso:account:access` (the default), then pick the `winmetta` account and the `ReadOnlyAccess` role, client region `us-east-1`, output `json`, and profile name `winmetta-ro`. The result in `~/.aws/config` looks like this (placeholders in capitals):
-
-   ```ini
-   [profile winmetta-ro]
-   sso_session = winmetta-ro
-   sso_account_id = ACCOUNT_ID
-   sso_role_name = ReadOnlyAccess
-   region = us-east-1
-
-   [sso-session winmetta-ro]
-   sso_start_url = START_URL
-   sso_region = SSO_REGION
-   sso_registration_scopes = sso:account:access
-   ```
-
-4. Sign in and check it works. Repeat the login when the session expires:
-
-   ```bash
-   aws sso login --profile winmetta-ro
-   aws sts get-caller-identity --profile winmetta-ro
-   ```
-
-5. Use it per command (`AWS_PROFILE=winmetta-ro npm run library:manifest`) or for the shell session (`export AWS_PROFILE=winmetta-ro`).
-
-If `aws configure sso` also created a profile named like `ReadOnlyAccess-<account id>`, delete that section from `~/.aws/config`; it duplicates `winmetta-ro`. The [runbook](runbook.md) covers deploying, rolling back and changing the infrastructure. Maintainers who run the one-time bootstrap or `pulumi up` use a separate write-access profile named `winmetta-admin` (the `AdministratorAccess` role), set up the same way with `aws configure sso --profile winmetta-admin` and `aws sso login --profile winmetta-admin`. Use it only for those tasks, and confirm before any command that changes AWS resources.
+Most work needs no AWS access. It is needed only for `npm run library:manifest`, to inspect the account, and for infrastructure work. Access uses AWS IAM Identity Center (SSO) with short-lived credentials from a browser sign-in; never create or store long-lived access keys, and keep the account ID out of this public repository, its issues and PRs. How to get access and set up the AWS CLI is in the private companion repository `winmetta/winmetta-platform-private` (operations runbook, access section; access on request). The [runbook](runbook.md) pointer covers deploying, rolling back and changing the infrastructure.
 
 ## 5. Configuration
 

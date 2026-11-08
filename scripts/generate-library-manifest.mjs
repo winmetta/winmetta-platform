@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Lists the Dhamma Library S3 bucket (read-only) and writes the committed manifest.
-// Needs a read-only AWS profile, e.g. `aws sso login --profile winmetta-ro`.
-//   AWS_PROFILE=winmetta-ro npm run library:manifest
+// Needs AWS read access: sign in, set AWS_PROFILE, then `npm run library:manifest`.
+// Profile setup is in the private operations runbook (winmetta-platform-private).
 // Overrides (title, titleNote, language, extra tags, hide) live in overrides.json by S3 key.
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
