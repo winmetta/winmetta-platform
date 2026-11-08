@@ -34,7 +34,7 @@ jobs:
       # versions as of 2026-10-11. To update: look up each version (mise latest <tool>),
       # change it here, and let the checks run on the PR.
       - name: Install the hook tools
-        uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
+        uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
         with:
           mise_toml: |
             [tools]
