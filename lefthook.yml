@@ -15,8 +15,6 @@ pre-commit:
     # Files listed in .prettierignore are skipped by prettier itself.
     prettier:
       glob: '*.{js,mjs,cjs,ts,tsx,astro,json,md,yml,yaml,css}'
-      # CLAUDE.md is a symlink to AGENTS.md and prettier refuses symlinks.
-      exclude: 'CLAUDE.md'
       run: npx --no-install prettier --check {staged_files}
     shellcheck:
       glob: '*.sh'

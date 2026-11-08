@@ -114,7 +114,7 @@ winmetta-platform/
 ├── .env.local                 # ignored developer-machine overrides
 ├── .nvmrc                     # 24 (CI)
 ├── mise.toml                  # node = "24" (developers)
-├── AGENTS.md / CLAUDE.md -> AGENTS.md
+├── AGENTS.md
 ├── LICENSE                    # MIT
 ├── package.json
 └── turbo.json

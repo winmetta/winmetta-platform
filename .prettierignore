@@ -7,7 +7,6 @@ playwright-report
 test-results
 # Planning prose is maintained independently of code formatting.
 AGENTS.md
-CLAUDE.md
 README.md
 docs
 apps/web/src/library/manifest.json
