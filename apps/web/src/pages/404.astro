@@ -3,6 +3,7 @@ import '../styles/global.css';
 import { localeCodes, locales } from '../i18n/locales';
 import { route } from '../i18n/routes';
 import { t } from '../i18n/messages';
+import Analytics from '../components/Analytics.astro';
 ---
 
 <!doctype html>
@@ -16,6 +17,7 @@ import { t } from '../i18n/messages';
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#ffffff" />
+    <Analytics notFound />
   </head>
   <body class="flex min-h-screen items-center justify-center p-5">
     <main

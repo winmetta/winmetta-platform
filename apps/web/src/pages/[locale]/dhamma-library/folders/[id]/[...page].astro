@@ -115,7 +115,7 @@ const text = (key: Parameters<typeof t>[1]) => t(locale, key);
         </h2>
         <ul class="space-y-3">
           {books.map((record) => (
-            <BookCard record={record} locale={locale} />
+            <BookCard record={record} locale={locale} from="folder" />
           ))}
         </ul>
       </section>
