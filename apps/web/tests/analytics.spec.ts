@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 // The tracker is off unless the build sets PUBLIC_ANALYTICS=true and a website id (docs/analytics.md).
 // Run the "on" tests against such a build with ANALYTICS_BUILD=true; the default build and the
-// post-deploy check (BASE_URL) cover the "off" tests until stage 4 turns it on for production.
+// post-deploy check (BASE_URL) skip the "off" test, because production has the tracker on.
 const onBuild = process.env.ANALYTICS_BUILD === 'true';
 const host = 'https://stats.app.winmetta.org';
 
