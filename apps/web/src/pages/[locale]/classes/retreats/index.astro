@@ -46,12 +46,16 @@ const labels = {
   </header>
   <RetreatsUpcoming locale={locale} retreats={allRetreats} />
   <section class="space-y-3" aria-labelledby="how">
-    <h2 id="how" class="text-2xl font-bold">{text('retreatsHowTitle')}</h2>
+    <h2 id="how" class="text-2xl font-bold">
+      {text('retreatsHowTitle')}
+    </h2>
     <p>{text('retreatsHowOnline')}</p>
     <p>{text('retreatsHowOnsite')}</p>
   </section>
   <section class="space-y-4" aria-labelledby="archive">
-    <h2 id="archive" class="text-2xl font-bold">{text('retreatsArchive')}</h2>
+    <h2 id="archive" class="text-2xl font-bold">
+      {text('retreatsArchive')}
+    </h2>
     <RetreatArchive client:load items={items} labels={labels} />
   </section>
 </Shell>

@@ -41,12 +41,12 @@ const latest = recentPosts(await loadPosts(), 3).flatMap((post) => {
       <h1 class="text-3xl font-bold sm:text-4xl">{text('homeTitle')}</h1>
       <p class="lead">{text('homeIntro')}</p>
       <p class="flex flex-wrap gap-3">
-        <a class="btn btn-primary" href={route(locale, 'library')}
-          >{text('libraryTitle')}</a
-        >
-        <a class="btn btn-outline" href={route(locale, 'about')}
-          >{text('aboutTitle')}</a
-        >
+        <a class="btn btn-primary" href={route(locale, 'library')}>
+          {text('libraryTitle')}
+        </a>
+        <a class="btn btn-outline" href={route(locale, 'about')}>
+          {text('aboutTitle')}
+        </a>
       </p>
     </div>
     <img
@@ -58,18 +58,18 @@ const latest = recentPosts(await loadPosts(), 3).flatMap((post) => {
     />
   </section>
   <section class="space-y-4" aria-labelledby="start">
-    <h2 id="start" class="text-2xl font-bold">{text('homeExplore')}</h2>
+    <h2 id="start" class="text-2xl font-bold">
+      {text('homeExplore')}
+    </h2>
     <ul class="grid gap-4 sm:grid-cols-2">
-      {
-        paths.map((item) => (
-          <li class="card card-link space-y-2">
-            <a class="link text-lg" href={route(locale, item.page)}>
-              {text(item.title)}
-            </a>
-            <p class="muted">{text(item.text)}</p>
-          </li>
-        ))
-      }
+      {paths.map((item) => (
+        <li class="card card-link space-y-2">
+          <a class="link text-lg" href={route(locale, item.page)}>
+            {text(item.title)}
+          </a>
+          <p class="muted">{text(item.text)}</p>
+        </li>
+      ))}
     </ul>
   </section>
   <section class="space-y-4" aria-labelledby="recent-posts">
@@ -77,22 +77,22 @@ const latest = recentPosts(await loadPosts(), 3).flatMap((post) => {
       {text('postsRecent')}
     </h2>
     <ul class="grid gap-3">
-      {
-        latest.map((post) => (
-          <li class="card card-link">
-            <a
-              class="link text-lg"
-              href={postRoute(locale, post.id)}
-              lang={post.lang}
-            >
-              {post.title}
-            </a>
-          </li>
-        ))
-      }
+      {latest.map((post) => (
+        <li class="card card-link">
+          <a
+            class="link text-lg"
+            href={postRoute(locale, post.id)}
+            lang={post.lang}
+          >
+            {post.title}
+          </a>
+        </li>
+      ))}
     </ul>
     <p>
-      <a class="link" href={route(locale, 'posts')}>{text('postsAllLink')}</a>
+      <a class="link" href={route(locale, 'posts')}>
+        {text('postsAllLink')}
+      </a>
     </p>
   </section>
 </Shell>

@@ -17,15 +17,13 @@ import { allowIndexing } from '../lib/site';
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#ffffff" />
     <link rel="canonical" href={Astro.site} />
-    {
-      localeCodes.map((code) => (
-        <link
-          rel="alternate"
-          hreflang={code}
-          href={new URL(route(code), Astro.site)}
-        />
-      ))
-    }
+    {localeCodes.map((code) => (
+      <link
+        rel="alternate"
+        hreflang={code}
+        href={new URL(route(code), Astro.site)}
+      />
+    ))}
     <link rel="alternate" hreflang="x-default" href={Astro.site} />
   </head>
   <body class="flex min-h-screen items-center justify-center p-5">
@@ -41,20 +39,14 @@ import { allowIndexing } from '../lib/site';
         class="mx-auto size-32"
       />
       <h1 class="text-2xl font-bold">{t('en', 'brand')}</h1>
-      {
-        localeCodes.map((code) => (
-          <section lang={code} class="space-y-2">
-            <h2 class="muted">{t(code, 'choose')}</h2>
-            <a
-              class="btn btn-primary w-full"
-              href={route(code)}
-              hreflang={code}
-            >
-              {locales[code].name}
-            </a>
-          </section>
-        ))
-      }
+      {localeCodes.map((code) => (
+        <section lang={code} class="space-y-2">
+          <h2 class="muted">{t(code, 'choose')}</h2>
+          <a class="btn btn-primary w-full" href={route(code)} hreflang={code}>
+            {locales[code].name}
+          </a>
+        </section>
+      ))}
     </main>
   </body>
 </html>

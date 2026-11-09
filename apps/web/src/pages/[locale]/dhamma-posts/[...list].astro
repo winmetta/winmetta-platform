@@ -51,7 +51,7 @@ const title =
   locale={locale}
   title={title}
   noindex={listing.sort === 'oldest'}
-  {...first ? { page: 'posts' } : { path }}
+  {...(first ? { page: 'posts' } : { path })}
 >
   <header class="space-y-4">
     <h1 class="text-3xl font-bold sm:text-4xl">{text('postsTitle')}</h1>
@@ -60,12 +60,16 @@ const title =
   </header>
   <PostSearch locale={locale} />
   <section class="space-y-4" aria-labelledby="topics" data-post-browse>
-    <h2 id="topics" class="text-2xl font-bold">{text('postsTags')}</h2>
+    <h2 id="topics" class="text-2xl font-bold">
+      {text('postsTags')}
+    </h2>
     <TopicChips locale={locale} topics={topics} />
   </section>
   <section class="space-y-4" aria-labelledby="all" data-post-browse>
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <h2 id="all" class="text-2xl font-bold">{text('postsAll')}</h2>
+      <h2 id="all" class="text-2xl font-bold">
+        {text('postsAll')}
+      </h2>
       <PostSort locale={locale} sort={listing.sort} />
     </div>
     <PostList locale={locale} posts={listing.items} />

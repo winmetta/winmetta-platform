@@ -17,26 +17,26 @@ const place = teacherPlace(teacher, locale);
 ---
 
 <li class="card card-link flex items-center gap-4">
-  {
-    image ? (
-      <Image
-        src={image}
-        width={72}
-        height={72}
-        class="avatar"
-        alt=""
-        loading="lazy"
-      />
-    ) : (
-      <span class="avatar" aria-hidden="true" />
-    )
-  }
+  {image ? (
+    <Image
+      src={image}
+      width={72}
+      height={72}
+      class="avatar"
+      alt=""
+      loading="lazy"
+    />
+  ) : (
+    <span class="avatar" aria-hidden="true" />
+  )}
   <div class="min-w-0">
     <a
       class="link text-lg"
       href={teacherRoute(locale, teacher.id)}
-      lang={languageOf(name)}>{name}</a
+      lang={languageOf(name)}
     >
+      {name}
+    </a>
     {place && <p class="muted text-sm">{place}</p>}
   </div>
 </li>

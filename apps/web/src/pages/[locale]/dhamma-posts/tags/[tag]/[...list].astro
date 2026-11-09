@@ -67,9 +67,13 @@ const url = new URL(listPath, Astro.site).href;
 >
   <nav aria-label={text('breadcrumb')}>
     <ol class="crumbs">
-      <li><a href={route(locale, 'posts')}>{text('postsTitle')}</a></li>
+      <li>
+        <a href={route(locale, 'posts')}>{text('postsTitle')}</a>
+      </li>
       <li class="flex items-center gap-x-1">
-        <span aria-hidden="true" class="muted">›</span>
+        <span aria-hidden="true" class="muted">
+          ›
+        </span>
         <span aria-current="page">{label}</span>
       </li>
     </ol>
@@ -77,27 +81,25 @@ const url = new URL(listPath, Astro.site).href;
   <header class="space-y-4">
     <h1 class="text-3xl font-bold sm:text-4xl">{heading}</h1>
     <p class="muted flex flex-wrap gap-x-3">
-      {
-        postLanguages.map((lang) => (
-          <span lang={lang}>{tagName(tag, lang)}</span>
-        ))
-      }
+      {postLanguages.map((lang) => (
+        <span lang={lang}>{tagName(tag, lang)}</span>
+      ))}
     </p>
     <ReadInToolbar locale={locale} url={url} title={heading} />
   </header>
-  {
-    related.length > 0 && (
-      <section class="space-y-3" aria-labelledby="related-topics">
-        <h2 id="related-topics" class="text-xl font-bold">
-          {text('postsRelatedTags')}
-        </h2>
-        <TopicChips locale={locale} topics={related} />
-      </section>
-    )
-  }
+  {related.length > 0 && (
+    <section class="space-y-3" aria-labelledby="related-topics">
+      <h2 id="related-topics" class="text-xl font-bold">
+        {text('postsRelatedTags')}
+      </h2>
+      <TopicChips locale={locale} topics={related} />
+    </section>
+  )}
   <section class="space-y-4" aria-labelledby="tag-posts">
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <h2 id="tag-posts" class="sr-only">{heading}</h2>
+      <h2 id="tag-posts" class="sr-only">
+        {heading}
+      </h2>
       <PostSort locale={locale} sort={listing.sort} tag={tag.slug} />
     </div>
     <PostList locale={locale} posts={listing.items} />

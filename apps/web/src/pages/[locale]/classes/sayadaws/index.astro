@@ -22,10 +22,8 @@ const { locale } = Astro.props;
     <p class="lead">{t(locale, 'teachersIntro')}</p>
   </header>
   <ul class="grid gap-4 sm:grid-cols-2">
-    {
-      allTeachers.map((teacher) => (
-        <TeacherCard teacher={teacher} locale={locale} />
-      ))
-    }
+    {allTeachers.map((teacher) => (
+      <TeacherCard teacher={teacher} locale={locale} />
+    ))}
   </ul>
 </Shell>

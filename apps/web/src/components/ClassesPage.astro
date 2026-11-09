@@ -68,47 +68,50 @@ const source = records[0]?.sourceUrl ?? 'https://winmetta.org/';
     <h1 class="text-3xl font-bold sm:text-4xl">{text(title)}</h1>
     <p class="lead">{text(intro)}</p>
   </header>
-  {
-    kind === 'class' && (
-      <div class="grid gap-4 sm:grid-cols-2">
-        {[
-          ['teachers', '🙏', 'meetSayadawsTitle', 'meetSayadawsText'],
-          ['retreats', '🧘', 'meetRetreatsTitle', 'meetRetreatsText'],
-        ].map(([target, icon, title, body]) => (
-          <a
-            class="card card-link flex items-center gap-4"
-            href={route(locale, target as PageId)}
-          >
-            <span class="guide-badge" aria-hidden="true">
-              {icon}
-            </span>
-            <span class="space-y-1">
-              <span class="link block text-lg">
-                {text(title as MessageKey)}
-              </span>
-              <span class="muted block">{text(body as MessageKey)}</span>
-            </span>
-          </a>
-        ))}
-      </div>
-    )
-  }
+  {kind === 'class' && (
+    <div class="grid gap-4 sm:grid-cols-2">
+      {[
+        ['teachers', '🙏', 'meetSayadawsTitle', 'meetSayadawsText'],
+        ['retreats', '🧘', 'meetRetreatsTitle', 'meetRetreatsText'],
+      ].map(([target, icon, title, body]) => (
+        <a
+          class="card card-link flex items-center gap-4"
+          href={route(locale, target as PageId)}
+        >
+          <span class="guide-badge" aria-hidden="true">
+            {icon}
+          </span>
+          <span class="space-y-1">
+            <span class="link block text-lg">{text(title as MessageKey)}</span>
+            <span class="muted block">{text(body as MessageKey)}</span>
+          </span>
+        </a>
+      ))}
+    </div>
+  )}
   <section class="card space-y-2" aria-labelledby="how">
-    <h2 id="how" class="text-xl font-bold">{text('classesHowTitle')}</h2>
+    <h2 id="how" class="text-xl font-bold">
+      {text('classesHowTitle')}
+    </h2>
     <p>{text('classesHowText')}</p>
     <p class="flex items-start gap-2 font-medium">
       <span aria-hidden="true">⚠️</span>
       <span>{text('joinNameNote')}</span>
     </p>
     <p>
-      <a class="link icon-link" href={route(locale, 'zoomHelp')}
-        ><BrandIcon name="zoom" />{text('zoomHelp')}</a
-      >
+      <a class="link icon-link" href={route(locale, 'zoomHelp')}>
+        <BrandIcon name="zoom" />
+        {text('zoomHelp')}
+      </a>
     </p>
   </section>
   <section class="space-y-3" aria-labelledby="schedule">
-    <h2 id="schedule" class="text-2xl font-bold">{text('scheduleTitle')}</h2>
-    <p class="muted">{text('scheduleIntro')} {text('scheduleLangNote')}</p>
+    <h2 id="schedule" class="text-2xl font-bold">
+      {text('scheduleTitle')}
+    </h2>
+    <p class="muted">
+      {text('scheduleIntro')} {text('scheduleLangNote')}
+    </p>
     <WeeklySchedule
       client:load
       rows={rows}
@@ -118,46 +121,42 @@ const source = records[0]?.sourceUrl ?? 'https://winmetta.org/';
     />
   </section>
   <ul class="grid gap-4 lg:grid-cols-2">
-    {
-      active.map((record) => (
-        <ClassCard record={record} locale={locale} builtAt={builtAt} />
-      ))
-    }
+    {active.map((record) => (
+      <ClassCard record={record} locale={locale} builtAt={builtAt} />
+    ))}
   </ul>
-  {
-    archived.length > 0 && (
-      <section class="space-y-3" aria-labelledby="archive">
-        <h2 id="archive" class="text-2xl font-bold">
-          {text('archiveTitle')}
-        </h2>
-        <p class="muted">{text('archiveNote')}</p>
-        <ul class="grid gap-4 lg:grid-cols-2">
-          {archived.map((record) => (
-            <ClassCard record={record} locale={locale} builtAt={builtAt} />
-          ))}
-        </ul>
-      </section>
-    )
-  }
-  {
-    kind === 'class' && (
-      <section class="card space-y-2">
-        <h2 class="text-xl font-bold">{text('dawTitle')}</h2>
-        <p class="muted">{text('dawText')}</p>
-        <p>
-          <a
-            class="link"
-            href="https://winmetta.org/dhamma-byuhar-daw-khin-hla-tin-uowl/"
-            rel="noopener"
-          >
-            {text('dawLink')}
-          </a>
-        </p>
-      </section>
-    )
-  }
+  {archived.length > 0 && (
+    <section class="space-y-3" aria-labelledby="archive">
+      <h2 id="archive" class="text-2xl font-bold">
+        {text('archiveTitle')}
+      </h2>
+      <p class="muted">{text('archiveNote')}</p>
+      <ul class="grid gap-4 lg:grid-cols-2">
+        {archived.map((record) => (
+          <ClassCard record={record} locale={locale} builtAt={builtAt} />
+        ))}
+      </ul>
+    </section>
+  )}
+  {kind === 'class' && (
+    <section class="card space-y-2">
+      <h2 class="text-xl font-bold">{text('dawTitle')}</h2>
+      <p class="muted">{text('dawText')}</p>
+      <p>
+        <a
+          class="link"
+          href="https://winmetta.org/dhamma-byuhar-daw-khin-hla-tin-uowl/"
+          rel="noopener"
+        >
+          {text('dawLink')}
+        </a>
+      </p>
+    </section>
+  )}
   <p class="muted text-sm">
     {format(text('classesSource'), { date: verified })}
-    <a class="link" href={source} rel="noopener">winmetta.org</a>
+    <a class="link" href={source} rel="noopener">
+      winmetta.org
+    </a>
   </p>
 </Shell>

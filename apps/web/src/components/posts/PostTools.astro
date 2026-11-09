@@ -45,33 +45,35 @@ const { locale, url, title, print = false, shareSearch = false } = Astro.props;
     </svg>
     {t(locale, 'postShare')}
   </button>
-  {
-    print && (
-      <button type="button" class="btn btn-outline" data-print>
-        <svg
-          class="link-icon"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <path d="M6 9V3h12v6" />
-          <rect x="3" y="9" width="18" height="8" rx="2" />
-          <path d="M6 14h12v7H6z" />
-        </svg>
-        {t(locale, 'postPrint')}
-      </button>
-    )
-  }
+  {print && (
+    <button type="button" class="btn btn-outline" data-print>
+      <svg
+        class="link-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M6 9V3h12v6" />
+        <rect x="3" y="9" width="18" height="8" rx="2" />
+        <path d="M6 14h12v7H6z" />
+      </svg>
+      {t(locale, 'postPrint')}
+    </button>
+  )}
 </div>
 <!-- A short-lived toast at the bottom of the screen; always in the page so screen readers
      announce each new message. -->
-<p class="toast no-print" role="status" aria-live="polite" data-share-status>
-</p>
+<p
+  class="toast no-print"
+  role="status"
+  aria-live="polite"
+  data-share-status
+></p>
 
 <script>
   import { isPostLanguage, withLangParam } from '../../lib/posts/languages';
