@@ -12,6 +12,8 @@ name: Deploy web
 # variables (none is secret):
 #   SITE_URL                    https://app.winmetta.org
 #   PUBLIC_ALLOW_INDEXING       false until the launch gates pass, then true
+#   PUBLIC_ANALYTICS            true turns on the cookieless Umami tracker (optional; off when unset)
+#   PUBLIC_ANALYTICS_WEBSITE_ID the website id from the Umami settings (public, not a secret)
 #   SITE_BUCKET                 the `siteBucket` stack output
 #   CLOUDFRONT_DISTRIBUTION_ID  the `distributionId` stack output
 # and the repository secret AWS_ACCOUNT_ID (the AWS account ID). The deploy role's ARN is
@@ -55,6 +57,8 @@ jobs:
       TURBO_TELEMETRY_DISABLED: '1'
       SITE_URL: ${{ vars.SITE_URL }}
       PUBLIC_ALLOW_INDEXING: ${{ vars.PUBLIC_ALLOW_INDEXING }}
+      PUBLIC_ANALYTICS: ${{ vars.PUBLIC_ANALYTICS }}
+      PUBLIC_ANALYTICS_WEBSITE_ID: ${{ vars.PUBLIC_ANALYTICS_WEBSITE_ID }}
       SITE_BUCKET: ${{ vars.SITE_BUCKET }}
       DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
@@ -90,7 +94,8 @@ jobs:
         run: npm install --global "$(node -p "require('./package.json').packageManager")"
       - run: npm ci
       # The build bakes in SITE_URL (canonical links, sitemap) and PUBLIC_ALLOW_INDEXING
-      # (the noindex tag and robots.txt), the only switch for indexing.
+      # (the noindex tag and robots.txt), the only switch for indexing, and PUBLIC_ANALYTICS
+      # with the website id (the only switch for the tracker; the Privacy page must match).
       - run: npm run build
       - name: Sign in to AWS with the deploy role
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0

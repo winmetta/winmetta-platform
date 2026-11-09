@@ -80,7 +80,7 @@ Never put secrets in `PUBLIC_*` variables, because they can appear in the genera
 - Styling with Tailwind utilities and shadcn/Radix primitives. Prefer logical properties (`ps-*`, `ms-*`) so layouts survive text expansion.
 - **Look and feel:** use the design tokens and component classes in `apps/web/src/styles/global.css` (palette from the Win Metta Brand Kit in Canva; derived colors are documented there with their contrast ratios). Interactive elements keep a 44 px target and a visible focus ring. Links are not underlined (see AGENTS.md §6 for the rule and why inline links are semibold brand color). Check new colors for contrast before adding them.
 - Design for mobile and desktop. Interactive elements need touch targets (`min-h-11`) and keyboard access, with visible focus. UI components need accessible names; the ESLint a11y rules run on `.tsx`.
-- No vanity metrics (streaks, leaderboards, badges) or engagement-optimized patterns. No analytics SDKs.
+- No vanity metrics (streaks, leaderboards, badges) or engagement-optimized patterns. No analytics SDKs except the cookieless Umami tracker behind the `PUBLIC_ANALYTICS` build flag ([analytics.md](analytics.md)).
 - Core content must work without login.
 - Keep the diff focused. Match the surrounding code's naming and comment density.
 
