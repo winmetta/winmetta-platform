@@ -12,6 +12,15 @@ import {
   readState,
   writeState,
 } from '../lib/library-url';
+import {
+  bucketCount,
+  bucketPosition,
+  bucketTime,
+  scriptOf,
+  track,
+  trackSettled,
+} from '../lib/analytics';
+import { hasZawgyiMarker } from '../lib/zawgyi';
 import { Button } from './ui/button';
 
 export interface Labels {
@@ -54,12 +63,15 @@ function Card({
   cdnBase,
   formatLocale,
   onTag,
+  onResultClick,
 }: {
   record: SearchRecord;
   labels: Labels;
   cdnBase: string;
   formatLocale: string;
   onTag: (tag: string) => void;
+  /** Called when the Download link of a search result is used. */
+  onResultClick: () => void;
 }) {
   return (
     <li className="card space-y-3">
@@ -89,6 +101,10 @@ function Card({
           href={fileUrl(cdnBase, record.key)}
           aria-label={`${labels.download}: ${record.title}`}
           rel="noopener"
+          onClick={onResultClick}
+          data-umami-event="library_pdf_download"
+          data-umami-event-book={record.id}
+          data-umami-event-from="search"
         >
           {labels.download}
         </a>
@@ -121,6 +137,7 @@ export default function LibrarySearchIsland({
     if (engine.current || started.current) return;
     started.current = true;
     setStatus('loading');
+    const began = performance.now();
     try {
       const [module, indexText, records] = await Promise.all([
         import('../lib/library-search'),
@@ -139,9 +156,19 @@ export default function LibrarySearchIsland({
       };
       setStatus('ready');
       setReady((n) => n + 1);
+      track('search_index_load', {
+        area: 'library',
+        ok: true,
+        time: bucketTime(performance.now() - began),
+      });
     } catch {
       started.current = false;
       setStatus('error');
+      track('search_index_load', {
+        area: 'library',
+        ok: false,
+        time: bucketTime(performance.now() - began),
+      });
     }
   }, [indexUrl, recordsUrl]);
 
@@ -191,19 +218,41 @@ export default function LibrarySearchIsland({
       similar: [] as SearchHit[],
     };
   }, [active, query, tag, ready]);
+  // One event per settled search: result bucket and the script of the query, never the text.
+  useEffect(() => {
+    if (!ready || !query.trim()) return;
+    return trackSettled('library_search', {
+      results: bucketCount(exact.length),
+      script: scriptOf(query),
+      similar_shown: similar.length > 0,
+      zawgyi_suspected: hasZawgyiMarker(query),
+    });
+  }, [ready, query, tag, exact.length, similar.length]);
+  const pickTag = (name: string) => {
+    track('library_tag_filter', { tag: name });
+    update({ tag: name });
+  };
   const suggestions = [
     ...new Set(similar.slice(0, 5).flatMap((hit) => hit.record.tags)),
   ].slice(0, 6);
-  const card = (hit: SearchHit) => (
-    <Card
-      key={hit.record.id}
-      record={hit.record}
-      labels={labels}
-      cdnBase={cdnBase}
-      formatLocale={formatLocale}
-      onTag={(t) => update({ tag: t })}
-    />
-  );
+  const card =
+    (kind: 'exact' | 'similar') => (hit: SearchHit, index: number) => (
+      <Card
+        key={hit.record.id}
+        record={hit.record}
+        labels={labels}
+        cdnBase={cdnBase}
+        formatLocale={formatLocale}
+        onTag={pickTag}
+        onResultClick={() => {
+          if (query.trim())
+            track('library_result_click', {
+              position: bucketPosition(index + 1),
+              kind,
+            });
+        }}
+      />
+    );
 
   return (
     <section className="space-y-4" aria-busy={status === 'loading'}>
@@ -292,7 +341,9 @@ export default function LibrarySearchIsland({
       {exact.length > 0 ? (
         <>
           <h2 className="text-2xl font-bold">{labels.results}</h2>
-          <ul className="space-y-3">{exact.slice(0, visible).map(card)}</ul>
+          <ul className="space-y-3">
+            {exact.slice(0, visible).map(card('exact'))}
+          </ul>
           {exact.length > visible ? (
             <Button
               type="button"
@@ -308,7 +359,7 @@ export default function LibrarySearchIsland({
       {similar.length > 0 ? (
         <>
           <h2 className="text-2xl font-bold">{labels.similarBooks}</h2>
-          <ul className="space-y-3">{similar.map(card)}</ul>
+          <ul className="space-y-3">{similar.map(card('similar'))}</ul>
         </>
       ) : null}
 
@@ -322,7 +373,7 @@ export default function LibrarySearchIsland({
                   type="button"
                   lang={languageOf(suggestion)}
                   className="chip"
-                  onClick={() => update({ tag: suggestion })}
+                  onClick={() => pickTag(suggestion)}
                 >
                   {suggestion}
                 </button>

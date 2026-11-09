@@ -85,8 +85,10 @@ test('Privacy states what the site does and shows a Latin-digit date', async ({
   await expect(page.locator('main')).toContainText('bunny.net');
   await expect(page.locator('main')).toContainText('2026');
   await page.goto('/en/privacy/');
-  await expect(page.getByRole('heading', { level: 2 })).toHaveCount(6);
-  await expect(page.locator('main')).toContainText('October 23, 2026');
+  await expect(page.getByRole('heading', { level: 2 })).toHaveCount(7);
+  await expect(page.locator('main')).toContainText('November 8, 2026');
+  await expect(page.locator('main')).toContainText('Anonymous visit counts');
+  await expect(page.locator('main')).toContainText('stats.app.winmetta.org');
 });
 
 test('language switch keeps the page and canonical URLs are per page', async ({

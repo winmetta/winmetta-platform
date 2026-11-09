@@ -131,7 +131,14 @@ const partKey = {
           {retreat.venue.mapUrl && (
             <>
               {' '}
-              <a class="link" href={retreat.venue.mapUrl} rel="noopener">
+              <a
+                class="link"
+                href={retreat.venue.mapUrl}
+                rel="noopener"
+                data-umami-event="retreat_link_click"
+                data-umami-event-retreat={retreat.id}
+                data-umami-event-kind="external"
+              >
                 {text('retreatMap')}
               </a>
             </>
@@ -160,6 +167,9 @@ const partKey = {
               href={doc.url}
               rel="noopener"
               lang={languageOf(doc.label)}
+              data-umami-event="retreat_link_click"
+              data-umami-event-retreat={retreat.id}
+              data-umami-event-kind="info"
             >
               {doc.label}
             </a>
@@ -173,6 +183,9 @@ const partKey = {
               href={doc.url}
               rel="noopener"
               lang={languageOf(doc.label)}
+              data-umami-event="retreat_link_click"
+              data-umami-event-retreat={retreat.id}
+              data-umami-event-kind="info"
             >
               {doc.label}
             </a>
@@ -200,6 +213,9 @@ const partKey = {
                 href={session.postUrl}
                 rel="noopener"
                 lang={languageOf(session.title)}
+                data-umami-event="retreat_link_click"
+                data-umami-event-retreat={retreat.id}
+                data-umami-event-kind="info"
               >
                 {session.title}
               </a>
@@ -212,7 +228,16 @@ const partKey = {
     </section>
   )}
   <p>
-    <a class="btn btn-outline" href={retreat.sourceUrl} rel="noopener">
+    <a
+      class="btn btn-outline"
+      href={retreat.sourceUrl}
+      rel="noopener"
+      data-umami-event="retreat_link_click"
+      data-umami-event-retreat={retreat.id}
+      data-umami-event-kind={
+        retreat.status === 'upcoming' ? 'register' : 'info'
+      }
+    >
       {text(
         retreat.status === 'upcoming' ? 'retreatRegister' : 'retreatSource',
       )}

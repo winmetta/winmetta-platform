@@ -102,7 +102,14 @@ const labels = {
       />
       <div class="join-panel">
         {record.joinUrl && (
-          <a class="btn btn-zoom" href={record.joinUrl} rel="noopener">
+          <a
+            class="btn btn-zoom"
+            href={record.joinUrl}
+            rel="noopener"
+            data-umami-event="class_zoom_join_click"
+            data-umami-event-class={record.id}
+            data-umami-event-source="class_page"
+          >
             {text('joinZoom')}
           </a>
         )}

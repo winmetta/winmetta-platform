@@ -8,8 +8,10 @@ import { libraryCdnBase } from '../lib/site';
 interface Props {
   record: LibraryFile;
   locale: Locale;
+  /** Where the card is shown, for the aggregate download count (analytics.md §3). */
+  from?: 'folder' | 'other';
 }
-const { record, locale } = Astro.props;
+const { record, locale, from = 'other' } = Astro.props;
 ---
 
 <li class="card flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
@@ -31,6 +33,9 @@ const { record, locale } = Astro.props;
       href={fileUrl(libraryCdnBase, record.key)}
       aria-label={`${t(locale, 'download')}: ${record.title}`}
       rel="noopener"
+      data-umami-event="library_pdf_download"
+      data-umami-event-book={record.id}
+      data-umami-event-from={from}
     >
       {t(locale, 'download')}
     </a>

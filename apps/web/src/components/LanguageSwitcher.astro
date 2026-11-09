@@ -23,6 +23,7 @@ const { locale } = Astro.props;
 </nav>
 <script>
   import { isLocale } from '../i18n/locales';
+  import { track } from '../lib/analytics';
   import { switchLocale, saveLocalePreference } from '../i18n/routes';
   // Only the locale segment may change; path, query and fragment come from the
   // current URL, which can change after load (hash links, history.replaceState).
@@ -41,6 +42,13 @@ const { locale } = Astro.props;
     // Refresh at activation time, including keyboard and modified clicks.
     for (const type of ['pointerdown', 'focus', 'mouseenter', 'click'])
       link.addEventListener(type, update);
-    link.addEventListener('click', () => saveLocalePreference(code));
+    link.addEventListener('click', () => {
+      saveLocalePreference(code);
+      if (document.documentElement.lang !== code)
+        track('locale_switch', {
+          from: document.documentElement.lang,
+          to: code,
+        });
+    });
   });
 </script>

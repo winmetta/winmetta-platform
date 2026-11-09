@@ -15,7 +15,12 @@ const { locale, topics } = Astro.props;
 <ul class="flex flex-wrap gap-2">
   {topics.map(({ tag, count }) => (
     <li>
-      <a class="chip gap-2" href={postTagRoute(locale, tag.slug)}>
+      <a
+        class="chip gap-2"
+        href={postTagRoute(locale, tag.slug)}
+        data-umami-event="post_filter"
+        data-umami-event-tag={tag.slug}
+      >
         {postLanguages.map((lang) => (
           <span lang={lang} data-post-lang={lang}>
             {tag.names[lang]}

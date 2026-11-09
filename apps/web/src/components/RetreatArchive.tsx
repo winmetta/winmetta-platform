@@ -178,7 +178,12 @@ export default function RetreatArchive({ items, labels }: Props) {
       <ul className="grid gap-4 lg:grid-cols-2">
         {shown.map((item) => (
           <li key={item.id} className="card card-link space-y-2">
-            <a className="link text-lg" href={item.href}>
+            <a
+              className="link text-lg"
+              href={item.href}
+              data-umami-event="retreat_archive_open"
+              data-umami-event-retreat={item.id}
+            >
               {item.title}
             </a>
             <p className="text-sm">{item.dates}</p>
