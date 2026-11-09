@@ -147,8 +147,10 @@ test_maintenance() {
         "SELECT string_agg(session_id::text, ',' ORDER BY session_id) FROM session"
     expect_sql "event_data of old events is gone, even when newer than its parent" "1" "SELECT count(*) FROM event_data"
     expect_sql "session_data of deleted sessions is gone" "1" "SELECT count(*) FROM session_data"
-    expect_sql "screen, region, city and distinct id are scrubbed" "0" \
-        "SELECT count(*) FROM session WHERE screen IS NOT NULL OR region IS NOT NULL OR city IS NOT NULL OR distinct_id IS NOT NULL"
+    expect_sql "screen and distinct id are scrubbed" "0" \
+        "SELECT count(*) FROM session WHERE screen IS NOT NULL OR distinct_id IS NOT NULL"
+    expect_sql "region and city are kept" "1" \
+        "SELECT count(*) FROM session WHERE region IS NOT NULL AND city IS NOT NULL"
     expect_sql "query strings, page title and utm fields are scrubbed" "0" \
         "SELECT count(*) FROM website_event WHERE url_query IS NOT NULL OR referrer_query IS NOT NULL OR page_title IS NOT NULL OR utm_source IS NOT NULL"
     expect_sql "paths and event names are kept" "/en/classes/|class_zoom_join_click" \

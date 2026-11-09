@@ -94,7 +94,7 @@ alias a-pg-oldest='a-pg "SELECT min(created_at) AS oldest, max(created_at) AS ne
 alias a-pg-today='a-pg "SELECT coalesce(event_name, '"'"'(page view)'"'"') AS event, count(*) FROM website_event WHERE created_at > date_trunc('"'"'day'"'"', now()) GROUP BY 1 ORDER BY 2 DESC"'
 alias a-pg-users='a-pg "SELECT u.username, u.role, u.created_at, coalesce(t.is_enabled, false) AS two_factor FROM \"user\" u LEFT JOIN two_factor_auth t ON t.user_id = u.user_id WHERE u.deleted_at IS NULL ORDER BY 1"'
 alias a-pg-conns='a-pg "SELECT state, count(*) FROM pg_stat_activity WHERE datname = current_database() GROUP BY 1"'
-alias a-pg-unscrubbed='a-pg "SELECT count(*) AS sessions_with_unwanted_fields FROM session WHERE screen IS NOT NULL OR region IS NOT NULL OR city IS NOT NULL OR distinct_id IS NOT NULL"'
+alias a-pg-unscrubbed='a-pg "SELECT count(*) AS sessions_with_unwanted_fields FROM session WHERE screen IS NOT NULL OR distinct_id IS NOT NULL"'
 alias a-pg-client='psql --version'
 
 # --- Umami and Caddy: is the site answering? ---------------------------------------------

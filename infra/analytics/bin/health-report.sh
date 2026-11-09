@@ -197,8 +197,8 @@ fi
 maintenance_epoch=$(cat "$STATE/maintenance.ok" 2>/dev/null || true)
 if [[ $maintenance_epoch =~ ^[0-9]+$ ]]; then
     cutoff="to_timestamp($maintenance_epoch) - interval '5 minutes'"
-    unscrubbed=$(sql "SELECT count(*) FROM session WHERE created_at < $cutoff AND (screen IS NOT NULL OR region IS NOT NULL OR city IS NOT NULL OR distinct_id IS NOT NULL)")
-    [ "${unscrubbed:-0}" -gt 0 ] && warn "$unscrubbed session(s) still hold screen, region, city or distinct id: the scrub job is not working"
+    unscrubbed=$(sql "SELECT count(*) FROM session WHERE created_at < $cutoff AND (screen IS NOT NULL OR distinct_id IS NOT NULL)")
+    [ "${unscrubbed:-0}" -gt 0 ] && warn "$unscrubbed session(s) still hold screen size or distinct id: the scrub job is not working"
     queries=$(sql "SELECT count(*) FROM website_event WHERE created_at < $cutoff AND (url_query IS NOT NULL OR referrer_query IS NOT NULL)")
     [ "${queries:-0}" -gt 0 ] && warn "$queries event(s) still hold a URL or referrer query string: check the tracker and the scrub job"
 else

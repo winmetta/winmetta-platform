@@ -28,10 +28,12 @@ DELETE FROM website_event WHERE event_id IN (SELECT event_id FROM old_events);
 DELETE FROM session WHERE session_id IN (SELECT session_id FROM old_sessions);
 
 -- 2. Backstop scrub: fields we never want to keep, whatever the tracker sent
---    (docs/analytics.md section 4 rules 4 and 8, section 9 item 15).
+--    (docs/analytics.md section 4 rules 4 and 8, section 9 item 15). Region and city are
+--    kept on purpose (decided 2026-11-08, for planning class times); they leave with the
+--    rest of the session at 13 months.
 UPDATE session
-   SET screen = NULL, region = NULL, city = NULL, distinct_id = NULL
- WHERE screen IS NOT NULL OR region IS NOT NULL OR city IS NOT NULL OR distinct_id IS NOT NULL;
+   SET screen = NULL, distinct_id = NULL
+ WHERE screen IS NOT NULL OR distinct_id IS NOT NULL;
 UPDATE website_event
    SET url_query = NULL, referrer_query = NULL, page_title = NULL,
        utm_source = NULL, utm_medium = NULL, utm_campaign = NULL, utm_content = NULL, utm_term = NULL,
