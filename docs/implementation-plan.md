@@ -364,7 +364,7 @@ Deferred when the site went public on 2026-10-23 (see "Launch status" in §4). D
 * [ ] Analytics drills on the real instance (the first nightly backups ran by 2026-11-02): restore the latest dump onto a clean instance; check that the visitor hash changes after the daily salt rotation (`SALT_ROTATION=day`); and run the server-level 2FA reset on a test account. Record the results in the private runbook. The restore drill by a person who did not build the server is still required before go-live (§5A, step 4).
 * [ ] Check the AWS bill after the first full month of traffic and revisit the CloudFront pricing choice if it is not small.
 * [ ] Use GitHub's merge queue instead of the "Require branches to be up to date" setting, once several people open PRs in parallel or merges to `main` start deploying to production: add the `merge_group` trigger to `ci.yml` first, then switch on "Require merge queue" in the ruleset (confirm it is available for this organization's public repo).
-* [ ] Revisit the approval and code owner settings (`.github/CODEOWNERS` names `@winmetta/developers`) once the team has a second member, for example 1 required approval with code owner review, and a second reviewer on the `production` environment.
+* [ ] Revisit the approval and code owner settings once the team has a second member, for example 1 required approval with code owner review (this needs a new `.github/CODEOWNERS`, removed while the team is small), and a second reviewer on the `production` environment.
 
 **5. Burmese-speaker review (then end the beta)**
 
