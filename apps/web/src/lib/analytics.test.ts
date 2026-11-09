@@ -5,10 +5,12 @@ import {
   bucketTime,
   cleanPayload,
   doNotTrack,
+  flushQueue,
   sanitizeReferrer,
   scriptOf,
   sectionOf,
   track,
+  trackSettled,
 } from './analytics';
 
 const origin = 'https://app.winmetta.org';
@@ -150,5 +152,54 @@ describe('track', () => {
       },
     });
     expect(() => track('x')).not.toThrow();
+  });
+});
+
+describe('the queue while the tracker loads', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
+  });
+  it('holds events until the tracker is ready, then sends them in order', () => {
+    vi.stubGlobal('winmettaAnalyticsQueue', []);
+    track('a', { n: 1 });
+    track('b');
+    const fn = vi.fn();
+    vi.stubGlobal('umami', { track: fn });
+    flushQueue();
+    expect(fn.mock.calls).toEqual([
+      ['a', { n: 1 }],
+      ['b', undefined],
+    ]);
+    track('c');
+    expect(fn).toHaveBeenCalledTimes(3);
+  });
+  it('drops events when analytics is off (no queue, no tracker)', () => {
+    track('a');
+    const fn = vi.fn();
+    vi.stubGlobal('umami', { track: fn });
+    flushQueue();
+    expect(fn).not.toHaveBeenCalled();
+  });
+});
+
+describe('trackSettled', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
+  });
+  it('sends one event after the input settles and none when cancelled', () => {
+    vi.useFakeTimers();
+    const fn = vi.fn();
+    vi.stubGlobal('umami', { track: fn });
+    const cancel = trackSettled('search', { n: 1 }, 1000);
+    vi.advanceTimersByTime(500);
+    cancel();
+    trackSettled('search', { n: 2 }, 1000);
+    vi.advanceTimersByTime(1000);
+    expect(fn.mock.calls).toEqual([['search', { n: 2 }]]);
+    trackSettled('search', { n: 3 }, 1000)();
+    vi.advanceTimersByTime(5000);
+    expect(fn).toHaveBeenCalledTimes(1);
   });
 });

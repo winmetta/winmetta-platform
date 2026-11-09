@@ -25,6 +25,8 @@ const formatLocale = locales[locale].formatLocale;
           class="tree-row"
           href={folderRoute(locale, node.id)}
           lang={languageOf(node.name)}
+          data-umami-event="library_folder_open"
+          data-umami-event-folder={node.id}
         >
           <span class="font-medium">{node.name}</span>
           <span class="badge" lang={locale}>

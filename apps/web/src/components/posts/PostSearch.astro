@@ -82,6 +82,14 @@ const { version } = await postSearchData();
   import type { PostSearch, PostSearchHit } from '../../lib/posts/search';
   import type { PostSearchRecord } from '../../lib/posts/search';
   import { readQuery, withQuery } from '../../lib/posts/search-url';
+  import {
+    bucketCount,
+    bucketPosition,
+    bucketTime,
+    scriptOf,
+    track,
+    trackSettled,
+  } from '../../lib/analytics';
 
   const root = document.querySelector<HTMLElement>('[data-post-search]');
   const input = root?.querySelector<HTMLInputElement>('[data-search-input]');
@@ -109,6 +117,8 @@ const { version } = await postSearchData();
 
     let engine: Promise<PostSearch> | undefined;
     const load = (): Promise<PostSearch> => {
+      const created = engine === undefined;
+      const started = performance.now();
       engine ??= (async () => {
         const fetchOk = async (url: string | undefined) => {
           const response = await fetch(url ?? '');
@@ -125,6 +135,22 @@ const { version } = await postSearchData();
         ]);
         return module.PostSearch.load(records, index, convert.toSimplified);
       })();
+      // Only the call that starts the download reports how long it took.
+      if (created)
+        engine.then(
+          () =>
+            track('search_index_load', {
+              area: 'posts',
+              ok: true,
+              time: bucketTime(performance.now() - started),
+            }),
+          () =>
+            track('search_index_load', {
+              area: 'posts',
+              ok: false,
+              time: bucketTime(performance.now() - started),
+            }),
+        );
       // A failed download can be retried.
       engine.catch(() => {
         engine = undefined;
@@ -162,8 +188,11 @@ const { version } = await postSearchData();
     };
 
     let latest = 0;
+    let cancelSearchEvent = () => {};
     const run = async (query: string) => {
       const ticket = ++latest;
+      // A new run (also a cleared box or a failed search) replaces the search not yet reported.
+      cancelSearchEvent();
       history.replaceState(
         history.state,
         '',
@@ -180,6 +209,11 @@ const { version } = await postSearchData();
         const search = await load();
         if (ticket !== latest) return;
         const { exact, similar } = search.search(query);
+        // One event per settled search, with only the result bucket and the script of the query.
+        cancelSearchEvent = trackSettled('post_search', {
+          results: bucketCount(exact.length),
+          script: scriptOf(query),
+        });
         exactList?.replaceChildren(...exact.flatMap((h) => card(h) ?? []));
         similarList?.replaceChildren(...similar.flatMap((h) => card(h) ?? []));
         if (similarTitle) similarTitle.hidden = similar.length === 0;
@@ -236,6 +270,15 @@ const { version } = await postSearchData();
       input.focus();
     });
     retry?.addEventListener('click', () => void run(input.value));
+    // Which result was opened: its place in the list, in buckets.
+    results?.addEventListener('click', (event) => {
+      const link = (event.target as Element).closest('[data-card-link]');
+      if (!link) return;
+      const all = [...results.querySelectorAll('[data-card-link]')];
+      track('post_result_click', {
+        position: bucketPosition(all.indexOf(link) + 1),
+      });
+    });
 
     // A shared or reloaded link with ?q= searches right away.
     const initial = readQuery(window.location.search);

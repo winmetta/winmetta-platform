@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactElement } from 'react';
 import { DateTime } from 'luxon';
+import { track } from '../lib/analytics';
 import { nextOccurrence, zoneView } from '../lib/class-schedule';
 import {
   defaultZone,
@@ -123,6 +124,7 @@ export default function WeeklySchedule({
       window.history.replaceState(null, '', writeZone(id, window.location));
   }, []);
   const choose = (id: ZoneId) => {
+    track('class_timezone_change', { zone: id });
     setZoneId(id);
     window.history.replaceState(null, '', writeZone(id, window.location));
   };

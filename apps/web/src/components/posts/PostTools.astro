@@ -76,6 +76,7 @@ const { locale, url, title, print = false, shareSearch = false } = Astro.props;
 <script>
   import { isPostLanguage, withLangParam } from '../../lib/posts/languages';
   import { readQuery, withQuery } from '../../lib/posts/search-url';
+  import { track } from '../../lib/analytics';
   const share = document.querySelector<HTMLButtonElement>('[data-share]');
   const toast = document.querySelector<HTMLElement>('[data-share-status]');
   let hideTimer: number | undefined;
@@ -91,7 +92,27 @@ const { locale, url, title, print = false, shareSearch = false } = Astro.props;
         toast.textContent = '';
       }, ms);
   };
+  // Post pages have a Print button; the post id is the last part of their address.
+  const printButton = document.querySelector('[data-print]');
+  const postId = printButton
+    ? (share?.dataset.url ?? '').split('/').filter(Boolean).pop()
+    : undefined;
+  if (postId)
+    track('post_open', {
+      post: postId,
+      langs: (document.documentElement.dataset.postLangs ?? '')
+        .split(' ')
+        .filter(isPostLanguage)
+        .join(','),
+    });
   share?.addEventListener('click', async () => {
+    track('post_share', {
+      kind: postId
+        ? 'post'
+        : share.dataset.shareSearch === undefined
+          ? 'tag'
+          : 'index',
+    });
     const langs = (document.documentElement.dataset.postLangs ?? '')
       .split(' ')
       .filter(isPostLanguage);
@@ -123,7 +144,8 @@ const { locale, url, title, print = false, shareSearch = false } = Astro.props;
       say(share.dataset.failed, 6000);
     }
   });
-  document
-    .querySelector('[data-print]')
-    ?.addEventListener('click', () => window.print());
+  printButton?.addEventListener('click', () => {
+    if (postId) track('post_print', { post: postId });
+    window.print();
+  });
 </script>

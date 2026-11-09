@@ -136,13 +136,48 @@ type Props = Record<string, string | number | boolean>;
 interface UmamiGlobal {
   track: (name: string, data?: Props) => unknown;
 }
+interface QueuedEvent {
+  name: string;
+  data?: Props;
+}
+type AnalyticsGlobal = {
+  umami?: UmamiGlobal;
+  /** Created by analytics-client.ts while the tracker script is loading; absent when analytics is off. */
+  winmettaAnalyticsQueue?: QueuedEvent[];
+};
 
-/** Sends one event. A silent no-op when the tracker is not loaded (dev, tests, Do Not Track). */
+/**
+ * Sends one event. A silent no-op when analytics is off (dev, tests, Do Not Track). While the
+ * tracker script is still loading, the event waits in a queue that analytics-client.ts flushes.
+ */
 export function track(name: string, data?: Props): void {
-  const umami = (globalThis as { umami?: UmamiGlobal }).umami;
+  const g = globalThis as AnalyticsGlobal;
   try {
-    umami?.track(name, data);
+    if (g.umami) g.umami.track(name, data);
+    else g.winmettaAnalyticsQueue?.push({ name, data });
   } catch {
     // analytics must never break the page
   }
+}
+
+/** Sends the events that waited for the tracker to load. */
+export function flushQueue(): void {
+  const g = globalThis as AnalyticsGlobal;
+  const queue = g.winmettaAnalyticsQueue ?? [];
+  g.winmettaAnalyticsQueue = undefined;
+  for (const event of queue) track(event.name, event.data);
+}
+
+/**
+ * Sends an event only once the visitor stops changing its input for `delay` ms, so typing a
+ * query counts as one search, not one per keystroke. Returns a function that cancels it, for
+ * the next keystroke or when the component goes away.
+ */
+export function trackSettled(
+  name: string,
+  data: Props,
+  delay = 1500,
+): () => void {
+  const timer = setTimeout(() => track(name, data), delay);
+  return () => clearTimeout(timer);
 }

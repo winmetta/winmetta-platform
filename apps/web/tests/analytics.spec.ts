@@ -124,4 +124,130 @@ test.describe('tracker on (ANALYTICS_BUILD=true)', () => {
     ]);
     expect(JSON.stringify(events)).not.toContain('typed');
   });
+
+  // Events the page sent, with navigation by clicked links stopped so the page (and its list) stays.
+  const events = (page: Page) =>
+    page.evaluate(() => (window as Seen).__events ?? []);
+  const stayOnPage = (page: Page, selector: string) =>
+    page.evaluate((sel) => {
+      document.addEventListener(
+        'click',
+        (e) => {
+          if ((e.target as Element).closest(sel)) e.preventDefault();
+        },
+        true,
+      );
+    }, selector);
+
+  test('a language switch reports only from and to', async ({ page }) => {
+    await page.goto('/en/');
+    await stayOnPage(page, 'a[data-locale]');
+    await page.locator('a[data-locale="my"]').click();
+    await expect
+      .poll(() => events(page))
+      .toContainEqual({
+        name: 'locale_switch',
+        data: { from: 'en', to: 'my' },
+      });
+  });
+
+  test('a library search sends buckets and labels, never the text', async ({
+    page,
+  }) => {
+    await page.goto('/en/dhamma-library/');
+    await stayOnPage(page, 'a.btn');
+    const box = page.getByRole('searchbox', { name: 'Search books' });
+    await box.fill('ဓမ္မပဒ');
+    await expect(
+      page.locator('h3', { hasText: 'ဓမ္မပဒ' }).first(),
+    ).toBeVisible();
+    await page.waitForFunction(() =>
+      ((window as Seen).__events ?? []).some(
+        (e) => e.name === 'library_search',
+      ),
+    );
+    await page
+      .getByRole('link', { name: /Download PDF/ })
+      .first()
+      .click();
+    const seen = await events(page);
+    const search = seen.filter((e) => e.name === 'library_search');
+    expect(search).toHaveLength(1);
+    expect(search[0]?.data).toMatchObject({
+      script: 'my',
+      similar_shown: expect.any(Boolean),
+      zawgyi_suspected: false,
+    });
+    expect(['0', '1-5', '6-20', 'more']).toContain(
+      (search[0]?.data as { results: string }).results,
+    );
+    expect(seen.find((e) => e.name === 'library_result_click')?.data).toEqual({
+      position: '1',
+      kind: 'exact',
+    });
+    expect(
+      seen.find((e) => e.name === 'search_index_load')?.data,
+    ).toMatchObject({
+      area: 'library',
+      ok: true,
+    });
+    expect(JSON.stringify(seen)).not.toContain('ဓမ္မပဒ');
+  });
+
+  test('the schedule time zone and a post share are reported', async ({
+    page,
+  }) => {
+    await page.goto('/en/classes/');
+    // The time zone select is a React island: change it only after it has hydrated.
+    await page.waitForFunction(
+      () =>
+        document.querySelector(
+          'astro-island[component-url*="WeeklySchedule"]',
+        ) &&
+        !document.querySelector(
+          'astro-island[component-url*="WeeklySchedule"][ssr]',
+        ),
+    );
+    await page.getByLabel('Show times in').selectOption('myanmar');
+    await expect
+      .poll(() => events(page))
+      .toContainEqual({
+        name: 'class_timezone_change',
+        data: { zone: 'myanmar' },
+      });
+    await page.goto('/en/dhamma-posts/');
+    await page.locator('[data-share]').click();
+    await expect
+      .poll(() => events(page))
+      .toContainEqual({
+        name: 'post_share',
+        data: { kind: 'index' },
+      });
+  });
+
+  test('opening a post reports its id and languages, and Print reports the id', async ({
+    page,
+  }) => {
+    await page.goto('/en/dhamma-posts/');
+    const href = await page
+      .locator('a[data-card-link]')
+      .first()
+      .getAttribute('href');
+    await page.goto(href ?? '/');
+    await page.waitForFunction(() => '__tracker' in window);
+    await expect
+      .poll(async () =>
+        (await events(page)).some((e) => e.name === 'post_open'),
+      )
+      .toBe(true);
+    const open = (await events(page)).find((e) => e.name === 'post_open');
+    expect(open?.data).toMatchObject({
+      post: expect.stringMatching(/^\d{4}-\d{2}-\d{2}-/),
+    });
+    await page.evaluate(() => (window.print = () => {}));
+    await page.getByRole('button', { name: 'Print' }).click();
+    expect((await events(page)).some((e) => e.name === 'post_print')).toBe(
+      true,
+    );
+  });
 });
