@@ -36,3 +36,10 @@ updates:
     groups:
       all:
         patterns: ['*']
+    ignore:
+      # Keep in step with the root workspace, which stays on TypeScript 6 until typescript-eslint supports 7.
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
+      # Keep @types/node on the Node 24 runtime pinned in engines.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
