@@ -89,6 +89,9 @@ function Card({
           href={fileUrl(cdnBase, record.key)}
           aria-label={`${labels.download}: ${record.title}`}
           rel="noopener"
+          data-umami-event="library_pdf_download"
+          data-umami-event-book={record.id}
+          data-umami-event-from="search"
         >
           {labels.download}
         </a>
