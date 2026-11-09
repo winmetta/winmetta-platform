@@ -23,7 +23,12 @@ const shown = slugs.flatMap((slug) => bySlug.get(slug) ?? []);
     <ul class="post-tags" lang={lang} aria-label={t(locale, 'postsTags')}>
       {shown.map((tag) => (
         <li>
-          <a class="tag" href={postTagRoute(locale, tag.slug)}>
+          <a
+            class="tag"
+            href={postTagRoute(locale, tag.slug)}
+            data-umami-event="post_filter"
+            data-umami-event-tag={tag.slug}
+          >
             {tagName(tag, lang)}
           </a>
         </li>

@@ -6,6 +6,7 @@
 import {
   cleanPayload,
   doNotTrack,
+  flushQueue,
   sectionOf,
   track,
   type TrackerPayload,
@@ -40,12 +41,17 @@ function start(el: HTMLElement) {
   script.dataset.excludeSearch = 'true';
   script.dataset.excludeHash = 'true';
   script.dataset.beforeSend = hook;
+  // Events sent while the script loads wait here; a failed load drops them with the queue.
+  (window as unknown as Record<string, unknown>).winmettaAnalyticsQueue = [];
+  script.addEventListener('load', flushQueue);
+  script.addEventListener('error', () => {
+    (window as unknown as Record<string, unknown>).winmettaAnalyticsQueue =
+      undefined;
+  });
   document.head.append(script);
+  // Only the section label, never the requested path (it is typed by the visitor or a link).
   if (isNotFound)
-    window.addEventListener('load', () =>
-      // Only the section label, never the requested path (it is typed by the visitor or a link).
-      track('page_not_found', { section: sectionOf(window.location.pathname) }),
-    );
+    track('page_not_found', { section: sectionOf(window.location.pathname) });
   document.addEventListener(
     'click',
     (event) => {

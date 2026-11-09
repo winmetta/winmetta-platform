@@ -47,6 +47,7 @@ const hintId = 'post-languages-hint';
     withLangParam,
     type PostLanguage,
   } from '../../lib/posts/languages';
+  import { track } from '../../lib/analytics';
   const root = document.documentElement;
   const current = (): PostLanguage[] =>
     (root.dataset.postLangs ?? '').split(' ').filter(isPostLanguage);
@@ -88,6 +89,7 @@ const hintId = 'post-languages-hint';
         withLangParam(window.location.href, ordered),
       );
       render();
+      track('post_language_change', { langs: ordered.join(',') });
     }),
   );
   render();
