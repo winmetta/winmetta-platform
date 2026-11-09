@@ -31,9 +31,9 @@ const { version } = await postSearchData();
   data-label-none={text('postsNoResults')}
 >
   <form role="search" class="js-only space-y-2" data-search-form>
-    <label id="post-search-label" for="post-search" class="font-semibold"
-      >{text('postsSearchLabel')}</label
-    >
+    <label id="post-search-label" for="post-search" class="font-semibold">
+      {text('postsSearchLabel')}
+    </label>
     <span class="field-wrap block">
       <svg
         aria-hidden="true"
@@ -57,7 +57,9 @@ const { version } = await postSearchData();
       />
     </span>
   </form>
-  <noscript><p class="muted">{text('searchNeedsJs')}</p></noscript>
+  <noscript>
+    <p class="muted">{text('searchNeedsJs')}</p>
+  </noscript>
   <div class="space-y-4" data-search-results hidden>
     <div class="flex flex-wrap items-center gap-3">
       <p class="font-semibold" role="status" data-search-status></p>
@@ -74,7 +76,9 @@ const { version } = await postSearchData();
     </h3>
     <ol class="grid gap-4" data-search-similar></ol>
   </div>
-  <template data-search-card><PostCard locale={locale} /></template>
+  <template data-search-card>
+    <PostCard locale={locale} />
+  </template>
 </section>
 
 <script>

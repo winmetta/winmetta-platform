@@ -32,13 +32,13 @@ const date = post
     href={post ? postRoute(locale, post.id) : undefined}
     data-card-link
   >
-    {
-      postLanguages.map((lang) => (
-        <span lang={lang} data-post-lang={lang} data-card-title={lang}>
-          {titleIn(lang)}
-        </span>
-      ))
-    }
+    {postLanguages.map((lang) => (
+      <span lang={lang} data-post-lang={lang} data-card-title={lang}>
+        {titleIn(lang)}
+      </span>
+    ))}
   </a>
-  <p class="muted text-sm" data-card-date>{date}</p>
+  <p class="muted text-sm" data-card-date>
+    {date}
+  </p>
 </li>

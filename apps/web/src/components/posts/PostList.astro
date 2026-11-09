@@ -13,5 +13,7 @@ const { locale, posts } = Astro.props;
 ---
 
 <ol class="grid gap-4" data-post-list>
-  {posts.map((post) => <PostCard locale={locale} post={post} />)}
+  {posts.map((post) => (
+    <PostCard locale={locale} post={post} />
+  ))}
 </ol>

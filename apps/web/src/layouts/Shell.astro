@@ -49,24 +49,20 @@ const postLanguageScript = postLanguagesHeadScript(defaultPostLanguage(locale));
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    {
-      !allowIndexing ? (
-        <meta name="robots" content="noindex" />
-      ) : (
-        noindex && <meta name="robots" content="noindex, follow" />
-      )
-    }
+    {!allowIndexing ? (
+      <meta name="robots" content="noindex" />
+    ) : (
+      noindex && <meta name="robots" content="noindex, follow" />
+    )}
     <title>{title} · {t(locale, 'brand')}</title>
     <link rel="canonical" href={canonical} />
-    {
-      localeCodes.map((code) => (
-        <link
-          rel="alternate"
-          hreflang={code}
-          href={new URL(href(code), Astro.site)}
-        />
-      ))
-    }
+    {localeCodes.map((code) => (
+      <link
+        rel="alternate"
+        hreflang={code}
+        href={new URL(href(code), Astro.site)}
+      />
+    ))}
     <link rel="alternate" hreflang="x-default" href={Astro.site} />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -78,7 +74,9 @@ const postLanguageScript = postLanguagesHeadScript(defaultPostLanguage(locale));
     <Analytics />
   </head>
   <body class="flex min-h-screen flex-col">
-    <a href="#main" class="skip-link">{t(locale, 'skip')}</a>
+    <a href="#main" class="skip-link">
+      {t(locale, 'skip')}
+    </a>
     <header class="site-header">
       <div class="site-header__inner">
         <div class="brand-group">
@@ -86,17 +84,15 @@ const postLanguageScript = postLanguagesHeadScript(defaultPostLanguage(locale));
             <img src="/logo-96.png" width="44" height="44" alt="" />
             <span>{t(locale, 'brand')}</span>
           </a>
-          {
-            isBeta && (
-              <a
-                href={`${route(locale, 'about')}#beta`}
-                class="beta-pill"
-                aria-label={t(locale, 'betaLink')}
-              >
-                <span aria-hidden="true">{t(locale, 'betaLabel')}</span>
-              </a>
-            )
-          }
+          {isBeta && (
+            <a
+              href={`${route(locale, 'about')}#beta`}
+              class="beta-pill"
+              aria-label={t(locale, 'betaLink')}
+            >
+              <span aria-hidden="true">{t(locale, 'betaLabel')}</span>
+            </a>
+          )}
         </div>
         <button
           type="button"
@@ -108,59 +104,57 @@ const postLanguageScript = postLanguagesHeadScript(defaultPostLanguage(locale));
           {t(locale, 'menu')}
         </button>
         <nav id="site-nav" class="site-nav" aria-label={t(locale, 'navMain')}>
-          {
-            navItems.map((item) => {
-              const current = (target: string) =>
-                page === target
-                  ? 'page'
-                  : (target === 'library' && inLibrary) ||
-                      (target === 'posts' && inPosts)
+          {navItems.map((item) => {
+            const current = (target: string) =>
+              page === target
+                ? 'page'
+                : (target === 'library' && inLibrary) ||
+                    (target === 'posts' && inPosts)
+                  ? 'true'
+                  : target === 'classes' && path?.startsWith('classes/')
                     ? 'true'
-                    : target === 'classes' && path?.startsWith('classes/')
-                      ? 'true'
-                      : undefined;
-              const link = (
-                <a
-                  href={route(locale, item.page)}
-                  class="nav-link"
-                  aria-current={
-                    current(item.page) ??
-                    ('children' in item &&
-                    item.children.some((child) => child.page === page)
-                      ? 'true'
-                      : undefined)
-                  }
-                >
-                  {t(locale, item.label)}
-                </a>
-              );
-              return 'children' in item ? (
-                <div class="nav-group">
-                  {link}
-                  <ul class="nav-sub">
-                    {item.children.map((child) => (
-                      <li>
-                        <a
-                          href={route(locale, child.page)}
-                          class="nav-sublink"
-                          aria-current={
-                            page === child.page ||
-                            Boolean(path?.startsWith(pagePaths[child.page]))
-                              ? 'page'
-                              : undefined
-                          }
-                        >
-                          {t(locale, child.label)}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : (
-                link
-              );
-            })
-          }
+                    : undefined;
+            const link = (
+              <a
+                href={route(locale, item.page)}
+                class="nav-link"
+                aria-current={
+                  current(item.page) ??
+                  ('children' in item &&
+                  item.children.some((child) => child.page === page)
+                    ? 'true'
+                    : undefined)
+                }
+              >
+                {t(locale, item.label)}
+              </a>
+            );
+            return 'children' in item ? (
+              <div class="nav-group">
+                {link}
+                <ul class="nav-sub">
+                  {item.children.map((child) => (
+                    <li>
+                      <a
+                        href={route(locale, child.page)}
+                        class="nav-sublink"
+                        aria-current={
+                          page === child.page ||
+                          Boolean(path?.startsWith(pagePaths[child.page]))
+                            ? 'page'
+                            : undefined
+                        }
+                      >
+                        {t(locale, child.label)}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              link
+            );
+          })}
         </nav>
         <LanguageSwitcher locale={locale} />
       </div>
@@ -178,23 +172,26 @@ const postLanguageScript = postLanguagesHeadScript(defaultPostLanguage(locale));
             href={route(locale, 'about')}
             class="footer-link"
             aria-current={page === 'about' ? 'page' : undefined}
-            >{t(locale, 'navAbout')}</a
           >
+            {t(locale, 'navAbout')}
+          </a>
           <a
             href={route(locale, 'privacy')}
             class="footer-link"
             aria-current={page === 'privacy' ? 'page' : undefined}
-            >{t(locale, 'navPrivacy')}</a
           >
+            {t(locale, 'navPrivacy')}
+          </a>
           <a
             href={route(locale, 'zoomHelp')}
             class="footer-link"
             aria-current={page === 'zoomHelp' ? 'page' : undefined}
-            >{t(locale, 'navZoomHelp')}</a
           >
-          <a href="https://winmetta.org/" class="footer-link" rel="noopener"
-            >winmetta.org</a
-          >
+            {t(locale, 'navZoomHelp')}
+          </a>
+          <a href="https://winmetta.org/" class="footer-link" rel="noopener">
+            winmetta.org
+          </a>
         </nav>
         <p class="muted">{t(locale, 'footerNote')}</p>
       </div>

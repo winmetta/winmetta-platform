@@ -35,27 +35,27 @@ const sections = [
     <p class="lead">{text('privacyIntro')}</p>
   </header>
   <div class="max-w-3xl space-y-4">
-    {
-      sections.map(([title, body]) => (
-        <section class="card space-y-2" aria-labelledby={title}>
-          <h2 id={title} class="text-xl font-bold">
-            {text(title)}
-          </h2>
-          <p>{text(body)}</p>
-        </section>
-      ))
-    }
+    {sections.map(([title, body]) => (
+      <section class="card space-y-2" aria-labelledby={title}>
+        <h2 id={title} class="text-xl font-bold">
+          {text(title)}
+        </h2>
+        <p>{text(body)}</p>
+      </section>
+    ))}
     <section class="card space-y-2" aria-labelledby="privacyContactTitle">
       <h2 id="privacyContactTitle" class="text-xl font-bold">
         {text('privacyContactTitle')}
       </h2>
       <p>
         {text('contactPrompt')}{' '}
-        <a class="link" href="mailto:contact@winmetta.org"
-          >contact@winmetta.org</a
-        >
+        <a class="link" href="mailto:contact@winmetta.org">
+          contact@winmetta.org
+        </a>
       </p>
     </section>
-    <p class="muted text-sm">{text('privacyUpdated')}: {updated}</p>
+    <p class="muted text-sm">
+      {text('privacyUpdated')}: {updated}
+    </p>
   </div>
 </Shell>

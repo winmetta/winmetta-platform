@@ -17,21 +17,15 @@ const hintId = 'post-languages-hint';
 <div class="post-picker js-only no-print">
   <fieldset class="flex flex-wrap items-center gap-x-3 gap-y-2">
     <legend class="sr-only">{t(locale, 'postLanguages')}</legend>
-    <span class="font-semibold" aria-hidden="true"
-      >{t(locale, 'postLanguages')}</span
-    >
+    <span class="font-semibold" aria-hidden="true">
+      {t(locale, 'postLanguages')}
+    </span>
     <div class="segmented" role="group" aria-describedby={hintId}>
-      {
-        postLanguages.map((lang) => (
-          <button
-            type="button"
-            aria-pressed="false"
-            data-post-lang-toggle={lang}
-          >
-            {t(locale, postLanguageNames[lang])}
-          </button>
-        ))
-      }
+      {postLanguages.map((lang) => (
+        <button type="button" aria-pressed="false" data-post-lang-toggle={lang}>
+          {t(locale, postLanguageNames[lang])}
+        </button>
+      ))}
     </div>
   </fieldset>
   <p id={hintId} class="muted mt-1 text-sm">

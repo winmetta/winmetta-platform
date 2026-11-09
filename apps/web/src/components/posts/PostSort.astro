@@ -22,19 +22,17 @@ const options = [
   class="no-print flex flex-wrap items-center gap-x-3 gap-y-2"
   aria-labelledby="post-sort-label"
 >
-  <span class="font-semibold" id="post-sort-label"
-    >{t(locale, 'postsSort')}</span
-  >
+  <span class="font-semibold" id="post-sort-label">
+    {t(locale, 'postsSort')}
+  </span>
   <div class="segmented">
-    {
-      options.map((option) => (
-        <a
-          href={postListRoute(locale, { tag, sort: option.sort })}
-          aria-current={option.sort === sort ? 'page' : undefined}
-        >
-          {t(locale, option.label)}
-        </a>
-      ))
-    }
+    {options.map((option) => (
+      <a
+        href={postListRoute(locale, { tag, sort: option.sort })}
+        aria-current={option.sort === sort ? 'page' : undefined}
+      >
+        {t(locale, option.label)}
+      </a>
+    ))}
   </div>
 </nav>

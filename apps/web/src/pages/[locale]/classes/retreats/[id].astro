@@ -58,10 +58,16 @@ const partKey = {
 >
   <nav aria-label={text('breadcrumb')}>
     <ol class="crumbs">
-      <li><a href={route(locale, 'retreats')}>{text('retreatsTitle')}</a></li>
+      <li>
+        <a href={route(locale, 'retreats')}>{text('retreatsTitle')}</a>
+      </li>
       <li class="flex items-center gap-x-1">
-        <span aria-hidden="true" class="muted">›</span>
-        <span aria-current="page" lang={language}>{value.title}</span>
+        <span aria-hidden="true" class="muted">
+          ›
+        </span>
+        <span aria-current="page" lang={language}>
+          {value.title}
+        </span>
       </li>
     </ol>
   </nav>
@@ -69,7 +75,9 @@ const partKey = {
     <h1 class="text-3xl font-bold sm:text-4xl" lang={language}>
       {value.title}
     </h1>
-    <p class="lead" lang={language}>{value.description}</p>
+    <p class="lead" lang={language}>
+      {value.description}
+    </p>
   </header>
   <dl class="card grid gap-x-6 gap-y-3 sm:grid-cols-2">
     <div>
@@ -94,54 +102,50 @@ const partKey = {
     <div>
       <dt class="font-semibold">{text('retreatTeacher')}</dt>
       <dd>
-        {
-          teachers.map((teacher, index) => (
-            <>
-              {index > 0 && ', '}
-              <a
-                class="link"
-                href={teacherRoute(locale, teacher.id)}
-                lang={languageOf(teacher.name)}
-              >
-                {teacher.name}
-              </a>
-            </>
-          ))
-        }
+        {teachers.map((teacher, index) => (
+          <>
+            {index > 0 && ', '}
+            <a
+              class="link"
+              href={teacherRoute(locale, teacher.id)}
+              lang={languageOf(teacher.name)}
+            >
+              {teacher.name}
+            </a>
+          </>
+        ))}
       </dd>
     </div>
-    {
-      retreat.venue && (
-        <div>
-          <dt class="font-semibold">{text('retreatVenue')}</dt>
-          <dd>
-            <span
-              lang={languageOf(
-                retreat.venue.name[locale] ?? retreat.venue.name.en ?? '',
-              )}
-            >
-              {retreat.venue.name[locale] ?? retreat.venue.name.en}
-            </span>
-            , {retreat.venue.address ?? retreat.venue.city}
-            {retreat.venue.mapUrl && (
-              <>
-                {' '}
-                <a
-                  class="link"
-                  href={retreat.venue.mapUrl}
-                  rel="noopener"
-                  data-umami-event="retreat_link_click"
-                  data-umami-event-retreat={retreat.id}
-                  data-umami-event-kind="external"
-                >
-                  {text('retreatMap')}
-                </a>
-              </>
+    {retreat.venue && (
+      <div>
+        <dt class="font-semibold">{text('retreatVenue')}</dt>
+        <dd>
+          <span
+            lang={languageOf(
+              retreat.venue.name[locale] ?? retreat.venue.name.en ?? '',
             )}
-          </dd>
-        </div>
-      )
-    }
+          >
+            {retreat.venue.name[locale] ?? retreat.venue.name.en}
+          </span>
+          , {retreat.venue.address ?? retreat.venue.city}
+          {retreat.venue.mapUrl && (
+            <>
+              {' '}
+              <a
+                class="link"
+                href={retreat.venue.mapUrl}
+                rel="noopener"
+                data-umami-event="retreat_link_click"
+                data-umami-event-retreat={retreat.id}
+                data-umami-event-kind="external"
+              >
+                {text('retreatMap')}
+              </a>
+            </>
+          )}
+        </dd>
+      </div>
+    )}
   </dl>
   <section class="space-y-2" aria-labelledby="ran">
     <h2 id="ran" class="text-2xl font-bold">
@@ -150,83 +154,79 @@ const partKey = {
     <p>{text('retreatsHowOnline')}</p>
     {retreat.format !== 'online' && <p>{text('retreatsHowOnsite')}</p>}
   </section>
-  {
-    retreat.timetables.length + retreat.notes.length > 0 && (
-      <section class="space-y-2" aria-labelledby="docs">
-        <h2 id="docs" class="text-2xl font-bold">
-          {text('retreatTimetables')}
-        </h2>
-        <ul class="space-y-1">
-          {retreat.timetables.map((doc) => (
-            <li>
+  {retreat.timetables.length + retreat.notes.length > 0 && (
+    <section class="space-y-2" aria-labelledby="docs">
+      <h2 id="docs" class="text-2xl font-bold">
+        {text('retreatTimetables')}
+      </h2>
+      <ul class="space-y-1">
+        {retreat.timetables.map((doc) => (
+          <li>
+            <a
+              class="link"
+              href={doc.url}
+              rel="noopener"
+              lang={languageOf(doc.label)}
+              data-umami-event="retreat_link_click"
+              data-umami-event-retreat={retreat.id}
+              data-umami-event-kind="info"
+            >
+              {doc.label}
+            </a>
+          </li>
+        ))}
+        {retreat.notes.map((doc) => (
+          <li>
+            {text('retreatNotes')}:{' '}
+            <a
+              class="link"
+              href={doc.url}
+              rel="noopener"
+              lang={languageOf(doc.label)}
+              data-umami-event="retreat_link_click"
+              data-umami-event-retreat={retreat.id}
+              data-umami-event-kind="info"
+            >
+              {doc.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+  {retreat.sessions.length > 0 && (
+    <section class="space-y-2" aria-labelledby="sessions">
+      <h2 id="sessions" class="text-2xl font-bold">
+        {text('retreatSessions')}
+      </h2>
+      <p class="muted">{text('retreatSessionsNote')}</p>
+      <ol class="space-y-1">
+        {retreat.sessions.map((session) => (
+          <li>
+            <span class="font-semibold">
+              {format(text('dayN'), { n: session.day })} ·{' '}
+              {text(partKey[session.part])}:
+            </span>{' '}
+            {session.postUrl ? (
               <a
                 class="link"
-                href={doc.url}
+                href={session.postUrl}
                 rel="noopener"
-                lang={languageOf(doc.label)}
+                lang={languageOf(session.title)}
                 data-umami-event="retreat_link_click"
                 data-umami-event-retreat={retreat.id}
                 data-umami-event-kind="info"
               >
-                {doc.label}
+                {session.title}
               </a>
-            </li>
-          ))}
-          {retreat.notes.map((doc) => (
-            <li>
-              {text('retreatNotes')}:{' '}
-              <a
-                class="link"
-                href={doc.url}
-                rel="noopener"
-                lang={languageOf(doc.label)}
-                data-umami-event="retreat_link_click"
-                data-umami-event-retreat={retreat.id}
-                data-umami-event-kind="info"
-              >
-                {doc.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </section>
-    )
-  }
-  {
-    retreat.sessions.length > 0 && (
-      <section class="space-y-2" aria-labelledby="sessions">
-        <h2 id="sessions" class="text-2xl font-bold">
-          {text('retreatSessions')}
-        </h2>
-        <p class="muted">{text('retreatSessionsNote')}</p>
-        <ol class="space-y-1">
-          {retreat.sessions.map((session) => (
-            <li>
-              <span class="font-semibold">
-                {format(text('dayN'), { n: session.day })} ·{' '}
-                {text(partKey[session.part])}:
-              </span>{' '}
-              {session.postUrl ? (
-                <a
-                  class="link"
-                  href={session.postUrl}
-                  rel="noopener"
-                  lang={languageOf(session.title)}
-                  data-umami-event="retreat_link_click"
-                  data-umami-event-retreat={retreat.id}
-                  data-umami-event-kind="info"
-                >
-                  {session.title}
-                </a>
-              ) : (
-                <span lang={languageOf(session.title)}>{session.title}</span>
-              )}
-            </li>
-          ))}
-        </ol>
-      </section>
-    )
-  }
+            ) : (
+              <span lang={languageOf(session.title)}>{session.title}</span>
+            )}
+          </li>
+        ))}
+      </ol>
+    </section>
+  )}
   <p>
     <a
       class="btn btn-outline"
@@ -234,17 +234,16 @@ const partKey = {
       rel="noopener"
       data-umami-event="retreat_link_click"
       data-umami-event-retreat={retreat.id}
-      data-umami-event-kind={retreat.status === 'upcoming'
-        ? 'register'
-        : 'info'}
-      >{
-        text(
-          retreat.status === 'upcoming' ? 'retreatRegister' : 'retreatSource',
-        )
-      }</a
+      data-umami-event-kind={
+        retreat.status === 'upcoming' ? 'register' : 'info'
+      }
     >
-    <a class="link ms-4" href={route(locale, 'retreats')}
-      >{text('retreatBack')}</a
-    >
+      {text(
+        retreat.status === 'upcoming' ? 'retreatRegister' : 'retreatSource',
+      )}
+    </a>
+    <a class="link ms-4" href={route(locale, 'retreats')}>
+      {text('retreatBack')}
+    </a>
   </p>
 </Shell>

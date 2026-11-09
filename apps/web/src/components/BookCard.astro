@@ -20,16 +20,14 @@ const { record, locale, from = 'other' } = Astro.props;
     lang={record.language}
   >
     {record.title}
-    {
-      record.titleNote && (
-        <span class="muted font-normal"> ({record.titleNote})</span>
-      )
-    }
+    {record.titleNote && (
+      <span class="muted font-normal"> ({record.titleNote})</span>
+    )}
   </h3>
   <p class="flex items-center gap-3 text-sm">
-    <span class="badge"
-      >{formatSize(record.sizeBytes, locales[locale].formatLocale)}</span
-    >
+    <span class="badge">
+      {formatSize(record.sizeBytes, locales[locale].formatLocale)}
+    </span>
     <a
       class="btn btn-outline"
       href={fileUrl(libraryCdnBase, record.key)}
@@ -37,7 +35,9 @@ const { record, locale, from = 'other' } = Astro.props;
       rel="noopener"
       data-umami-event="library_pdf_download"
       data-umami-event-book={record.id}
-      data-umami-event-from={from}>{t(locale, 'download')}</a
+      data-umami-event-from={from}
     >
+      {t(locale, 'download')}
+    </a>
   </p>
 </li>

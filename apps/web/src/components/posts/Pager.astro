@@ -19,36 +19,34 @@ const count = (value: number) =>
   formatCount(value, locales[locale].formatLocale);
 ---
 
-{
-  pages > 1 && (
-    <nav aria-label={t(locale, 'pagination')} class="no-print">
-      <ul class="pager">
-        {page > 1 && (
-          <li>
-            <a href={href(page - 1)} rel="prev">
-              {t(locale, 'previousPage')}
-            </a>
-          </li>
-        )}
-        {Array.from({ length: pages }, (_, i) => i + 1).map((n) => (
-          <li>
-            <a
-              href={href(n)}
-              aria-current={n === page ? 'page' : undefined}
-              aria-label={`${t(locale, 'pageWord')} ${count(n)}`}
-            >
-              {count(n)}
-            </a>
-          </li>
-        ))}
-        {page < pages && (
-          <li>
-            <a href={href(page + 1)} rel="next">
-              {t(locale, 'nextPage')}
-            </a>
-          </li>
-        )}
-      </ul>
-    </nav>
-  )
-}
+{pages > 1 && (
+  <nav aria-label={t(locale, 'pagination')} class="no-print">
+    <ul class="pager">
+      {page > 1 && (
+        <li>
+          <a href={href(page - 1)} rel="prev">
+            {t(locale, 'previousPage')}
+          </a>
+        </li>
+      )}
+      {Array.from({ length: pages }, (_, i) => i + 1).map((n) => (
+        <li>
+          <a
+            href={href(n)}
+            aria-current={n === page ? 'page' : undefined}
+            aria-label={`${t(locale, 'pageWord')} ${count(n)}`}
+          >
+            {count(n)}
+          </a>
+        </li>
+      ))}
+      {page < pages && (
+        <li>
+          <a href={href(page + 1)} rel="next">
+            {t(locale, 'nextPage')}
+          </a>
+        </li>
+      )}
+    </ul>
+  </nav>
+)}

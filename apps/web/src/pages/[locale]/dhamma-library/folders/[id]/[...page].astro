@@ -58,27 +58,25 @@ const text = (key: Parameters<typeof t>[1]) => t(locale, key);
       <li>
         <a href={route(locale, 'library')}>{text('libraryTitle')}</a>
       </li>
-      {
-        crumbs.map((crumb, i) => (
-          <li class="flex items-center gap-x-1">
-            <span aria-hidden="true" class="muted">
-              ›
+      {crumbs.map((crumb, i) => (
+        <li class="flex items-center gap-x-1">
+          <span aria-hidden="true" class="muted">
+            ›
+          </span>
+          {i < crumbs.length - 1 ? (
+            <a
+              href={folderRoute(locale, crumb.id)}
+              lang={languageOf(crumb.name)}
+            >
+              {crumb.name}
+            </a>
+          ) : (
+            <span aria-current="page" lang={languageOf(crumb.name)}>
+              {crumb.name}
             </span>
-            {i < crumbs.length - 1 ? (
-              <a
-                href={folderRoute(locale, crumb.id)}
-                lang={languageOf(crumb.name)}
-              >
-                {crumb.name}
-              </a>
-            ) : (
-              <span aria-current="page" lang={languageOf(crumb.name)}>
-                {crumb.name}
-              </span>
-            )}
-          </li>
-        ))
-      }
+          )}
+        </li>
+      ))}
     </ol>
   </nav>
 
@@ -94,67 +92,61 @@ const text = (key: Parameters<typeof t>[1]) => t(locale, key);
     </p>
   </header>
 
-  {
-    children.length > 0 && page === 1 && (
-      <section class="space-y-3" aria-labelledby="subfolders">
-        <h2 id="subfolders" class="text-xl font-bold">
-          {text('subfolders')}
-        </h2>
-        <div class="card">
-          <FolderTreeList tree={tree} nodes={children} locale={locale} />
-        </div>
-      </section>
-    )
-  }
+  {children.length > 0 && page === 1 && (
+    <section class="space-y-3" aria-labelledby="subfolders">
+      <h2 id="subfolders" class="text-xl font-bold">
+        {text('subfolders')}
+      </h2>
+      <div class="card">
+        <FolderTreeList tree={tree} nodes={children} locale={locale} />
+      </div>
+    </section>
+  )}
 
-  {
-    node.books.length > 0 ? (
-      <section class="space-y-3" aria-labelledby="books">
-        <h2 id="books" class="text-xl font-bold">
-          {text('booksInFolder')}
-        </h2>
-        <ul class="space-y-3">
-          {books.map((record) => (
-            <BookCard record={record} locale={locale} from="folder" />
-          ))}
-        </ul>
-      </section>
-    ) : (
-      children.length === 0 && <p class="card">{text('emptyFolder')}</p>
-    )
-  }
+  {node.books.length > 0 ? (
+    <section class="space-y-3" aria-labelledby="books">
+      <h2 id="books" class="text-xl font-bold">
+        {text('booksInFolder')}
+      </h2>
+      <ul class="space-y-3">
+        {books.map((record) => (
+          <BookCard record={record} locale={locale} from="folder" />
+        ))}
+      </ul>
+    </section>
+  ) : (
+    children.length === 0 && <p class="card">{text('emptyFolder')}</p>
+  )}
 
-  {
-    pages > 1 && (
-      <nav aria-label={text('pagination')}>
-        <ul class="pager">
-          {page > 1 && (
-            <li>
-              <a href={folderRoute(locale, id, page - 1)} rel="prev">
-                {text('previousPage')}
-              </a>
-            </li>
-          )}
-          {Array.from({ length: pages }, (_, i) => i + 1).map((n) => (
-            <li>
-              <a
-                href={folderRoute(locale, id, n)}
-                aria-current={n === page ? 'page' : undefined}
-                aria-label={`${text('pageWord')} ${count(n)}`}
-              >
-                {count(n)}
-              </a>
-            </li>
-          ))}
-          {page < pages && (
-            <li>
-              <a href={folderRoute(locale, id, page + 1)} rel="next">
-                {text('nextPage')}
-              </a>
-            </li>
-          )}
-        </ul>
-      </nav>
-    )
-  }
+  {pages > 1 && (
+    <nav aria-label={text('pagination')}>
+      <ul class="pager">
+        {page > 1 && (
+          <li>
+            <a href={folderRoute(locale, id, page - 1)} rel="prev">
+              {text('previousPage')}
+            </a>
+          </li>
+        )}
+        {Array.from({ length: pages }, (_, i) => i + 1).map((n) => (
+          <li>
+            <a
+              href={folderRoute(locale, id, n)}
+              aria-current={n === page ? 'page' : undefined}
+              aria-label={`${text('pageWord')} ${count(n)}`}
+            >
+              {count(n)}
+            </a>
+          </li>
+        ))}
+        {page < pages && (
+          <li>
+            <a href={folderRoute(locale, id, page + 1)} rel="next">
+              {text('nextPage')}
+            </a>
+          </li>
+        )}
+      </ul>
+    </nav>
+  )}
 </Shell>

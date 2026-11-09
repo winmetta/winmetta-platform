@@ -12,23 +12,19 @@ const { notFound = false } = Astro.props;
 const domain = new URL(Astro.site ?? 'http://localhost').hostname;
 ---
 
-{
-  /* Off unless the build sets PUBLIC_ANALYTICS=true: then this element is absent and
-  analytics-client.ts does nothing. */
-}
-{
-  analyticsEnabled && (
-    <script
-      is:inline
-      type="application/json"
-      id="analytics-config"
-      data-host={analyticsHost}
-      data-website-id={analyticsWebsiteId}
-      data-domain={domain}
-      data-not-found={String(notFound)}
-    />
-  )
-}
+{/* Off unless the build sets PUBLIC_ANALYTICS=true: then this element is absent and
+  analytics-client.ts does nothing. */}
+{analyticsEnabled && (
+  <script
+    is:inline
+    type="application/json"
+    id="analytics-config"
+    data-host={analyticsHost}
+    data-website-id={analyticsWebsiteId}
+    data-domain={domain}
+    data-not-found={String(notFound)}
+  />
+)}
 <script>
   import '../lib/analytics-client';
 </script>

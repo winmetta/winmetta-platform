@@ -9,19 +9,17 @@ const { locale } = Astro.props;
 ---
 
 <nav aria-label={t(locale, 'language')} class="segmented">
-  {
-    localeCodes.map((code) => (
-      <a
-        href={switchLocale(Astro.url, code)}
-        lang={code}
-        hreflang={code}
-        aria-current={code === locale ? 'page' : undefined}
-        data-locale={code}
-      >
-        {locales[code].name}
-      </a>
-    ))
-  }
+  {localeCodes.map((code) => (
+    <a
+      href={switchLocale(Astro.url, code)}
+      lang={code}
+      hreflang={code}
+      aria-current={code === locale ? 'page' : undefined}
+      data-locale={code}
+    >
+      {locales[code].name}
+    </a>
+  ))}
 </nav>
 <script>
   import { isLocale } from '../i18n/locales';

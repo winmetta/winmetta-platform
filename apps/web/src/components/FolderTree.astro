@@ -18,34 +18,32 @@ const formatLocale = locales[locale].formatLocale;
 ---
 
 <ul class="tree">
-  {
-    nodes.map((node) => (
-      <li>
-        <a
-          class="tree-row"
-          href={folderRoute(locale, node.id)}
-          lang={languageOf(node.name)}
-          data-umami-event="library_folder_open"
-          data-umami-event-folder={node.id}
-        >
-          <span class="font-medium">{node.name}</span>
-          <span class="badge" lang={locale}>
-            {formatCount(node.total, formatLocale)}{' '}
-            {t(
-              locale,
-              isSingular(node.total, formatLocale) ? 'bookOne' : 'bookOther',
-            )}
-          </span>
-        </a>
-        {nested && node.childIds.length > 0 && (
-          <FolderTreeSelf
-            tree={tree}
-            locale={locale}
-            nodes={node.childIds.flatMap((id) => tree.nodes.get(id) ?? [])}
-            nested
-          />
-        )}
-      </li>
-    ))
-  }
+  {nodes.map((node) => (
+    <li>
+      <a
+        class="tree-row"
+        href={folderRoute(locale, node.id)}
+        lang={languageOf(node.name)}
+        data-umami-event="library_folder_open"
+        data-umami-event-folder={node.id}
+      >
+        <span class="font-medium">{node.name}</span>
+        <span class="badge" lang={locale}>
+          {formatCount(node.total, formatLocale)}{' '}
+          {t(
+            locale,
+            isSingular(node.total, formatLocale) ? 'bookOne' : 'bookOther',
+          )}
+        </span>
+      </a>
+      {nested && node.childIds.length > 0 && (
+        <FolderTreeSelf
+          tree={tree}
+          locale={locale}
+          nodes={node.childIds.flatMap((id) => tree.nodes.get(id) ?? [])}
+          nested
+        />
+      )}
+    </li>
+  ))}
 </ul>
