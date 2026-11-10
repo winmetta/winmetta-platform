@@ -9,6 +9,7 @@ The first three phases, all done, took the project from an empty repo to a publi
 | **2 — Infrastructure & deployment** | Pulumi (TypeScript), domains, AWS hosting (S3 + CloudFront), Route 53 DNS, a CI deploy workflow, a Beta label and a single production environment. New media infrastructure and staging come later. | Yes (public) |
 | **3 — Dhamma Posts** | Short trilingual (Burmese, English, Simplified Chinese) Dhamma posts kept as markdown files in the repo: post, tag and paginated list pages, a "Read in" language choice that links can carry, share and print, and format checks in the hook, CI and build. Built 2026-10-23, merged into `main` on 2026-10-25 (PR #10) and deployed to production on 2026-10-26. | Yes (public) |
 | **4 — Analytics** | Privacy-first, cookieless, aggregate activity measurement with self-hosted Umami at `stats.app.winmetta.org`. Planned 2026-10-26; stages 1–4 done (the tracker is live once the go-live change is deployed), stage 5 (review after one month) open. See §5A and [analytics.md](analytics.md). | Yes (public) |
+| **Feedback form** | An in-place report form on every page type (Dhamma Posts, classes and retreats, library, general) and a private Sādhu appreciation button on posts, with one small AWS Lambda endpoint and SNS email. Planned 2026-11-10; see §5B and [feedback.md](feedback.md). | Not yet |
 
 Everything not yet scheduled is in the **backlog (§6)**: the open todos left from the finished phases (reviews, the launch announcement, operations) and the candidate future phases (LLB lessons, the library upload pipeline, accounts, native apps; see also [prd.md](prd.md) §7). Reading order: toolchain (§1), Phases 0–3 (§2–§5), backlog (§6), then reference material (§7–§9). Scope per [prd.md](prd.md) (§4.7, §7) and [tech-architecture.md](tech-architecture.md) (§0): one static Astro web app designed for mobile and desktop — no backend, no database, no desktop/mobile apps.
 
@@ -330,6 +331,33 @@ Each stage is reviewed and merged before the next starts. A stage that changes c
 
 ---
 
+## 5B. Feedback form and Sādhu button (planned 2026-11-10)
+
+**Goal:** let visitors report a typo, wrong content, a wrong class schedule or a broken book link from the page where they see it, and let readers show appreciation for a post, without accounts, cookies or a database. Full design, request format and infrastructure: [feedback.md](feedback.md).
+
+### Decisions (2026-11-10)
+
+* Own form, in an in-place dialog, with four contexts (Dhamma Post, classes and retreats, library, general), each with its own problem types and recipient.
+* One small endpoint: AWS Lambda behind a Function URL with no auth, reached through CloudFront at `/api/feedback`; CloudFront adds a shared secret header and the Lambda rejects requests without it. Delivery by plain-text SNS email; nothing is stored. This is a deliberate exception to "no backend" (tech-architecture.md §4.5).
+* A single Sādhu (သာဓု) button on posts, a private signal sent as an analytics event: no public count, no ranking, no thumbs-down.
+
+### Stages
+
+Each stage is reviewed and merged before the next starts. A stage that changes cloud resources needs the maintainer's explicit go-ahead before `pulumi up`.
+
+* [ ] **1. Design and docs.** This design, the plan, the architecture note, the analytics events and the AGENTS.md pointers.
+* [ ] **2. Infrastructure.** `infra/pulumi/feedback.ts` behind `feedbackEnabled`, the function in `infra/feedback/` with unit tests (secret check, field rules, honeypot, no logging of the body), the SNS topic, the CloudFront origin and behavior, the alarm and the secret in Pulumi config. `pulumi preview`, then apply with approval; test with `curl`: no or wrong secret gives `403`, a valid report gives `204` and the email arrives.
+* [ ] **3. Dialog and general feedback.** The shared dialog and contexts file, the footer link (and a menu entry if there is room), the `mailto:` fallback, the Privacy page text in both languages and the `feedback_open` and `feedback_submit` events, behind a build flag (`PUBLIC_FEEDBACK`) so the site can deploy before the endpoint is switched on. Unit and Playwright tests for both locales, keyboard use and no storage.
+* [ ] **4. Context links, one reviewed PR each.** (a) Dhamma Posts: the toolbar and per-language links and the Sādhu button with `post_reaction`. (b) Classes, study groups, retreats, Sayadaws and Zoom help: the "Something wrong?" links. (c) Library: the book card links.
+* [ ] **5. Go live.** The maintainer sets `PUBLIC_FEEDBACK` in the `production` environment; group mailboxes subscribe to the SNS topic with their filter policies (private runbook); one test report per route reaches the right mailbox; the secret rotation and the kill switch are tried once.
+* [ ] **6. Review after one month.** How many reports, how many were real, spam or abuse, who answered and how fast, which posts get Sādhu clicks, and whether a daily cap or SES is needed.
+
+### Acceptance
+
+See [feedback.md](feedback.md) §9.
+
+---
+
 ## 6. Backlog (not scheduled)
 
 Phases 0–3 are done. Everything else lives here, in two groups: **open todos** left from the finished phases, and **future phases**, which are candidate directions rather than commitments. Nothing here is dated: the maintainer decides the order and scope as the work comes, and a future phase gets its own numbered section (like §5) when it starts. Product reasoning is in [prd.md](prd.md) §7; tentative technical notes are in [tech-architecture.md](tech-architecture.md) §10.
@@ -374,6 +402,7 @@ Deferred when the site went public on 2026-10-23 (see "Launch status" in §4). D
 * [ ] The golden-query suite (partial words, typos, spaced and unspaced queries, digits, ဥ/ဉ variants), then record the index size and query-time budgets.
 * [ ] All Burmese interface text on the Classes, Dhamma Study Groups, Retreats, Sayadaws and Zoom help pages, the schedule table, the time zone names, and the draft English biographies (set a teacher's English `reviewed` to `true` only after this).
 * [ ] The Burmese Privacy wording for the analytics section and the changed `privacyNone` sentence (drafts in [analytics.md](analytics.md) §8; added 2026-10-30, to be reviewed after Phase 4 goes live; the Burmese must keep the same meaning as the English, with some terms deliberately left in English). Assign the reviewer in the private repo.
+* [ ] The Burmese text of the feedback form, the Privacy sentences about it and the Sādhu (သာဓု) label and thank-you ([feedback.md](feedback.md) §4 and §7): a Burmese speaker, ideally a teacher, confirms them before the post links go live. Assign the reviewer in the private repo.
 * [ ] Remove the Beta label once the reviews above are done or consciously accepted (set `isBeta` to `false` in `apps/web/src/lib/site.ts`).
 
 **6. Review by native readers (Dhamma Posts)**
