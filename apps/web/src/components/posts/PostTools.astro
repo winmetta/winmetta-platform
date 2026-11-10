@@ -107,6 +107,17 @@ const { locale, url, title, print = false, shareSearch = false } = Astro.props;
         .filter(isPostLanguage)
         .join(','),
     });
+  // Once per page view, when the end marker below the last section scrolls into view (a short
+  // post reports it at once). Only the post id is sent (docs/analytics.md §3).
+  const end = document.querySelector('[data-post-end]');
+  if (postId && end && 'IntersectionObserver' in window) {
+    const seen = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      seen.disconnect();
+      track('post_end_reached', { post: postId });
+    });
+    seen.observe(end);
+  }
   share?.addEventListener('click', async () => {
     track('post_share', {
       kind: postId
