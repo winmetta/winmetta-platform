@@ -92,6 +92,8 @@ const updated = formatPostDate(post.updated, formatLocale);
         <div class="post-body" set:html={section.html} />
       </section>
     ))}
+    <!-- Marks the end of the post for the post_end_reached event (PostTools.astro). -->
+    <div data-post-end aria-hidden="true"></div>
     <p class="print-only muted text-sm">
       {text('postSource')}: {url} ·{' '}
       {format(text('postCreated'), { date: created })}

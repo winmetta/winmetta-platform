@@ -250,4 +250,31 @@ test.describe('tracker on (ANALYTICS_BUILD=true)', () => {
       true,
     );
   });
+
+  test('reaching the end of a post reports its id once', async ({ page }) => {
+    await page.goto('/en/dhamma-posts/');
+    const href = await page
+      .locator('a[data-card-link]')
+      .first()
+      .getAttribute('href');
+    await page.goto(href ?? '/');
+    await page.waitForFunction(() => '__tracker' in window);
+    await page.locator('[data-post-end]').scrollIntoViewIfNeeded();
+    await expect
+      .poll(async () =>
+        (await events(page)).filter((e) => e.name === 'post_end_reached'),
+      )
+      .toEqual([
+        {
+          name: 'post_end_reached',
+          data: { post: expect.stringMatching(/^\d{4}-\d{2}-\d{2}-/) },
+        },
+      ]);
+    // Scrolling away and back must not report it again.
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.locator('[data-post-end]').scrollIntoViewIfNeeded();
+    expect(
+      (await events(page)).filter((e) => e.name === 'post_end_reached'),
+    ).toHaveLength(1);
+  });
 });
