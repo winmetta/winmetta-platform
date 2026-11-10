@@ -8,7 +8,7 @@
 
 ## 0. Scope: v1 Is a Static Web App
 
-Per [prd.md](prd.md) §4.7 and §7, v1 is **one responsive web app designed for mobile and desktop, built with Astro** (static-first, React islands for interactive pieces). Most content — LLB curriculum, Dhamma Library metadata, class directory — is static and lives in the repo as content collections. That means **no backend server and no database in Phases 0–2**: fewer moving parts for a volunteer team to run, cheaper, and easier to move.
+Per [prd.md](prd.md) §4.7 and §7, v1 is **one responsive web app designed for mobile and desktop, built with Astro** (static-first, React islands for interactive pieces). Most content — LLB curriculum, Dhamma Library metadata, class directory — is static and lives in the repo as content collections. That means **no backend server and no database in Phases 0–2**: fewer moving parts for a volunteer team to run, cheaper, and easier to move. Two small, deliberate exceptions follow without changing that: the analytics-only server of Phase 4 (§4.4) and the planned feedback endpoint (§4.5), neither of which holds learner accounts or content.
 
 A backend (Fastify + PostgreSQL), accounts, offline support and native apps are all documented as [future work](#10-future-directions-tentative), added only when a real need appears.
 
@@ -209,6 +209,18 @@ Phases 0–3 collect no analytics: no SDK, no learner events, no collection serv
 * Umami runs on one AWS EC2 instance in the AWS account (Pulumi, Caddy with Let's Encrypt, PostgreSQL on the same instance) at `stats.app.winmetta.org` (§6). It adds the app's first server, but it is analytics-only: the site stays static and no learner data touches it.
 * IndexedDB progress and review state remain local features for learners, not telemetry. The measures in [prd.md](prd.md) §6 that need the same learner recognized across days are not measurable by this design.
 * Hosting/CDN operational logs are separate from product analytics and are not a promise of zero provider-side logging.
+
+---
+
+### 4.5. Feedback form and Sādhu button (planned, 2026-11-10)
+
+Visitors can report a typo, wrong content, a wrong class schedule or a broken book link, and readers can show appreciation for a post. The design, request format, routing and privacy rules are in [feedback.md](feedback.md); the staged plan is in implementation-plan.md §5B. The summary:
+
+* **One stateless endpoint:** an AWS Lambda function behind a Function URL with no auth, reached through the existing CloudFront distribution at `/api/feedback` (same origin, no CORS). CloudFront adds a shared secret header and the function rejects requests without it. Defined in Pulumi behind a flag, like the analytics server (§8).
+* **Delivery without storage:** the function validates the report and publishes it to an SNS topic, which emails group mailboxes by route (`content`, `schedule`, `site`). There is no database, and the function does not read or log the IP address or the message.
+* **The form** is an in-place `<dialog>` opened from a link on the page that has the problem; without JavaScript the link is a `mailto:`.
+* **The Sādhu button** sends only an analytics event; there is no count on the site and no server state.
+* This is the first request path other than the static site and the analytics host, so the staging and integration-test advice in §7 and §10 stays in force for the first real API.
 
 ---
 
