@@ -1,3 +1,5 @@
+import FeedbackCardLink from './FeedbackCardLink';
+import type { Locale } from '../i18n/locales';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type {
   LibrarySearch,
@@ -38,6 +40,7 @@ export interface Labels {
   folder: string;
   removeFolder: string;
   download: string;
+  locale: Locale;
   showMore: string;
 }
 interface Props {
@@ -95,6 +98,12 @@ function Card({
           </li>
         ))}
       </ul>
+      <FeedbackCardLink
+        locale={labels.locale}
+        ctx="library"
+        item={record.id}
+        page={`/${labels.locale}/dhamma-library/`}
+      />
       <p className="flex flex-wrap items-center gap-3 text-sm">
         <a
           className="btn btn-outline"

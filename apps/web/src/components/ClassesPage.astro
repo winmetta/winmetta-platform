@@ -1,4 +1,5 @@
 ---
+import FeedbackLink from './FeedbackLink.astro';
 import Shell from '../layouts/Shell.astro';
 import BrandIcon from './BrandIcon.astro';
 import ClassCard from './ClassCard.astro';
@@ -112,6 +113,7 @@ const source = records[0]?.sourceUrl ?? 'https://winmetta.org/';
     <p class="muted">
       {text('scheduleIntro')} {text('scheduleLangNote')}
     </p>
+    <FeedbackLink locale={locale} ctx="class" item="schedule" />
     <WeeklySchedule
       client:load
       rows={rows}

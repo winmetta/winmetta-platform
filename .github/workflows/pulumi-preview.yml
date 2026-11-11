@@ -45,7 +45,7 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           files="$(gh api --paginate "repos/$REPO/pulls/$PR_NUMBER/files" --jq '.[] | .filename, (.previous_filename // empty)')"
-          if printf '%s\n' "$files" | grep -qE '^(infra/pulumi/|\.github/workflows/pulumi-preview\.yml$)'; then
+          if printf '%s\n' "$files" | grep -qE '^(infra/pulumi/|infra/feedback/|apps/web/src/lib/feedback-schema\.ts$|\.github/workflows/pulumi-preview\.yml$)'; then
             echo "infra=true" >> "$GITHUB_OUTPUT"
           else
             echo "infra=false" >> "$GITHUB_OUTPUT"
@@ -70,6 +70,11 @@ jobs:
         if: steps.changes.outputs.infra == 'true'
         run: npm ci
         working-directory: infra/pulumi
+      - name: Build the feedback function archive
+        if: steps.changes.outputs.infra == 'true'
+        run: |
+          npm ci --prefix infra/feedback
+          npm run feedback:build
       - name: Sign in to AWS with the preview role
         if: steps.changes.outputs.infra == 'true'
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0

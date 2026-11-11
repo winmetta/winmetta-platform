@@ -27,6 +27,7 @@ jobs:
           cache-dependency-path: |
             package-lock.json
             infra/pulumi/package-lock.json
+            infra/feedback/package-lock.json
       - name: Use the declared npm version
         run: npm install --global "$(node -p "require('./package.json').packageManager")"
       - run: npm ci
@@ -79,6 +80,11 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       # infra/pulumi is not an npm workspace (the root commands skip it), so check it here.
+      - name: Install the feedback endpoint dependencies
+        run: npm ci --prefix infra/feedback
+      - run: npm run feedback:typecheck
+      - run: npm run feedback:test
+      - run: npm run feedback:build
       - name: Install the Pulumi program's dependencies
         run: npm ci
         working-directory: infra/pulumi
@@ -117,3 +123,14 @@ jobs:
         run: npx playwright install-deps chromium
         working-directory: apps/web
       - run: npm run test:smoke
+      # Exercise the opt-in form as well as the ordinary feature-off production build.
+      - name: Build with feedback enabled for browser tests
+        run: npm run build
+        env:
+          PUBLIC_FEEDBACK: 'true'
+          PUBLIC_FEEDBACK_POSTS_REVIEWED: 'true'
+      - name: Test the feedback-enabled site in both locales
+        run: npm run test:smoke
+        env:
+          PUBLIC_FEEDBACK: 'true'
+          PUBLIC_FEEDBACK_POSTS_REVIEWED: 'true'

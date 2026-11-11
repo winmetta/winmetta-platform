@@ -1,6 +1,6 @@
 # Feedback form and Sādhu button
 
-**Status:** planned 2026-11-10; nothing is built yet. The staged plan is in [implementation-plan.md](implementation-plan.md) §5B.
+**Status:** implementation prepared 2026-11-10, disabled by default; infrastructure has not been applied or tested against AWS. The staged plan is in [implementation-plan.md](implementation-plan.md) §5B.
 
 **Why:** the site is public and its content is only as good as its corrections. A visitor who finds a typo in a Dhamma Post, a wrong class time or a broken book link has no way to tell us. Win Metta also has no way to tell which posts readers value, other than page views ([analytics.md](analytics.md)).
 
@@ -16,8 +16,8 @@ This adds two things, both without accounts, cookies or a database:
 | Decision | Choice | Notes |
 | --- | --- | --- |
 | Own form or a hosted one | **Own form** | One small endpoint on the AWS account the site already uses. No third-party form provider sees reports. |
-| Endpoint | **AWS Lambda behind a Function URL (no auth), reached through CloudFront at `/api/feedback`** | Same origin as the site, so no CORS and no new domain. |
-| Access control | **A shared secret header.** CloudFront adds `x-feedback-secret` to every request it forwards; the Lambda rejects a request without it | The Function URL itself is public, so this header is the only gate. Chosen over origin access control, which would make the browser compute a hash of every request body. See section 5. |
+| Endpoint | **AWS Lambda behind an IAM-authenticated Function URL, reached through CloudFront at `/api/feedback`** | Same origin as the site, so no CORS and no new domain. |
+| Access control | **CloudFront origin access control (OAC)** | Lambda authorizes only the CloudFront service for this distribution. The browser includes a SHA-256 hash of the request body. No shared secret is stored in Pulumi state. |
 | Delivery | **Amazon SNS email, plain text** | Starts simple. SES (replyable, formatted mail) is a later option; it needs a verified sender domain. |
 | Storage | **None.** The report exists only as the email | No database, no table, no log of the text. How long mailboxes keep reports is an organization decision (private repository). |
 | Form UI | **An in-place dialog** (the native `<dialog>` element), one shared component | Keeps the reader on the page. Without JavaScript the same links open a `mailto:` message instead. |
@@ -31,7 +31,7 @@ Out of scope: attachments or screenshots, accounts, a public list of reports, CA
 
 ## 2. Contexts, problem types and recipients
 
-One form component and one endpoint. A **context** decides which problem types the form offers, what it prefills, and where the report goes. The contexts and types live in **one shared file** used by the form and the Lambda, with a test that checks they agree.
+One form component and one endpoint. A **context** decides which problem types the form offers, what it prefills, and where the report goes. The contexts and types live in **one shared file**, `apps/web/src/lib/feedback-schema.ts`, used by the form and the Lambda. Endpoint tests exercise every allowed context/type pair. Wire values are `post`: `typo`, `content`, `translation`, `other`; `class`: `time`, `zoom`, `language`, `retreat`, `other`; `library`: `broken`, `title`, `other`; `general`: `suggestion`, `website`, `other`.
 
 | Context | Where the link appears | Problem types | Route |
 | --- | --- | --- | --- |
@@ -62,11 +62,11 @@ One form component and one endpoint. A **context** decides which problem types t
 | `lang` | optional, `my`, `en` or `zh-Hans` (posts only) |
 | `locale` | `en` or `my`, the interface language |
 | `hp` | a hidden field that must be empty |
-| `t` | milliseconds the dialog was open; a report sent in under 3 seconds is dropped |
+| `t` | milliseconds the dialog was open; a report sent in under 3 seconds is dropped (the dialog enables Send after 3 seconds so a quick human submission is not silently lost) |
 
-Responses: `204` accepted (including a silently dropped bot report), `400` invalid, `403` missing or wrong secret, `413` too large, `429` throttled. On any failure the dialog says so and offers the `mailto:` address.
+Responses: `204` accepted (including a silently dropped bot report), `400` invalid, `413` too large, `429` throttled, `503` delivery failed. Other methods return `405`. On any failure the dialog says so and offers the `mailto:` address.
 
-**The email.** SNS plain text. The subject is ASCII only and at most 100 characters (SNS rules), for example `[Win Metta] class / time wrong`. The body lists the context, type, page, item, language and locale, then the message and the reply address. It never contains an IP address or browser details; the Lambda does not read them. Message attributes `route` and `ctx` drive the filter policies.
+**The email.** SNS plain text. The subject uses ASCII only and fewer than 100 characters (the implementation caps it at 99), for example `[Win Metta] class / time wrong`. The body lists the context, type, page, item, language and locale, then the message and the reply address. It never contains an IP address or browser details; the Lambda does not read them. Message attributes `route` and `ctx` drive the filter policies.
 
 ---
 
@@ -86,19 +86,18 @@ If public counts are ever wanted, that is a new decision: it needs a small datab
 
 Defined in Pulumi (TypeScript) as a component `infra/pulumi/feedback.ts`, behind a stack flag `feedbackEnabled`, with the function in `infra/feedback/` (like `infra/analytics/`).
 
-- **Lambda:** Node.js (the repo's version), arm64, 128 MB, 5 second timeout, **reserved concurrency 2** (extra requests get `429`; setting it to 0 is the kill switch). The log group keeps 14 days and the code never logs a request body or header. The function reads the secret from its environment (set from Pulumi secret config, never from git).
-- **Secret header:** CloudFront adds `x-feedback-secret: <secret>` as an origin custom header. The Lambda compares it in constant time and also accepts `FEEDBACK_SECRET_PREVIOUS`, so the secret can be rotated without downtime: add the new value as current, move the old to previous, change CloudFront, then drop the previous. The header value is visible to anyone with CloudFront read access in the AWS account.
-- **CloudFront:** a second origin (the Function URL host) and an ordered behavior for `/api/feedback`. POST needs the "all methods" allowed set. Caching is off and the origin request policy forwards no cookies, headers or query strings. The existing response headers policy applies.
-- **A Function URL without auth is reachable directly.** Without the header a call gets `403`, but it still starts the function. The concurrency cap and an alarm (below) limit what that can cost.
+- **Lambda:** Node.js (the repo's version), arm64, 128 MB, 5 second timeout, **reserved concurrency 2** (extra requests get `429`; `feedbackConcurrency=0` is the kill switch). The log group keeps 14 days and the code never logs a request body or header.
+- **CloudFront:** a second origin (the Function URL host) and an ordered behavior for `/api/feedback`. POST needs the "all methods" allowed set. Caching is off and the origin request policy forwards no cookies or query strings and only the payload hash header. The existing response headers policy applies. The directory-index viewer function is not attached to this API behavior. The distribution-wide static-site error policy can translate origin `403` to the site's `404`; direct Function URL tests verify IAM rejects unsigned access, while the dialog handles any non-`204` as a failure.
+- **Function URL:** IAM denies direct unsigned requests. CloudFront signs origin requests using OAC; permissions restrict invocation to this distribution.
 - **SNS:** one `feedback` topic with email subscriptions and filter policies on `route`. Subscribers confirm by link, so the group mailboxes must be able to receive the confirmation.
 - **Alarm:** a CloudWatch alarm when the function runs unusually often in a day (about 200 invocations), notifying the organization admin group the way the analytics alerts do.
 - **Cost:** well under $1 a month at this scale (Lambda and SNS email fall in the free allowances). Resources are tagged `component=feedback` and covered by the existing monthly budget alert.
-- **Cloud writes** (`pulumi up`, subscribing mailboxes, setting the secret) need the maintainer's explicit go-ahead, with a `pulumi preview` first. The procedures go in the private repository's runbook.
+- **Cloud writes** (`pulumi up`, subscribing mailboxes, configuring the endpoint) need the maintainer's explicit go-ahead, with a `pulumi preview` first. The procedures go in the private repository's runbook.
 
 ### Alternatives considered
 
-- **Origin access control to the Function URL:** keeps the URL private, but for a POST the browser must send the SHA-256 of the body in `x-amz-content-sha256`. Rejected for the extra client code.
-- **API Gateway HTTP API:** no such quirk, about $1 per million requests, but one more service to define. A fallback if the header approach causes trouble.
+- **Shared secret header:** rejected because the Pulumi preview role can decrypt production state, exposing the shared secret to same-repository PR code.
+- **API Gateway HTTP API:** no such quirk, about $1 per million requests, but one more service to define. A fallback if the OAC approach causes trouble.
 - **Hosted forms (Google Forms and similar):** no code, but a third party holds the reports and the Privacy page changes the same way. Rejected for this design.
 - **SES instead of SNS:** replyable HTML mail; needs a verified sender domain (easy for `app.winmetta.org`, whose zone is in Route 53). A later upgrade.
 - **A daily counter in a database** to cap reports: not needed yet. Add it only if the concurrency cap and alarm prove too weak.
@@ -110,7 +109,7 @@ Defined in Pulumi (TypeScript) as a component `infra/pulumi/feedback.ts`, behind
 - **Nothing is stored on the server**, apart from the email and a Lambda log without the request. The Lambda does not read the IP address or user agent. No cookie or storage key is added, and nothing is sent until the reporter presses Send.
 - **The Privacy page** (English and Burmese), changed in the same PR that ships the dialog: reports are emailed to the Win Metta team; the optional reply address is used only to answer; the message may include what the reporter types, so please leave out personal details; the Sādhu button counts clicks anonymously.
 - **Analytics events** ([analytics.md](analytics.md) §3, added there first): `feedback_open` (`ctx`), `feedback_submit` (`ctx`, `type`, `ok`) and `post_reaction` (`post`, `kind`). Never the message, the address or the page text. The form page is not tracked separately: the dialog has no URL.
-- **Public repo:** no mailbox names, subscriber lists or the secret in this repository. Routing and rotation steps live in `winmetta-platform-private`.
+- **Public repo:** no mailbox names or subscriber lists in this repository. Routing and operational steps live in `winmetta-platform-private`.
 
 ---
 
@@ -134,8 +133,37 @@ Defined in Pulumi (TypeScript) as a component `infra/pulumi/feedback.ts`, behind
 ## 9. Acceptance
 
 - A report from each context reaches the right group mailbox, with the page, item and language filled in.
-- A request without the secret gets `403`; a bot-filled hidden field or a report under 3 seconds produces no email.
+- An unsigned direct Function URL request is denied; a bot-filled hidden field or a report under 3 seconds produces no email.
 - No cookie or storage key is written, and no request or log keeps the message text.
 - The dialog works by keyboard and on a phone, in both languages, and the links fall back to `mailto:` without JavaScript.
 - The Sādhu click appears as `post_reaction` in Umami, and nothing on the site shows a count.
 - The Privacy page matches what is collected.
+
+
+## 10. Implementation and deployment gates
+
+The endpoint is in `infra/feedback/`; `infra/pulumi/feedback.ts` defines its resources.
+The shared dialog and links are in `apps/web/src/components/Feedback*.astro` and
+`FeedbackCardLink.tsx`; the post button is `components/posts/Sadhu.astro`.
+`npm run feedback:test` checks validation, routing, body limits,
+bot drops and delivery failures without AWS. Pulumi mocks check permissions and
+resource limits. Playwright checks the feature both off and on, in both locales,
+on desktop and mobile. See [infra/feedback/README.md](../infra/feedback/README.md).
+
+* `PUBLIC_FEEDBACK=true` builds the dialog and general, class and library links;
+  unset or false leaves them absent, including the Privacy section about feedback.
+* `PUBLIC_FEEDBACK_POSTS_REVIEWED=true`, together with `PUBLIC_FEEDBACK`, enables
+  post report links and Sādhu only after the required wording review. The new
+  Burmese messages remain drafts pending that review.
+* `feedbackEnabled=true` defines the AWS resources. This flag has not been set by the implementation. Keep the web feature off until the
+  endpoint, email route filters and alert delivery have been verified with approval.
+* Actual AWS integration, SNS subscription confirmation, mailbox retention,
+  kill-switch drills, go-live and the one-month review remain
+  outstanding. The steps that change AWS or production live in the private runbook.
+
+
+AWS references checked during implementation: [Lambda runtimes](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html),
+[Function URL permissions](https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html),
+[SNS Publish subject constraints](https://docs.aws.amazon.com/sns/latest/api/API_Publish.html),
+and [CloudFront OAC payload-hash requirements](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-lambda.html).
+These documentation checks do not replace the pending AWS integration tests.

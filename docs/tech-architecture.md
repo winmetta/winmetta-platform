@@ -212,11 +212,11 @@ Phases 0–3 collect no analytics: no SDK, no learner events, no collection serv
 
 ---
 
-### 4.5. Feedback form and Sādhu button (planned, 2026-11-10)
+### 4.5. Feedback form and Sādhu button (implemented behind disabled flags, 2026-11-10)
 
 Visitors can report a typo, wrong content, a wrong class schedule or a broken book link, and readers can show appreciation for a post. The design, request format, routing and privacy rules are in [feedback.md](feedback.md); the staged plan is in implementation-plan.md §5B. The summary:
 
-* **One stateless endpoint:** an AWS Lambda function behind a Function URL with no auth, reached through the existing CloudFront distribution at `/api/feedback` (same origin, no CORS). CloudFront adds a shared secret header and the function rejects requests without it. Defined in Pulumi behind a flag, like the analytics server (§8).
+* **One stateless endpoint:** an AWS Lambda function behind an IAM-authenticated Function URL, reached through the existing CloudFront distribution at `/api/feedback` (same origin, no CORS). CloudFront origin access control signs requests, and permissions restrict access to the distribution. Defined in Pulumi behind a flag, like the analytics server (§8).
 * **Delivery without storage:** the function validates the report and publishes it to an SNS topic, which emails group mailboxes by route (`content`, `schedule`, `site`). There is no database, and the function does not read or log the IP address or the message.
 * **The form** is an in-place `<dialog>` opened from a link on the page that has the problem; without JavaScript the link is a `mailto:`.
 * **The Sādhu button** sends only an analytics event; there is no count on the site and no server state.

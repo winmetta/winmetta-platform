@@ -1,4 +1,5 @@
 ---
+import FeedbackLink from './FeedbackLink.astro';
 import BrandIcon from './BrandIcon.astro';
 import { languageList } from '../lib/languages';
 import LinkIcon from './LinkIcon.astro';
@@ -90,6 +91,7 @@ const labels = {
             {slot.timezone === 'America/Phoenix'
               ? text('arizonaTime')
               : text('pacificTime')}
+            <FeedbackLink locale={locale} ctx="class" item={record.id} />
           </li>
         ))}
       </ul>

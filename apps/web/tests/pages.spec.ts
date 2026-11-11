@@ -85,8 +85,13 @@ test('Privacy states what the site does and shows a Latin-digit date', async ({
   await expect(page.locator('main')).toContainText('bunny.net');
   await expect(page.locator('main')).toContainText('2026');
   await page.goto('/en/privacy/');
-  await expect(page.getByRole('heading', { level: 2 })).toHaveCount(7);
-  await expect(page.locator('main')).toContainText('November 8, 2026');
+  const feedback = process.env.PUBLIC_FEEDBACK === 'true';
+  await expect(page.getByRole('heading', { level: 2 })).toHaveCount(
+    feedback ? 8 : 7,
+  );
+  await expect(page.locator('main')).toContainText(
+    feedback ? 'November 10, 2026' : 'November 8, 2026',
+  );
   await expect(page.locator('main')).toContainText('Anonymous visit counts');
   await expect(page.locator('main')).toContainText('stats.app.winmetta.org');
 });
@@ -128,7 +133,11 @@ test('privacy page discloses that search words appear in the page address', asyn
   await expect(
     page.getByRole('heading', { name: 'Search words in the page address' }),
   ).toBeVisible();
-  await expect(page.getByText('request logs')).toBeVisible();
+  await expect(
+    page
+      .locator('section[aria-labelledby=privacySearchUrlTitle]')
+      .getByText('request logs'),
+  ).toBeVisible();
   await page.goto('/my/privacy/');
   await expect(
     page.getByRole('heading', {

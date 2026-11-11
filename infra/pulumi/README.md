@@ -29,6 +29,8 @@ mise). Type checks and tests need no AWS access. In this folder:
 ```bash
 npm install
 npm run typecheck
+npm ci --prefix ../feedback
+npm run feedback:build --prefix ../..
 npm test
 ```
 
@@ -150,3 +152,26 @@ then hold a lock and block `pulumi up`. Only maintainers run `pulumi up`, after 
 | `delegationConfirmed` | `false` (`true` once the DNS delegation works, see above)   |
 
 Never put the account ID, keys or other secrets in config or code.
+
+
+## Feedback component (disabled by default)
+
+`feedback.ts` defines the Lambda, an IAM-authenticated Function URL accessed using CloudFront OAC, the feedback SNS topic, a 14-day log group and a daily volume
+alarm. The distribution adds a non-cached `/api/feedback` behavior only when enabled,
+with no static-site URL rewrite and no forwarding of viewer cookies or queries.
+The two invocation grants are limited to this CloudFront distribution. The function
+can publish only to the feedback topic and write only its own logs.
+
+| Config | Default / purpose |
+| --- | --- |
+| `feedbackEnabled` | `false`; creates nothing until explicitly enabled |
+| `feedbackConcurrency` | `2`; accepted values `0`, `1`, `2`; zero stops invocations |
+| `feedbackAlertTopicArn` | Required only without analytics; otherwise the analytics alert topic is reused |
+
+The deployment archive is built with the root command `npm run feedback:build`
+after installing `infra/feedback` dependencies. CI installs, tests and builds it
+before the Pulumi tests. Mock tests do not contact AWS. The public design lists
+remaining deployment gates in [docs/feedback.md](../../docs/feedback.md) §10.
+Before adding a secret to this stack, the preview-role trust must be reviewed as
+required in "Pull request previews" above. Live operations, subscriptions and
+recipient/filter details belong in the private companion runbook.
