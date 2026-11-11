@@ -3,6 +3,7 @@
 // Share and (posts) Print.
 import PostLanguagePicker from './PostLanguagePicker.astro';
 import PostTools from './PostTools.astro';
+import FeedbackLink from '../FeedbackLink.astro';
 import type { Locale } from '../../i18n/locales';
 interface Props {
   locale: Locale;
@@ -12,8 +13,16 @@ interface Props {
   print?: boolean;
   /** Posts index: Share also keeps the active search (?q=). */
   shareSearch?: boolean;
+  post?: string;
 }
-const { locale, url, title, print = false, shareSearch = false } = Astro.props;
+const {
+  locale,
+  url,
+  title,
+  print = false,
+  shareSearch = false,
+  post,
+} = Astro.props;
 ---
 
 <div class="post-toolbar no-print">
@@ -25,4 +34,5 @@ const { locale, url, title, print = false, shareSearch = false } = Astro.props;
     print={print}
     shareSearch={shareSearch}
   />
+  {post && <FeedbackLink locale={locale} ctx="post" item={post} />}
 </div>

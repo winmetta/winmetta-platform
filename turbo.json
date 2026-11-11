@@ -5,7 +5,13 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**"],
-      "env": ["SITE_URL", "PUBLIC_ALLOW_INDEXING", "PUBLIC_LIBRARY_CDN_BASE"]
+      "env": [
+        "SITE_URL",
+        "PUBLIC_ALLOW_INDEXING",
+        "PUBLIC_LIBRARY_CDN_BASE",
+        "PUBLIC_FEEDBACK",
+        "PUBLIC_FEEDBACK_POSTS_REVIEWED"
+      ]
     },
     "dev": {
       "cache": false,

@@ -102,7 +102,7 @@ test('schedule shows one time column and lets the visitor pick a time zone', asy
   expect(myanmar).not.toBe(pacific);
   await page.getByRole('link', { name: 'မြန်မာ', exact: true }).click();
   await expect(page).toHaveURL(/\/my\/classes\/\?tz=myanmar/);
-  await expect(page.locator('select')).toHaveValue('myanmar');
+  await expect(page.getByRole('combobox')).toHaveValue('myanmar');
 });
 
 test('live-streamed classes show an icon with an accessible label', async ({

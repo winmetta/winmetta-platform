@@ -1,4 +1,5 @@
 ---
+import FeedbackLink from './FeedbackLink.astro';
 import type { LibraryFile } from '../lib/schemas';
 import { fileUrl } from '../lib/library-index';
 import { formatSize } from '../lib/library-url';
@@ -40,4 +41,5 @@ const { record, locale, from = 'other' } = Astro.props;
       {t(locale, 'download')}
     </a>
   </p>
+  <FeedbackLink locale={locale} ctx="library" item={record.id} />
 </li>

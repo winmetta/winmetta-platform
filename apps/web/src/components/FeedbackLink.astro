@@ -1,0 +1,39 @@
+---
+import {
+  feedbackEnabled,
+  postFeedbackEnabled,
+  feedbackMailto,
+} from '../lib/feedback';
+import type { FeedbackContext } from '../lib/feedback-schema';
+import type { Locale } from '../i18n/locales';
+import { t } from '../i18n/messages';
+interface Props {
+  locale: Locale;
+  ctx?: FeedbackContext;
+  item?: string;
+  lang?: string;
+  class?: string;
+}
+const {
+  locale,
+  ctx = 'general',
+  item = '',
+  lang = '',
+  class: css = 'link text-sm',
+} = Astro.props;
+const enabled = ctx === 'post' ? postFeedbackEnabled : feedbackEnabled;
+const page = Astro.url.pathname;
+---
+
+{enabled && (
+  <a
+    class={`no-print ${css}`}
+    href={feedbackMailto(page, item, lang)}
+    data-feedback={ctx}
+    data-feedback-page={page}
+    data-feedback-item={item}
+    data-feedback-lang={lang}
+  >
+    {t(locale, ctx === 'general' ? 'feedbackLink' : 'feedbackProblem')}
+  </a>
+)}

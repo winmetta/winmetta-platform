@@ -14,6 +14,7 @@ import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
 
 import { createAnalytics } from './analytics';
+import { createFeedback } from './feedback';
 
 const config = new pulumi.Config();
 const domain = config.get('domain') ?? 'app.winmetta.org';
@@ -68,6 +69,63 @@ const zone = new aws.route53.Zone(
 
 export const nameServers = zone.nameServers;
 export const siteBucket = siteBucketName;
+
+// --- Analytics server (Phase 4): off until `analyticsEnabled` is true --------------------
+// Defined in analytics.ts. See docs/analytics.md and docs/runbook.md (analytics section).
+
+const analyticsEnabled = config.getBoolean('analyticsEnabled') ?? false;
+const analyticsResources = analyticsEnabled
+  ? createAnalytics({ zone, domain, tags })
+  : undefined;
+export const analytics =
+  analyticsResources ?? 'not created (analyticsEnabled is false)';
+const feedbackEnabled = config.getBoolean('feedbackEnabled') ?? false;
+if (feedbackEnabled && !delegationConfirmed)
+  throw new Error('Feedback requires the site distribution.');
+const feedbackConcurrency = config.getNumber('feedbackConcurrency') ?? 2;
+if (![0, 1, 2].includes(feedbackConcurrency))
+  throw new Error('feedbackConcurrency must be 0, 1 or 2.');
+const feedbackResources = feedbackEnabled
+  ? createFeedback({
+      provider,
+      alertTopicArn:
+        analyticsResources?.alertTopicArn ??
+        config.require('feedbackAlertTopicArn'),
+      concurrency: feedbackConcurrency,
+    })
+  : undefined;
+const feedbackOac = feedbackResources
+  ? new aws.cloudfront.OriginAccessControl(
+      'feedback',
+      {
+        originAccessControlOriginType: 'lambda',
+        signingBehavior: 'always',
+        signingProtocol: 'sigv4',
+        description: 'Authenticated CloudFront access to feedback Lambda',
+      },
+      opts,
+    )
+  : undefined;
+const feedbackRequestPolicy = feedbackResources
+  ? new aws.cloudfront.OriginRequestPolicy(
+      'feedback',
+      {
+        cookiesConfig: { cookieBehavior: 'none' },
+        queryStringsConfig: { queryStringBehavior: 'none' },
+        headersConfig: {
+          headerBehavior: 'whitelist',
+          headers: { items: ['x-amz-content-sha256'] },
+        },
+      },
+      opts,
+    )
+  : undefined;
+export const feedback = feedbackResources
+  ? {
+      topicArn: feedbackResources.topicArn,
+      functionName: feedbackResources.functionName,
+    }
+  : 'not created (feedbackEnabled is false)';
 
 // --- Site bucket: private, versioned, readable only through CloudFront --------------
 const bucket = new aws.s3.Bucket(
@@ -256,12 +314,51 @@ if (delegationConfirmed) {
       // Readers are worldwide, including Myanmar, and PriceClass_100 leaves out Asia.
       priceClass: 'PriceClass_All',
       origins: [
+        ...(feedbackResources && feedbackOac
+          ? [
+              {
+                originId: 'feedback',
+                domainName: feedbackResources.originDomain,
+                originAccessControlId: feedbackOac.id,
+                customOriginConfig: {
+                  httpPort: 80,
+                  httpsPort: 443,
+                  originProtocolPolicy: 'https-only',
+                  originSslProtocols: ['TLSv1.2'],
+                },
+              },
+            ]
+          : []),
         {
           originId,
           domainName: bucket.bucketRegionalDomainName,
           originAccessControlId: originAccessControl.id,
         },
       ],
+      orderedCacheBehaviors: feedbackResources
+        ? [
+            {
+              pathPattern: '/api/feedback',
+              targetOriginId: 'feedback',
+              viewerProtocolPolicy: 'https-only',
+              allowedMethods: [
+                'GET',
+                'HEAD',
+                'OPTIONS',
+                'PUT',
+                'PATCH',
+                'POST',
+                'DELETE',
+              ],
+              cachedMethods: ['GET', 'HEAD'],
+              // AWS managed CachingDisabled; no cookies, query strings or viewer headers are
+              // forwarded. The application parses the JSON body without needing Content-Type.
+              cachePolicyId: '4135ea2d-6df8-44a3-9df3-4b5a84be39ad',
+              originRequestPolicyId: feedbackRequestPolicy?.id,
+              responseHeadersPolicyId: headersPolicy.id,
+            },
+          ]
+        : [],
       defaultCacheBehavior: {
         targetOriginId: originId,
         viewerProtocolPolicy: 'redirect-to-https',
@@ -349,6 +446,27 @@ if (delegationConfirmed) {
       },
       opts,
     );
+  }
+
+  if (feedbackResources) {
+    for (const [name, action] of [
+      ['feedback-url', 'lambda:InvokeFunctionUrl'],
+      ['feedback-invoke', 'lambda:InvokeFunction'],
+    ] as const) {
+      new aws.lambda.Permission(
+        name,
+        {
+          function: feedbackResources.functionResource.name,
+          action,
+          principal: 'cloudfront.amazonaws.com',
+          sourceArn: distribution.arn,
+          ...(action === 'lambda:InvokeFunctionUrl'
+            ? { functionUrlAuthType: 'AWS_IAM' }
+            : { invokedViaFunctionUrl: true }),
+        },
+        opts,
+      );
+    }
   }
 
   // --- Deploy role for GitHub Actions (OIDC, no stored keys) --------------------------
@@ -520,13 +638,6 @@ new aws.iam.RolePolicy(
   opts,
 );
 export const previewRoleArn = previewRole.arn;
-
-// --- Analytics server (Phase 4): off until `analyticsEnabled` is true --------------------
-// Defined in analytics.ts. See docs/analytics.md and docs/runbook.md (analytics section).
-const analyticsEnabled = config.getBoolean('analyticsEnabled') ?? false;
-export const analytics = analyticsEnabled
-  ? createAnalytics({ zone, domain, tags })
-  : 'not created (analyticsEnabled is false)';
 
 const pending = 'not created yet (delegationConfirmed is false)';
 export const distributionId = distribution ? distribution.id : pending;

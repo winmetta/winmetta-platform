@@ -1,3 +1,5 @@
+import FeedbackCardLink from './FeedbackCardLink';
+import type { Locale } from '../i18n/locales';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   emptyState,
@@ -12,6 +14,7 @@ import {
 import { Button } from './ui/button';
 
 export interface ArchiveLabels {
+  locale: Locale;
   searchLabel: string;
   searchPlaceholder: string;
   year: string;
@@ -195,6 +198,12 @@ export default function RetreatArchive({ items, labels }: Props) {
               {item.teachers.map((t) => t.name).join(', ')}
               {item.venue ? ` · ${item.venue}` : ''}
             </p>
+            <FeedbackCardLink
+              locale={labels.locale}
+              ctx="class"
+              item={item.id}
+              page={`/${labels.locale}/classes/retreats/`}
+            />
           </li>
         ))}
       </ul>

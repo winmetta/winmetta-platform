@@ -1,0 +1,35 @@
+---
+import type { Locale } from '../../i18n/locales';
+import { t } from '../../i18n/messages';
+import { postFeedbackEnabled } from '../../lib/feedback';
+interface Props {
+  locale: Locale;
+  post: string;
+}
+const { locale, post } = Astro.props;
+---
+
+{postFeedbackEnabled && (
+  <div class="js-only no-print space-y-2">
+    <button
+      type="button"
+      class="btn btn-outline"
+      data-sadhu={post}
+      data-thanks={t(locale, 'sadhuThanks')}
+    >
+      {t(locale, 'sadhu')}
+    </button>
+    <p role="status" aria-live="polite" data-sadhu-status></p>
+  </div>
+)}
+<script>
+  import { track } from '../../lib/analytics';
+  const button = document.querySelector<HTMLButtonElement>('[data-sadhu]');
+  button?.addEventListener('click', () => {
+    if (button.disabled) return;
+    button.disabled = true;
+    track('post_reaction', { post: button.dataset.sadhu ?? '', kind: 'sadhu' });
+    const status = document.querySelector('[data-sadhu-status]');
+    if (status) status.textContent = button.dataset.thanks ?? '';
+  });
+</script>

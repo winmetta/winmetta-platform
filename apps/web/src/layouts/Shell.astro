@@ -1,5 +1,8 @@
 ---
+import FeedbackDialog from '../components/FeedbackDialog.astro';
+import FeedbackLink from '../components/FeedbackLink.astro';
 import '../styles/global.css';
+import { feedbackEnabled } from '../lib/feedback';
 import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 import Analytics from '../components/Analytics.astro';
 import { locales, localeCodes, type Locale } from '../i18n/locales';
@@ -189,6 +192,7 @@ const postLanguageScript = postLanguagesHeadScript(defaultPostLanguage(locale));
           >
             {t(locale, 'navZoomHelp')}
           </a>
+          <FeedbackLink locale={locale} class="footer-link" />
           <a href="https://winmetta.org/" class="footer-link" rel="noopener">
             winmetta.org
           </a>
@@ -196,6 +200,7 @@ const postLanguageScript = postLanguagesHeadScript(defaultPostLanguage(locale));
         <p class="muted">{t(locale, 'footerNote')}</p>
       </div>
     </footer>
+    {feedbackEnabled && <FeedbackDialog locale={locale} />}
     <script>
       // Phones: the menu button shows and hides the navigation. Without JavaScript the links stay visible.
       const button = document.querySelector<HTMLButtonElement>('[data-menu]');

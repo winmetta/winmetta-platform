@@ -1,4 +1,5 @@
 ---
+import FeedbackLink from '../../../../components/FeedbackLink.astro';
 import Shell from '../../../../layouts/Shell.astro';
 import { localeCodes, type Locale } from '../../../../i18n/locales';
 import { format, t, type MessageKey } from '../../../../i18n/messages';
@@ -246,4 +247,5 @@ const partKey = {
       {text('retreatBack')}
     </a>
   </p>
+  <FeedbackLink locale={locale} ctx="class" item={id} />
 </Shell>

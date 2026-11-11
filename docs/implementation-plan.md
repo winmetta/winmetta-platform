@@ -338,19 +338,27 @@ Each stage is reviewed and merged before the next starts. A stage that changes c
 ### Decisions (2026-11-10)
 
 * Own form, in an in-place dialog, with four contexts (Dhamma Post, classes and retreats, library, general), each with its own problem types and recipient.
-* One small endpoint: AWS Lambda behind a Function URL with no auth, reached through CloudFront at `/api/feedback`; CloudFront adds a shared secret header and the Lambda rejects requests without it. Delivery by plain-text SNS email; nothing is stored. This is a deliberate exception to "no backend" (tech-architecture.md §4.5).
+* One small endpoint: AWS Lambda behind an IAM-authenticated Function URL, reached through CloudFront at `/api/feedback`; CloudFront origin access control signs the origin request. Delivery by plain-text SNS email; nothing is stored. This is a deliberate exception to "no backend" (tech-architecture.md §4.5).
 * A single Sādhu (သာဓု) button on posts, a private signal sent as an analytics event: no public count, no ranking, no thumbs-down.
 
 ### Stages
 
 Each stage is reviewed and merged before the next starts. A stage that changes cloud resources needs the maintainer's explicit go-ahead before `pulumi up`.
 
-* [ ] **1. Design and docs.** This design, the plan, the architecture note, the analytics events and the AGENTS.md pointers.
-* [ ] **2. Infrastructure.** `infra/pulumi/feedback.ts` behind `feedbackEnabled`, the function in `infra/feedback/` with unit tests (secret check, field rules, honeypot, no logging of the body), the SNS topic, the CloudFront origin and behavior, the alarm and the secret in Pulumi config. `pulumi preview`, then apply with approval; test with `curl`: no or wrong secret gives `403`, a valid report gives `204` and the email arrives.
+* [x] **1. Design and docs.** Merged in [PR #34](https://github.com/winmetta/winmetta-platform/pull/34). This design, the plan, the architecture note, the analytics events and the AGENTS.md pointers.
+* [ ] **2. Infrastructure.** `infra/pulumi/feedback.ts` behind `feedbackEnabled`, the function in `infra/feedback/` with unit tests (field rules, honeypot, no logging of the body), the SNS topic, the CloudFront origin and behavior, the alarm and distribution-scoped Lambda permissions. `pulumi preview`, then apply with approval; test with `curl`: unsigned direct access is denied, a valid report gives `204` and the email arrives.
 * [ ] **3. Dialog and general feedback.** The shared dialog and contexts file, the footer link (and a menu entry if there is room), the `mailto:` fallback, the Privacy page text in both languages and the `feedback_open` and `feedback_submit` events, behind a build flag (`PUBLIC_FEEDBACK`) so the site can deploy before the endpoint is switched on. Unit and Playwright tests for both locales, keyboard use and no storage.
 * [ ] **4. Context links, one reviewed PR each.** (a) Dhamma Posts: the toolbar and per-language links and the Sādhu button with `post_reaction`. (b) Classes, study groups, retreats, Sayadaws and Zoom help: the "Something wrong?" links. (c) Library: the book card links.
-* [ ] **5. Go live.** The maintainer sets `PUBLIC_FEEDBACK` in the `production` environment; group mailboxes subscribe to the SNS topic with their filter policies (private runbook); one test report per route reaches the right mailbox; the secret rotation and the kill switch are tried once.
+* [ ] **5. Go live.** The maintainer sets `PUBLIC_FEEDBACK` in the `production` environment; group mailboxes subscribe to the SNS topic with their filter policies (private runbook); one test report per route reaches the right mailbox; the kill switch is tried once.
 * [ ] **6. Review after one month.** How many reports, how many were real, spam or abuse, who answered and how fast, which posts get Sādhu clicks, and whether a daily cap or SES is needed.
+
+### Implementation prepared (2026-11-10)
+
+Stages 2–4 now have code, unit tests and browser tests on the implementation branch,
+behind disabled infrastructure and build flags. Stage 2 remains unchecked until
+an approved apply and real AWS email and access checks succeed. The required separate
+reviews/merges, native-reader review, route subscriptions, alert delivery and kill-switch drill, go-live and one-month review remain outstanding. Details:
+[feedback.md](feedback.md) §10. No cloud resources were changed by implementing it.
 
 ### Acceptance
 

@@ -12,6 +12,8 @@ name: Deploy web
 # variables (none is secret):
 #   SITE_URL                    https://app.winmetta.org
 #   PUBLIC_ALLOW_INDEXING       false until the launch gates pass, then true
+#   PUBLIC_FEEDBACK             optional; off until the feedback endpoint is verified
+#   PUBLIC_FEEDBACK_POSTS_REVIEWED optional; enables post links/Sādhu only after wording review
 #   PUBLIC_ANALYTICS            true turns on the cookieless Umami tracker (optional; off when unset)
 #   PUBLIC_ANALYTICS_WEBSITE_ID the website id from the Umami settings (public, not a secret)
 #   SITE_BUCKET                 the `siteBucket` stack output
@@ -57,6 +59,8 @@ jobs:
       TURBO_TELEMETRY_DISABLED: '1'
       SITE_URL: ${{ vars.SITE_URL }}
       PUBLIC_ALLOW_INDEXING: ${{ vars.PUBLIC_ALLOW_INDEXING }}
+      PUBLIC_FEEDBACK: ${{ vars.PUBLIC_FEEDBACK }}
+      PUBLIC_FEEDBACK_POSTS_REVIEWED: ${{ vars.PUBLIC_FEEDBACK_POSTS_REVIEWED }}
       PUBLIC_ANALYTICS: ${{ vars.PUBLIC_ANALYTICS }}
       PUBLIC_ANALYTICS_WEBSITE_ID: ${{ vars.PUBLIC_ANALYTICS_WEBSITE_ID }}
       SITE_BUCKET: ${{ vars.SITE_BUCKET }}

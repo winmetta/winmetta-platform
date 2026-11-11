@@ -1,4 +1,5 @@
 ---
+import FeedbackLink from '../../../../components/FeedbackLink.astro';
 import { Image } from 'astro:assets';
 import Shell from '../../../../layouts/Shell.astro';
 import { localeCodes, type Locale } from '../../../../i18n/locales';
@@ -157,4 +158,5 @@ const text = (key: Parameters<typeof t>[1]) => t(locale, key);
       {text('backToTeachers')}
     </a>
   </p>
+  <FeedbackLink locale={locale} ctx="class" item={id} />
 </Shell>

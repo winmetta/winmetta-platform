@@ -20,6 +20,7 @@ const items = allRetreats
   .filter((retreat) => retreat.status === 'past')
   .map((retreat) => retreatItem(retreat, locale));
 const labels = {
+  locale,
   searchLabel: text('retreatsSearchLabel'),
   searchPlaceholder: text('retreatsSearchPlaceholder'),
   year: text('filterYear'),

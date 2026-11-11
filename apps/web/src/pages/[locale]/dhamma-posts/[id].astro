@@ -1,4 +1,7 @@
 ---
+import Sadhu from '../../../components/posts/Sadhu.astro';
+import FeedbackLink from '../../../components/FeedbackLink.astro';
+import { postFeedbackEnabled } from '../../../lib/feedback';
 import Shell from '../../../layouts/Shell.astro';
 import PostTags from '../../../components/posts/PostTags.astro';
 import ReadInToolbar from '../../../components/posts/ReadInToolbar.astro';
@@ -68,7 +71,13 @@ const updated = formatPostDate(post.updated, formatLocale);
           <span>{format(text('postUpdated'), { date: updated })}</span>
         )}
       </p>
-      <ReadInToolbar locale={locale} url={url} title={main.title} print />
+      <ReadInToolbar
+        locale={locale}
+        url={url}
+        title={main.title}
+        post={post.id}
+        print
+      />
     </header>
     {post.sections.map((section) => (
       <section
@@ -90,10 +99,21 @@ const updated = formatPostDate(post.updated, formatLocale);
           {section.title}
         </h2>
         <div class="post-body" set:html={section.html} />
+        {postFeedbackEnabled && (
+          <p lang={locale}>
+            <FeedbackLink
+              locale={locale}
+              ctx="post"
+              item={post.id}
+              lang={section.lang}
+            />
+          </p>
+        )}
       </section>
     ))}
     <!-- Marks the end of the post for the post_end_reached event (PostTools.astro). -->
     <div data-post-end aria-hidden="true"></div>
+    <Sadhu locale={locale} post={post.id} />
     <p class="print-only muted text-sm">
       {text('postSource')}: {url} ·{' '}
       {format(text('postCreated'), { date: created })}

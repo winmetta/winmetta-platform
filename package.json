@@ -21,7 +21,10 @@
     "test:smoke": "npm run test:smoke --workspace @winmetta/web",
     "library:manifest": "node scripts/generate-library-manifest.mjs",
     "posts:new": "node scripts/new-post.mjs",
-    "posts:validate": "node scripts/validate-posts.mjs"
+    "posts:validate": "node scripts/validate-posts.mjs",
+    "feedback:build": "npm run build --prefix infra/feedback",
+    "feedback:test": "npm test --prefix infra/feedback",
+    "feedback:typecheck": "npm run typecheck --prefix infra/feedback"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

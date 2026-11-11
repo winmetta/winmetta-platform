@@ -19,6 +19,7 @@ interface Props {
 const { locale } = Astro.props;
 const text = (key: Parameters<typeof t>[1]) => t(locale, key);
 const labels = {
+  locale,
   searchLabel: text('searchLabel'),
   searchPlaceholder: text('searchPlaceholder'),
   searchLoading: text('searchLoading'),
