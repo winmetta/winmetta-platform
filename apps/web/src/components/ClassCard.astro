@@ -91,10 +91,10 @@ const labels = {
             {slot.timezone === 'America/Phoenix'
               ? text('arizonaTime')
               : text('pacificTime')}
-            <FeedbackLink locale={locale} ctx="class" item={record.id} />
           </li>
         ))}
       </ul>
+      <FeedbackLink locale={locale} ctx="class" item={record.id} />
       <ClassNext
         client:visible
         slots={record.recurrences}

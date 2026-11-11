@@ -17,14 +17,19 @@ test.describe('feedback enabled', () => {
   for (const locale of ['en', 'my']) {
     test(`feedback ${locale}: canonical context, keyboard, success and no new storage`, async ({
       page,
-    }, testInfo) => {
+    }) => {
       const requests: Record<string, unknown>[] = [];
+      // Checked after the submit: an assertion thrown inside the route handler would leave the
+      // request unfulfilled and fail by timeout instead of with this comparison.
+      const hashes: { sent: string | undefined; expected: string }[] = [];
       await page.route('**/api/feedback', async (route) => {
         const request = route.request();
-        const expectedHash = createHash('sha256')
-          .update(request.postData() ?? '')
-          .digest('hex');
-        expect(request.headers()['x-amz-content-sha256']).toBe(expectedHash);
+        hashes.push({
+          sent: request.headers()['x-amz-content-sha256'],
+          expected: createHash('sha256')
+            .update(request.postData() ?? '')
+            .digest('hex'),
+        });
         requests.push(request.postDataJSON());
         await route.fulfill({ status: 204 });
       });
@@ -40,9 +45,6 @@ test.describe('feedback enabled', () => {
       await footerLink(page).focus();
       await page.keyboard.press('Enter');
       await expect(dialog(page)).toBeVisible();
-      if (locale === 'my' && testInfo.project.name === 'mobile') {
-        await page.screenshot({ path: '/tmp/winmetta-feedback-mobile.png' });
-      }
       const opener = footerLink(page);
       await dialog(page).locator('[data-feedback-close]').focus();
       await page.keyboard.press('Shift+Tab');
@@ -58,6 +60,7 @@ test.describe('feedback enabled', () => {
       await dialog(page).locator('[type=submit]').click();
       await expect(dialog(page).locator('form')).toBeHidden();
       expect(requests).toHaveLength(1);
+      expect(hashes[0]?.sent).toBe(hashes[0]?.expected);
       expect(requests[0]).toMatchObject({
         ctx: 'general',
         type: 'suggestion',
