@@ -87,7 +87,11 @@ const { locale } = Astro.props;
     </form>
     <p role="status" aria-live="polite" tabindex="-1" data-feedback-status></p>
     <p class="text-sm">
-      <a class="link" data-feedback-fallback href="mailto:contact@winmetta.org">
+      <a
+        class="link"
+        data-feedback-fallback
+        href="mailto:feedback@winmetta.org"
+      >
         {t(locale, 'feedbackEmailInstead')}
       </a>
     </p>

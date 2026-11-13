@@ -110,7 +110,7 @@ test.describe('feedback enabled', () => {
     );
     await expect(
       dialog(page).locator('[data-feedback-fallback]'),
-    ).toHaveAttribute('href', /^mailto:contact@winmetta.org\?/);
+    ).toHaveAttribute('href', /^mailto:feedback@winmetta.org\?/);
   });
 
   test('feedback post language and Sādhu work without analytics', async ({
@@ -198,7 +198,7 @@ test.describe('feedback enabled', () => {
       await page.goto('/my/classes/');
       await expect(footerLink(page)).toHaveAttribute(
         'href',
-        /^mailto:contact@winmetta.org\?/,
+        /^mailto:feedback@winmetta.org\?/,
       );
       await expect(
         page.locator('[data-feedback-item=schedule]'),
