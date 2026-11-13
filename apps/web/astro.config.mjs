@@ -10,6 +10,46 @@ import { validateMessages } from './src/i18n/messages.ts';
 const localEnv = new URL('../../.env.local', import.meta.url);
 if (existsSync(localEnv)) loadEnvFile(localEnv);
 
+// `just feedback-dev` sets FEEDBACK_STUB_URL: forward POST /api/feedback to the local stub
+// (scripts/feedback-stub.mjs) so the dialog has an endpoint. With trailingSlash "always", Astro's
+// dev server answers a path without a slash (this one) with a 404 from a middleware it puts at the
+// front of the stack, so the plugin runs last and puts its own handler ahead of that.
+function feedbackStub() {
+  const target = process.env.FEEDBACK_STUB_URL;
+  if (!target) return [];
+  const forward = async (req, res, next) => {
+    if (req.url?.split('?')[0] !== '/api/feedback') return next();
+    const chunks = [];
+    for await (const chunk of req) chunks.push(chunk);
+    try {
+      const reply = await fetch(target, {
+        method: req.method,
+        headers: { 'content-type': 'application/json' },
+        body: ['GET', 'HEAD'].includes(req.method)
+          ? undefined
+          : Buffer.concat(chunks),
+      });
+      res.writeHead(reply.status).end();
+    } catch {
+      res.writeHead(502).end();
+    }
+  };
+  return [
+    {
+      name: 'feedback-stub',
+      configureServer: {
+        order: 'post',
+        handler(server) {
+          // Astro finishes installing its middleware asynchronously; the server is listening after.
+          server.httpServer?.once('listening', () => {
+            server.middlewares.stack.unshift({ route: '', handle: forward });
+          });
+        },
+      },
+    },
+  ];
+}
+
 validateMessages();
 export default defineConfig({
   // Set SITE_URL in each deployed environment (see .env.example).
@@ -30,7 +70,7 @@ export default defineConfig({
     }),
   ],
   vite: {
-    plugins: [tailwind()],
+    plugins: [tailwind(), ...feedbackStub()],
     // Pre-bundle everything the islands import, so a long-running dev server never reloads its
     // dependencies mid-session ("Outdated Optimize Dep" 504s leave islands unhydrated).
     optimizeDeps: {
