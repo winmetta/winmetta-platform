@@ -31,5 +31,5 @@ export const feedbackOptions = (locale: Locale) =>
     ]),
   );
 export function feedbackMailto(page: string, item = '', lang = ''): string {
-  return `mailto:contact@winmetta.org?subject=${encodeURIComponent('[Win Metta] Feedback')}&body=${encodeURIComponent(`Page: ${page}\nItem: ${item}\nLanguage: ${lang}\n\n`)}`;
+  return `mailto:feedback@winmetta.org?subject=${encodeURIComponent('[Win Metta] Feedback')}&body=${encodeURIComponent(`Page: ${page}\nItem: ${item}\nLanguage: ${lang}\n\n`)}`;
 }
