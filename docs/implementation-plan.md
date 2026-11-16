@@ -354,10 +354,10 @@ Each stage is reviewed and merged before the next starts. A stage that changes c
 
 ### Implementation prepared (2026-11-10)
 
-Stages 2–4 now have code, unit tests and browser tests on the implementation branch,
-behind disabled infrastructure and build flags. Stage 2 remains unchecked until
-an approved apply and real AWS email and access checks succeed. The required separate
-reviews/merges, native-reader review, route subscriptions, alert delivery and kill-switch drill, go-live and one-month review remain outstanding. Details:
+Stages 2–4 have merged code, unit tests and browser tests. The production stack
+config enables the infrastructure; the web build flags remain off. Stage 2 remains unchecked until
+an approved apply and real AWS email and access checks succeed. Native-reader review,
+route subscriptions, alert delivery, the kill-switch drill, go-live and one-month review remain outstanding. Details:
 [feedback.md](feedback.md) §10. No cloud resources were changed by implementing it.
 
 ### Acceptance

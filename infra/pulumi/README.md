@@ -154,7 +154,7 @@ then hold a lock and block `pulumi up`. Only maintainers run `pulumi up`, after 
 Never put the account ID, keys or other secrets in config or code.
 
 
-## Feedback component (disabled by default)
+## Feedback component
 
 `feedback.ts` defines the Lambda, an IAM-authenticated Function URL accessed using CloudFront OAC, the feedback SNS topic, a 14-day log group and a daily volume
 alarm. The distribution adds a non-cached `/api/feedback` behavior only when enabled,
@@ -164,7 +164,7 @@ can publish only to the feedback topic and write only its own logs.
 
 | Config | Default / purpose |
 | --- | --- |
-| `feedbackEnabled` | `false`; creates nothing until explicitly enabled |
+| `feedbackEnabled` | Defaults to `false`; enabled in production config, pending an approved apply |
 | `feedbackConcurrency` | `2`; accepted values `0`, `1`, `2`; zero stops invocations |
 | `feedbackAlertTopicArn` | Required only without analytics; otherwise the analytics alert topic is reused |
 
