@@ -106,20 +106,6 @@ const feedbackOac = feedbackResources
       opts,
     )
   : undefined;
-const feedbackRequestPolicy = feedbackResources
-  ? new aws.cloudfront.OriginRequestPolicy(
-      'feedback',
-      {
-        cookiesConfig: { cookieBehavior: 'none' },
-        queryStringsConfig: { queryStringBehavior: 'none' },
-        headersConfig: {
-          headerBehavior: 'whitelist',
-          headers: { items: ['x-amz-content-sha256'] },
-        },
-      },
-      opts,
-    )
-  : undefined;
 export const feedback = feedbackResources
   ? {
       topicArn: feedbackResources.topicArn,
@@ -351,10 +337,10 @@ if (delegationConfirmed) {
                 'DELETE',
               ],
               cachedMethods: ['GET', 'HEAD'],
-              // AWS managed CachingDisabled; no cookies, query strings or viewer headers are
-              // forwarded. The application parses the JSON body without needing Content-Type.
+              // OAC uses the viewer payload hash when signing POST requests. AWS rejects
+              // explicitly allowlisting this header in an origin request policy. The
+              // managed CachingDisabled policy forwards no cookies or query strings.
               cachePolicyId: '4135ea2d-6df8-44a3-9df3-4b5a84be39ad',
-              originRequestPolicyId: feedbackRequestPolicy?.id,
               responseHeadersPolicyId: headersPolicy.id,
             },
           ]
