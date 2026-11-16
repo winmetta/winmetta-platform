@@ -1,6 +1,6 @@
 # Feedback form and Sādhu button
 
-**Status:** implementation prepared 2026-11-10, disabled by default; infrastructure has not been applied or tested against AWS. The staged plan is in [implementation-plan.md](implementation-plan.md) §5B.
+**Status:** implementation prepared 2026-11-10; the production stack config enables feedback, pending an approved apply and AWS integration tests. The web controls remain disabled. The staged plan is in [implementation-plan.md](implementation-plan.md) §5B.
 
 **Why:** the site is public and its content is only as good as its corrections. A visitor who finds a typo in a Dhamma Post, a wrong class time or a broken book link has no way to tell us. Win Metta also has no way to tell which posts readers value, other than page views ([analytics.md](analytics.md)).
 
@@ -155,7 +155,7 @@ on desktop and mobile. See [infra/feedback/README.md](../infra/feedback/README.m
 * `PUBLIC_FEEDBACK_POSTS_REVIEWED=true`, together with `PUBLIC_FEEDBACK`, enables
   post report links and Sādhu only after the required wording review. The new
   Burmese messages remain drafts pending that review.
-* `feedbackEnabled=true` defines the AWS resources. This flag has not been set by the implementation. Keep the web feature off until the
+* `feedbackEnabled=true` in the production stack config defines the AWS resources; an approved apply is still required. Keep the web feature off until the
   endpoint, email route filters and alert delivery have been verified with approval.
 * Actual AWS integration, SNS subscription confirmation, mailbox retention,
   kill-switch drills, go-live and the one-month review remain
