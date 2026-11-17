@@ -65,13 +65,13 @@ const updated = formatPostDate(post.updated, formatLocale);
       <h1 class="sr-only" lang={main.lang}>
         {main.title}
       </h1>
+      <ReadInToolbar locale={locale} url={url} title={main.title} print />
       <p class="muted flex flex-wrap justify-end gap-x-4 text-sm">
         <span>{format(text('postCreated'), { date: created })}</span>
         {post.updated !== post.created && (
           <span>{format(text('postUpdated'), { date: updated })}</span>
         )}
       </p>
-      <ReadInToolbar locale={locale} url={url} title={main.title} print />
     </header>
     {post.sections.map((section) => (
       <section
