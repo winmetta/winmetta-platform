@@ -136,13 +136,14 @@ test.describe('feedback enabled', () => {
     ).not.toHaveCount(0);
     await expect(page.locator('[data-sadhu]')).toHaveAccessibleName(/./);
     await expect(page.locator('[data-sadhu]')).toHaveText('🙏');
-    await expect(page.locator('.sadhu-card')).toContainText(/\S+\s+\S+/);
+    await expect(page.locator('[data-sadhu-prompt]')).toBeVisible();
     const sadhu = page.locator('[data-sadhu]');
     await sadhu.click();
     await expect(sadhu).toBeDisabled();
     await expect(page.locator('[data-sadhu-status]')).toHaveText(
       'Sādhu Sādhu Sādhu',
     );
+    await expect(page.locator('[data-sadhu-prompt]')).toBeHidden();
     await page.locator('[data-feedback-lang=zh-Hans]').click();
     await expect(dialog(page).locator('[data-feedback-about]')).toContainText(
       'zh-Hans',
