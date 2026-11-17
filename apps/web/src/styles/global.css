@@ -245,6 +245,10 @@
   .eyebrow {
     @apply text-sm font-semibold uppercase tracking-wide text-brand;
   }
+  /* A post's language label is not a link: use ink, not the link color. */
+  .post-section > .eyebrow {
+    color: var(--text-muted);
+  }
   .hero {
     @apply grid items-center gap-8 rounded-3xl p-6 sm:p-10 md:grid-cols-[1fr_auto];
     background: linear-gradient(135deg, var(--sand) 0%, var(--sky) 100%);
@@ -466,8 +470,9 @@
   .crumbs a {
     @apply inline-flex min-h-11 items-center rounded-full px-3 font-medium text-brand transition-colors hover:bg-sky;
   }
+  /* The current page is plain text, not a pill, so it cannot be mistaken for a button. */
   .crumbs [aria-current] {
-    @apply inline-flex min-h-11 items-center rounded-full bg-sand px-3 font-semibold;
+    @apply inline-flex min-h-11 items-center px-3 font-semibold;
   }
   .pager {
     @apply flex flex-wrap items-center gap-2;
