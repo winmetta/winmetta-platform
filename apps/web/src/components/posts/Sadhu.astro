@@ -48,9 +48,6 @@ const { locale, post } = Astro.props;
     document
       .querySelector<HTMLElement>('[data-sadhu-prompt]')
       ?.setAttribute('hidden', '');
-    document
-      .querySelector<HTMLElement>('[data-sadhu-prompt]')
-      ?.setAttribute('hidden', '');
     const status = document.querySelector('[data-sadhu-status]');
     if (status) status.textContent = button.dataset.thanks ?? '';
   });
