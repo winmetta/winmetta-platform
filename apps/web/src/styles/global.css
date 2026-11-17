@@ -247,6 +247,7 @@
   }
   /* A post's language label is not a link: use ink, not the link color. */
   .post-section > .eyebrow {
+    @apply text-base font-bold;
     color: var(--text-muted);
   }
   .hero {
