@@ -10,16 +10,32 @@ const { locale, post } = Astro.props;
 ---
 
 {postFeedbackEnabled && (
-  <div class="js-only no-print space-y-2">
+  <div class="sadhu-card js-only no-print">
     <button
       type="button"
-      class="btn btn-outline"
+      class="sadhu"
+      aria-label={t(locale, 'sadhu')}
+      title={t(locale, 'sadhu')}
+      aria-describedby="sadhu-hint"
       data-sadhu={post}
       data-thanks={t(locale, 'sadhuThanks')}
     >
-      {t(locale, 'sadhu')}
+      <span aria-hidden="true">🙏</span>
     </button>
-    <p role="status" aria-live="polite" data-sadhu-status></p>
+    <div>
+      <div data-sadhu-prompt>
+        <p class="font-semibold">{t(locale, 'sadhu')}</p>
+        <p id="sadhu-hint" class="sadhu-hint">
+          {t(locale, 'sadhuHint')}
+        </p>
+      </div>
+      <p
+        role="status"
+        aria-live="polite"
+        class="font-semibold text-brand"
+        data-sadhu-status
+      ></p>
+    </div>
   </div>
 )}
 <script>
@@ -29,6 +45,9 @@ const { locale, post } = Astro.props;
     if (button.disabled) return;
     button.disabled = true;
     track('post_reaction', { post: button.dataset.sadhu ?? '', kind: 'sadhu' });
+    document
+      .querySelector<HTMLElement>('[data-sadhu-prompt]')
+      ?.setAttribute('hidden', '');
     const status = document.querySelector('[data-sadhu-status]');
     if (status) status.textContent = button.dataset.thanks ?? '';
   });

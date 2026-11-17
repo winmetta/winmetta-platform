@@ -119,10 +119,10 @@ export const sectionIn = (
 ): PostSection | undefined =>
   post.sections.find((section) => section.lang === lang);
 
-/** "October 23, 2026" in the interface locale, with Latin digits (as on the Privacy page). */
+/** "October 23, 2026" in the interface locale: Latin digits, but Burmese digits (၂၀၂၆) in Burmese. */
 export const formatPostDate = (date: string, formatLocale: string): string =>
   new Intl.DateTimeFormat(formatLocale, {
     dateStyle: 'long',
-    numberingSystem: 'latn',
+    numberingSystem: formatLocale.startsWith('my') ? 'mymr' : 'latn',
     timeZone: 'UTC',
   }).format(new Date(`${date}T00:00:00Z`));

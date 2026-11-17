@@ -245,6 +245,11 @@
   .eyebrow {
     @apply text-sm font-semibold uppercase tracking-wide text-brand;
   }
+  /* A post's language label is not a link: use ink, not the link color. */
+  .post-section > .eyebrow {
+    @apply text-base font-bold;
+    color: var(--text-muted);
+  }
   .hero {
     @apply grid items-center gap-8 rounded-3xl p-6 sm:p-10 md:grid-cols-[1fr_auto];
     background: linear-gradient(135deg, var(--sand) 0%, var(--sky) 100%);
@@ -283,6 +288,22 @@
   }
   .join-details dd {
     @apply font-semibold;
+  }
+  /* Sādhu: a bordered card with a title and a hint; the button is only the folded-hands emoji (its name is the aria-label). */
+  .sadhu-card {
+    @apply mt-6 flex max-w-md items-center gap-4 rounded-xl border border-mist bg-sky/40 p-4;
+  }
+  .sadhu-hint {
+    @apply text-sm;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+  /* text-sm sets its own line height, which is too tight for stacked Burmese marks. */
+  .sadhu-hint:lang(my) {
+    line-height: 2.2;
+  }
+  .sadhu {
+    @apply inline-flex size-14 shrink-0 cursor-pointer items-center justify-center rounded-full border border-mist bg-white text-3xl leading-none transition-colors hover:bg-sky disabled:pointer-events-none disabled:opacity-60;
   }
   .btn-outline {
     @apply border border-brand bg-white text-brand hover:bg-sky hover:text-brand-strong;
@@ -455,8 +476,9 @@
   .crumbs a {
     @apply inline-flex min-h-11 items-center rounded-full px-3 font-medium text-brand transition-colors hover:bg-sky;
   }
+  /* The current page is plain text, not a pill, so it cannot be mistaken for a button. */
   .crumbs [aria-current] {
-    @apply inline-flex min-h-11 items-center rounded-full bg-sand px-3 font-semibold;
+    @apply inline-flex min-h-11 items-center px-3 font-semibold;
   }
   .pager {
     @apply flex flex-wrap items-center gap-2;
@@ -512,7 +534,7 @@
     @apply relative z-10 inline-flex min-h-9 items-center rounded-full bg-sky px-3 text-sm font-medium transition-colors hover:bg-mist;
   }
   .post-section {
-    @apply max-w-prose space-y-3 border-t border-stone pt-8;
+    @apply max-w-prose space-y-3 border-b border-stone pb-8;
   }
   .post-title {
     @apply text-2xl font-bold sm:text-3xl;

@@ -13,17 +13,17 @@ This adds two things, both without accounts, cookies or a database:
 
 ## 1. Decisions (2026-11-10)
 
-| Decision | Choice | Notes |
-| --- | --- | --- |
-| Own form or a hosted one | **Own form** | One small endpoint on the AWS account the site already uses. No third-party form provider sees reports. |
-| Endpoint | **AWS Lambda behind an IAM-authenticated Function URL, reached through CloudFront at `/api/feedback`** | Same origin as the site, so no CORS and no new domain. |
-| Access control | **CloudFront origin access control (OAC)** | Lambda authorizes only the CloudFront service for this distribution. The browser includes a SHA-256 hash of the request body. No shared secret is stored in Pulumi state. |
-| Delivery | **Amazon SNS email, plain text** | Starts simple. SES (replyable, formatted mail) is a later option; it needs a verified sender domain. |
-| Storage | **None.** The report exists only as the email | No database, no table, no log of the text. How long mailboxes keep reports is an organization decision (private repository). |
-| Form UI | **An in-place dialog** (the native `<dialog>` element), one shared component | Keeps the reader on the page. Without JavaScript the same links open a `mailto:` message instead. |
-| Contexts in v1 | **All four:** Dhamma Post, classes and retreats, library, general | Each has its own problem types and recipient (section 2). |
-| Appreciation | **A single Sādhu (သာဓု) button on posts, private signal only** | No public count, no ranking, no thumbs-down. A down-vote is replaced by "Report a problem". See section 4. |
-| Reply from the site | **No.** Replies happen by email, only if the reporter gave an address | |
+| Decision                 | Choice                                                                                                 | Notes                                                                                                                                                                     |
+| ------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Own form or a hosted one | **Own form**                                                                                           | One small endpoint on the AWS account the site already uses. No third-party form provider sees reports.                                                                   |
+| Endpoint                 | **AWS Lambda behind an IAM-authenticated Function URL, reached through CloudFront at `/api/feedback`** | Same origin as the site, so no CORS and no new domain.                                                                                                                    |
+| Access control           | **CloudFront origin access control (OAC)**                                                             | Lambda authorizes only the CloudFront service for this distribution. The browser includes a SHA-256 hash of the request body. No shared secret is stored in Pulumi state. |
+| Delivery                 | **Amazon SNS email, plain text**                                                                       | Starts simple. SES (replyable, formatted mail) is a later option; it needs a verified sender domain.                                                                      |
+| Storage                  | **None.** The report exists only as the email                                                          | No database, no table, no log of the text. How long mailboxes keep reports is an organization decision (private repository).                                              |
+| Form UI                  | **An in-place dialog** (the native `<dialog>` element), one shared component                           | Keeps the reader on the page. Without JavaScript the same links open a `mailto:` message instead.                                                                         |
+| Contexts in v1           | **All four:** Dhamma Post, classes and retreats, library, general                                      | Each has its own problem types and recipient (section 2).                                                                                                                 |
+| Appreciation             | **A single Sādhu (သာဓု) button on posts, private signal only**                                         | No public count, no ranking, no thumbs-down. A down-vote is replaced by "Report a problem". See section 4.                                                                |
+| Reply from the site      | **No.** Replies happen by email, only if the reporter gave an address                                  |                                                                                                                                                                           |
 
 Out of scope: attachments or screenshots, accounts, a public list of reports, CAPTCHAs, public like counts, reactions on anything other than posts.
 
@@ -33,12 +33,12 @@ Out of scope: attachments or screenshots, accounts, a public list of reports, CA
 
 One form component and one endpoint. A **context** decides which problem types the form offers, what it prefills, and where the report goes. The contexts and types live in **one shared file**, `apps/web/src/lib/feedback-schema.ts`, used by the form and the Lambda. Endpoint tests exercise every allowed context/type pair. Wire values are `post`: `typo`, `content`, `translation`, `other`; `class`: `time`, `zoom`, `language`, `retreat`, `other`; `library`: `broken`, `title`, `other`; `general`: `suggestion`, `website`, `other`.
 
-| Context | Where the link appears | Problem types | Route |
-| --- | --- | --- | --- |
-| `post` | Post toolbar (beside Share and Print) and a small link in each language section, which prefills that language | typo, wrong content, translation problem, other | `content` |
-| `class` | A "Something wrong?" link on each class, study group and retreat card, on the Sayadaws and Zoom help pages, and one at the top of the schedule table | class time wrong, Zoom ID or passcode wrong, language wrong, retreat detail wrong, other | `schedule` |
-| `library` | On each book card | broken file or link, wrong title or tag, other | `site` for a broken file or link and for other; `content` for a wrong title or tag |
-| `general` | The site footer on every page, and a menu entry if the menu has room | suggestion, website problem, other | `site` |
+| Context   | Where the link appears                                                                                                                               | Problem types                                                                            | Route                                                                              |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `post`    | A small link under each language section, which prefills that language                                                                               | typo, wrong content, translation problem, other                                          | `content`                                                                          |
+| `class`   | A "Something wrong?" link on each class, study group and retreat card, on the Sayadaws and Zoom help pages, and one at the top of the schedule table | class time wrong, Zoom ID or passcode wrong, language wrong, retreat detail wrong, other | `schedule`                                                                         |
+| `library` | On each book card                                                                                                                                    | broken file or link, wrong title or tag, other                                           | `site` for a broken file or link and for other; `content` for a wrong title or tag |
+| `general` | The site footer on every page, and a menu entry if the menu has room                                                                                 | suggestion, website problem, other                                                       | `site`                                                                             |
 
 - **No floating button.** The calm, distraction-free design rule applies.
 - **Recipients.** The Lambda sets the SNS `route` attribute (`schedule`, `content` or `site`) from the context and type, never from a value the browser sends. SNS filter policies send each route to its own group mailbox. Which group reads which route is set in the private repository.
@@ -51,18 +51,18 @@ One form component and one endpoint. A **context** decides which problem types t
 
 `POST /api/feedback`, a JSON body of at most 8 KB. Nothing but these fields is read; unknown fields are dropped.
 
-| Field | Rule |
-| --- | --- |
-| `ctx` | one of `post`, `class`, `library`, `general` |
-| `type` | one of the types listed for that `ctx` |
-| `message` | required, 1 to 2,000 characters, plain text |
-| `email` | optional, at most 254 characters, a simple address check; used only to reply |
-| `page` | a site path such as `/en/dhamma-posts/<id>/`: the locale and known characters only, at most 200 characters, no query string or fragment |
-| `item` | optional, an id such as a post id or class id: lowercase letters, digits, `.`, `_` and `-`, at most 80 characters |
-| `lang` | optional, `my`, `en` or `zh-Hans` (posts only) |
-| `locale` | `en` or `my`, the interface language |
-| `hp` | a hidden field that must be empty |
-| `t` | milliseconds the dialog was open; a report sent in under 3 seconds is dropped (the dialog enables Send after 3 seconds so a quick human submission is not silently lost) |
+| Field     | Rule                                                                                                                                                                     |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `ctx`     | one of `post`, `class`, `library`, `general`                                                                                                                             |
+| `type`    | one of the types listed for that `ctx`                                                                                                                                   |
+| `message` | required, 1 to 2,000 characters, plain text                                                                                                                              |
+| `email`   | optional, at most 254 characters, a simple address check; used only to reply                                                                                             |
+| `page`    | a site path such as `/en/dhamma-posts/<id>/`: the locale and known characters only, at most 200 characters, no query string or fragment                                  |
+| `item`    | optional, an id such as a post id or class id: lowercase letters, digits, `.`, `_` and `-`, at most 80 characters                                                        |
+| `lang`    | optional, `my`, `en` or `zh-Hans` (posts only)                                                                                                                           |
+| `locale`  | `en` or `my`, the interface language                                                                                                                                     |
+| `hp`      | a hidden field that must be empty                                                                                                                                        |
+| `t`       | milliseconds the dialog was open; a report sent in under 3 seconds is dropped (the dialog enables Send after 3 seconds so a quick human submission is not silently lost) |
 
 Responses: `204` accepted (including a silently dropped bot report), `400` invalid, `413` too large, `429` throttled, `503` delivery failed. Other methods return `405`. On any failure the dialog says so and offers the `mailto:` address.
 
@@ -72,7 +72,7 @@ Responses: `204` accepted (including a silently dropped bot report), `400` inval
 
 ## 4. The Sādhu button
 
-- **What it is:** one button, "Sādhu" in English and "သာဓု" in Burmese, once per post page, after the last language section. A click shows a short thank-you and sends the analytics event `post_reaction` with `post` (the post id) and `kind=sadhu` ([analytics.md](analytics.md) §3).
+- **What it is:** one button in a bordered card with a title and a one-line hint (both replaced by the response after a click); the button is shown as the folded-hands emoji (its accessible name is "Sādhu" in English and "သာဓု" in Burmese), once per post page, after the last language section. A click shows "Sādhu Sādhu Sādhu" ("သာဓု သာဓု သာဓု" on the Burmese pages) and sends the analytics event `post_reaction` with `post` (the post id) and `kind=sadhu` ([analytics.md](analytics.md) §3).
 - **What it is not:** there is no public count, no sorting or recommending by it, no thumbs-down, no streaks or badges (AGENTS.md §1, §6). It is a signal for the team, read in the Umami dashboard and in the one-month review (stage 6 in [implementation-plan.md](implementation-plan.md) §5B).
 - **No storage.** After one click the button is disabled for that page view, in memory only. A reload allows another click, so the numbers are rough clicks, not people. This is the price of having no identity.
 - **Do Not Track.** The tracker does not load when Do Not Track is on, so nothing is counted; the reader still sees the thank-you.
@@ -139,7 +139,6 @@ Defined in Pulumi (TypeScript) as a component `infra/pulumi/feedback.ts`, behind
 - The Sādhu click appears as `post_reaction` in Umami, and nothing on the site shows a count.
 - The Privacy page matches what is collected.
 
-
 ## 10. Implementation and deployment gates
 
 The endpoint is in `infra/feedback/`; `infra/pulumi/feedback.ts` defines its resources.
@@ -150,15 +149,14 @@ bot drops and delivery failures without AWS. Pulumi mocks check permissions and
 resource limits. Playwright checks the feature both off and on, in both locales,
 on desktop and mobile. See [infra/feedback/README.md](../infra/feedback/README.md).
 
-* `PUBLIC_FEEDBACK=true` builds the dialog and general, class and library links;
+- `PUBLIC_FEEDBACK=true` builds the dialog and general, class and library links;
   unset or false leaves them absent, including the Privacy section about feedback.
-* `PUBLIC_FEEDBACK_POSTS_REVIEWED=true`, together with `PUBLIC_FEEDBACK`, enables
+- `PUBLIC_FEEDBACK_POSTS_REVIEWED=true`, together with `PUBLIC_FEEDBACK`, enables
   post report links and Sādhu only after the required wording review. The new
   Burmese messages remain drafts pending that review.
-* `feedbackEnabled=true` in the production stack config defines the AWS resources; they were applied and verified with test reports before the web build flag was set.
-* Status (2026-11-16): `PUBLIC_FEEDBACK=true` is set in the `production` environment and deployed. `PUBLIC_FEEDBACK_POSTS_REVIEWED` is unset, so the post report links and Sādhu stay off until the Burmese wording review.
-* Still outstanding: one test report per route, mailbox retention, the kill-switch drill and the one-month review. The steps that change AWS or production live in the private runbook.
-
+- `feedbackEnabled=true` in the production stack config defines the AWS resources; they were applied and verified with test reports before the web build flag was set.
+- Status (2026-11-16): `PUBLIC_FEEDBACK=true` is set in the `production` environment and deployed. `PUBLIC_FEEDBACK_POSTS_REVIEWED` is unset, so the post report links and Sādhu stay off until the Burmese wording review.
+- Still outstanding: one test report per route, mailbox retention, the kill-switch drill and the one-month review. The steps that change AWS or production live in the private runbook.
 
 AWS references checked during implementation: [Lambda runtimes](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html),
 [Function URL permissions](https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html),

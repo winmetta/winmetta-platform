@@ -124,12 +124,26 @@ test.describe('feedback enabled', () => {
       .getAttribute('href');
     expect(href).toBeTruthy();
     await page.goto(href! + '?lang=en,zh');
+    // One link under each language section; none in the "Read in" bar above the post.
+    await expect(page.locator('.post-toolbar [data-feedback]')).toHaveCount(0);
+    await expect(
+      page.locator('.post-section [data-feedback=post]'),
+    ).not.toHaveCount(0);
+    // The flag beside "Something wrong?" is decoration, hidden from screen readers. The Sādhu
+    // button is only the folded-hands emoji (hidden); its name comes from its aria-label.
+    await expect(
+      page.locator('.post-section [data-feedback=post] svg[aria-hidden=true]'),
+    ).not.toHaveCount(0);
+    await expect(page.locator('[data-sadhu]')).toHaveAccessibleName(/./);
+    await expect(page.locator('[data-sadhu]')).toHaveText('🙏');
+    await expect(page.locator('[data-sadhu-prompt]')).toBeVisible();
     const sadhu = page.locator('[data-sadhu]');
     await sadhu.click();
     await expect(sadhu).toBeDisabled();
-    await expect(page.locator('[data-sadhu-status]')).toContainText(
-      'Thank you',
+    await expect(page.locator('[data-sadhu-status]')).toHaveText(
+      'Sādhu Sādhu Sādhu',
     );
+    await expect(page.locator('[data-sadhu-prompt]')).toBeHidden();
     await page.locator('[data-feedback-lang=zh-Hans]').click();
     await expect(dialog(page).locator('[data-feedback-about]')).toContainText(
       'zh-Hans',

@@ -65,19 +65,13 @@ const updated = formatPostDate(post.updated, formatLocale);
       <h1 class="sr-only" lang={main.lang}>
         {main.title}
       </h1>
-      <p class="muted flex flex-wrap gap-x-4 text-sm">
+      <ReadInToolbar locale={locale} url={url} title={main.title} print />
+      <p class="muted flex flex-wrap justify-end gap-x-4 text-sm">
         <span>{format(text('postCreated'), { date: created })}</span>
         {post.updated !== post.created && (
           <span>{format(text('postUpdated'), { date: updated })}</span>
         )}
       </p>
-      <ReadInToolbar
-        locale={locale}
-        url={url}
-        title={main.title}
-        post={post.id}
-        print
-      />
     </header>
     {post.sections.map((section) => (
       <section
@@ -86,7 +80,22 @@ const updated = formatPostDate(post.updated, formatLocale);
         data-post-lang={section.lang}
         aria-labelledby={`title-${section.lang}`}
       >
-        <p class="eyebrow" lang={locale}>
+        <p class="eyebrow icon-link" lang={locale}>
+          <svg
+            class="size-5 shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+            <path d="M2 12h20" />
+          </svg>
           {text(postLanguageNames[section.lang])}
         </p>
         <PostTags
