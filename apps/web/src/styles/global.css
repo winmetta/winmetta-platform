@@ -284,6 +284,11 @@
   .join-details dd {
     @apply font-semibold;
   }
+  /* Sādhu: a quiet text control with a lotus, not a pill button. */
+  .sadhu {
+    @apply inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-1 font-semibold text-brand transition-colors hover:text-brand-strong hover:underline disabled:pointer-events-none disabled:opacity-60;
+    text-underline-offset: 0.2em;
+  }
   .btn-outline {
     @apply border border-brand bg-white text-brand hover:bg-sky hover:text-brand-strong;
   }

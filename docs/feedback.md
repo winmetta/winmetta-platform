@@ -35,7 +35,7 @@ One form component and one endpoint. A **context** decides which problem types t
 
 | Context | Where the link appears | Problem types | Route |
 | --- | --- | --- | --- |
-| `post` | Post toolbar (beside Share and Print) and a small link in each language section, which prefills that language | typo, wrong content, translation problem, other | `content` |
+| `post` | A small link under each language section, which prefills that language | typo, wrong content, translation problem, other | `content` |
 | `class` | A "Something wrong?" link on each class, study group and retreat card, on the Sayadaws and Zoom help pages, and one at the top of the schedule table | class time wrong, Zoom ID or passcode wrong, language wrong, retreat detail wrong, other | `schedule` |
 | `library` | On each book card | broken file or link, wrong title or tag, other | `site` for a broken file or link and for other; `content` for a wrong title or tag |
 | `general` | The site footer on every page, and a menu entry if the menu has room | suggestion, website problem, other | `site` |

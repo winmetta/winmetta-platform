@@ -71,13 +71,7 @@ const updated = formatPostDate(post.updated, formatLocale);
           <span>{format(text('postUpdated'), { date: updated })}</span>
         )}
       </p>
-      <ReadInToolbar
-        locale={locale}
-        url={url}
-        title={main.title}
-        post={post.id}
-        print
-      />
+      <ReadInToolbar locale={locale} url={url} title={main.title} print />
     </header>
     {post.sections.map((section) => (
       <section
