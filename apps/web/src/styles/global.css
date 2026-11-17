@@ -534,7 +534,7 @@
     @apply relative z-10 inline-flex min-h-9 items-center rounded-full bg-sky px-3 text-sm font-medium transition-colors hover:bg-mist;
   }
   .post-section {
-    @apply max-w-prose space-y-3 border-t border-stone pt-8;
+    @apply max-w-prose space-y-3 border-b border-stone pb-8;
   }
   .post-title {
     @apply text-2xl font-bold sm:text-3xl;
