@@ -296,6 +296,11 @@
   .sadhu-hint {
     @apply text-sm;
     color: var(--text-muted);
+    line-height: 1.7;
+  }
+  /* text-sm sets its own line height, which is too tight for stacked Burmese marks. */
+  .sadhu-hint:lang(my) {
+    line-height: 2.2;
   }
   .sadhu {
     @apply inline-flex size-14 shrink-0 cursor-pointer items-center justify-center rounded-full border border-mist bg-white text-3xl leading-none transition-colors hover:bg-sky disabled:pointer-events-none disabled:opacity-60;
