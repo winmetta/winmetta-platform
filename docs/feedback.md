@@ -72,7 +72,7 @@ Responses: `204` accepted (including a silently dropped bot report), `400` inval
 
 ## 4. The Sādhu button
 
-- **What it is:** one button, "Sādhu" in English and "သာဓု" in Burmese, once per post page, after the last language section. A click shows a short thank-you and sends the analytics event `post_reaction` with `post` (the post id) and `kind=sadhu` ([analytics.md](analytics.md) §3).
+- **What it is:** one button, shown as the folded-hands emoji (its accessible name is "Sādhu" in English and "သာဓု" in Burmese), once per post page, after the last language section. A click shows "Sādhu Sādhu Sādhu" ("သာဓု သာဓု သာဓု" on the Burmese pages) and sends the analytics event `post_reaction` with `post` (the post id) and `kind=sadhu` ([analytics.md](analytics.md) §3).
 - **What it is not:** there is no public count, no sorting or recommending by it, no thumbs-down, no streaks or badges (AGENTS.md §1, §6). It is a signal for the team, read in the Umami dashboard and in the one-month review (stage 6 in [implementation-plan.md](implementation-plan.md) §5B).
 - **No storage.** After one click the button is disabled for that page view, in memory only. A reload allows another click, so the numbers are rough clicks, not people. This is the price of having no identity.
 - **Do Not Track.** The tracker does not load when Do Not Track is on, so nothing is counted; the reader still sees the thank-you.

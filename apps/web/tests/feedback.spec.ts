@@ -139,8 +139,8 @@ test.describe('feedback enabled', () => {
     const sadhu = page.locator('[data-sadhu]');
     await sadhu.click();
     await expect(sadhu).toBeDisabled();
-    await expect(page.locator('[data-sadhu-status]')).toContainText(
-      'Thank you',
+    await expect(page.locator('[data-sadhu-status]')).toHaveText(
+      'Sādhu Sādhu Sādhu',
     );
     await page.locator('[data-feedback-lang=zh-Hans]').click();
     await expect(dialog(page).locator('[data-feedback-about]')).toContainText(

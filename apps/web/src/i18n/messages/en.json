@@ -263,7 +263,7 @@
   "feedbackTypeSuggestion": "Suggestion",
   "feedbackTypeWebsite": "Website problem",
   "sadhu": "Sādhu",
-  "sadhuThanks": "Thank you for your appreciation.",
+  "sadhuThanks": "Sādhu Sādhu Sādhu",
   "privacyFeedbackTitle": "Feedback and appreciation",
   "privacyFeedback": "When you send feedback, your message, the page and item you report, its language and your interface language are emailed to the Win Metta team through Amazon SNS. Your email address is optional and used only to answer you. Please leave out personal details. Reports are not saved in an application database or request logs; they remain in the recipients’ mailboxes. Opening the form and submitting it send anonymous counts of the context, problem type and success, never the message or email address. The Sādhu button, when available, counts anonymous appreciation clicks. No cookie or storage key is added for either feature. Do Not Track disables these anonymous counts."
 }
