@@ -155,11 +155,9 @@ on desktop and mobile. See [infra/feedback/README.md](../infra/feedback/README.m
 * `PUBLIC_FEEDBACK_POSTS_REVIEWED=true`, together with `PUBLIC_FEEDBACK`, enables
   post report links and Sādhu only after the required wording review. The new
   Burmese messages remain drafts pending that review.
-* `feedbackEnabled=true` in the production stack config defines the AWS resources; an approved apply is still required. Keep the web feature off until the
-  endpoint, email route filters and alert delivery have been verified with approval.
-* Actual AWS integration, SNS subscription confirmation, mailbox retention,
-  kill-switch drills, go-live and the one-month review remain
-  outstanding. The steps that change AWS or production live in the private runbook.
+* `feedbackEnabled=true` in the production stack config defines the AWS resources; they were applied and verified with test reports before the web build flag was set.
+* Status (2026-11-16): `PUBLIC_FEEDBACK=true` is set in the `production` environment and deployed. `PUBLIC_FEEDBACK_POSTS_REVIEWED` is unset, so the post report links and Sādhu stay off until the Burmese wording review.
+* Still outstanding: one test report per route, mailbox retention, the kill-switch drill and the one-month review. The steps that change AWS or production live in the private runbook.
 
 
 AWS references checked during implementation: [Lambda runtimes](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html),
