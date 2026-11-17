@@ -136,6 +136,7 @@ test.describe('feedback enabled', () => {
     ).not.toHaveCount(0);
     await expect(page.locator('[data-sadhu]')).toHaveAccessibleName(/./);
     await expect(page.locator('[data-sadhu]')).toHaveText('🙏');
+    await expect(page.locator('.sadhu-card')).toContainText(/\S+\s+\S+/);
     const sadhu = page.locator('[data-sadhu]');
     await sadhu.click();
     await expect(sadhu).toBeDisabled();

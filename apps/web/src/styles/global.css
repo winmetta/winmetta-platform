@@ -284,9 +284,16 @@
   .join-details dd {
     @apply font-semibold;
   }
-  /* Sādhu: just the folded-hands emoji, no label and no button chrome; its name is the aria-label. */
+  /* Sādhu: a bordered card with a title and a hint; the button is only the folded-hands emoji (its name is the aria-label). */
+  .sadhu-card {
+    @apply mt-6 flex max-w-md items-center gap-4 rounded-xl border border-mist bg-sky/40 p-4;
+  }
+  .sadhu-hint {
+    @apply text-sm;
+    color: var(--text-muted);
+  }
   .sadhu {
-    @apply inline-flex size-11 cursor-pointer items-center justify-center rounded-full text-2xl leading-none transition-colors hover:bg-sky disabled:pointer-events-none disabled:opacity-60;
+    @apply inline-flex size-14 shrink-0 cursor-pointer items-center justify-center rounded-full border border-mist bg-white text-3xl leading-none transition-colors hover:bg-sky disabled:pointer-events-none disabled:opacity-60;
   }
   .btn-outline {
     @apply border border-brand bg-white text-brand hover:bg-sky hover:text-brand-strong;
