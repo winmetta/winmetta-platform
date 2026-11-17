@@ -129,13 +129,13 @@ test.describe('feedback enabled', () => {
     await expect(
       page.locator('.post-section [data-feedback=post]'),
     ).not.toHaveCount(0);
-    // The icons beside "Something wrong?" and Sādhu are decoration: hidden from screen readers.
+    // The flag beside "Something wrong?" is decoration, hidden from screen readers. The Sādhu
+    // button is only the folded-hands emoji (hidden); its name comes from its aria-label.
     await expect(
       page.locator('.post-section [data-feedback=post] svg[aria-hidden=true]'),
     ).not.toHaveCount(0);
-    await expect(
-      page.locator('[data-sadhu] svg[aria-hidden=true]'),
-    ).toHaveCount(1);
+    await expect(page.locator('[data-sadhu]')).toHaveAccessibleName(/./);
+    await expect(page.locator('[data-sadhu]')).toHaveText('🙏');
     const sadhu = page.locator('[data-sadhu]');
     await sadhu.click();
     await expect(sadhu).toBeDisabled();

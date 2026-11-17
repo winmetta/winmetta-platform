@@ -284,10 +284,9 @@
   .join-details dd {
     @apply font-semibold;
   }
-  /* Sādhu: a quiet text control with a lotus, not a pill button. */
+  /* Sādhu: just the folded-hands emoji, no label and no button chrome; its name is the aria-label. */
   .sadhu {
-    @apply inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-1 font-semibold text-brand transition-colors hover:text-brand-strong hover:underline disabled:pointer-events-none disabled:opacity-60;
-    text-underline-offset: 0.2em;
+    @apply inline-flex size-11 cursor-pointer items-center justify-center rounded-full text-2xl leading-none transition-colors hover:bg-sky disabled:pointer-events-none disabled:opacity-60;
   }
   .btn-outline {
     @apply border border-brand bg-white text-brand hover:bg-sky hover:text-brand-strong;
