@@ -39,6 +39,20 @@ test('study apps are reachable from the library in both languages', async ({
     page.getByRole('heading', { name: 'Digital Pāḷi Dictionary' }),
   ).toBeVisible();
   await expect(page.locator('main li > img')).toHaveCount(5);
+  const reader = page.locator('#tipitaka-pali-reader');
+  for (const label of [
+    'Visit website',
+    'Windows',
+    'iPhone, iPad and Mac',
+    'Android',
+    'Linux (Flathub)',
+  ]) {
+    const link = reader.getByRole('link', {
+      name: `${label}: Tipitaka Pāḷi Reader`,
+    });
+    await expect(link).toBeVisible();
+    await expect(link.locator('svg, img')).toHaveCount(1);
+  }
   await page.locator('a[data-locale="my"]').click();
   await expect(page).toHaveURL(/\/my\/dhamma-library\/apps\/$/);
   await page.waitForLoadState('load');
