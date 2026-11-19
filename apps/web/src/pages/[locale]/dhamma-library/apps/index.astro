@@ -1,0 +1,189 @@
+---
+import Shell from '../../../../layouts/Shell.astro';
+import { localeCodes, type Locale } from '../../../../i18n/locales';
+import { t } from '../../../../i18n/messages';
+import { Image } from 'astro:assets';
+import readerIcon from '../../../../assets/study-apps/tipitaka-pali-reader.png';
+import tpoIcon from '../../../../assets/study-apps/tipitakapali.svg';
+import sutamayaIcon from '../../../../assets/study-apps/sutamaya.png';
+import dictionaryIcon from '../../../../assets/study-apps/digital-pali-dictionary.svg';
+import myanmarIcon from '../../../../assets/study-apps/tipitaka-myanmar.png';
+import { studyApps } from '../../../../lib/study-apps';
+import LinkIcon from '../../../../components/LinkIcon.astro';
+import appleIcon from '../../../../assets/brand/apple.svg?url';
+import androidIcon from '../../../../assets/brand/android.svg?url';
+import linuxIcon from '../../../../assets/brand/linux.svg?url';
+
+export function getStaticPaths() {
+  return localeCodes.map((locale) => ({
+    params: { locale },
+    props: { locale },
+  }));
+}
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const text = (key: Parameters<typeof t>[1]) => t(locale, key);
+const platformIcons = {
+  apple: appleIcon,
+  android: androidIcon,
+  linux: linuxIcon,
+};
+
+// Sources: winmetta.org/dhamma-download/ and each project's website; checked 2026-11-19.
+const apps = [
+  {
+    title: studyApps.reader.title,
+    id: studyApps.reader.id,
+    image: readerIcon,
+    description: text('studyAppsReader'),
+    links: [
+      {
+        label: text('studyAppsVisit'),
+        icon: 'website',
+        url: 'https://americanmonk.org/tipitaka-pali-reader/',
+      },
+      {
+        label: text('studyAppsWindows'),
+        icon: 'windows',
+        url: 'https://apps.microsoft.com/detail/9MTH9TD82TGR',
+      },
+      {
+        label: text('studyAppsApple'),
+        icon: 'apple',
+        url: 'https://apps.apple.com/us/app/tipitaka-pali-reader/id1541426949',
+      },
+      {
+        label: text('studyAppsAndroid'),
+        icon: 'android',
+        url: 'https://play.google.com/store/apps/details?id=com.paauk.tipitakapalireader',
+      },
+      {
+        label: text('studyAppsLinux'),
+        icon: 'linux',
+        url: 'https://flathub.org/apps/org.americanmonk.TipitakaPaliReader',
+      },
+    ],
+  },
+  {
+    title: text('studyAppsPublisher'),
+    id: studyApps.publisher.id,
+    image: myanmarIcon,
+    imageCaption: 'Tipitaka Myanmar',
+    description: text('studyAppsPublisherDescription'),
+    links: [
+      {
+        label: text('studyAppsWindows'),
+        icon: 'windows',
+        url: 'https://apps.microsoft.com/store/search?publisher=PnDaza',
+      },
+      {
+        label: text('studyAppsApple'),
+        icon: 'apple',
+        url: 'https://apps.apple.com/us/developer/pinnyar-daza/id1531500544',
+      },
+      {
+        label: text('studyAppsAndroid'),
+        icon: 'android',
+        url: 'https://play.google.com/store/apps/developer?id=Pn+Daza',
+      },
+    ],
+  },
+  {
+    title: studyApps.tpo.title,
+    id: studyApps.tpo.id,
+    image: tpoIcon,
+    description: text('studyAppsTpo'),
+    links: [
+      {
+        label: text('studyAppsVisit'),
+        icon: 'website',
+        url: 'https://tipitakapali.org/info',
+      },
+    ],
+  },
+  {
+    title: studyApps.sutamaya.title,
+    id: studyApps.sutamaya.id,
+    image: sutamayaIcon,
+    description: text('studyAppsSutamaya'),
+    links: [
+      {
+        label: text('studyAppsVisit'),
+        icon: 'website',
+        url: 'https://sutamaya.org/',
+      },
+    ],
+  },
+  {
+    title: studyApps.dictionary.title,
+    id: studyApps.dictionary.id,
+    image: dictionaryIcon,
+    description: text('studyAppsDictionary'),
+    links: [
+      {
+        label: text('studyAppsVisit'),
+        icon: 'website',
+        url: 'https://digitalpalidictionary.github.io/',
+      },
+    ],
+  },
+] as const;
+---
+
+<Shell locale={locale} title={text('studyAppsTitle')} page="studyApps">
+  <header class="space-y-4">
+    <a class="link inline-block" href={`/${locale}/dhamma-library/`}>
+      ← {text('studyAppsBack')}
+    </a>
+    <h1 class="text-3xl font-bold sm:text-4xl">{text('studyAppsTitle')}</h1>
+    <p class="lead">{text('studyAppsIntro')}</p>
+  </header>
+  <ul class="grid gap-4 md:grid-cols-2">
+    {apps.map((app) => (
+      <li id={app.id} class="card space-y-4">
+        {app.image && (
+          <Image
+            src={app.image}
+            width={72}
+            height={72}
+            alt=""
+            class="size-18 rounded-lg object-contain"
+          />
+        )}
+        {'imageCaption' in app && (
+          <p class="muted text-sm">{app.imageCaption}</p>
+        )}
+        <h2 class="text-xl font-bold">{app.title}</h2>
+        <p>{app.description}</p>
+        <ul class="flex flex-wrap gap-2">
+          {app.links.map((link) => (
+            <li>
+              <a
+                class="btn btn-outline px-3 py-2 text-sm"
+                href={link.url}
+                aria-label={`${link.label}: ${app.title}`}
+              >
+                {link.icon === 'website' ? (
+                  <LinkIcon name="language" />
+                ) : link.icon === 'windows' ? (
+                  <LinkIcon name="computer" />
+                ) : (
+                  <img
+                    src={platformIcons[link.icon]}
+                    class="size-4"
+                    alt=""
+                    loading="lazy"
+                  />
+                )}
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </li>
+    ))}
+  </ul>
+</Shell>

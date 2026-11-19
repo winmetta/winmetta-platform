@@ -15,7 +15,7 @@ import {
 export type SearchRecord = Pick<
   LibraryFile,
   'id' | 'key' | 'title' | 'titleNote' | 'tags' | 'language' | 'sizeBytes'
->;
+> & { appId?: string };
 
 interface Doc {
   id: string;

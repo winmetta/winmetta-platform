@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 const book = 'ဓမ္မပဒ';
 const search = (page: Page) =>
-  page.getByRole('searchbox', { name: 'Search books' });
+  page.getByRole('searchbox', { name: 'Search books and apps' });
 const dataRequests = (page: Page) => {
   const urls: string[] = [];
   page.on('request', (request) => {
@@ -10,6 +10,66 @@ const dataRequests = (page: Page) => {
   });
   return urls;
 };
+
+test('study apps are reachable from the library in both languages', async ({
+  page,
+}) => {
+  await page.goto('/en/');
+  await expect(
+    page.locator('main').getByRole('link', { name: 'Dhamma Study Apps' }),
+  ).toHaveAttribute('href', '/en/dhamma-library/apps/');
+  await expect(
+    page.locator('#site-nav').getByRole('link', {
+      name: 'Dhamma Apps',
+      includeHidden: true,
+    }),
+  ).toHaveAttribute('href', '/en/dhamma-library/apps/');
+  await page.goto('/en/dhamma-library/');
+  await page
+    .getByRole('link', { name: 'Explore Pāḷi and Dhamma study apps' })
+    .click();
+  await expect(page).toHaveURL(/\/en\/dhamma-library\/apps\/$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'Dhamma Study Apps',
+  );
+  await expect(
+    page.getByRole('heading', { name: 'Tipitaka Pāḷi Reader' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Digital Pāḷi Dictionary' }),
+  ).toBeVisible();
+  await expect(page.locator('main li > img')).toHaveCount(5);
+  const reader = page.locator('#tipitaka-pali-reader');
+  for (const label of [
+    'Visit website',
+    'Windows',
+    'iPhone, iPad and Mac',
+    'Android',
+    'Linux (Flathub)',
+  ]) {
+    const link = reader.getByRole('link', {
+      name: `${label}: Tipitaka Pāḷi Reader`,
+    });
+    await expect(link).toBeVisible();
+    await expect(link.locator('svg, img')).toHaveCount(1);
+  }
+  await page.locator('a[data-locale="my"]').click();
+  await expect(page).toHaveURL(/\/my\/dhamma-library\/apps\/$/);
+  await page.waitForLoadState('load');
+  await expect(
+    page.locator('#site-nav').getByRole('link', {
+      name: 'ဓမ္မ Apps',
+      includeHidden: true,
+    }),
+  ).toHaveAttribute('href', '/my/dhamma-library/apps/');
+  await expect(
+    page.getByRole('heading', { name: 'ဓမ္မလေ့လာရေး Apps' }),
+  ).toBeVisible();
+  await page
+    .getByRole('link', { name: '← ဓမ္မစာကြည့်တိုက်သို့ ပြန်သွားရန်' })
+    .click();
+  await expect(page).toHaveURL(/\/my\/dhamma-library\/$/);
+});
 
 test('search data downloads only when search is used', async ({ page }) => {
   const urls = dataRequests(page);
@@ -22,6 +82,28 @@ test('search data downloads only when search is used', async ({ page }) => {
   expect(
     urls.some((u) => /\/library-data\/index\.[0-9a-f]+\.json$/.test(u)),
   ).toBe(true);
+});
+
+test('library search finds a study app and opens its recommendation', async ({
+  page,
+}) => {
+  await page.goto('/en/dhamma-library/');
+  await search(page).fill('Sutamaya');
+  const result = page.getByRole('listitem').filter({
+    has: page.getByRole('heading', { name: 'Sutamaya', exact: true }),
+  });
+  await expect(result).toBeVisible();
+  await result.getByRole('link', { name: 'View app' }).click();
+  await expect(page).toHaveURL(/\/en\/dhamma-library\/apps\/#sutamaya$/);
+  await expect(page.locator('#sutamaya')).toBeVisible();
+});
+
+test('library search finds an app using a Burmese alias', async ({ page }) => {
+  await page.goto('/my/dhamma-library/');
+  await page.getByRole('searchbox').fill('ပါဠိ အဘိဓာန်');
+  await expect(
+    page.getByRole('heading', { name: 'Digital Pāḷi Dictionary' }),
+  ).toBeVisible();
 });
 
 test('finds Burmese books and keeps the query in the URL', async ({ page }) => {
@@ -40,7 +122,7 @@ test('a misspelled query shows similar books', async ({ page }) => {
   await page.goto('/en/dhamma-library/');
   await search(page).fill('ဓမ္မပဒါ');
   await expect(
-    page.getByRole('heading', { name: 'Similar books' }),
+    page.getByRole('heading', { name: 'Similar results' }),
   ).toBeVisible();
   await expect(page.locator('h3', { hasText: book }).first()).toBeVisible();
   await expect(page.getByText('No exact match.')).toBeVisible();
@@ -87,7 +169,7 @@ test('folder chips carry the language of their text', async ({ page }) => {
 test('empty results explain what to do', async ({ page }) => {
   await page.goto('/en/dhamma-library/');
   await search(page).fill('zzzzqqqq');
-  await expect(page.getByText(/No books found/)).toBeVisible();
+  await expect(page.getByText(/No results found/)).toBeVisible();
 });
 
 test('language switch keeps the query', async ({ page }) => {

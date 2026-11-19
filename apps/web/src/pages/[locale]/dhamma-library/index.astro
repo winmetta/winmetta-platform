@@ -34,6 +34,7 @@ const labels = {
   folder: text('folder'),
   removeFolder: text('removeFolder'),
   download: text('download'),
+  viewApp: text('studyAppsView'),
   showMore: text('showMore'),
 };
 ---
@@ -42,6 +43,9 @@ const labels = {
   <header class="space-y-4">
     <h1 class="text-3xl font-bold sm:text-4xl">{text('libraryTitle')}</h1>
     <p class="lead">{text('libraryIntro')}</p>
+    <a class="link" href={`/${locale}/dhamma-library/apps/`}>
+      {text('studyAppsLink')} →
+    </a>
   </header>
   <noscript>
     <p class="card">{text('searchNeedsJs')}</p>

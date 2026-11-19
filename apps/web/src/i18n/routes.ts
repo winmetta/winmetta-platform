@@ -10,6 +10,7 @@ export const pagePaths = {
   teachers: 'classes/sayadaws/',
   zoomHelp: 'zoom-help/',
   library: 'dhamma-library/',
+  studyApps: 'dhamma-library/apps/',
   posts: 'dhamma-posts/',
 } as const;
 export type PageId = keyof typeof pagePaths;
