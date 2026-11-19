@@ -1,10 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
+import { siteOrigin } from './site';
 
-// The tracker is off unless the build sets PUBLIC_ANALYTICS=true and a website id (docs/analytics.md).
-// Run the "on" tests against such a build with ANALYTICS_BUILD=true; the default build and the
-// post-deploy check (BASE_URL) skip the "off" test, because production has the tracker on.
+// Run the enabled tests against a build with PUBLIC_ANALYTICS=true and a website ID.
+// The default build tests that the tracker is absent. The post-deploy check skips that assertion.
 const onBuild = process.env.ANALYTICS_BUILD === 'true';
-const host = 'https://stats.app.winmetta.org';
+const host = (
+  process.env.PUBLIC_ANALYTICS_HOST || 'https://stats.app.winmetta.org'
+).replace(/\/$/, '');
 
 interface Tracker {
   attrs: Record<string, string>;
@@ -75,7 +77,7 @@ test.describe('tracker on (ANALYTICS_BUILD=true)', () => {
       'data-do-not-track': 'true',
       'data-exclude-search': 'true',
       'data-exclude-hash': 'true',
-      'data-domains': 'app.winmetta.org',
+      'data-domains': new URL(siteOrigin).hostname,
     });
     expect(t.sent).not.toHaveProperty('screen');
     expect(t.sent.url).toBe('/en/dhamma-library/');
