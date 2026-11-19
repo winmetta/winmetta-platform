@@ -1,0 +1,119 @@
+---
+import Shell from '../../../../layouts/Shell.astro';
+import { localeCodes, type Locale } from '../../../../i18n/locales';
+import { t } from '../../../../i18n/messages';
+
+export function getStaticPaths() {
+  return localeCodes.map((locale) => ({
+    params: { locale },
+    props: { locale },
+  }));
+}
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const text = (key: Parameters<typeof t>[1]) => t(locale, key);
+
+// Sources: winmetta.org/dhamma-download/ and each project's website; checked 2026-11-19.
+const apps = [
+  {
+    title: 'Tipitaka Pāḷi Reader',
+    description: text('studyAppsReader'),
+    links: [
+      {
+        label: text('studyAppsVisit'),
+        url: 'https://americanmonk.org/tipitaka-pali-reader/',
+      },
+      {
+        label: text('studyAppsWindows'),
+        url: 'https://apps.microsoft.com/detail/9MTH9TD82TGR',
+      },
+      {
+        label: text('studyAppsApple'),
+        url: 'https://apps.apple.com/us/app/tipitaka-pali-reader/id1541426949',
+      },
+      {
+        label: text('studyAppsAndroid'),
+        url: 'https://play.google.com/store/apps/details?id=com.paauk.tipitakapalireader',
+      },
+      {
+        label: text('studyAppsLinux'),
+        url: 'https://flathub.org/apps/org.americanmonk.TipitakaPaliReader',
+      },
+    ],
+  },
+  {
+    title: text('studyAppsPublisher'),
+    description: text('studyAppsPublisherDescription'),
+    links: [
+      {
+        label: text('studyAppsWindows'),
+        url: 'https://apps.microsoft.com/store/search?publisher=PnDaza',
+      },
+      {
+        label: text('studyAppsApple'),
+        url: 'https://apps.apple.com/us/developer/pinnyar-daza/id1531500544',
+      },
+      {
+        label: text('studyAppsAndroid'),
+        url: 'https://play.google.com/store/apps/developer?id=Pn+Daza',
+      },
+    ],
+  },
+  {
+    title: 'TipitakaPali.org',
+    description: text('studyAppsTpo'),
+    links: [
+      { label: text('studyAppsVisit'), url: 'https://tipitakapali.org/info' },
+    ],
+  },
+  {
+    title: 'Sutamaya',
+    description: text('studyAppsSutamaya'),
+    links: [{ label: text('studyAppsVisit'), url: 'https://sutamaya.org/' }],
+  },
+  {
+    title: 'Digital Pāḷi Dictionary',
+    description: text('studyAppsDictionary'),
+    links: [
+      {
+        label: text('studyAppsVisit'),
+        url: 'https://digitalpalidictionary.github.io/',
+      },
+    ],
+  },
+];
+---
+
+<Shell
+  locale={locale}
+  title={text('studyAppsTitle')}
+  path="dhamma-library/apps/"
+>
+  <header class="space-y-4">
+    <a class="link inline-block" href={`/${locale}/dhamma-library/`}>
+      ← {text('studyAppsBack')}
+    </a>
+    <h1 class="text-3xl font-bold sm:text-4xl">{text('studyAppsTitle')}</h1>
+    <p class="lead">{text('studyAppsIntro')}</p>
+  </header>
+  <ul class="grid gap-4 md:grid-cols-2">
+    {apps.map((app) => (
+      <li class="card space-y-4">
+        <h2 class="text-xl font-bold">{app.title}</h2>
+        <p>{app.description}</p>
+        <ul class="flex flex-wrap gap-x-5 gap-y-2">
+          {app.links.map((link) => (
+            <li>
+              <a class="link" href={link.url}>
+                {link.label} <span aria-hidden="true">↗</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </li>
+    ))}
+  </ul>
+</Shell>

@@ -11,6 +11,32 @@ const dataRequests = (page: Page) => {
   return urls;
 };
 
+test('study apps are reachable from the library in both languages', async ({
+  page,
+}) => {
+  await page.goto('/en/dhamma-library/');
+  await page
+    .getByRole('link', { name: 'Explore Pāḷi and Dhamma study apps' })
+    .click();
+  await expect(page).toHaveURL(/\/en\/dhamma-library\/apps\/$/);
+  await expect(
+    page.getByRole('heading', { name: 'Tipitaka Pāḷi Reader' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Digital Pāḷi Dictionary' }),
+  ).toBeVisible();
+  await page.locator('a[data-locale="my"]').click();
+  await expect(page).toHaveURL(/\/my\/dhamma-library\/apps\/$/);
+  await page.waitForLoadState('load');
+  await expect(
+    page.getByRole('heading', { name: 'ပါဠိနှင့် ဓမ္မလေ့လာရေး အက်ပ်များ' }),
+  ).toBeVisible();
+  await page
+    .getByRole('link', { name: '← ဓမ္မစာကြည့်တိုက်သို့ ပြန်သွားရန်' })
+    .click();
+  await expect(page).toHaveURL(/\/my\/dhamma-library\/$/);
+});
+
 test('search data downloads only when search is used', async ({ page }) => {
   const urls = dataRequests(page);
   await page.goto('/en/dhamma-library/');
