@@ -16,9 +16,7 @@ test('study apps are reachable from the library in both languages', async ({
 }) => {
   await page.goto('/en/');
   await expect(
-    page
-      .locator('main')
-      .getByRole('link', { name: 'Pāḷi and Dhamma study apps' }),
+    page.locator('main').getByRole('link', { name: 'Dhamma Study Apps' }),
   ).toHaveAttribute('href', '/en/dhamma-library/apps/');
   await expect(
     page.locator('#site-nav').getByRole('link', {
@@ -31,6 +29,9 @@ test('study apps are reachable from the library in both languages', async ({
     .getByRole('link', { name: 'Explore Pāḷi and Dhamma study apps' })
     .click();
   await expect(page).toHaveURL(/\/en\/dhamma-library\/apps\/$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'Dhamma Study Apps',
+  );
   await expect(
     page.getByRole('heading', { name: 'Tipitaka Pāḷi Reader' }),
   ).toBeVisible();
@@ -48,7 +49,7 @@ test('study apps are reachable from the library in both languages', async ({
     }),
   ).toHaveAttribute('href', '/my/dhamma-library/apps/');
   await expect(
-    page.getByRole('heading', { name: 'ပါဠိနှင့် ဓမ္မလေ့လာရေး အက်ပ်များ' }),
+    page.getByRole('heading', { name: 'ဓမ္မလေ့လာရေး Apps' }),
   ).toBeVisible();
   await page
     .getByRole('link', { name: '← ဓမ္မစာကြည့်တိုက်သို့ ပြန်သွားရန်' })
