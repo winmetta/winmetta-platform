@@ -22,7 +22,7 @@ test('study apps are reachable from the library in both languages', async ({
   ).toHaveAttribute('href', '/en/dhamma-library/apps/');
   await expect(
     page.locator('#site-nav').getByRole('link', {
-      name: 'Dhamma Study Apps',
+      name: 'Dhamma Apps',
       includeHidden: true,
     }),
   ).toHaveAttribute('href', '/en/dhamma-library/apps/');
@@ -43,7 +43,7 @@ test('study apps are reachable from the library in both languages', async ({
   await page.waitForLoadState('load');
   await expect(
     page.locator('#site-nav').getByRole('link', {
-      name: 'တရား လေ့လာရေး Apps',
+      name: 'ဓမ္မ Apps',
       includeHidden: true,
     }),
   ).toHaveAttribute('href', '/my/dhamma-library/apps/');
