@@ -2,10 +2,44 @@
 	# Needed so the rate_limit handler runs before the proxy.
 	order rate_limit before reverse_proxy
 	admin off
+	# Proxy errors include a request object even when access logging is disabled.
+	log {
+		format filter {
+			request delete
+		}
+	}
 }
 
 {$STATS_DOMAIN} {
 	encode zstd gzip
+	# Keep route categories for troubleshooting without recording dynamic paths or queries.
+	map {path} {log_route} {
+		/api/send collector
+		/script.js tracker
+		/api/auth/login login
+		/api/heartbeat health
+		default other
+	}
+	log_append route {log_route}
+	@do_not_track header DNT 1
+	log_skip @do_not_track
+	log {
+		output file /var/log/analytics-caddy/access.log {
+			mode 0600
+			roll_size 10MiB
+			roll_at 00:00
+			roll_keep 14
+			roll_keep_for 144h
+		}
+		format filter {
+			request>headers delete
+			request>uri delete
+			request>remote_ip delete
+			request>remote_port delete
+			resp_headers delete
+			user_id delete
+		}
+	}
 
 	header {
 		Strict-Transport-Security "max-age=31536000"
@@ -34,5 +68,12 @@
 		}
 	}
 
+	@collection {
+		method POST
+		path /api/send
+	}
+	reverse_proxy @collection analytics-collector:3001 {
+		header_up X-Winmetta-Client-IP {remote_host}
+	}
 	reverse_proxy analytics-umami:3000
 }

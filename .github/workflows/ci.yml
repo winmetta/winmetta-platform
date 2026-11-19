@@ -79,6 +79,8 @@ jobs:
         run: npm run posts:validate -- --base "$BASE_SHA"
       - run: npm run typecheck
       - run: npm test
+      - name: Test the analytics collection proxy
+        run: node --test infra/analytics/test/collector.test.mjs
       # infra/pulumi is not an npm workspace (the root commands skip it), so check it here.
       - name: Install the feedback endpoint dependencies
         run: npm ci --prefix infra/feedback
@@ -135,3 +137,4 @@ jobs:
           PUBLIC_ANALYTICS_HOST: https://analytics.example.test
           PUBLIC_ANALYTICS_WEBSITE_ID: '00000000-0000-4000-8000-000000000000'
           ANALYTICS_BUILD: 'true'
+          PUBLIC_ANALYTICS_IP_LOGGING: 'true'

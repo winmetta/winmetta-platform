@@ -24,6 +24,8 @@ DELETE FROM event_data WHERE website_event_id IN (SELECT event_id FROM old_event
 DELETE FROM event_data WHERE created_at < now() - interval '12 months';
 DELETE FROM session_data WHERE session_id IN (SELECT session_id FROM old_sessions);
 DELETE FROM session_data WHERE created_at < now() - interval '12 months';
+-- Run nightly. A six-day threshold leaves one day for the next scheduled run.
+DELETE FROM session_data WHERE data_key = 'visitor_ip' AND created_at <= now() - interval '6 days';
 DELETE FROM website_event WHERE event_id IN (SELECT event_id FROM old_events);
 DELETE FROM session WHERE session_id IN (SELECT session_id FROM old_sessions);
 

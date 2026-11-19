@@ -86,13 +86,15 @@ test('Privacy states what the site does and shows a Latin-digit date', async ({
   await expect(page.locator('main')).toContainText('2026');
   await page.goto('/en/privacy/');
   const feedback = process.env.PUBLIC_FEEDBACK === 'true';
+  const ipLogging = process.env.PUBLIC_ANALYTICS_IP_LOGGING === 'true';
   await expect(page.getByRole('heading', { level: 2 })).toHaveCount(
-    feedback ? 8 : 7,
+    7 + Number(feedback) + Number(ipLogging),
   );
-  await expect(page.locator('main')).toContainText(
-    feedback ? 'November 10, 2026' : 'November 8, 2026',
+  await expect(page.locator('main')).toContainText('November 19, 2026');
+  await expect(page.locator('main')).toContainText('Website analytics');
+  await expect(page.locator('#privacyAnalyticsIpTitle')).toHaveCount(
+    Number(ipLogging),
   );
-  await expect(page.locator('main')).toContainText('Anonymous visit counts');
   await expect(page.locator('main')).toContainText('stats.app.winmetta.org');
 });
 

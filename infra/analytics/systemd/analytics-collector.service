@@ -1,0 +1,20 @@
+[Unit]
+Description=Analytics collection proxy for Umami session properties
+Requires=docker.service
+Wants=analytics-umami.service
+After=docker.service analytics-umami.service
+
+[Service]
+EnvironmentFile=/opt/analytics/versions.env
+Restart=always
+RestartSec=5
+ExecStartPre=-/usr/bin/docker rm -f analytics-collector
+ExecStart=/usr/bin/docker run --rm --name analytics-collector --network analytics \
+  --memory 64m --read-only --user 1000:1000 --entrypoint node \
+  -e ANALYTICS_SITE_ORIGIN=https://app.winmetta.org \
+  -v /opt/analytics/collector/server.mjs:/collector.mjs:ro \
+  ${UMAMI_IMAGE} /collector.mjs
+ExecStop=/usr/bin/docker stop -t 10 analytics-collector
+
+[Install]
+WantedBy=multi-user.target
