@@ -1,6 +1,20 @@
 # Image sources
 
-Images copied from winmetta.org (the organization's own published content). Run the importers to refresh.
+## Study app icons
+
+These project and app icons were retrieved on 2026-11-19 from their official pages or store listings. The Tipitaka Myanmar icon illustrates one app in the Pn Daza collection.
+
+| File                                   | Source                                                                     |
+| -------------------------------------- | -------------------------------------------------------------------------- |
+| study-apps/tipitaka-pali-reader.png    | https://play.google.com/store/apps/details?id=com.paauk.tipitakapalireader |
+| study-apps/tipitaka-myanmar.png        | https://play.google.com/store/apps/details?id=mm.pndaza.tipitakamyanmar    |
+| study-apps/tipitakapali.svg            | https://tipitakapali.org/tipitakapali_org_logo.svg                         |
+| study-apps/sutamaya.png                | https://sutamaya.org/icons/icon-512-v2.png                                 |
+| study-apps/digital-pali-dictionary.svg | https://digitalpalidictionary.github.io/assets/dpd-logo.svg                |
+
+## Teachers
+
+Teacher images below are copied from winmetta.org (the organization's own published content). Run the importers to refresh.
 
 | File                          | Source URL                                                                                                                                                                                                                        | Retrieved  |
 | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |

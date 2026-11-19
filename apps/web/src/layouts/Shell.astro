@@ -36,11 +36,17 @@ const navItems = [
     ],
   },
   { page: 'studyGroups', label: 'navStudyGroups' },
-  { page: 'library', label: 'navLibrary' },
+  {
+    page: 'library',
+    label: 'navLibrary',
+    children: [{ page: 'studyApps', label: 'studyAppsTitle' }],
+  },
   { page: 'posts', label: 'navPosts' },
 ] as const;
 const inLibrary =
-  page === 'library' || Boolean(path?.startsWith('dhamma-library/'));
+  page === 'library' ||
+  page === 'studyApps' ||
+  Boolean(path?.startsWith('dhamma-library/'));
 const inPosts = page === 'posts' || Boolean(path?.startsWith('dhamma-posts/'));
 // Dhamma post languages ("Read in"): ?lang= first, then the saved choice, then the interface
 // language; applied before paint (lib/posts/languages.ts).

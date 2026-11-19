@@ -40,6 +40,7 @@ export interface Labels {
   folder: string;
   removeFolder: string;
   download: string;
+  viewApp: string;
   locale: Locale;
   showMore: string;
 }
@@ -76,6 +77,22 @@ function Card({
   /** Called when the Download link of a search result is used. */
   onResultClick: () => void;
 }) {
+  if (record.appId) {
+    return (
+      <li className="card space-y-3">
+        <h3 className="text-lg font-semibold" lang={record.language}>
+          {record.title}
+        </h3>
+        <a
+          className="btn btn-outline"
+          href={`/${labels.locale}/dhamma-library/apps/#${record.appId}`}
+          onClick={onResultClick}
+        >
+          {labels.viewApp}
+        </a>
+      </li>
+    );
+  }
   return (
     <li className="card space-y-3">
       <h3 className="text-lg font-semibold" lang={record.language}>

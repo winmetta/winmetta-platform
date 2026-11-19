@@ -3,6 +3,7 @@
 import { createHash } from 'node:crypto';
 import { files } from './library-catalog';
 import { LibrarySearch, type SearchRecord } from './library-search';
+import { studyApps } from './study-apps';
 
 // Records stay in library order (the manifest order): it is the search tie-breaker.
 const records: SearchRecord[] = files.map((file) => ({
@@ -14,6 +15,18 @@ const records: SearchRecord[] = files.map((file) => ({
   language: file.language,
   sizeBytes: file.sizeBytes,
 }));
+records.push(
+  ...Object.values(studyApps).map((app) => ({
+    id: `app-${app.id}`,
+    appId: app.id,
+    key: '',
+    title: app.title,
+    titleNote: app.aliases,
+    tags: [],
+    language: 'en',
+    sizeBytes: 0,
+  })),
+);
 const recordsJson = JSON.stringify(records);
 const indexJson = LibrarySearch.build(records).serialize();
 // A content hash in the URL lets the CDN cache both files forever.

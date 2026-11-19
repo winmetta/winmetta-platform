@@ -125,7 +125,8 @@ test('Sayadaws sit under Classes in the menu and are linked from the Classes pag
     page.getByRole('link', { name: 'Meet the Sayadaws' }),
   ).toBeVisible();
   if (isMobile) await page.getByRole('button', { name: 'Menu' }).click();
-  else await page.locator('.nav-group > .nav-link').hover();
+  else
+    await page.locator('.nav-group > .nav-link[href="/en/classes/"]').hover();
   await page.locator('.nav-sublink', { hasText: 'Sayadaws' }).click();
   await expect(page).toHaveURL(/\/en\/classes\/sayadaws\/$/);
   await expect(page.locator('.nav-link[href="/en/classes/"]')).toHaveAttribute(
@@ -143,7 +144,8 @@ test('Retreats sit under Classes in the menu and are linked from the Classes pag
     page.getByRole('link', { name: /^Retreats Online and in-person/ }),
   ).toBeVisible();
   if (isMobile) await page.getByRole('button', { name: 'Menu' }).click();
-  else await page.locator('.nav-group > .nav-link').hover();
+  else
+    await page.locator('.nav-group > .nav-link[href="/en/classes/"]').hover();
   await page.locator('.nav-sublink', { hasText: 'Retreats' }).click();
   await expect(page).toHaveURL(/\/en\/classes\/retreats\/$/);
   await expect(page.locator('.nav-link[href="/en/classes/"]')).toHaveAttribute(

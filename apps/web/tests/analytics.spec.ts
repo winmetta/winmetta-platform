@@ -158,7 +158,7 @@ test.describe('tracker on (ANALYTICS_BUILD=true)', () => {
   }) => {
     await page.goto('/en/dhamma-library/');
     await stayOnPage(page, 'a.btn');
-    const box = page.getByRole('searchbox', { name: 'Search books' });
+    const box = page.getByRole('searchbox', { name: 'Search books and apps' });
     await box.fill('ဓမ္မပဒ');
     await expect(
       page.locator('h3', { hasText: 'ဓမ္မပဒ' }).first(),
