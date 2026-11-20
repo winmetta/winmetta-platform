@@ -33,7 +33,7 @@ require_docker() {
 }
 
 cleanup() {
-    docker rm -f "${PREFIX}-umami" "${PREFIX}-pg" "${PREFIX}-caddy" >/dev/null 2>&1 || true
+    docker rm -f "${PREFIX}-umami" "${PREFIX}-pg" "${PREFIX}-caddy" "${PREFIX}-collector" >/dev/null 2>&1 || true
     docker network rm "$NETWORK" >/dev/null 2>&1 || true
     docker volume rm "${PREFIX}-data" >/dev/null 2>&1 || true
 }
@@ -146,7 +146,9 @@ test_maintenance() {
         "00000000-0000-0000-0000-0000000000b2,00000000-0000-0000-0000-0000000000b3" \
         "SELECT string_agg(session_id::text, ',' ORDER BY session_id) FROM session"
     expect_sql "event_data of old events is gone, even when newer than its parent" "1" "SELECT count(*) FROM event_data"
-    expect_sql "session_data of deleted sessions is gone" "1" "SELECT count(*) FROM session_data"
+    expect_sql "session_data of deleted sessions is gone" "1" "SELECT count(*) FROM session_data WHERE data_key <> 'visitor_ip'"
+    expect_sql "only the recent IP property survives" "192.0.2.22" \
+        "SELECT string_agg(string_value, ',') FROM session_data WHERE data_key = 'visitor_ip'"
     expect_sql "screen and distinct id are scrubbed" "0" \
         "SELECT count(*) FROM session WHERE screen IS NOT NULL OR distinct_id IS NOT NULL"
     expect_sql "region and city are kept" "1" \
@@ -206,14 +208,57 @@ proxy_answers() {
     [[ $(curl -s -o /dev/null -w '%{http_code}' "http://localhost:${CADDY_PORT}/api/heartbeat") == 200 ]]
 }
 
+start_collector() {
+    docker run -d --name "${PREFIX}-collector" --network "$NETWORK" --network-alias analytics-collector \
+        --entrypoint node -e ANALYTICS_SITE_ORIGIN=https://app.example.test \
+        -v "$ROOT/collector/server.mjs:/collector.mjs:ro" "$UMAMI_IMAGE" /collector.mjs >/dev/null
+}
+
+test_collection_ip() {
+    local session
+    session=$(curl -fsS -X POST "http://localhost:${CADDY_PORT}/api/send?private-check" \
+        -H 'Origin: https://app.example.test' -H 'Content-Type: application/json' \
+        -H 'X-Winmetta-Client-IP: 192.0.2.111' -H 'Cookie: private-check=secret' \
+        -A 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/130.0.0.0 Safari/537.36' \
+        -d '{"type":"event","payload":{"website":"00000000-0000-4000-8000-0000000000a1","hostname":"app.example.test","url":"/en/","ip":"192.0.2.222"}}' |
+        json_field sessionId)
+    [[ $session =~ ^[[:xdigit:]-]{36}$ ]] || {
+        fail "the collector did not return a session ID"
+        return
+    }
+    local _ value=''
+    for _ in $(seq 1 20); do
+        value=$(psql_db -c "SELECT string_value FROM session_data WHERE session_id = '$session' AND data_key = 'visitor_ip' AND distinct_id IS NULL")
+        [ -n "$value" ] && break
+        sleep 0.1
+    done
+    check "Umami records the Caddy address as a session property" test -n "$value"
+    check "the supplied address was ignored" test "$value" != '192.0.2.111'
+    check "the payload address was ignored" test "$value" != '192.0.2.222'
+    check "the access log contains the same IP and excludes URL and header text" access_log_matches "$value"
+}
+
+access_log_matches() {
+    docker exec "${PREFIX}-caddy" cat /var/log/analytics-caddy/access.log | python3 -c '
+import json, sys
+records = [json.loads(line) for line in sys.stdin]
+assert any(row.get("route") == "collector" and row["request"]["client_ip"] == sys.argv[1]
+           and row["status"] == 200 for row in records)
+assert all("uri" not in row["request"] and "headers" not in row["request"]
+           and "resp_headers" not in row for row in records)
+' "$1"
+}
+
 test_caddy() {
     log "4. Caddyfile"
     check "caddy validate" caddy_validates
+    start_collector
     # Same Caddyfile, plain HTTP on a local port, in front of the Umami container.
     docker run -d --name "${PREFIX}-caddy" --network "$NETWORK" -p "${CADDY_PORT}:8080" \
         -e STATS_DOMAIN="http://:8080" -v "$ROOT/caddy/Caddyfile:/etc/caddy/Caddyfile:ro" "$CADDY_IMAGE" >/dev/null
     sleep 4
     check "Caddy proxies /api/heartbeat to Umami" proxy_answers
+    test_collection_ip
     local codes
     codes=$(for _ in $(seq 1 12); do
         curl -s -o /dev/null -w '%{http_code} ' -X POST "http://localhost:${CADDY_PORT}/api/auth/login" \

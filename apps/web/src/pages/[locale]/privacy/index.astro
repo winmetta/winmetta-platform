@@ -19,12 +19,13 @@ const updated = new Intl.DateTimeFormat(locales[locale].formatLocale, {
   dateStyle: 'long',
   numberingSystem: 'latn',
   timeZone: 'UTC',
-}).format(
-  new Date(feedbackEnabled ? '2026-11-10T00:00:00Z' : '2026-11-08T00:00:00Z'),
-);
+}).format(new Date('2026-11-19T00:00:00Z'));
 const sections = [
   ['privacyNoneTitle', 'privacyNone'],
   ['privacyAnalyticsTitle', 'privacyAnalytics'],
+  ...(import.meta.env.PUBLIC_ANALYTICS_IP_LOGGING === 'true'
+    ? [['privacyAnalyticsIpTitle', 'privacyAnalyticsIp'] as const]
+    : []),
   ...(feedbackEnabled
     ? [['privacyFeedbackTitle', 'privacyFeedback'] as const]
     : []),

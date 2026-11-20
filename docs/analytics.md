@@ -2,15 +2,24 @@
 
 **Status:** planned 2026-10-26; live once the go-live change (stage 4 in [implementation-plan.md](implementation-plan.md) §5A) is deployed. The server (stage 2) has run since 2026-10-31. The tracker and the events (stage 3) are in the code, built only when `PUBLIC_ANALYTICS=true` and a website id are set, and the go-live change sets both for the production build and publishes the Privacy wording of section 8 in the same change. Until then, [prd.md](prd.md) §4.7 and [tech-architecture.md](tech-architecture.md) §4.4 describe what is live.
 
-**Why:** the site is public and Win Metta has no view of what helps learners: which classes and retreats people look up, whether the library search finds books, whether Burmese and Chinese readers use their language. Measurement should answer those questions without identifying anyone.
+**Why:** the site is public and Win Metta has no view of what helps learners: which classes and retreats people look up, whether the library search finds books, whether Burmese and Chinese readers use their language. The product measures resource usage without collecting names or learner progress.
 
 ---
+
+## Short-lived IP logging
+
+The raw-IP rollout adds a private Caddy access log for the analytics origin and a `visitor_ip` property on individual Umami sessions. It is staged separately from the existing tracker. The site publishes the IP notice through `PUBLIC_ANALYTICS_IP_LOGGING` as part of the approved server rollout. The default Privacy page also acknowledges that older proxy error logs may contain IP addresses.
+
+* Caddy records the peer IP, time, method, route category, status and duration. It omits request and response headers and full URLs. Requests with `DNT: 1` are skipped. Runtime error logs omit the request object. The private access files live on the encrypted root volume, outside the analytics data backups, and rotate daily with up to six days of rolled files.
+* The collector receives the address from a header set by Caddy, forwards the event to Umami and then saves the IP as a custom property of the returned session. Authorized dashboard users can see the property on the session profile. It does not set a Distinct ID. Session hashes still rotate daily, but maintainers can compare the recorded IP across sessions during its retention window. A shared IP does not establish that two sessions belong to the same person.
+* The nightly SQL deletes IP properties once they reach six days of age, keeping them for up to seven days under the normal schedule. Database dumps expire after 21 days and data-volume snapshots after 14 days. Run maintenance before serving a restored database so expired IP properties do not become visible again.
+* The rollout and rollback require the bilingual Privacy notice and server behavior to agree. Before enabling raw collection, confirm that people with access to session-level data and server logs are authorized to see IP addresses. The two build modes and the local Caddy-to-Umami smoke test use synthetic data.
 
 ## 1. Decisions
 
 | Decision | Choice | Notes |
 | --- | --- | --- |
-| Identity model | **Cookieless, aggregate only** | No cookie, no localStorage, no fingerprinting script, no persistent visitor ID. Decided 2026-10-26. |
+| Identity model | **Cookieless, daily session IDs** | No cookie, no localStorage, no fingerprinting script, no persistent visitor ID. See short-lived IP logging for the separately authorized raw-IP collection. Decided 2026-10-26. |
 | Tool | **Umami, self-hosted** | MIT license, light to run (Node.js + PostgreSQL), custom events, no cookies by default. |
 | Hosting | One **AWS EC2** instance (`t4g.small`, 2 GB) in the existing AWS account, defined in Pulumi, with PostgreSQL on the same instance. Changed from Lightsail on 2026-10-29 | Host `stats.app.winmetta.org`, a record in the existing `app.winmetta.org` Route 53 zone (no new zone). Decided 2026-10-26; alternatives in section 5. |
 | HTTPS | **Caddy** on the instance, Let's Encrypt | Not an Application Load Balancer (about $16 a month, more than the server) and not nginx + certbot (same result, more parts). |
@@ -21,7 +30,7 @@
 Umami derives a visitor hash from the site, IP address, user agent and a rotating salt, and stores no ID in the browser. With the salt rotated daily, the same person on two different days looks like two visitors. So:
 
 * **We can answer:** page views, unique visitors per day, which pages, classes, library folders, books (downloads), posts, tags and languages are used, which interface and reading languages, referrers, countries and device types, how many searches return nothing, and trends of all of these over weeks and months.
-* **We cannot answer:** whether the same person came back next week, a single person's journey across days, or per-learner retention. The candidate measures in [prd.md](prd.md) §6 that need this (return-to-learn, bridge-to-community) stay unmeasured on the server. If a learner-progress feature is built later, progress stays **on the learner's own device** (IndexedDB, [tech-architecture.md](tech-architecture.md) §4.3), not sent to us.
+* **We cannot reliably answer:** whether the same person came back next week, a single person's journey across days, or per-learner retention. IP addresses can be compared during their retention window, but networks and devices may share or change addresses. The candidate measures in [prd.md](prd.md) §6 that need this (return-to-learn, bridge-to-community) stay unmeasured on the server. If a learner-progress feature is built later, progress stays **on the learner's own device** (IndexedDB, [tech-architecture.md](tech-architecture.md) §4.3), not sent to us.
 * **Not decided, and not built:** an opt-in "recognize me across visits" ID (a random UUID kept in the browser only after the visitor agrees, passed to Umami as a distinct ID). It would add a consent banner, change the Privacy promise and need a legal check, so it is a separate decision for a later phase if per-visitor continuity is ever needed.
 
 ## 2. Tools considered
@@ -43,11 +52,11 @@ Cloud option for Umami (Hobby/Pro) remains a fallback if self-hosting stops bein
 
 ## 3. What we collect
 
-Every event is a **name plus non-identifying properties**. Nothing the visitor types and nothing that identifies a person is ever sent.
+Browser events use non-identifying properties and omit text the visitor types. The analytics server handles IP addresses as described above.
 
 | Area | Events (name: properties) |
 | --- | --- |
-| All pages | Automatic page view: path (no query string), referrer (sanitized, see section 4), interface locale (`en`, `my`), plus what Umami derives itself and the Privacy page discloses: country, region, city, browser, operating system, device type, browser language, time of day. Screen size is **not** kept (removed in the tracker's before-send hook and scrubbed nightly). Region and city **are** kept for 13 months (decided 2026-11-08, to plan class times); the server looks them up from the IP address, which is not stored, and they are reported only as totals, never for a group under 10 |
+| All pages | Automatic page view: path (no query string), referrer (sanitized, see section 4), interface locale (`en`, `my`), plus what Umami derives itself and the Privacy page discloses: country, region, city, browser, operating system, device type, browser language, time of day. Screen size is **not** kept (removed in the tracker's before-send hook and scrubbed nightly). Region and city **are** kept for 13 months (decided 2026-11-08, to plan class times); the server looks them up from the IP address, and they are reported only as totals, never for a group under 10 |
 | Classes | `class_zoom_join_click`: class id, `source` (`schedule`, `next`, `class_page`); `class_detail_open`: class id (only if a class opens in a panel; separate pages are covered by page views); `class_timezone_change`: zone (only while the schedule has a time-zone control) |
 | Retreats | `retreat_link_click`: retreat id, `kind` (`register`, `zoom`, `info`, `external`); `retreat_archive_open`: retreat id |
 | Library | `library_search`: result count bucket, `script` (`my`, `latin`, `mixed`), `similar_shown` (true or false), `zawgyi_suspected` (true or false, decided in the browser; never the text); `library_result_click`: position bucket (1, 2–3, 4–10, more), `kind` (`exact`, `similar`); `library_tag_filter`: tag id; `library_folder_open`: folder id; `library_pdf_download`: book id, `from` (`search`, `folder`, `other`) |
@@ -101,11 +110,11 @@ Reporting rules: do not read or publish a rate when its denominator is under 30;
 | 25 | Which posts do readers appreciate? | `post_reaction` (`kind=sadhu`) by `post` | `post_open` by post id | Clicks, not people: a reload allows another click. Never shown on the site or used to rank posts |
 | 26 | Where do visitors want to report problems? | `feedback_open` by `ctx`; `feedback_submit` by `ctx` and `type` | `feedback_open` | A high open-to-submit gap means the form is too hard or the link is misleading |
 
-**Not measurable by design** (no visitor ID across days): the same person returning, unique people per week or month, a visitor's path across days, and the prd.md §6 measures return-to-learn and bridge-to-community. If one becomes important, see the opt-in ID in section 1.
+**Not reliably measurable from daily session records:** the same person returning, unique people per week or month, a visitor's path across days, and the prd.md §6 measures return-to-learn and bridge-to-community. If one becomes important, see the opt-in ID in section 1.
 
 ### Never collected
 
-Names, email addresses, IP addresses stored in readable form, search or form text, screen size, Zoom IDs or passcodes a visitor types, precise location, device fingerprints, cookies, localStorage values, session replays, heatmaps, and any ID that survives past the daily salt. No advertising or third-party scripts. Nothing is shared or sold. Do Not Track is honored: the tracker script is not even loaded.
+Names, email addresses, search or form text, screen size, Zoom IDs or passcodes a visitor types, precise location, device fingerprints, cookies, localStorage values, session replays, heatmaps, and any ID that survives past the daily salt. No advertising or third-party scripts. Nothing is shared or sold. Do Not Track is honored: the tracker script is not even loaded.
 
 ## 4. Privacy requirements
 
@@ -179,18 +188,18 @@ How Win Metta is organized or run (who maintains the server, who administers wha
 Review of the design, with the residual risks accepted as low. This is our own reading, not legal advice.
 
 1. **Consent for device access (EU/UK ePrivacy, Article 5(3)):** applies only when information is stored on or read from the visitor's device. The design stores nothing and reads nothing from the device, so no consent or cookie banner is required. Kept true by checking storage before launch and after every Umami upgrade (section 4.1).
-2. **GDPR and UK GDPR:** the daily hash is built from IP address, user agent and a salt, and regulators may treat an IP-derived value as personal data while the salt exists. Accepted position: legitimate interest (Article 6(1)(f)) for running the site; raw IPs are not stored; the salt rotates daily (`SALT_ROTATION=day`) so a value cannot be linked across days or back to a person without the app secret.
+2. **GDPR and UK GDPR:** the daily hash is built from IP address, user agent and a salt, and regulators may treat an IP-derived value as personal data while the salt exists. The original aggregate analytics design cited legitimate interest (Article 6(1)(f)) for running the site. The short-lived IP rollout separately retains raw addresses. The salt still rotates daily (`SALT_ROTATION=day`).
 3. **Transparency:** the Privacy page, in English and Burmese, states what is counted and why, the daily hash, the 13-month retention and a contact (`contact@winmetta.org`), changing in the same PR as the tracker (section 8).
 4. **Objection:** Do Not Track is honored. No separate opt-out page, because it would itself need storage.
 5. **Retention:** 13 months at most for any copy of an event, backups included (live events 12 months, dumps 21 days, snapshots 14 days).
 6. **Processor and region:** the data stays in Win Metta's own AWS account in `us-east-1`; AWS is the only processor and no analytics company receives the data.
-7. **California (CCPA/CPRA):** no sale or sharing, no advertising use, nothing linked to a person.
-8. **Myanmar and other countries:** counts are aggregate and non-identifying, so exposure is low.
+7. **California (CCPA/CPRA):** no sale or sharing, no advertising use. The IP rollout adds a session property visible to authorized dashboard users.
+8. **Myanmar and other countries:** the Privacy page describes aggregate counts and the IP addresses retained during the short-lived IP rollout.
 9. **If an opt-in visitor ID is added later:** consent comes before anything is stored, with a way to withdraw, and this review is repeated.
 
-## 8. Privacy page wording (draft for stage 4)
+## 8. Original Privacy page wording (stage 4)
 
-Published with the go-live change (stage 4, 2026-11-08) as drafted. Checking each statement against the running system (no IP stored, daily salt, 13-month deletion, storage empty, region and city) is a backlog todo done right after go-live, decided 2026-11-08 ([implementation-plan.md](implementation-plan.md) §6.1, Operations).
+Published with the go-live change (stage 4, 2026-11-08) as drafted. The live wording is maintained in the English and Burmese locale files. The raw-IP rollout supersedes the original IP storage wording below. Checking each statement against the running system (no IP stored, daily salt, 13-month deletion, storage empty, region and city) is a backlog todo done right after go-live, decided 2026-11-08 ([implementation-plan.md](implementation-plan.md) §6.1, Operations).
 
 > **Translation rule.** The Burmese Privacy text must mean exactly the same as the English text. Some terms are deliberately left in English (for example Umami, analytics, server, IP, hash, cookie, Do Not Track) because a Burmese rendering risks changing the meaning, or the Burmese word is not settled or not widely understood. Do not "fix" these by translating them. If the two versions ever differ in meaning, the English wording is checked first and the Burmese is corrected to match. Use the same Burmese nouns the site already uses elsewhere (for example for classes and retreats in `apps/web/src/i18n/messages/my.json`). A Burmese speaker reviews the published text afterwards; that review is a future todo ([implementation-plan.md](implementation-plan.md) §6.1, group 5), so the Burmese must be written carefully to match the English the first time.
 

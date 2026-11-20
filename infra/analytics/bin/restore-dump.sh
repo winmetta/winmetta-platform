@@ -10,11 +10,14 @@ source /etc/analytics/instance.env
 dump=${1:?usage: restore-dump.sh <dump file name under dumps/>}
 file="/data/tmp/restore.dump"
 
-# Umami is stopped for the restore and ALWAYS started again, on success and on any failure
-# (with a failed restore the database is unchanged, see below).
+# A failed restore leaves the original database intact. If the restore succeeds but
+# retention fails, keep Umami stopped so expired session IPs cannot be viewed.
+restored_unscrubbed=0
 cleanup() {
     rm -f "$file"
-    systemctl start analytics-umami || true
+    if [ "$restored_unscrubbed" = 0 ]; then
+        systemctl start analytics-umami || true
+    fi
 }
 trap cleanup EXIT
 
@@ -37,6 +40,9 @@ systemctl stop analytics-umami
 # database.
 docker exec -i analytics-postgres pg_restore -U umami -d umami --single-transaction --exit-on-error \
     --clean --if-exists --no-owner <"$file"
+restored_unscrubbed=1
+/opt/analytics/bin/maintenance.sh
+restored_unscrubbed=0
 # The restored database already holds the real administrator accounts: never let the
 # installer's first-boot step replace the admin password again.
 touch /data/.admin-bootstrapped

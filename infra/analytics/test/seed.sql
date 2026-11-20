@@ -3,7 +3,8 @@
 -- has a recent event) and fields the scrub must clear. Umami 3.4.1 schema.
 \set ON_ERROR_STOP on
 INSERT INTO website (website_id, name, domain, created_at)
-VALUES ('00000000-0000-0000-0000-0000000000a1', 'test', 'app.example.test', now());
+VALUES ('00000000-0000-0000-0000-0000000000a1', 'test', 'app.example.test', now()),
+       ('00000000-0000-4000-8000-0000000000a1', 'collector test', 'app.example.test', now());
 
 INSERT INTO session (session_id, website_id, browser, os, device, screen, language, country, region, city, distinct_id, created_at) VALUES
  -- b1: old, unwanted fields, old events
@@ -33,4 +34,6 @@ INSERT INTO event_data (event_data_id, website_id, website_event_id, data_key, s
 INSERT INTO session_data (session_data_id, website_id, session_id, data_key, string_value, data_type, distinct_id, created_at) VALUES
  (gen_random_uuid(), '00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000b1', 'k', 'v', 1, 'who', now()),
  (gen_random_uuid(), '00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000b4', 'k', 'v', 1, NULL, now()),
- (gen_random_uuid(), '00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000b2', 'k', 'v', 1, 'who', now());
+ (gen_random_uuid(), '00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000b2', 'k', 'v', 1, 'who', now()),
+ (gen_random_uuid(), '00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000b2', 'visitor_ip', '192.0.2.11', 1, NULL, now() - interval '7 days'),
+ (gen_random_uuid(), '00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000b3', 'visitor_ip', '192.0.2.22', 1, NULL, now());

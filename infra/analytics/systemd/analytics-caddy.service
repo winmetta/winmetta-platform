@@ -1,7 +1,8 @@
 [Unit]
 Description=Analytics Caddy (HTTPS and rate limits)
 Requires=analytics-umami.service
-After=analytics-umami.service
+Wants=analytics-collector.service
+After=analytics-umami.service analytics-collector.service
 RequiresMountsFor=/data
 
 [Service]
@@ -11,9 +12,11 @@ EnvironmentFile=/etc/analytics/caddy-image
 Restart=always
 RestartSec=5
 ExecStartPre=-/usr/bin/docker rm -f analytics-caddy
+ExecStartPre=/usr/bin/install -d -m 0700 /var/log/analytics-caddy
 ExecStart=/usr/bin/docker run --rm --name analytics-caddy --network analytics --memory 200m \
   -p 80:80 -p 443:443 -e STATS_DOMAIN=${STATS_DOMAIN} \
   -v /opt/analytics/caddy/Caddyfile:/etc/caddy/Caddyfile:ro -v /data/caddy:/data \
+  -v /var/log/analytics-caddy:/var/log/analytics-caddy \
   ${CADDY_IMAGE}
 ExecStop=/usr/bin/docker stop -t 10 analytics-caddy
 

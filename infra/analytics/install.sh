@@ -161,6 +161,7 @@ install_units() {
 config_fingerprint() {
     {
         cat /opt/analytics/caddy/Caddyfile /opt/analytics/versions.env /etc/analytics/*.env
+        cat /opt/analytics/collector/server.mjs
         cat /opt/analytics/systemd/*.service /opt/analytics/systemd/*.timer
     } 2>/dev/null | sha256sum | cut -d' ' -f1
 }
@@ -178,7 +179,8 @@ restart_changed_services() {
         log "runtime configuration changed; restarting the services"
         restart_all=1
     fi
-    for pair in "analytics-postgres:${POSTGRES_IMAGE}" "analytics-umami:${UMAMI_IMAGE}" "analytics-caddy:${CADDY_IMAGE}"; do
+    for pair in "analytics-postgres:${POSTGRES_IMAGE}" "analytics-umami:${UMAMI_IMAGE}" \
+        "analytics-collector:${UMAMI_IMAGE}" "analytics-caddy:${CADDY_IMAGE}"; do
         unit=${pair%%:*}
         image=${pair#*:}
         if [ "$restart_all" = 1 ]; then
