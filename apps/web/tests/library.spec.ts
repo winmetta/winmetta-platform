@@ -256,6 +256,18 @@ test('a file size is a badge with a document symbol, right after the Download bu
   await expect(size).toHaveClass(/badge/);
   await expect(size.locator('svg')).toHaveCount(1);
   await expect(size).toHaveText(/\d/);
+  // Plain information, not a pill: no background or rounded frame that would look like a button.
+  const look = await size.evaluate((el) => {
+    const css = getComputedStyle(el);
+    return {
+      background: css.backgroundColor,
+      radius: css.borderRadius,
+      cursor: css.cursor,
+    };
+  });
+  expect(look.background).toBe('rgba(0, 0, 0, 0)');
+  expect(look.radius).toBe('0px');
+  expect(look.cursor).not.toBe('pointer');
   const download = (await card
     .getByRole('link', { name: /Download PDF/ })
     .boundingBox())!;
@@ -272,4 +284,28 @@ test('a file size is a badge with a document symbol, right after the Download bu
     .boundingBox())!;
   const b2 = (await folderCard.locator('[data-file-size]').boundingBox())!;
   expect(b2.x).toBeGreaterThan(d2.x + d2.width);
+});
+
+test('in Burmese, counts use Burmese digits and the counter အုပ်', async ({
+  page,
+}) => {
+  await page.goto('/my/dhamma-library/');
+  const counts = page.locator('#folders').locator('..').locator('.badge');
+  const first = (await counts.first().innerText()).trim();
+  expect(first).toMatch(/^[၀-၉,]+ အုပ်$/);
+  expect(first).not.toContain('စာအုပ်');
+  await page.goto('/my/dhamma-library/folders/f005/');
+  const header = (
+    await page.locator('header .badge').first().innerText()
+  ).trim();
+  expect(header).toMatch(/^[၀-၉,]+ အုပ်$/);
+  const size = (
+    await page.locator('[data-file-size]').first().innerText()
+  ).trim();
+  expect(size).toMatch(/^[၀-၉.,]+ (kB|MB|GB)$/);
+  // English keeps Latin digits.
+  await page.goto('/en/dhamma-library/folders/f005/');
+  expect(
+    (await page.locator('header .badge').first().innerText()).trim(),
+  ).toMatch(/^[0-9,]+ books?$/);
 });

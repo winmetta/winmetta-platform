@@ -154,8 +154,20 @@
   .brand img {
     @apply size-11 shrink-0;
   }
+  /* The phone menu control: the usual three-line symbol and the word, like a text action. */
   .menu-button {
-    @apply hidden min-h-11 cursor-pointer items-center rounded-full bg-sand px-5 font-semibold transition-colors hover:bg-sky;
+    @apply hidden min-h-11 cursor-pointer items-center gap-1 border-0 bg-transparent p-0 font-semibold text-brand transition-colors hover:text-brand-strong hover:underline;
+    text-underline-offset: 0.2em;
+  }
+  .menu-button svg {
+    @apply size-6 shrink-0;
+  }
+  .menu-button .menu-close,
+  .menu-button[aria-expanded='true'] .menu-open {
+    @apply hidden;
+  }
+  .menu-button[aria-expanded='true'] .menu-close {
+    @apply block;
   }
   /* The navigation always sits on its own row, so the language switcher stays top right. */
   .site-nav {
@@ -343,13 +355,24 @@
   .live-icon:focus::after {
     @apply block;
   }
+  /* Symbol and words share the text's baseline, then the symbol drops a little so it is centred on
+     the capitals and figures. Centring both boxes (items-center) puts the symbol too low, most in
+     Burmese, whose font has tall line metrics. */
   .badge .link-icon,
   .badge svg {
     @apply size-4 shrink-0;
+    translate: 0 0.2em;
   }
-  /* Read-only information (a count, a state, a page number): no pointer, no hover. */
+  /* Burmese digits (၉.၅) sit lower than Latin capitals, so the symbol drops further. */
+  :lang(my) .badge .link-icon,
+  :lang(my) .badge svg {
+    translate: 0 0.5em;
+  }
+  /* Read-only information (a count, a size, a state, a page number): plain muted text with a
+     symbol where it helps. No pill, no frame, no pointer, no hover, so it cannot be mistaken
+     for a button (docs/design-guide.md §1). */
   .badge {
-    @apply inline-flex items-center gap-1.5 rounded-full bg-sand px-3 py-0.5 text-sm font-medium;
+    @apply inline-flex items-baseline gap-1.5 text-sm font-medium;
     color: var(--text-muted);
   }
 

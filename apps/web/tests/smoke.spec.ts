@@ -93,3 +93,31 @@ test('language switch uses the URL at activation time, not at page load', async 
   await page.locator('a[data-locale="en"]').click();
   await expect(page).toHaveURL(/\/en\/\?q=third#results$/);
 });
+
+test('on a phone the Menu control is an icon with the word, not a framed button, and its symbol changes when open', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.goto('/en/');
+  const menu = page.locator('[data-menu]');
+  await expect(menu).toBeVisible();
+  await expect(menu).toContainText('Menu');
+  const look = await menu.evaluate((el) => {
+    const css = getComputedStyle(el);
+    return { background: css.backgroundColor, radius: css.borderRadius };
+  });
+  expect(look.background).toBe('rgba(0, 0, 0, 0)');
+  expect(look.radius).toBe('0px');
+  const visibleSymbols = () =>
+    menu
+      .locator('svg')
+      .evaluateAll((all) =>
+        all
+          .filter((svg) => getComputedStyle(svg).display !== 'none')
+          .map((svg) => svg.getAttribute('class')),
+      );
+  expect(await visibleSymbols()).toEqual(['menu-open']);
+  await menu.click();
+  await expect(menu).toHaveAttribute('aria-expanded', 'true');
+  expect(await visibleSymbols()).toEqual(['menu-close']);
+});

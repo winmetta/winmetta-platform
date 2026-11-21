@@ -33,6 +33,7 @@ const formatLocale = locales[locale].formatLocale;
           {node.name}
         </span>
         <span class="badge" lang={locale}>
+          <LinkIcon name="book" />
           {formatCount(node.total, formatLocale)}{' '}
           {t(
             locale,

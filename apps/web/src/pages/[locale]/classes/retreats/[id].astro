@@ -1,7 +1,8 @@
 ---
 import FeedbackLink from '../../../../components/FeedbackLink.astro';
 import Shell from '../../../../layouts/Shell.astro';
-import { localeCodes, type Locale } from '../../../../i18n/locales';
+import { locales, localeCodes, type Locale } from '../../../../i18n/locales';
+import { formatCount } from '../../../../lib/library-url';
 import { format, t, type MessageKey } from '../../../../i18n/messages';
 import { retreatRoute, route, teacherRoute } from '../../../../i18n/routes';
 import { languageOf } from '../../../../lib/library-index';
@@ -87,7 +88,11 @@ const partKey = {
     </div>
     <div>
       <dt class="font-semibold">{text('retreatLength')}</dt>
-      <dd>{format(text('daysCount'), { n: retreat.days })}</dd>
+      <dd>
+        {format(text('daysCount'), {
+          n: formatCount(retreat.days, locales[locale].formatLocale),
+        })}
+      </dd>
     </div>
     <div>
       <dt class="font-semibold">{text('retreatFormat')}</dt>
@@ -205,8 +210,10 @@ const partKey = {
         {retreat.sessions.map((session) => (
           <li>
             <span class="font-semibold">
-              {format(text('dayN'), { n: session.day })} ·{' '}
-              {text(partKey[session.part])}:
+              {format(text('dayN'), {
+                n: formatCount(session.day, locales[locale].formatLocale),
+              })}{' '}
+              · {text(partKey[session.part])}:
             </span>{' '}
             {session.postUrl ? (
               <a

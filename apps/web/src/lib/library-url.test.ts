@@ -38,10 +38,14 @@ describe('formatSize', () => {
   });
 });
 describe('formatCount', () => {
-  it('uses Latin digits in every interface locale', () => {
+  it('uses Latin digits in English and Burmese digits in Burmese', () => {
     expect(formatCount(1012, 'en-US')).toBe('1,012');
-    expect(formatCount(1012, 'my-MM')).toMatch(/^[0-9,.\s]+$/);
-    expect(formatSize(11800000, 'my-MM')).toMatch(/^[0-9]/);
+    expect(formatCount(12, 'my-MM')).toBe('၁၂');
+    expect(formatCount(1012, 'my-MM')).toBe('၁,၀၁၂');
+  });
+  it('writes file sizes with the same digits', () => {
+    expect(formatSize(11800000, 'en-US')).toMatch(/^11\.8/);
+    expect(formatSize(11800000, 'my-MM')).toMatch(/^၁၁\.၈/);
   });
 });
 describe('isSingular', () => {

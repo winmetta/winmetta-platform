@@ -12,7 +12,7 @@ A reader decides what to tap by how a thing looks, so **only things that do some
 
 Ask in this order and stop at the first yes:
 
-1. **Does it only show a fact** (a count, a state, a page number, a size)? A **badge**. Never clickable, never styled as clickable.
+1. **Does it only show a fact** (a count, a state, a page number, a size)? A **badge**: plain muted text, with a symbol where it helps (a document before a file size, a book before a number of books). **No pill, no background, no frame**: a rounded filled shape reads as a button. Never clickable, never styled as clickable.
 2. **Does it take the reader to another page** (or to a file's own page)? A **link**.
 3. **Does it submit a form, or get or start something for the reader** (download or open a file, join a meeting)? A **framed button**: filled (`.btn-primary`) for the one main submit of a page or form, outline (`.btn-outline`) for the card's own action in a list (Download PDF, Open PDF at this page).
 4. **Does it only act on what is already on screen** (copy, clear a search, remove a filter, reset, try again, show more, print)? A **text action**: the usual symbol, then the words, in the link color, with no frame. It is still a real `<button>` in the HTML.
@@ -30,7 +30,8 @@ If a control seems to need a frame to be noticed, the layout is the problem, not
 | Quiet link | `.link-quiet` in a `.card-aside` or `.card-actions` row | Something wrong? | Content, or anything the reader came to do |
 | Folder name | `.folder-name` (symbol and name), as a text action, a tree link or a label | Dhamma Library folders in result cards, "Try these folders", the folder tree, the active filter | A filled pill or chip |
 | Chip | `.chip` | A clickable Dhamma post topic | Folders, anything that is not clickable |
-| Badge | `.badge` | PDF page 60, Read by OCR, a count; a file size has a document symbol before it (`FileIcon`, or `LinkIcon name="file"` in Astro) and sits right after its Download button | Anything clickable |
+| Menu control | `.menu-button` (the three-line symbol, which becomes a cross when open, then the word "Menu"; a text action in the header) | The phone navigation toggle | Anything but the header |
+| Badge | `.badge` (plain muted text and symbol) | PDF page 60, Read by OCR, a count; a file size has a document symbol before it (`FileIcon`, or `LinkIcon name="file"` in Astro) and sits right after its Download button | Anything clickable |
 
 Rules that follow:
 
@@ -56,7 +57,7 @@ Rules that follow:
 - One `h1` per page. Headings go down one level at a time (`h2` for a section, `h3` inside it, `h4` for the title of a card inside an `h3` section); never pick a level for its size, style it with a class.
 - Colors come from the tokens in `global.css`; no new hex values. `--grey` (#959897) is never used for text or control borders (it fails contrast). Information is never carried by color alone.
 - Set `lang` on text whose language differs from the interface (titles, snippets, tags), so screen readers and Burmese line-height rules apply.
-- Numbers (counts, page numbers) are written with Latin digits in every interface language (`formatCount`).
+- Numbers follow the interface language: Burmese digits in Burmese (၁၂ အုပ်, ၉.၅ MB), Latin digits in English (`formatCount`, `formatSize`; never `toString()` or a raw number in a message). A counted thing uses its counter after the number (books are `အုပ်`, not `စာအုပ်`). Dates, times and class schedules keep the Latin digits they were decided to have.
 
 ## 4. Words and translations
 

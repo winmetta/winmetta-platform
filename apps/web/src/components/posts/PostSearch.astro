@@ -125,9 +125,9 @@ const { version } = await postSearchData();
     const browse = document.querySelectorAll<HTMLElement>('[data-post-browse]');
     const formatLocale = data.formatLocale ?? 'en-US';
     const count = (value: number) =>
-      new Intl.NumberFormat(formatLocale, { numberingSystem: 'latn' }).format(
-        value,
-      );
+      new Intl.NumberFormat(formatLocale, {
+        numberingSystem: formatLocale.startsWith('my') ? 'mymr' : 'latn',
+      }).format(value);
 
     let engine: Promise<PostSearch> | undefined;
     const load = (): Promise<PostSearch> => {

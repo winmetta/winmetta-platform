@@ -26,13 +26,17 @@ export function writeState(
 export const isSingular = (value: number, formatLocale: string): boolean =>
   new Intl.PluralRules(formatLocale).select(value) === 'one';
 
-/** Whole numbers (counts, page numbers) in Latin digits, whatever the interface locale. */
-export const formatCount = (value: number, formatLocale: string): string =>
-  new Intl.NumberFormat(formatLocale, { numberingSystem: 'latn' }).format(
-    value,
-  );
+/** The digits of an interface locale: Burmese digits (၁၂) in Burmese, Latin elsewhere. */
+export const numberingSystemOf = (formatLocale: string): 'mymr' | 'latn' =>
+  formatLocale.startsWith('my') ? 'mymr' : 'latn';
 
-/** File size in the interface locale's number format, decimal units (1 MB = 1,000,000 bytes). */
+/** Whole numbers (counts, page numbers) in the interface language's digits. */
+export const formatCount = (value: number, formatLocale: string): string =>
+  new Intl.NumberFormat(formatLocale, {
+    numberingSystem: numberingSystemOf(formatLocale),
+  }).format(value);
+
+/** File size in the interface language's digits, decimal units (1 MB = 1,000,000 bytes). */
 export function formatSize(bytes: number, formatLocale: string): string {
   const [unit, divisor] =
     bytes >= 1e9
@@ -44,7 +48,7 @@ export function formatSize(bytes: number, formatLocale: string): string {
     style: 'unit',
     unit,
     unitDisplay: 'short',
-    numberingSystem: 'latn',
+    numberingSystem: numberingSystemOf(formatLocale),
     maximumFractionDigits: unit === 'kilobyte' ? 0 : 1,
   }).format(bytes / divisor);
 }
