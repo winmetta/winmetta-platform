@@ -1,6 +1,8 @@
 ---
 import Shell from '../../../layouts/Shell.astro';
 import LibrarySearchIsland from '../../../components/LibrarySearchIsland';
+import BookSearchIsland from '../../../components/BookSearchIsland';
+import { bookSearchEnabled } from '../../../lib/book-search';
 import { locales, localeCodes, type Locale } from '../../../i18n/locales';
 import { t } from '../../../i18n/messages';
 import { libraryData } from '../../../lib/library-data';
@@ -37,6 +39,26 @@ const labels = {
   viewApp: text('studyAppsView'),
   showMore: text('showMore'),
 };
+const bookSearchLabels = {
+  title: text('bookSearchTitle'),
+  intro: text('bookSearchIntro'),
+  label: text('bookSearchLabel'),
+  placeholder: text('bookSearchPlaceholder'),
+  button: text('bookSearchButton'),
+  searching: text('bookSearchSearching'),
+  noResults: text('bookSearchNoResults'),
+  tooShort: text('bookSearchTooShort'),
+  unavailable: text('bookSearchUnavailable'),
+  retry: text('searchRetry'),
+  page: text('bookSearchPage'),
+  ocr: text('bookSearchOcr'),
+  printedNote: text('bookSearchPrintedNote'),
+  open: text('bookSearchOpen'),
+  copy: text('bookSearchCopy'),
+  copied: text('bookSearchCopied'),
+  more: text('bookSearchMore'),
+  results: text('bookSearchResults'),
+};
 ---
 
 <Shell locale={locale} title={text('libraryTitle')} page="library">
@@ -58,6 +80,13 @@ const labels = {
     cdnBase={libraryCdnBase}
     formatLocale={locales[locale].formatLocale}
   />
+  {bookSearchEnabled && (
+    <BookSearchIsland
+      client:load
+      labels={bookSearchLabels}
+      formatLocale={locales[locale].formatLocale}
+    />
+  )}
   <section class="space-y-3" aria-labelledby="folders">
     <h2 id="folders" class="text-2xl font-bold">
       {text('browseFolders')}

@@ -10,7 +10,8 @@
         "PUBLIC_ALLOW_INDEXING",
         "PUBLIC_LIBRARY_CDN_BASE",
         "PUBLIC_FEEDBACK",
-        "PUBLIC_FEEDBACK_POSTS_REVIEWED"
+        "PUBLIC_FEEDBACK_POSTS_REVIEWED",
+        "PUBLIC_BOOK_SEARCH"
       ]
     },
     "dev": {
