@@ -14,6 +14,24 @@ test('feedback is absent when its build flag is off', async ({ page }) => {
 
 test.describe('feedback enabled', () => {
   test.skip(!enabled);
+  test('in Burmese the report link is short and stays at the right of a folder page card', async ({
+    page,
+  }) => {
+    await page.goto('/my/dhamma-library/folders/f005/');
+    const card = page
+      .locator('li.card', { has: page.locator('[data-feedback="library"]') })
+      .first();
+    const link = card.locator('[data-feedback="library"]');
+    await expect(link).toHaveText('အမှားပြင်ရန်');
+    const cardBox = (await card.boundingBox())!;
+    const linkBox = (await link.boundingBox())!;
+    expect(linkBox.width).toBeLessThan(cardBox.width * 0.35);
+    // Its right edge is the card's right edge (less the padding), not trailing the size badge.
+    expect(linkBox.x + linkBox.width).toBeGreaterThan(
+      cardBox.x + cardBox.width - 40,
+    );
+  });
+
   test('the report link is a quiet aside at the bottom right of a library card, after the main action', async ({
     page,
   }) => {

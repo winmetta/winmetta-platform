@@ -62,6 +62,7 @@ Rules that follow:
 
 - Sentence case, short, plain; the same thing has the same words everywhere: **Open PDF**, **Download PDF**, **Copy citation**, **Try again**, **Show more**, **Search**. Look for an existing message key before writing a new one.
 - All visible text is a message key in `en.json` and `my.json`, never a string in a component. A new Burmese text is flagged in the PR as needing a Burmese reader's review. Never copy teachings; keep titles and Pāḷi diacritics exact.
+- **Secondary labels are short in both languages**, so they never take more room or attention than the content: Burmese often runs longer than English, so when the Burmese version of a secondary link or action is clearly longer, write a shorter one (the "Something wrong?" link is `အမှားပြင်ရန်`, not a full sentence). Check the Burmese page too: a secondary link should take well under a third of its row.
 - Say what the reader can do next in an error ("You can still search titles and tags above"), never only what went wrong, and never show technical details or codes.
 
 ## 5. States: every control that waits has all of them
