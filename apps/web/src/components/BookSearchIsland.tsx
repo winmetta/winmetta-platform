@@ -11,7 +11,9 @@ import {
   type FailureKind,
 } from '../lib/book-search';
 import { formatCount } from '../lib/library-url';
+import { CheckIcon, CopyIcon, MoreIcon, RetryIcon } from './icons';
 import { Button } from './ui/button';
+import { TextAction } from './ui/text-action';
 
 export interface BookSearchLabels {
   title: string;
@@ -218,12 +220,12 @@ export default function BookSearchIsland({ labels, formatLocale }: Props) {
       {status === 'unavailable' ? (
         <p role="alert" className="space-x-3">
           <span>{labels.unavailable}</span>
-          <Button
-            type="button"
+          <TextAction
+            icon={<RetryIcon />}
             onClick={() => void run(submitted.current || query.trim(), 1)}
           >
             {labels.retry}
-          </Button>
+          </TextAction>
         </p>
       ) : null}
 
@@ -239,17 +241,17 @@ export default function BookSearchIsland({ labels, formatLocale }: Props) {
                     {hit.title}
                   </h4>
                   <p className="flex flex-wrap items-center gap-2">
-                    <span className="chip" title={labels.printedNote}>
+                    <span className="badge">
                       {pageLabel(labels.page, hit.page, formatLocale)}
                     </span>
                     {hit.ocr ? (
-                      <span className="chip">{labels.ocr}</span>
+                      <span className="badge">{labels.ocr}</span>
                     ) : null}
                   </p>
                   <p lang={hit.language}>{hit.snippet}</p>
                   <p className="flex flex-wrap items-center gap-3">
                     <a
-                      className="btn btn-primary"
+                      className="btn btn-outline"
                       href={hit.pdfUrl}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -259,13 +261,12 @@ export default function BookSearchIsland({ labels, formatLocale }: Props) {
                     >
                       {labels.open}
                     </a>
-                    <Button
-                      type="button"
-                      variant="outline"
+                    <TextAction
+                      icon={copied === key ? <CheckIcon /> : <CopyIcon />}
                       onClick={() => void onCopy(hit)}
                     >
                       {copied === key ? labels.copied : labels.copy}
-                    </Button>
+                    </TextAction>
                   </p>
                 </li>
               );
@@ -275,21 +276,20 @@ export default function BookSearchIsland({ labels, formatLocale }: Props) {
           {moreFailed ? (
             <p role="alert" className="space-x-3">
               <span>{labels.unavailable}</span>
-              <Button
-                type="button"
+              <TextAction
+                icon={<RetryIcon />}
                 onClick={() => void run(submitted.current, page + 1)}
               >
                 {labels.retry}
-              </Button>
+              </TextAction>
             </p>
           ) : hasMore ? (
-            <Button
-              type="button"
-              variant="outline"
+            <TextAction
+              icon={<MoreIcon />}
               onClick={() => void run(submitted.current, page + 1)}
             >
               {labels.more}
-            </Button>
+            </TextAction>
           ) : null}
         </div>
       ) : null}

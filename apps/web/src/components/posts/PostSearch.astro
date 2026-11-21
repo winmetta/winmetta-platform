@@ -63,11 +63,21 @@ const { version } = await postSearchData();
   <div class="space-y-4" data-search-results hidden>
     <div class="flex flex-wrap items-center gap-3">
       <p class="font-semibold" role="status" data-search-status></p>
-      <button type="button" class="btn btn-outline" data-search-retry hidden>
-        {text('searchRetry')}
+      <button type="button" class="text-action" data-search-retry hidden>
+        <Fragment
+          set:html={
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 11a8 8 0 1 0-2.3 5.7" /><path d="M20 5v6h-6" /></svg>'
+          }
+        />
+        <span>{text('searchRetry')}</span>
       </button>
-      <button type="button" class="btn btn-outline" data-search-reset>
-        {text('resetSearch')}
+      <button type="button" class="text-action" data-search-reset>
+        <Fragment
+          set:html={
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18" /></svg>'
+          }
+        />
+        <span>{text('resetSearch')}</span>
       </button>
     </div>
     <ol class="grid gap-4" data-search-exact></ol>
@@ -115,9 +125,9 @@ const { version } = await postSearchData();
     const browse = document.querySelectorAll<HTMLElement>('[data-post-browse]');
     const formatLocale = data.formatLocale ?? 'en-US';
     const count = (value: number) =>
-      new Intl.NumberFormat(formatLocale, { numberingSystem: 'latn' }).format(
-        value,
-      );
+      new Intl.NumberFormat(formatLocale, {
+        numberingSystem: formatLocale.startsWith('my') ? 'mymr' : 'latn',
+      }).format(value);
 
     let engine: Promise<PostSearch> | undefined;
     const load = (): Promise<PostSearch> => {

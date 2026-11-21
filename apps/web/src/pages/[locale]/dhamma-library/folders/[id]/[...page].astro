@@ -2,6 +2,7 @@
 import Shell from '../../../../../layouts/Shell.astro';
 import BookCard from '../../../../../components/BookCard.astro';
 import FolderTreeList from '../../../../../components/FolderTree.astro';
+import LinkIcon from '../../../../../components/LinkIcon.astro';
 import { locales, localeCodes, type Locale } from '../../../../../i18n/locales';
 import { folderRoute, route } from '../../../../../i18n/routes';
 import { t } from '../../../../../i18n/messages';
@@ -86,6 +87,7 @@ const text = (key: Parameters<typeof t>[1]) => t(locale, key);
     </h1>
     <p>
       <span class="badge" lang={locale}>
+        <LinkIcon name="book" />
         {count(node.total)}{' '}
         {text(isSingular(node.total, formatLocale) ? 'bookOne' : 'bookOther')}
       </span>

@@ -1,5 +1,6 @@
 ---
 import FeedbackLink from './FeedbackLink.astro';
+import { feedbackEnabled } from '../lib/feedback';
 import BrandIcon from './BrandIcon.astro';
 import { languageList } from '../lib/languages';
 import LinkIcon from './LinkIcon.astro';
@@ -94,7 +95,6 @@ const labels = {
           </li>
         ))}
       </ul>
-      <FeedbackLink locale={locale} ctx="class" item={record.id} />
       <ClassNext
         client:visible
         slots={record.recurrences}
@@ -160,4 +160,14 @@ const labels = {
       </a>
     )}
   </p>
+  {feedbackEnabled && record.status === 'active' && (
+    <p class="card-aside">
+      <FeedbackLink
+        locale={locale}
+        ctx="class"
+        item={record.id}
+        class="link-quiet relative z-10"
+      />
+    </p>
+  )}
 </li>

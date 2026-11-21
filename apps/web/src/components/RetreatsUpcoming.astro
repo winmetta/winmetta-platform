@@ -1,5 +1,6 @@
 ---
 import FeedbackLink from './FeedbackLink.astro';
+import { feedbackEnabled } from '../lib/feedback';
 // Upcoming retreats, or the "none scheduled" notice when there are none.
 import BrandIcon from './BrandIcon.astro';
 import { format, t, type MessageKey } from '../i18n/messages';
@@ -9,7 +10,8 @@ import { languageOf } from '../lib/library-index';
 import { formatIcon } from '../lib/retreat-filter';
 import { retreatDates, retreatText } from '../lib/retreats';
 import { teacherById, teacherName } from '../lib/teachers';
-import type { Locale } from '../i18n/locales';
+import { locales, type Locale } from '../i18n/locales';
+import { formatCount } from '../lib/library-url';
 import type { Retreat } from '../lib/schemas';
 interface Props {
   locale: Locale;
@@ -66,7 +68,9 @@ const upcoming = retreats
               {retreatDates(retreat, locale)}
               <span class="muted">
                 {' · '}
-                {format(text('daysCount'), { n: retreat.days })}
+                {format(text('daysCount'), {
+                  n: formatCount(retreat.days, locales[locale].formatLocale),
+                })}
               </span>
             </p>
             <p class="flex items-center gap-2 text-sm font-medium">
@@ -83,12 +87,16 @@ const upcoming = retreats
               {retreat.venue &&
                 ` · ${retreat.venue.name[locale] ?? retreat.venue.name.en ?? ''}, ${retreat.venue.city}`}
             </p>
-            <FeedbackLink
-              locale={locale}
-              ctx="class"
-              item={retreat.id}
-              class="link relative z-10 text-sm"
-            />
+            {feedbackEnabled && (
+              <p class="card-aside">
+                <FeedbackLink
+                  locale={locale}
+                  ctx="class"
+                  item={retreat.id}
+                  class="link-quiet relative z-10"
+                />
+              </p>
+            )}
           </li>
         );
       })}

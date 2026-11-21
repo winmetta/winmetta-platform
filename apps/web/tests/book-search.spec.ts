@@ -48,9 +48,15 @@ test('search inside PDFs is absent when its build flag is off', async ({
 test.describe('search inside PDFs enabled', () => {
   test.skip(!enabled);
 
-  for (const [locale, button, openText] of [
-    ['en', 'Search', 'Open PDF at this page'],
-    ['my', 'ရှာမည်', 'ဤစာမျက်နှာတွင် PDF ဖွင့်ရန်'],
+  for (const [locale, button, openText, copyText, copiedText] of [
+    ['en', 'Search', 'Open PDF at this page', 'Copy citation', 'Copied'],
+    [
+      'my',
+      'ရှာမည်',
+      'ဤစာမျက်နှာတွင် PDF ဖွင့်ရန်',
+      'ကိုးကားချက် ကူးယူရန်',
+      'ကူးယူပြီး',
+    ],
   ] as const) {
     test(`${locale}: shows pages with the PDF page, OCR mark and links, and copies a citation`, async ({
       page,
@@ -82,11 +88,26 @@ test.describe('search inside PDFs enabled', () => {
         'https://cdn.example/book1.pdf#page=11',
       );
       await expect(hits.nth(0).locator('a')).toHaveText(openText);
+      // The PDF action looks like the catalog's Download PDF: an outline button, not a filled one.
+      await expect(hits.nth(0).locator('a')).toHaveClass(/btn-outline/);
+      await expect(hits.nth(0).locator('a')).not.toHaveClass(/btn-primary/);
       await expect(hits.nth(0).locator('a')).toHaveAttribute('rel', /noopener/);
       // OCR is marked only where the text came from OCR.
-      await expect(hits.nth(0).locator('.chip')).toHaveCount(1);
-      await expect(hits.nth(1).locator('.chip')).toHaveCount(2);
-      await hits.nth(1).getByRole('button').click();
+      await expect(hits.nth(0).locator('.badge')).toHaveCount(1);
+      await expect(hits.nth(1).locator('.badge')).toHaveCount(2);
+      // Information is not styled as something to click: no chip, button look or pointer cursor.
+      await expect(hits.nth(1).locator('.chip')).toHaveCount(0);
+      for (const badge of await hits.nth(1).locator('.badge').all())
+        expect(
+          await badge.evaluate((el) => getComputedStyle(el).cursor),
+        ).not.toBe('pointer');
+      // Copy is an icon and words, not a framed button.
+      const copy = hits.nth(1).locator('button.text-action');
+      await expect(copy.locator('svg')).toHaveCount(1);
+      await expect(copy).toContainText(copyText);
+      await expect(copy).not.toHaveClass(/btn/);
+      await copy.click();
+      await expect(copy).toContainText(copiedText);
       const copied = await page.evaluate(() => navigator.clipboard.readText());
       expect(copied).toContain('ဓမ္မ စာအုပ်');
       expect(copied).toContain('https://cdn.example/book2.pdf#page=12');
@@ -109,6 +130,23 @@ test.describe('search inside PDFs enabled', () => {
       'noble truths',
     );
     expect(new URL(page.url()).searchParams.get('tag')).toBe('x');
+  });
+
+  test('the section is spaced from the catalog search above it and the folders below it', async ({
+    page,
+  }) => {
+    await page.goto('/en/dhamma-library/');
+    const box = async (selector: string) => {
+      const found = await page.locator(selector).first().boundingBox();
+      expect(found, selector).not.toBeNull();
+      return found!;
+    };
+    const catalog = await box('[data-library-search]');
+    const book = await box('[data-book-search]');
+    const folders = await box('section[aria-labelledby="folders"]');
+    // The page's section spacing (space-y-10 = 40px) must reach every block: at least 24px.
+    expect(book.y - (catalog.y + catalog.height)).toBeGreaterThanOrEqual(24);
+    expect(folders.y - (book.y + book.height)).toBeGreaterThanOrEqual(24);
   });
 
   test('does not search while typing, and an empty query searches nothing', async ({

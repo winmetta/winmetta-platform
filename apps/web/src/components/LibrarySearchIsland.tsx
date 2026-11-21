@@ -23,7 +23,8 @@ import {
   trackSettled,
 } from '../lib/analytics';
 import { hasZawgyiMarker } from '../lib/zawgyi';
-import { Button } from './ui/button';
+import { CloseIcon, FileIcon, FolderIcon, MoreIcon, RetryIcon } from './icons';
+import { TextAction } from './ui/text-action';
 
 export interface Labels {
   searchLabel: string;
@@ -101,43 +102,45 @@ function Card({
           <span className="muted font-normal"> ({record.titleNote})</span>
         ) : null}
       </h3>
-      <ul className="flex flex-wrap gap-2" aria-label={labels.folder}>
+      <ul className="flex flex-wrap gap-x-4 gap-y-1" aria-label={labels.folder}>
         {record.tags.map((tag) => (
           <li key={tag}>
-            <button
-              type="button"
+            <TextAction
+              icon={<FolderIcon />}
               lang={languageOf(tag)}
-              className="chip"
               onClick={() => onTag(tag)}
             >
               {tag}
-            </button>
+            </TextAction>
           </li>
         ))}
       </ul>
-      <FeedbackCardLink
-        locale={labels.locale}
-        ctx="library"
-        item={record.id}
-        page={`/${labels.locale}/dhamma-library/`}
-      />
-      <p className="flex flex-wrap items-center gap-3 text-sm">
-        <a
-          className="btn btn-outline"
-          href={fileUrl(cdnBase, record.key)}
-          aria-label={`${labels.download}: ${record.title}`}
-          rel="noopener"
-          onClick={onResultClick}
-          data-umami-event="library_pdf_download"
-          data-umami-event-book={record.id}
-          data-umami-event-from="search"
-        >
-          {labels.download}
-        </a>
-        <span className="badge">
-          {formatSize(record.sizeBytes, formatLocale)}
-        </span>
-      </p>
+      <div className="card-actions">
+        <p className="flex flex-wrap items-center gap-3 text-sm">
+          <a
+            className="btn btn-outline"
+            href={fileUrl(cdnBase, record.key)}
+            aria-label={`${labels.download}: ${record.title}`}
+            rel="noopener"
+            onClick={onResultClick}
+            data-umami-event="library_pdf_download"
+            data-umami-event-book={record.id}
+            data-umami-event-from="search"
+          >
+            {labels.download}
+          </a>
+          <span className="badge" data-file-size>
+            <FileIcon />
+            {formatSize(record.sizeBytes, formatLocale)}
+          </span>
+        </p>
+        <FeedbackCardLink
+          locale={labels.locale}
+          ctx="library"
+          item={record.id}
+          page={`/${labels.locale}/dhamma-library/`}
+        />
+      </div>
     </li>
   );
 }
@@ -317,32 +320,28 @@ export default function LibrarySearchIsland({
           </span>
         </label>
         {active ? (
-          <Button
-            type="button"
-            variant="outline"
+          <TextAction
+            icon={<CloseIcon />}
             onClick={() => {
               update({ q: '', tag: '' });
               input.current?.focus();
             }}
           >
             {labels.resetSearch}
-          </Button>
+          </TextAction>
         ) : null}
       </div>
 
       {tag ? (
         <p className="flex flex-wrap items-center gap-2">
           <span>{labels.folder}:</span>
-          <span lang={languageOf(tag)} className="chip">
+          <span lang={languageOf(tag)} className="folder-name font-medium">
+            <FolderIcon />
             {tag}
           </span>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => update({ tag: '' })}
-          >
+          <TextAction icon={<CloseIcon />} onClick={() => update({ tag: '' })}>
             {labels.removeFolder}
-          </Button>
+          </TextAction>
         </p>
       ) : null}
 
@@ -358,9 +357,9 @@ export default function LibrarySearchIsland({
       {status === 'error' ? (
         <p role="alert" className="space-x-3">
           <span>{labels.searchError}</span>
-          <Button type="button" onClick={() => void load()}>
+          <TextAction icon={<RetryIcon />} onClick={() => void load()}>
             {labels.searchRetry}
-          </Button>
+          </TextAction>
         </p>
       ) : null}
 
@@ -375,13 +374,12 @@ export default function LibrarySearchIsland({
             {exact.slice(0, visible).map(card('exact'))}
           </ul>
           {exact.length > visible ? (
-            <Button
-              type="button"
-              variant="outline"
+            <TextAction
+              icon={<MoreIcon />}
               onClick={() => setVisible(visible + PAGE)}
             >
               {labels.showMore}
-            </Button>
+            </TextAction>
           ) : null}
         </>
       ) : null}
@@ -396,17 +394,16 @@ export default function LibrarySearchIsland({
       {exact.length === 0 && suggestions.length > 0 ? (
         <div className="space-y-2">
           <h2 className="text-2xl font-bold">{labels.tryFolders}</h2>
-          <ul className="flex flex-wrap gap-2">
+          <ul className="flex flex-wrap gap-x-4 gap-y-1">
             {suggestions.map((suggestion) => (
               <li key={suggestion}>
-                <button
-                  type="button"
+                <TextAction
+                  icon={<FolderIcon />}
                   lang={languageOf(suggestion)}
-                  className="chip"
                   onClick={() => pickTag(suggestion)}
                 >
                   {suggestion}
-                </button>
+                </TextAction>
               </li>
             ))}
           </ul>

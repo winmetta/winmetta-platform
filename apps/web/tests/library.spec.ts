@@ -164,11 +164,13 @@ test('folder chips carry the language of their text', async ({ page }) => {
   await search(page).fill('Pali Grammar');
   await expect(page.locator('h3').first()).toBeVisible();
   const english = page
-    .locator('button[lang="en"]', { hasText: /[A-Za-z]/ })
+    .locator('button.text-action[lang="en"]', { hasText: /[A-Za-z]/ })
     .first();
   await expect(english).toBeVisible();
   await search(page).fill(book);
-  await expect(page.locator('button[lang="my"]').first()).toBeVisible();
+  await expect(
+    page.locator('button.text-action[lang="my"]').first(),
+  ).toBeVisible();
 });
 
 test('empty results explain what to do', async ({ page }) => {
@@ -209,4 +211,101 @@ test('narrow screens do not scroll sideways with results', async ({ page }) => {
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
+});
+
+test('in-place actions are text actions with an icon, not framed buttons', async ({
+  page,
+}) => {
+  await page.goto('/en/dhamma-library/?q=dhamma&tag=Rare-Buddhist-Books-1');
+  const catalog = page.locator('[data-library-search]');
+  for (const name of ['Clear search', 'Remove folder filter']) {
+    const action = catalog.getByRole('button', { name });
+    await expect(action).toBeVisible();
+    await expect(action).toHaveClass(/text-action/);
+    await expect(action).not.toHaveClass(/btn/);
+    await expect(action.locator('svg')).toHaveCount(1);
+  }
+  // The folder name is information, not a control.
+  await expect(
+    catalog.locator('.folder-name', { hasText: 'Rare-Buddhist-Books-1' }),
+  ).toBeVisible();
+  // A folder name in a result card is a text action with a folder symbol, not a chip.
+  const folderAction = catalog
+    .locator('li.card button.text-action', { hasText: 'Rare-Buddhist-Books-1' })
+    .first();
+  await expect(folderAction.locator('svg')).toHaveCount(1);
+  await expect(folderAction).not.toHaveClass(/chip/);
+  // Getting a file stays a framed (outline) button.
+  await expect(
+    catalog.getByRole('link', { name: /Download PDF/ }).first(),
+  ).toHaveClass(/btn-outline/);
+  await catalog.getByRole('button', { name: 'Remove folder filter' }).click();
+  await expect(page).not.toHaveURL(/tag=/);
+});
+
+test('a file size is a badge with a document symbol, right after the Download button', async ({
+  page,
+}) => {
+  await page.goto('/en/dhamma-library/?q=dhamma');
+  const card = page
+    .locator('[data-library-search] li.card', {
+      has: page.locator('[data-file-size]'),
+    })
+    .first();
+  const size = card.locator('[data-file-size]');
+  await expect(size).toHaveClass(/badge/);
+  await expect(size.locator('svg')).toHaveCount(1);
+  await expect(size).toHaveText(/\d/);
+  // Plain information, not a pill: no background or rounded frame that would look like a button.
+  const look = await size.evaluate((el) => {
+    const css = getComputedStyle(el);
+    return {
+      background: css.backgroundColor,
+      radius: css.borderRadius,
+      cursor: css.cursor,
+    };
+  });
+  expect(look.background).toBe('rgba(0, 0, 0, 0)');
+  expect(look.radius).toBe('0px');
+  expect(look.cursor).not.toBe('pointer');
+  const download = (await card
+    .getByRole('link', { name: /Download PDF/ })
+    .boundingBox())!;
+  const badge = (await size.boundingBox())!;
+  expect(badge.x).toBeGreaterThan(download.x + download.width);
+  // The same in a folder page's card.
+  await page.goto('/en/dhamma-library/folders/f001/');
+  const folderCard = page
+    .locator('li.card', { has: page.locator('[data-file-size]') })
+    .first();
+  await expect(folderCard.locator('[data-file-size] svg')).toHaveCount(1);
+  const d2 = (await folderCard
+    .getByRole('link', { name: /Download PDF/ })
+    .boundingBox())!;
+  const b2 = (await folderCard.locator('[data-file-size]').boundingBox())!;
+  expect(b2.x).toBeGreaterThan(d2.x + d2.width);
+});
+
+test('in Burmese, counts use Burmese digits and the counter အုပ်', async ({
+  page,
+}) => {
+  await page.goto('/my/dhamma-library/');
+  const counts = page.locator('#folders').locator('..').locator('.badge');
+  const first = (await counts.first().innerText()).trim();
+  expect(first).toMatch(/^[၀-၉,]+ အုပ်$/);
+  expect(first).not.toContain('စာအုပ်');
+  await page.goto('/my/dhamma-library/folders/f005/');
+  const header = (
+    await page.locator('header .badge').first().innerText()
+  ).trim();
+  expect(header).toMatch(/^[၀-၉,]+ အုပ်$/);
+  const size = (
+    await page.locator('[data-file-size]').first().innerText()
+  ).trim();
+  expect(size).toMatch(/^[၀-၉.,]+ (kB|MB|GB)$/);
+  // English keeps Latin digits.
+  await page.goto('/en/dhamma-library/folders/f005/');
+  expect(
+    (await page.locator('header .badge').first().innerText()).trim(),
+  ).toMatch(/^[0-9,]+ books?$/);
 });

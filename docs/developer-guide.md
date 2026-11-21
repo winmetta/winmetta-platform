@@ -123,6 +123,8 @@ Never put secrets in `PUBLIC_*` variables, because they can appear in the genera
 - Core content must work without login.
 - Keep the diff focused. Match the surrounding code's naming and comment density.
 
+The look and behaviour of the UI follow the [design guide](design-guide.md): what may look clickable, spacing, states, wording and checks. Read it before changing a page or component.
+
 ## 7. Internationalization
 
 All user-facing text supports English (`en`) and Burmese (`my`).

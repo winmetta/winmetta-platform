@@ -14,6 +14,62 @@ test('feedback is absent when its build flag is off', async ({ page }) => {
 
 test.describe('feedback enabled', () => {
   test.skip(!enabled);
+  test('in Burmese the report link is short and stays at the right of a folder page card', async ({
+    page,
+  }) => {
+    await page.goto('/my/dhamma-library/folders/f005/');
+    const card = page
+      .locator('li.card', { has: page.locator('[data-feedback="library"]') })
+      .first();
+    const link = card.locator('[data-feedback="library"]');
+    await expect(link).toHaveText('အမှားပြင်ရန်');
+    const cardBox = (await card.boundingBox())!;
+    const linkBox = (await link.boundingBox())!;
+    expect(linkBox.width).toBeLessThan(cardBox.width * 0.35);
+    // Its right edge is the card's right edge (less the padding), not trailing the size badge.
+    expect(linkBox.x + linkBox.width).toBeGreaterThan(
+      cardBox.x + cardBox.width - 40,
+    );
+  });
+
+  test('the report link is a quiet aside at the bottom right of a library card, after the main action', async ({
+    page,
+  }) => {
+    await page.goto('/en/dhamma-library/?q=dhamma');
+    const card = page
+      .locator('li.card', { has: page.locator('[data-feedback="library"]') })
+      .first();
+    await expect(card).toBeVisible();
+    const link = card.locator('[data-feedback="library"]');
+    const download = card.getByRole('link', { name: /Download PDF/ });
+    const cardBox = (await card.boundingBox())!;
+    const linkBox = (await link.boundingBox())!;
+    const downloadBox = (await download.boundingBox())!;
+    // Inside the card's right half and not above the Download button's top edge.
+    expect(linkBox.x + linkBox.width).toBeGreaterThan(
+      cardBox.x + cardBox.width * 0.6,
+    );
+    expect(linkBox.y + linkBox.height).toBeLessThanOrEqual(
+      cardBox.y + cardBox.height,
+    );
+    expect(linkBox.y + linkBox.height).toBeGreaterThanOrEqual(downloadBox.y);
+    // After the Download link in reading and tab order.
+    expect(
+      await card.evaluate((el) => {
+        const a = el.querySelector('a[href$=".pdf"], a[href*=".pdf"]');
+        const b = el.querySelector('[data-feedback="library"]');
+        return (
+          !!a &&
+          !!b &&
+          !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING)
+        );
+      }),
+    ).toBe(true);
+    // Quiet: not the link color of the main content.
+    const color = await link.evaluate((el) => getComputedStyle(el).fontWeight);
+    expect(Number(color)).toBeLessThan(600);
+  });
+
   for (const locale of ['en', 'my']) {
     test(`feedback ${locale}: canonical context, keyboard, success and no new storage`, async ({
       page,

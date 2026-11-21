@@ -1,5 +1,7 @@
 import FeedbackCardLink from './FeedbackCardLink';
-import type { Locale } from '../i18n/locales';
+import { feedbackEnabled } from '../lib/feedback';
+import { locales, type Locale } from '../i18n/locales';
+import { formatCount } from '../lib/library-url';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   emptyState,
@@ -11,7 +13,8 @@ import {
   type RetreatItem,
   type RetreatState,
 } from '../lib/retreat-filter';
-import { Button } from './ui/button';
+import { CloseIcon } from './icons';
+import { TextAction } from './ui/text-action';
 
 export interface ArchiveLabels {
   locale: Locale;
@@ -35,8 +38,8 @@ interface Props {
   labels: ArchiveLabels;
 }
 
-const fill = (template: string, n: number) =>
-  template.replace('{n}', String(n));
+const fill = (template: string, n: number, formatLocale: string) =>
+  template.replace('{n}', formatCount(n, formatLocale));
 
 // Server-rendered with the full list (works without JavaScript); after hydration the URL's
 // ?q=&year=&format=&days=&teacher= narrows it, and every change is written back to the URL.
@@ -152,7 +155,11 @@ export default function RetreatArchive({ items, labels }: Props) {
           labels.days,
           lengths.map((d) => ({
             value: String(d),
-            label: fill(labels.daysCount, d),
+            label: fill(
+              labels.daysCount,
+              d,
+              locales[labels.locale].formatLocale,
+            ),
           })),
         )}
         {select(
@@ -166,15 +173,20 @@ export default function RetreatArchive({ items, labels }: Props) {
         role="status"
         aria-live="polite"
       >
-        <p>{fill(labels.count, shown.length)}</p>
+        <p>
+          {fill(
+            labels.count,
+            shown.length,
+            locales[labels.locale].formatLocale,
+          )}
+        </p>
         {isActive(state) ? (
-          <Button
-            type="button"
-            variant="outline"
+          <TextAction
+            icon={<CloseIcon />}
             onClick={() => update({ ...emptyState })}
           >
             {labels.reset}
-          </Button>
+          </TextAction>
         ) : null}
       </div>
       {shown.length === 0 ? <p>{labels.noResults}</p> : null}
@@ -198,12 +210,16 @@ export default function RetreatArchive({ items, labels }: Props) {
               {item.teachers.map((t) => t.name).join(', ')}
               {item.venue ? ` · ${item.venue}` : ''}
             </p>
-            <FeedbackCardLink
-              locale={labels.locale}
-              ctx="class"
-              item={item.id}
-              page={`/${labels.locale}/classes/retreats/`}
-            />
+            {feedbackEnabled ? (
+              <p className="card-aside">
+                <FeedbackCardLink
+                  locale={labels.locale}
+                  ctx="class"
+                  item={item.id}
+                  page={`/${labels.locale}/classes/retreats/`}
+                />
+              </p>
+            ) : null}
           </li>
         ))}
       </ul>
