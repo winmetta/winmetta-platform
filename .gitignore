@@ -16,3 +16,6 @@ infra/pulumi/node_modules/
 
 # Local config symlinks created by other AI tools
 .antigravitycli/
+
+# Book search work folder: PDFs, OCR models, state store, built indexes (docs/book-search.md)
+.cache/

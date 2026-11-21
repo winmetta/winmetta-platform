@@ -1,0 +1,215 @@
+# Book search: searching inside library PDFs
+
+**Status:** stage 1 planned 2026-11-20, not started. Stage 1 runs entirely on a developer's machine: nothing is deployed and no AWS resource is created. The checklist is in [implementation-plan.md](implementation-plan.md) §5C. Later stages are only notes (§12); the maintainer decides each next step when the previous one is done.
+
+**Why:** the Dhamma Library catalog search finds a book by its title, tags and folder ([tech-architecture.md](tech-architecture.md) §3). Readers also need to find a passage _inside_ a book and cite the exact page in notes, articles or Dhamma Posts. Most books are Burmese, many are scans without a text layer, and some text layers are Zawgyi or legacy fonts, so the text has to come from OCR as well as from the PDF itself.
+
+**Model:** book → PDF page → passage. Every result is a passage on a physical PDF page, linked as `<pdf>#page=N`. The linked PDF page is the citation source; OCR text only helps readers find it.
+
+---
+
+## 1. Stage 1 scope
+
+**In:**
+
+1. Index a set of library PDFs locally: text from the PDF's own text layer where it is usable, Tesseract OCR where it is not.
+2. Keep the page results in a local state store (JSONL), and build one SQLite FTS5 file from it.
+3. Serve the search API from a **local web server** that behaves like the future AWS backend (same path, parameters and responses).
+4. An **API client** that takes a base URL, so the same client can later point at the AWS backend, and a **CLI** built on it.
+5. Tests for the tokenizer, the query parser, the builder, the server, the client and the CLI.
+6. A pilot on 30 PDFs, with the numbers recorded (§10).
+
+**Out:** anything on AWS (S3 sync of the state store, the index bucket, Lambda, CloudFront), any change to the website, Google Cloud Vision, the upload command and the full backfill. They are listed in §12, not designed.
+
+## 2. How it works
+
+```text
+PDF (public CDN) ──fetch──▶ work folder/pdfs/
+        │
+        ▼  extract (per page)
+  pdftotext text layer ──quality check──▶ usable? ── yes ──▶ page record (method "text")
+        │                                     no
+        ▼
+  pdftoppm 300 dpi image ──▶ tesseract mya+eng ──▶ page record (method "ocr")
+        │
+        ▼  append
+  state/<bookId>.jsonl  (durable source; never rebuilt by OCR again)
+        │
+        ▼  build (one transaction)
+  dist/library-search-<version>.sqlite  + .sha256
+        │
+        ▼  open read-only
+  local API server  ◀── API client ◀── CLI and tests
+```
+
+## 3. Work folder
+
+Everything the indexer reads and writes lives in **`winmetta-platform/.cache/book-search/`**, which is in `.gitignore`. Set `BOOK_SEARCH_WORK_DIR` to use another folder. It is never committed and never placed at the workspace root.
+
+```text
+.cache/book-search/
+  tessdata/          # pinned Tesseract models (developer-guide.md §2, "Book search tools")
+  pdfs/<bookId>.pdf  # downloaded copies of the pilot books
+  state/<bookId>.jsonl
+  tmp/               # rendered page images, deleted after each book
+  dist/              # built SQLite files and their .sha256
+```
+
+## 4. Page records (state store)
+
+The indexer appends one JSON line per page to `state/<bookId>.jsonl` as each page finishes, so an interrupted run resumes at the next page. A page is redone only with `--force` or when its book's `sha256` or the extractor version changes.
+
+```json
+{
+  "v": 1,
+  "bookId": "a1b2c3d4e5f6",
+  "key": "<S3 key from the manifest>",
+  "sha256": "<SHA-256 of the PDF file>",
+  "page": 12,
+  "method": "ocr",
+  "engine": "tesseract 5.5.4, tessdata_best e12c65a, mya+eng",
+  "status": "ok",
+  "confidence": 0.87,
+  "passages": [{ "ordinal": 1, "script": "my", "text": "<the passage as read>" }],
+  "extractedAt": "2026-11-20T21:00:00Z"
+}
+```
+
+- `method` is `text` (the PDF's own text layer) or `ocr`. `status` is `ok`, `suspect` (low confidence or failed checks; still indexed, flagged in the report) or `failed` (nothing indexed for the page).
+- **Text-layer quality check.** The layer is used only when it passes: enough Myanmar or Latin letters for the page, no Zawgyi (the generator's two-gate rule: `myanmar-tools` score of at least 0.9 **and** a marker impossible in valid Unicode), no glyph-only code points (U+1060–U+1097), no ေ before its consonant, and no legacy-font text (Latin letters where the book is Burmese). Otherwise the page is rendered and read by OCR.
+- **Passages** are paragraphs: blank-line blocks from `pdftotext -layout`, or Tesseract's paragraph blocks from its TSV output, whose word confidences give the page's mean `confidence`.
+- **Script, not language.** Each passage records its script (`my`, `latn` or `mixed`). Its language comes from the book's manifest `language` when the SQLite file is built. Pāḷi written in Burmese script cannot be told apart from Burmese automatically, so stage 1 does not tag passages as Pāḷi.
+- The book id is the manifest id (the first 12 hex characters of SHA-256 of the S3 key). It changes if the S3 key changes, so every record also keeps `key` and `sha256` and can be remapped (§11).
+
+## 5. SQLite file
+
+`npm run book-search:build` creates a new file from the approved manifest revision and the state store in one transaction:
+
+| Table | Columns |
+| --- | --- |
+| `meta` | `key`, `value`: index version, manifest revision, extractor and model versions, build time |
+| `books` | `id` (primary key), `key`, `title`, `author` (empty until the manifest has the field), `language`, `pages`, `sha256` |
+| `pages` | `book_id`, `page`, `method`, `status`, `confidence`; primary key (`book_id`, `page`) |
+| `passages` | `id` (integer primary key), `book_id`, `page`, `ordinal`, `language`, `script`, `display_text` |
+| `passages_fts` | FTS5, contentless (`content=''`), columns `my_tokens` and `latin_tokens`, row id = `passages.id`. Language filters join `passages`; snippets come from `passages.display_text` |
+
+A passage is stored twice: exactly as read in `passages.display_text` (snippets and citations), and as space-separated search tokens in `passages_fts`. For example, `ဓမ္မ ဒေသနာ` is indexed in `my_tokens` as `ဓ မ္မ ဒေ သ နာ`.
+
+After the inserts the builder runs FTS5 `optimize`, `VACUUM`, `PRAGMA integrity_check`, checks that every book in the pilot list has a row in `books` and a `pages` row for every page, and runs the golden queries (§9). It writes `dist/library-search-<YYYY-MM-DD>-r<n>.sqlite` and a `.sha256` file next to it. The SQLite file is never committed.
+
+The file is opened with Node's built-in `node:sqlite` (Node 24; its bundled SQLite 3.53.4 includes FTS5, checked 2026-11-20). No native npm module is needed.
+
+## 6. Tokens and normalization
+
+The website, the builder and the search API share one copy of the text code. Stage 1 moves `normalize.ts`, `burmese.ts` and `search-text.ts` from `apps/web/src/lib/` into a new workspace package, `packages/search-text`, and adds `ftsTokens(text)`:
+
+- the same normalization as library search (NFC, zero-width removal, ဥ/ဉ equal, Burmese and ASCII digits equal, Latin diacritics folded, never on Burmese), so `dhamma` finds `dhammā` and `Pāḷi` finds `pali`;
+- Burmese split into syllables with the existing syllable regex, one token per syllable, so a query of two or more syllables becomes an FTS5 phrase and matches regardless of the spaces the book used;
+- Latin and digits as words.
+
+The library and Dhamma Posts golden tests (`library-search.test.ts`, `posts/search.test.ts`) must pass unchanged after the move. FTS5's `unicode61` tokenizer sees the tokens already split by spaces; a builder test checks that it never splits a Burmese syllable further (every Myanmar letter, sign and mark in U+1000–U+109F), and the tokenizer gets `tokenchars` if one does.
+
+## 7. Search API (v1)
+
+The local server and the future AWS backend implement the same contract, so the client, the CLI and the tests do not change when the base URL does.
+
+**`GET /api/search`**
+
+| Parameter | Rule |
+| --- | --- |
+| `q` | Required, 1–200 characters after normalization, at most 8 terms. A Burmese term needs at least two syllables. `"…"` is a phrase. |
+| `lang` | `any` (default), `my`, `en`, `pi` or `und`; filters on the passage language |
+| `limit` | 1–20, default 10 |
+| `page` | 1–10, default 1 |
+
+Unknown parameters are rejected. The query parser accepts only terms and quoted phrases and quotes every token itself, so FTS5 syntax typed by a user (`OR`, `NEAR`, `*`, `^`, `"`) is searched as text, never run as an operator. Values are bound parameters. Results are ranked with `bm25()`.
+
+```json
+{
+  "v": 1,
+  "indexVersion": "2026-11-20-r1",
+  "query": { "q": "ဓမ္မ ဒေသနာ", "lang": "any", "limit": 10, "page": 1 },
+  "hasMore": false,
+  "results": [
+    {
+      "bookId": "a1b2c3d4e5f6",
+      "title": "<book title>",
+      "language": "my",
+      "page": 12,
+      "snippet": "… ဓမ္မ ဒေသနာ …",
+      "ocr": true,
+      "confidence": 0.87,
+      "pdfUrl": "https://dhamma-library.b-cdn.net/<key>#page=12"
+    }
+  ]
+}
+```
+
+- `page` is the **physical PDF page** (1-based), which can differ from the printed page number. `pdfUrl` is built with the catalog's own `fileUrl(PUBLIC_LIBRARY_CDN_BASE, key)` (`apps/web/src/lib/library-index.ts`, which percent-encodes every key segment), then `#page=N` is appended, so a result links to the same file address as the catalog.
+- The snippet is a window of `display_text` around the first match, at most 200 characters.
+- **Errors** are `{ "v": 1, "error": { "code": "…" } }` with status 400 (`query_missing`, `query_too_short`, `query_too_long`, `too_many_terms`, `bad_param`), 404 for another path, 405 for a method other than GET, and 503 `index_unavailable`.
+
+**`GET /api/search/health`** returns `{ "v": 1, "indexVersion", "books", "pages", "passages" }`.
+
+**Local server** (`npm run book-search:serve -- --db <file>`): `node:http`, listening on `127.0.0.1:8787` only, opens the file read-only. Like the planned production route, it sends no CORS headers and refuses a request whose `Sec-Fetch-Site` header is `cross-site`. It logs one line per request with status and duration, never the query.
+
+## 8. API client and CLI
+
+- **Client** (`apps/book-search/src/client/`): `createSearchClient({ baseUrl, fetch?, timeoutMs? })` with `search(params)` and `health()`. It appends `/api/search` to `baseUrl`, validates responses with Zod and throws a `SearchApiError` carrying the HTTP status and error code. Nothing in it is specific to the local server or to AWS.
+- **CLI:**
+
+  ```bash
+  npm run book-search -- search "ဓမ္မ ဒေသနာ" --lang my --limit 10
+  npm run book-search -- search "dhamma" --base-url http://127.0.0.1:8787 --json
+  npm run book-search -- health
+  ```
+
+  The base URL comes from `--base-url`, else `BOOK_SEARCH_BASE_URL`, else `http://127.0.0.1:8787`. The default output lists title, page, snippet and PDF link; `--json` prints the API response.
+
+## 9. Tests
+
+Vitest, like the rest of the repo. Fixtures are synthetic text only, never text copied from library books, so the tests run in CI without PDFs, Tesseract or AWS.
+
+| Area | What is checked |
+| --- | --- |
+| `ftsTokens` | Burmese syllables with stacked consonants, spaced and unspaced Burmese, Pāḷi diacritics folded, digits, ဥ/ဉ |
+| Query parser | terms and phrases, limits, FTS5 operators and stray quotes searched as text |
+| Quality check | Zawgyi, glyph-only code points, ေ before its consonant, legacy-font Latin, empty pages |
+| Builder | fixture JSONL → SQLite: tables, counts, `integrity_check`, the `unicode61` check in §6, golden queries |
+| Server + client | the server starts on a free port with a fixture index; the client calls it through `baseUrl`: results, `lang` filter, paging, every error code, `Sec-Fetch-Site: cross-site` refused |
+| CLI | spawned with `--base-url` against the same server: text and `--json` output, exit code on errors |
+| Contract | the client suite reads its own variable, `BOOK_SEARCH_TEST_BASE_URL` (never the CLI's `BOOK_SEARCH_BASE_URL`, so a shell set up for the CLI cannot point `npm test` at a deployed backend); unset, it starts the fixture server, and later the same suite can run against a deployed backend on purpose |
+| OCR smoke test | one tiny generated PDF with synthetic Burmese and English text, OCR'd with the pinned models; **skipped when `tesseract` is not installed** (CI does not install it in stage 1) |
+
+**Golden queries for the pilot** live in `apps/book-search/pilot/golden-queries.json`: at least 30, supplied by Burmese and English readers, each with the expected book and page. They run against a locally built pilot index, not in CI, because the index is not committed.
+
+## 10. Pilot
+
+`apps/book-search/pilot/books.json` lists 30 manifest book ids with the reason each was chosen: Burmese, English and Pāḷi books; born-digital, scanned, mixed-language and poor-quality copies; at least one known Zawgyi or legacy-font text layer. The PDFs are fetched from the public CDN, so no AWS access is needed.
+
+The stage 1 report, added to this file when the pilot is done, records:
+
+- pages per method and status (`text`, `ocr`; `ok`, `suspect`, `failed`) and the reasons for failures;
+- OCR time per page on the machine used, and the projected time for the whole library (3,009 books, about 113.5 GiB, page count measured during the pilot);
+- index size per 1,000 pages and the projected size for the whole library;
+- local query latency at p50 and p95;
+- golden-query results: target at least 90% with the expected book and page in the first five results, reported separately for Burmese and English and for `text` and `ocr` pages;
+- a spot check of every pilot result's page link against the PDF.
+
+## 11. Known limitations in stage 1
+
+- **Book ids** are the hash of the S3 key, so renaming or moving a file in S3 gives it a new id. Records keep `key` and `sha256` for remapping; stable ids are a decision for a later stage.
+- **Tesseract's Burmese model** is weak on old print, stacked consonants and handwritten manuscripts. Some pages will be `suspect` or `failed`; those books stay findable through the catalog search.
+- **No Pāḷi detection** inside Burmese-script books (§4), and no fuzzy matching: unlike catalog search, FTS5 matches whole tokens and phrases only.
+- **`#page=N`** opens the right page in desktop Chrome, Firefox and Safari, but most mobile browsers ignore it.
+- **Local only:** the index and API exist only on the developer's machine; readers cannot use them yet.
+
+## 12. Later stages (notes, not defined)
+
+Each of these becomes a defined stage only when the maintainer chooses it after stage 1. Nothing here is designed or scheduled.
+
+- **Google Cloud Vision OCR:** run Cloud Vision as a second OCR engine and store its results in the same local state store and index (`engine` already records which engine read a page). Needs a Google Cloud project, billing and credentials, which need approval.
+- **Compare Tesseract and Cloud Vision** on a few pages: character error rate against hand-checked text, failed pages, time and cost per page, then decide the engine for the backfill.
+- **AWS backend for the API:** the same contract as a Lambda function reached only through `https://app.winmetta.org/api/search` (same origin, no public API, no WAF for now; reserved concurrency, CloudFront caching, query limits, a budget alarm and a kill switch), with the SQLite file in a new private index bucket and the state store synced to it. Pulumi, with approval before any apply.
+- **Dhamma Library page:** a "Search inside PDFs" mode next to the catalog search, with **Open PDF** and **Copy citation**, and the Privacy page updated.
+- **Also noted:** stable book ids, the upload command and regeneration PR ([implementation-plan.md](implementation-plan.md) §6.2), the full backfill of every PDF, and a public API with its own host, WAF and optional keys if a real need appears.

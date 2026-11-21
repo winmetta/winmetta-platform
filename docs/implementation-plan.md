@@ -10,6 +10,7 @@ The first three phases, all done, took the project from an empty repo to a publi
 | **3 — Dhamma Posts** | Short trilingual (Burmese, English, Simplified Chinese) Dhamma posts kept as markdown files in the repo: post, tag and paginated list pages, a "Read in" language choice that links can carry, share and print, and format checks in the hook, CI and build. Built 2026-10-23, merged into `main` on 2026-10-25 (PR #10) and deployed to production on 2026-10-26. | Yes (public) |
 | **4 — Analytics** | Privacy-first, cookieless, aggregate activity measurement with self-hosted Umami at `stats.app.winmetta.org`. Planned 2026-10-26; stages 1–4 done (the tracker is live once the go-live change is deployed), stage 5 (review after one month) open. See §5A and [analytics.md](analytics.md). | Yes (public) |
 | **Feedback form** | An in-place report form on every page type (Dhamma Posts, classes and retreats, library, general) and a private Sādhu appreciation button on posts, with one small AWS Lambda endpoint and SNS email. Planned 2026-11-10; see §5B and [feedback.md](feedback.md). | Partly (live; post links and Sādhu off) |
+| **Book search, stage 1** | Search inside library PDFs, locally only: index pilot PDFs with Poppler and Tesseract into a SQLite FTS5 file, serve the search API from a local server shaped like the future AWS backend, and call it through a base-URL API client and CLI, with tests. Planned 2026-11-20; see §5C and [book-search.md](book-search.md). | No (local only) |
 
 Everything not yet scheduled is in the **backlog (§6)**: the open todos left from the finished phases (reviews, the launch announcement, operations) and the candidate future phases (LLB lessons, the library upload pipeline, accounts, native apps; see also [prd.md](prd.md) §7). Reading order: toolchain (§1), Phases 0–3 (§2–§5), backlog (§6), then reference material (§7–§9). Scope per [prd.md](prd.md) (§4.7, §7) and [tech-architecture.md](tech-architecture.md) (§0): one static Astro web app designed for mobile and desktop — no backend, no database, no desktop/mobile apps.
 
@@ -362,6 +363,38 @@ See [feedback.md](feedback.md) §9.
 
 ---
 
+## 5C. Book search, stage 1 (planned 2026-11-20)
+
+**Goal:** prove that Win Metta can search inside its library PDFs and cite the exact page, on a developer's machine, before anything is deployed. The design, data model, API contract and test plan are in [book-search.md](book-search.md); installing Tesseract and the pinned models is in [developer-guide.md](developer-guide.md) §2 ("Book search tools"). It is numbered 5C so the backlog keeps its §6 number.
+
+### Decisions (2026-11-20)
+
+* Local only: no AWS resource, no deploy, no change to the website. The local server is a development tool, not a production backend.
+* Poppler for the PDF text layer and page images, Tesseract 5.5.4 with the `mya` and `eng` models from `tessdata_best` pinned to one commit, run from `winmetta-platform/.cache/book-search/` (gitignored).
+* Page results go to a JSONL state store first; one build step turns it into a versioned SQLite FTS5 file, opened with Node's built-in `node:sqlite`.
+* One copy of the search text code: `normalize.ts`, `burmese.ts` and `search-text.ts` move to `packages/search-text`, used by the website, the builder and the API.
+* The API contract is the one the AWS backend will serve later (`GET /api/search`, `GET /api/search/health`), and the client takes a base URL, so pointing it at AWS changes no client or test code.
+* Later stages are not defined here; they are noted in [book-search.md](book-search.md) §12 and chosen by the maintainer after this stage.
+
+### Steps
+
+One reviewed PR each, in this order.
+
+* [ ] **1. Docs.** This section, [book-search.md](book-search.md), the developer-guide tool setup, the tech-architecture note and the AGENTS.md pointers; `.cache/` in `.gitignore`.
+* [ ] **2. Shared text package.** Add `packages/*` to the workspaces; move `normalize.ts`, `burmese.ts` and `search-text.ts` into `packages/search-text` and import them from `apps/web`; add `ftsTokens()` with tests. The library and posts golden tests pass unchanged.
+* [ ] **3. Indexer.** `apps/book-search` with `book-search:setup` (checks Tesseract and Poppler, downloads the pinned models and verifies their hashes), `book-search:fetch` (pilot PDFs from the public CDN) and `book-search:index` (text layer, quality check, OCR, resumable JSONL), with tests for the quality check and the OCR smoke test.
+* [ ] **4. Builder.** `book-search:build`: the SQLite schema, `optimize`, `VACUUM`, integrity and completeness checks, the `unicode61` check, versioned file name and SHA-256, with fixture tests.
+* [ ] **5. API, client and CLI.** The search core and query parser, the local server (`book-search:serve`), the base-URL client and the CLI (`book-search`), with server, client, CLI and contract tests that run in CI without Tesseract.
+* [ ] **6. Pilot.** Index the 30 pilot books, collect at least 30 golden queries from Burmese and English readers, and record the report in [book-search.md](book-search.md) §10.
+
+### Acceptance
+
+* A developer who follows [developer-guide.md](developer-guide.md) on a clean checkout installs the tools and models, indexes the pilot books, builds the index, starts the local server and finds an expected page with the CLI.
+* `npm test` runs the tokenizer, parser, builder, server, client and CLI tests in CI, and the website's golden search tests pass unchanged.
+* The pilot report is recorded: at least 90% of the golden queries return the expected book and page in the first five results, and every pilot result's page link was checked against its PDF. If the target is missed, the report says why and the maintainer decides the next stage.
+
+---
+
 ## 6. Backlog (not scheduled)
 
 Phases 0–3 are done. Everything else lives here, in two groups: **open todos** left from the finished phases, and **future phases**, which are candidate directions rather than commitments. Nothing here is dated: the maintainer decides the order and scope as the work comes, and a future phase gets its own numbered section (like §5) when it starts. Product reasoning is in [prd.md](prd.md) §7; tentative technical notes are in [tech-architecture.md](tech-architecture.md) §10.
@@ -419,7 +452,7 @@ Deferred when the site went public on 2026-10-23 (see "Launch status" in §4). D
 Candidate directions, in no fixed order:
 
 * **Let's Learn Burmese (LLB) pilot:** digitize the LLB curriculum as an interactive self-paced app with local progress (needs the new media infrastructure and the adaptive onboarding in prd.md §4.1–§4.2).
-* **Library content pipeline and class archive:** the repeatable upload-and-reindex workflow (outline below), a unified class archive, and full-text, OCR and transcript search.
+* **Library content pipeline and class archive:** the repeatable upload-and-reindex workflow (outline below), a unified class archive, and full-text, OCR and transcript search. Search inside PDFs starts with book search stage 1 (§5C); its possible next stages are noted in [book-search.md](book-search.md) §12.
 * **Optional accounts and progress sync, and the first backend:** also the point to add a staging environment with integration tests (tech-architecture.md §10).
 * **Native apps, monastic content tools and more curricula.**
 
@@ -432,13 +465,13 @@ Candidate directions, in no fixed order:
 * [ ] **Regeneration PR:** a manually triggered or scheduled GitHub Actions job using an OIDC role with read-only S3 access (no stored AWS keys) runs `npm run library:manifest` and opens a PR with the manifest diff: added, changed and removed files, the duplicate report, new tags and folders, and `zawgyi-review.json`.
 * [ ] **Review checklist in the PR:** Burmese speaker checks new titles, tags and any Zawgyi conversions and records corrections in `overrides.json`; new folders get ids and names in `folders.json`; golden search tests are updated only when a title they name was legitimately removed or renamed.
 * [ ] **CI gates:** schema validation, golden queries, and the index size and query-time budgets; merging to `main` deploys.
-* [ ] **Separate future work:** full-text search inside PDFs, OCR, transcripts, and the unified class archive.
+* [ ] **Separate future work:** transcripts and the unified class archive. Full-text and OCR search inside PDFs is book search (§5C and [book-search.md](book-search.md)).
 
 Acceptance: a maintainer who has never touched the repo adds one new PDF following the written procedure, and it is searchable and downloadable after the PR is merged, with no hand edits to listing files.
 
 ### 6.3 Not planned in Phases 0–3
 
-Candidates for future phases, with no date: a staging environment and PR preview host (planned with the first API or backend), new media buckets and the `cdn.app.winmetta.org` hostname (when something needs them), interactive LLB lessons, the repeatable upload-and-reindex pipeline for new library files (§6.2), full-text/OCR/transcript search inside PDFs, a unified class archive, additional interface locales beyond English/Burmese, product analytics/metric collection, profile timezone preferences (product analytics is now Phase 4, §5A), a backend API, a database, accounts, offline/PWA, `apps/desktop` and `apps/mobile`. For Dhamma Posts: RSS/Atom feeds, joining posts and library books in one search, and more post languages (§5).
+Candidates for future phases, with no date: a staging environment and PR preview host (planned with the first API or backend), new media buckets and the `cdn.app.winmetta.org` hostname (when something needs them), interactive LLB lessons, the repeatable upload-and-reindex pipeline for new library files (§6.2), transcript search (full-text and OCR search inside PDFs starts with book search stage 1, §5C), a unified class archive, additional interface locales beyond English/Burmese, product analytics/metric collection, profile timezone preferences (product analytics is now Phase 4, §5A), a backend API, a database, accounts, offline/PWA, `apps/desktop` and `apps/mobile`. For Dhamma Posts: RSS/Atom feeds, joining posts and library books in one search, and more post languages (§5).
 
 Excluded entirely: automatic feeds of WordPress content, copying the existing site UI and bulk website migration.
 
