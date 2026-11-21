@@ -333,7 +333,7 @@ export default function LibrarySearchIsland({
       {tag ? (
         <p className="flex flex-wrap items-center gap-2">
           <span>{labels.folder}:</span>
-          <span lang={languageOf(tag)} className="chip">
+          <span lang={languageOf(tag)} className="badge">
             {tag}
           </span>
           <Button
