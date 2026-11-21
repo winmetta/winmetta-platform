@@ -55,6 +55,16 @@ Everything the indexer reads and writes lives in **`winmetta-platform/.cache/boo
   dist/              # built SQLite files and their .sha256
 ```
 
+Commands (implemented in `apps/book-search`; a book is named by its manifest id):
+
+```bash
+npm run book-search:setup                      # check Tesseract and Poppler, download and verify the models
+npm run book-search:fetch -- <bookId>...       # copy PDFs from the public CDN (size checked against the manifest)
+npm run book-search:index -- <bookId>... [--pages 1-6] [--ocr auto|always|never] [--force]
+```
+
+`--force` redoes the pages in the `--pages` range (every page without it) and keeps the other pages' records, unless the PDF or the extractor version changed, which makes all records stale. `--pilot` names the books in `apps/book-search/pilot/books.json` (added with the pilot, §10). `index` with no ids indexes every PDF already in `pdfs/`. It exits 2 if any page failed with an error; those pages are not recorded and are retried on the next run.
+
 ## 4. Page records (state store)
 
 The indexer appends one JSON line per page to `state/<bookId>.jsonl` as each page finishes, so an interrupted run resumes at the next page. A page is redone only with `--force` or when its book's `sha256` or the extractor version changes.
@@ -76,8 +86,11 @@ The indexer appends one JSON line per page to `state/<bookId>.jsonl` as each pag
 ```
 
 - `method` is `text` (the PDF's own text layer) or `ocr`. `status` is `ok`, `suspect` (low confidence or failed checks; still indexed, flagged in the report) or `failed` (nothing indexed for the page).
-- **Text-layer quality check.** The layer is used only when it passes: enough Myanmar or Latin letters for the page, no Zawgyi (the generator's two-gate rule: `myanmar-tools` score of at least 0.9 **and** a marker impossible in valid Unicode), no glyph-only code points (U+1060–U+1097), no ေ before its consonant, and no legacy-font text (Latin letters where the book is Burmese). Otherwise the page is rendered and read by OCR.
-- **Passages** are paragraphs: blank-line blocks from `pdftotext -layout`, or Tesseract's paragraph blocks from its TSV output, whose word confidences give the page's mean `confidence`.
+- **Text-layer quality check** (`apps/book-search/src/quality.ts`). The layer is used only when the page passes all of these, otherwise it is rendered and read by OCR, and the failed checks are recorded in `reasons`:
+  - `too_little_text`: fewer than 20 letters (blank, image-only or a lone page number);
+  - `zawgyi`: at least 3 Zawgyi-only patterns on the page (a glyph-only code point U+1060–U+1097, ေ before its consonant, or a loose virama), counted with the generator's marker regexes. Page text is long, so repeated markers are strong evidence; the detector score used for titles is not needed here;
+  - `legacy_font`: three or more private-use characters; or, in a Burmese book, a page with under 10% Myanmar letters that has many odd symbols (15% or more) or fewer than three common English words. The last rule catches old Burmese fonts that extract as ASCII-looking text (for example `ausmfpf GmG a'guf`, seen on a real library page). It also sends romanized Pāḷi pages in Burmese books to OCR, which costs time and loses nothing. In an English book, ASCII-mapped garbage cannot be told from English (§11).
+- **Passages** are paragraphs: blank-line blocks from `pdftotext -layout`, or Tesseract's paragraph blocks from its TSV output, whose word confidences give the page's mean `confidence`. Blocks over 1,500 characters are cut at a sentence end (`။`) or space. An OCR page below 0.6 mean confidence is `suspect` (the threshold is to be tuned in the pilot); an OCR page with no words is `failed` (`no_text`), which also happens for pure artwork or blank pages. Tesseract is run with `-c tessedit_create_tsv=1`, not the `tsv` config name, because the pinned `tessdata_best` folder has no `configs/` directory.
 - **Script, not language.** Each passage records its script (`my`, `latn` or `mixed`). Its language comes from the book's manifest `language` when the SQLite file is built. Pāḷi written in Burmese script cannot be told apart from Burmese automatically, so stage 1 does not tag passages as Pāḷi.
 - The book id is the manifest id (the first 12 hex characters of SHA-256 of the S3 key). It changes if the S3 key changes, so every record also keeps `key` and `sha256` and can be remapped (§11).
 
@@ -195,6 +208,8 @@ The stage 1 report, added to this file when the pilot is done, records:
 - local query latency at p50 and p95;
 - golden-query results: target at least 90% with the expected book and page in the first five results, reported separately for Burmese and English and for `text` and `ocr` pages;
 - a spot check of every pilot result's page link against the PDF.
+
+**Early observations (2026-11-20, step 3, two small Burmese books, pages 1–6 each):** OCR with `mya+eng` at 300 dpi took about 6 seconds per page on one core of the developer's MacBook, so about 70 seconds for 12 pages. At that rate 100,000 pages would take about a week, and the whole library's page count is not measured yet, so the pilot must quantify what the full backfill needs (parallel runs, a bigger machine or a different engine). In one book the text layer was Zawgyi on pages 2–6 (OCR read them at 0.76–0.91 confidence), and page 1 was ASCII-mapped legacy-font text that the first version of the quality check accepted; it now goes to OCR. In the other book the pages were scans with no text layer; pages 2–5 were read at 0.70–0.82, and two pages of artwork produced no text.
 
 ## 11. Known limitations in stage 1
 

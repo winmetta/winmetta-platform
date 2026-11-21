@@ -23,6 +23,14 @@ export interface ZawgyiConverter {
 export const hasZawgyiMarker = (text: string): boolean =>
   glyphOnly.test(text) || eVowelFirst.test(text) || looseVirama.test(text);
 
+/** How many Zawgyi-only patterns a longer text contains (book search counts them per PDF page). */
+export const countZawgyiMarkers = (text: string): number =>
+  [glyphOnly, eVowelFirst, looseVirama].reduce(
+    (total, pattern) =>
+      total + (text.match(new RegExp(pattern.source, 'g'))?.length ?? 0),
+    0,
+  );
+
 export const CONVERT_THRESHOLD = 0.9;
 const AMBIGUOUS_THRESHOLD = 0.5;
 

@@ -64,7 +64,7 @@ Finally, check that Tesseract finds both models:
 tesseract --tessdata-dir .cache/book-search/tessdata --list-langs
 ```
 
-It should list `eng` and `mya`. The models are never committed. To change the pin, pick a new `tessdata_best` commit, update the commit and both blob ids here and the commit in [book-search.md](book-search.md) §4, and rebuild the index: the `engine` field of every page record names the models that read it. Stage 1 adds `npm run book-search:setup`, which performs the same steps and fails on a hash mismatch; these manual steps stay as the reference.
+It should list `eng` and `mya`. The models are never committed. To change the pin, pick a new `tessdata_best` commit, update the commit and both blob ids here and the commit in [book-search.md](book-search.md) §4, and rebuild the index: the `engine` field of every page record names the models that read it. `npm run book-search:setup` performs the same steps (it checks both tools, downloads what is missing and refuses a file whose hash does not match the table), so the manual commands are the reference rather than the usual way. The indexer commands are in [book-search.md](book-search.md) §3.
 
 ## 3. Repository layout
 
@@ -73,6 +73,7 @@ It should list `eng` and `mya`. The models are never committed. To change the pi
 | `apps/web` | The only app: Astro static site with React islands. |
 | `apps/web/src/i18n` | Locale registry, keyed messages (`messages/en.json`, `messages/my.json`), route helpers, localized-content fallback. |
 | `apps/web/src/lib` | Zod schemas, schedule helper, library filter, site config. |
+| `apps/book-search` | Book search stage 1 (local only): PDF indexer, and later the SQLite builder, API server, client and CLI; see [book-search.md](book-search.md). |
 | `packages/search-text` | Search normalization, Burmese syllable tokenizer and FTS token helpers shared by the website and book search; imported as `@winmetta/search-text`. |
 | `apps/web/src/fixtures` | Synthetic content used by the content collections in Phase 0. |
 | `apps/web/tests` | Playwright smoke tests. |
