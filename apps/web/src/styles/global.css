@@ -266,7 +266,7 @@
   /* A small action on the page, like Copy: an icon and words in the link color, no button
      frame. A real <button> underneath (keyboard, screen readers), styled as plain text. */
   .text-action {
-    @apply inline-flex min-h-11 cursor-pointer items-center gap-2 border-0 bg-transparent p-0 font-semibold text-brand transition-colors hover:text-brand-strong hover:underline;
+    @apply inline-flex min-h-11 cursor-pointer items-center gap-1 border-0 bg-transparent p-0 font-semibold text-brand transition-colors hover:text-brand-strong hover:underline;
     text-underline-offset: 0.2em;
   }
   .text-action svg {
@@ -495,7 +495,7 @@
   }
   /* A folder's name, with the folder symbol before it (a text action, a tree row or a label). */
   .folder-name {
-    @apply inline-flex items-center gap-2;
+    @apply inline-flex items-center gap-1.5;
   }
   .folder-name svg,
   .folder-name .link-icon {
