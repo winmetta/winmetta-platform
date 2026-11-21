@@ -164,11 +164,13 @@ test('folder chips carry the language of their text', async ({ page }) => {
   await search(page).fill('Pali Grammar');
   await expect(page.locator('h3').first()).toBeVisible();
   const english = page
-    .locator('button[lang="en"]', { hasText: /[A-Za-z]/ })
+    .locator('button.text-action[lang="en"]', { hasText: /[A-Za-z]/ })
     .first();
   await expect(english).toBeVisible();
   await search(page).fill(book);
-  await expect(page.locator('button[lang="my"]').first()).toBeVisible();
+  await expect(
+    page.locator('button.text-action[lang="my"]').first(),
+  ).toBeVisible();
 });
 
 test('empty results explain what to do', async ({ page }) => {
@@ -225,8 +227,14 @@ test('in-place actions are text actions with an icon, not framed buttons', async
   }
   // The folder name is information, not a control.
   await expect(
-    catalog.locator('.badge', { hasText: 'Rare-Buddhist-Books-1' }),
+    catalog.locator('.folder-name', { hasText: 'Rare-Buddhist-Books-1' }),
   ).toBeVisible();
+  // A folder name in a result card is a text action with a folder symbol, not a chip.
+  const folderAction = catalog
+    .locator('li.card button.text-action', { hasText: 'Rare-Buddhist-Books-1' })
+    .first();
+  await expect(folderAction.locator('svg')).toHaveCount(1);
+  await expect(folderAction).not.toHaveClass(/chip/);
   // Getting a file stays a framed (outline) button.
   await expect(
     catalog.getByRole('link', { name: /Download PDF/ }).first(),

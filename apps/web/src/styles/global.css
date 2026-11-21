@@ -493,6 +493,14 @@
   .tree .tree {
     @apply ms-3 mt-1 border-s-2 border-sky ps-3;
   }
+  /* A folder's name, with the folder symbol before it (a text action, a tree row or a label). */
+  .folder-name {
+    @apply inline-flex items-center gap-2;
+  }
+  .folder-name svg,
+  .folder-name .link-icon {
+    @apply size-5 shrink-0;
+  }
   .tree-row {
     @apply flex min-h-11 items-center justify-between gap-3 rounded-xl px-3 py-1 transition-colors hover:bg-sand;
   }

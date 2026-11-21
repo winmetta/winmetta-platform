@@ -6,6 +6,7 @@ import { t } from '../i18n/messages';
 import { locales, type Locale } from '../i18n/locales';
 import { formatCount, isSingular } from '../lib/library-url';
 import FolderTreeSelf from './FolderTree.astro';
+import LinkIcon from './LinkIcon.astro';
 interface Props {
   tree: FolderTree;
   nodes: FolderNode[];
@@ -27,7 +28,10 @@ const formatLocale = locales[locale].formatLocale;
         data-umami-event="library_folder_open"
         data-umami-event-folder={node.id}
       >
-        <span class="font-medium">{node.name}</span>
+        <span class="folder-name font-medium">
+          <LinkIcon name="folder" />
+          {node.name}
+        </span>
         <span class="badge" lang={locale}>
           {formatCount(node.total, formatLocale)}{' '}
           {t(

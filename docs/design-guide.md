@@ -16,7 +16,8 @@ Ask in this order and stop at the first yes:
 2. **Does it take the reader to another page** (or to a file's own page)? A **link**.
 3. **Does it submit a form, or get or start something for the reader** (download or open a file, join a meeting)? A **framed button**: filled (`.btn-primary`) for the one main submit of a page or form, outline (`.btn-outline`) for the card's own action in a list (Download PDF, Open PDF at this page).
 4. **Does it only act on what is already on screen** (copy, clear a search, remove a filter, reset, try again, show more, print)? A **text action**: the usual symbol, then the words, in the link color, with no frame. It is still a real `<button>` in the HTML.
-5. **Is it a clickable filter or tag** a reader picks from a set? A **chip**.
+5. **Is it a folder name** (a library folder, which is also a tag)? The **folder symbol before the name**, always: a clickable one is a **text action** (it filters the page in place), a folder row in the tree is a **link**, and the active filter is a plain label (`.folder-name`) with a **Remove** text action beside it. Never a filled pill.
+6. **Is it a clickable topic tag** of another kind (a Dhamma post topic)? A **chip**.
 
 If a control seems to need a frame to be noticed, the layout is the problem, not the control.
 
@@ -27,7 +28,8 @@ If a control seems to need a frame to be noticed, the layout is the problem, not
 | Text action | `.text-action` (React: `TextAction` with an icon from `icons.tsx`) | Copy citation (copy icon, then a check and "Copied"), Clear search and Remove folder filter (×), Try again (retry arrow), Show more (chevron) | The main action of a card, navigation |
 | Link | `.link` (brand color, semibold, no underline until hover) | Going to another page | Actions that change the page |
 | Quiet link | `.link-quiet` in a `.card-aside` or `.card-actions` row | Something wrong? | Content, or anything the reader came to do |
-| Chip | `.chip` | A folder or topic tag the reader can pick | Anything that is not clickable |
+| Folder name | `.folder-name` (symbol and name), as a text action, a tree link or a label | Dhamma Library folders in result cards, "Try these folders", the folder tree, the active filter | A filled pill or chip |
+| Chip | `.chip` | A clickable Dhamma post topic | Folders, anything that is not clickable | Anything that is not clickable |
 | Badge | `.badge` | PDF page 60, Read by OCR, 5.4 MB, a count | Anything clickable |
 
 Rules that follow:

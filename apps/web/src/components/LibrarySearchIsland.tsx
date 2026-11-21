@@ -23,7 +23,7 @@ import {
   trackSettled,
 } from '../lib/analytics';
 import { hasZawgyiMarker } from '../lib/zawgyi';
-import { CloseIcon, MoreIcon, RetryIcon } from './icons';
+import { CloseIcon, FolderIcon, MoreIcon, RetryIcon } from './icons';
 import { TextAction } from './ui/text-action';
 
 export interface Labels {
@@ -102,17 +102,16 @@ function Card({
           <span className="muted font-normal"> ({record.titleNote})</span>
         ) : null}
       </h3>
-      <ul className="flex flex-wrap gap-2" aria-label={labels.folder}>
+      <ul className="flex flex-wrap gap-x-4 gap-y-1" aria-label={labels.folder}>
         {record.tags.map((tag) => (
           <li key={tag}>
-            <button
-              type="button"
+            <TextAction
+              icon={<FolderIcon />}
               lang={languageOf(tag)}
-              className="chip"
               onClick={() => onTag(tag)}
             >
               {tag}
-            </button>
+            </TextAction>
           </li>
         ))}
       </ul>
@@ -335,7 +334,8 @@ export default function LibrarySearchIsland({
       {tag ? (
         <p className="flex flex-wrap items-center gap-2">
           <span>{labels.folder}:</span>
-          <span lang={languageOf(tag)} className="badge">
+          <span lang={languageOf(tag)} className="folder-name font-medium">
+            <FolderIcon />
             {tag}
           </span>
           <TextAction icon={<CloseIcon />} onClick={() => update({ tag: '' })}>
@@ -393,17 +393,16 @@ export default function LibrarySearchIsland({
       {exact.length === 0 && suggestions.length > 0 ? (
         <div className="space-y-2">
           <h2 className="text-2xl font-bold">{labels.tryFolders}</h2>
-          <ul className="flex flex-wrap gap-2">
+          <ul className="flex flex-wrap gap-x-4 gap-y-1">
             {suggestions.map((suggestion) => (
               <li key={suggestion}>
-                <button
-                  type="button"
+                <TextAction
+                  icon={<FolderIcon />}
                   lang={languageOf(suggestion)}
-                  className="chip"
                   onClick={() => pickTag(suggestion)}
                 >
                   {suggestion}
-                </button>
+                </TextAction>
               </li>
             ))}
           </ul>
