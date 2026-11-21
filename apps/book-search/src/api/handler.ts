@@ -48,7 +48,13 @@ export function handleRequest(
   request: ApiRequest,
   context: ApiContext,
 ): ApiResponse {
-  const url = new URL(request.url, 'http://localhost');
+  let url: URL;
+  try {
+    url = new URL(request.url, 'http://localhost');
+  } catch {
+    // A request target the URL parser rejects (for example `//[`).
+    return failure(400, 'bad_param');
+  }
   if (url.pathname !== '/api/search' && url.pathname !== '/api/search/health')
     return failure(404, 'not_found');
   if (request.method !== 'GET') return failure(405, 'method_not_allowed');

@@ -273,6 +273,17 @@ describe('handleRequest on a built index', () => {
       expect(JSON.stringify(r.body)).not.toMatch(/truths|sqlite|database/i);
     }
   });
+  it('answers a request target the URL parser rejects with 400, not an exception', () => {
+    for (const url of ['//[', 'http://[', '//a b:99999999']) {
+      const r = handleRequest({ method: 'GET', url, headers: {} }, context);
+      expect([400, 404]).toContain(r.status);
+    }
+    const r = handleRequest(
+      { method: 'GET', url: '//[', headers: {} },
+      context,
+    );
+    expect(r.status).toBe(400);
+  });
   it('allows same-origin and header-less requests, and sends no CORS headers', () => {
     expect(
       get('/api/search?q=abc', { 'sec-fetch-site': 'same-origin' }).status,
