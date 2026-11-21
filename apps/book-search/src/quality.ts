@@ -41,8 +41,8 @@ export function checkTextLayer(
 /**
  * Old Burmese fonts (Win Innwa and similar) extract as Latin-looking garbage or private-use
  * characters. Heuristic: private-use characters, or in a Burmese book almost no Myanmar letters
- * together with many odd symbols, or with fewer than three common English words (a legacy font
- * mapped onto ASCII letters, such as `ausmfpf GmG a'guf`, found on a real library page). In an
+ * together with many odd symbols, or with too few common English words (a legacy font mapped onto
+ * ASCII letters, such as `ausmfpf GmG a'guf`, found on real library pages). In an
  * English book such a page cannot be told from English, so it stays a known gap (docs/book-search.md §11).
  */
 function isLegacyFontText(
@@ -58,7 +58,10 @@ function isLegacyFontText(
   const odd = count(visible, /[^\p{L}\p{N}.,;:'"()\-!?]/gu);
   if (visible.length > 0 && odd / visible.length >= MAX_ODD_SHARE) return true;
   // Latin-looking text that is not English: a legacy font mapped onto ASCII letters.
-  return englishWords(text) < MIN_ENGLISH_WORDS;
+  const words = latinWords(text);
+  return words.length >= MIN_WORDS_FOR_SHARE
+    ? englishShare(words) < MIN_ENGLISH_SHARE
+    : englishCount(words) < MIN_ENGLISH_WORDS;
 }
 
 const stopwords = new Set(
@@ -66,9 +69,17 @@ const stopwords = new Set(
     ' ',
   ),
 );
-/** Common English words on the page; real English text has several, ASCII-mapped garbage none. */
-const englishWords = (text: string): number =>
-  (text.toLowerCase().match(/[a-z]+/g) ?? []).filter((word) =>
-    stopwords.has(word),
-  ).length;
+const latinWords = (text: string): string[] =>
+  text.toLowerCase().match(/[a-z]+/g) ?? [];
+const englishCount = (words: string[]): number =>
+  words.filter((word) => stopwords.has(word)).length;
+const englishShare = (words: string[]): number =>
+  englishCount(words) / words.length;
+/** Short pages: real English has a few common words, ASCII-mapped garbage almost none. */
 const MIN_ENGLISH_WORDS = 3;
+/**
+ * Longer pages: a long page of garbage still hits a few short words by chance, so the share is
+ * used. Measured on real library pages (2026-11-20): garbage 0.01 to 0.08, English 0.16 to 0.40.
+ */
+const MIN_WORDS_FOR_SHARE = 15;
+const MIN_ENGLISH_SHARE = 0.12;

@@ -6,6 +6,7 @@ import { ftsTokens, normalizeSearch } from '@winmetta/search-text';
 import { describe, expect, it } from 'vitest';
 import { tempDir } from '../test/helpers.ts';
 import { buildIndex, nextVersion, passageLanguage, ranges } from './builder.ts';
+import { EXTRACTOR_VERSION } from './config.ts';
 import type { Book } from './library.ts';
 import type { PageRecord } from './record.ts';
 import { appendRecord, statePath } from './state.ts';
@@ -39,7 +40,7 @@ function record(
     page,
     method: 'text',
     engine: 'pdftotext 1',
-    extractorVersion: 1,
+    extractorVersion: EXTRACTOR_VERSION,
     status: 'ok',
     confidence: null,
     reasons: [],

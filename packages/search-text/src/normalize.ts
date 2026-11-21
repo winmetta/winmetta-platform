@@ -6,10 +6,11 @@ const foldBurmese = (value: string): string =>
     .replace(/ဥ/g, 'ဉ')
     .replace(/[၀-၉]/g, (digit) => String(myanmarDigits.indexOf(digit)));
 // Diacritics are stripped from non-Burmese runs only, so `pali` finds `Pāḷi`
-// without touching Burmese combining marks.
+// without touching Burmese combining marks. NFKD (not NFD) also unfolds the compatibility
+// forms that PDF text layers contain, such as the ligature ﬁ in `exempliﬁed` (book search).
 const foldLatin = (value: string): string =>
   value.replace(/[^က-႟]+/g, (run) =>
-    run.normalize('NFD').replace(/\p{M}/gu, '').normalize('NFC'),
+    run.normalize('NFKD').replace(/\p{M}/gu, '').normalize('NFC'),
   );
 /**
  * The one normalization shared by the build (index) and queries.

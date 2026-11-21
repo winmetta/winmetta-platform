@@ -21,3 +21,12 @@ describe('normalizeSearch', () => {
     expect(normalizeSearch('မြန်မာ')).toBe('မြန်မာ');
   });
 });
+
+describe('compatibility forms in PDF text layers', () => {
+  it('unfolds ligatures so exempliﬁed matches exemplified', () => {
+    expect(normalizeSearch('exempliﬁed ﬂow ﬃ')).toBe('exemplified flow ffi');
+  });
+  it('leaves Burmese text alone', () => {
+    expect(normalizeSearch('ဓမ္မ ﬁ')).toBe('ဓမ္မ fi');
+  });
+});

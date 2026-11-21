@@ -1,0 +1,90 @@
+{
+  "note": "Golden queries for the pilot index. They were written on 2026-11-21 from the indexed text itself, not supplied by readers, so they test retrieval and ranking, not OCR accuracy. Replace or add reader-supplied queries (docs/book-search.md §10). Each is checked against the first five results.",
+  "queries": [
+    {
+      "q": "နားပါးမှုတ်",
+      "book": "35795bec9fe8",
+      "page": 43,
+      "language": "my"
+    },
+    {
+      "q": "စက္ခုဝိညာဉ်",
+      "book": "5c9d96d37e06",
+      "page": 35,
+      "language": "my"
+    },
+    { "q": "ဦးပညာသီဟ", "book": "5c9d96d37e06", "page": 8, "language": "my" },
+    {
+      "q": "သြဝါဒပေးသနားတော်မူ",
+      "book": "712ab83326a1",
+      "page": 2,
+      "language": "my"
+    },
+    {
+      "q": "ပထမောဝါဒ ဒုတီယောဝါဒ",
+      "book": "712ab83326a1",
+      "page": 6,
+      "language": "my"
+    },
+    {
+      "q": "မသူတော်သာဖြစ်သည်",
+      "book": "712ab83326a1",
+      "page": 13,
+      "language": "my"
+    },
+    {
+      "q": "step out of our ruts",
+      "book": "9cbce55159ec",
+      "page": 65,
+      "language": "en"
+    },
+    {
+      "q": "methodical practice of insight meditation",
+      "book": "9cbce55159ec",
+      "page": 69,
+      "language": "en"
+    },
+    {
+      "q": "contemplation of mind-objects",
+      "book": "9cbce55159ec",
+      "page": 29,
+      "language": "en"
+    },
+    {
+      "q": "dhammanupassana",
+      "book": "9cbce55159ec",
+      "page": 29,
+      "language": "en"
+    },
+    {
+      "q": "exemplified",
+      "book": "9cbce55159ec",
+      "page": 26,
+      "language": "en"
+    },
+    {
+      "q": "Dependent Arising",
+      "book": "a8b5239ba041",
+      "page": 15,
+      "language": "en"
+    },
+    {
+      "q": "\"Wheel-turning King\"",
+      "book": "a8b5239ba041",
+      "page": 50,
+      "language": "en"
+    },
+    {
+      "q": "Noble Eightfold Path analyze",
+      "book": "a8b5239ba041",
+      "page": 45,
+      "language": "en"
+    },
+    {
+      "q": "question on nibbana",
+      "book": "a8b5239ba041",
+      "page": 42,
+      "language": "en"
+    }
+  ]
+}

@@ -6,3 +6,4 @@ config:
   winmetta-platform:analyticsEnabled: "true"
   winmetta-platform:feedbackEnabled: "true"
   winmetta-platform:bookSearchEnabled: "true"
+  winmetta-platform:bookSearchIndexVersion: 2026-11-21-r4
