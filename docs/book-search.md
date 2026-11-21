@@ -204,9 +204,9 @@ Vitest, like the rest of the repo. Fixtures are synthetic text only, never text 
 
 ## 10. Pilot
 
-`apps/book-search/pilot/books.json` lists 30 manifest book ids with the reason each was chosen: Burmese, English and Pāḷi books; born-digital, scanned, mixed-language and poor-quality copies; at least one known Zawgyi or legacy-font text layer. The PDFs are fetched from the public CDN, so no AWS access is needed.
+`apps/book-search/pilot/books.json` lists the pilot books with the reason each was chosen. The plan is 30 manifest book ids covering Burmese, English and Pāḷi books and born-digital, scanned, mixed-language and poor-quality copies, with at least one known Zawgyi or legacy-font text layer. **What exists today is five books** (three Burmese, two English: legacy-font and scanned Burmese, born-digital English, with Pāḷi terms in the English ones); the 30-book list and its reader-supplied queries are still to do. The PDFs are fetched from the public CDN, so no AWS access is needed.
 
-The stage 1 report, added to this file when the pilot is done, records:
+The stage 1 report records:
 
 - pages per method and status (`text`, `ocr`; `ok`, `suspect`, `failed`) and the reasons for failures;
 - OCR time per page on the machine used, and the projected time for the whole library (3,009 books, about 113.5 GiB, page count measured during the pilot);
