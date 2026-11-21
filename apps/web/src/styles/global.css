@@ -411,6 +411,20 @@
   .icon-link {
     @apply inline-flex items-center gap-2;
   }
+  /* A secondary utility link inside a card, such as "Something wrong?": small, muted, at the
+     bottom right of the card after the main content and action, never between them
+     (docs/design-guide.md §1). */
+  .link-quiet {
+    @apply text-sm font-normal transition-colors hover:text-brand-strong hover:underline;
+    color: var(--text-muted);
+    text-underline-offset: 0.2em;
+  }
+  .card-aside {
+    @apply flex justify-end;
+  }
+  .card-actions {
+    @apply flex flex-wrap items-center justify-between gap-x-4 gap-y-2;
+  }
 
   /* Zoom help: numbered steps and emoji badges */
   .guide-badge {

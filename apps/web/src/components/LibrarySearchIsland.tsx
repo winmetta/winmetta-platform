@@ -115,29 +115,31 @@ function Card({
           </li>
         ))}
       </ul>
-      <FeedbackCardLink
-        locale={labels.locale}
-        ctx="library"
-        item={record.id}
-        page={`/${labels.locale}/dhamma-library/`}
-      />
-      <p className="flex flex-wrap items-center gap-3 text-sm">
-        <a
-          className="btn btn-outline"
-          href={fileUrl(cdnBase, record.key)}
-          aria-label={`${labels.download}: ${record.title}`}
-          rel="noopener"
-          onClick={onResultClick}
-          data-umami-event="library_pdf_download"
-          data-umami-event-book={record.id}
-          data-umami-event-from="search"
-        >
-          {labels.download}
-        </a>
-        <span className="badge">
-          {formatSize(record.sizeBytes, formatLocale)}
-        </span>
-      </p>
+      <div className="card-actions">
+        <p className="flex flex-wrap items-center gap-3 text-sm">
+          <a
+            className="btn btn-outline"
+            href={fileUrl(cdnBase, record.key)}
+            aria-label={`${labels.download}: ${record.title}`}
+            rel="noopener"
+            onClick={onResultClick}
+            data-umami-event="library_pdf_download"
+            data-umami-event-book={record.id}
+            data-umami-event-from="search"
+          >
+            {labels.download}
+          </a>
+          <span className="badge">
+            {formatSize(record.sizeBytes, formatLocale)}
+          </span>
+        </p>
+        <FeedbackCardLink
+          locale={labels.locale}
+          ctx="library"
+          item={record.id}
+          page={`/${labels.locale}/dhamma-library/`}
+        />
+      </div>
     </li>
   );
 }

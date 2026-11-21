@@ -83,12 +83,14 @@ const upcoming = retreats
               {retreat.venue &&
                 ` · ${retreat.venue.name[locale] ?? retreat.venue.name.en ?? ''}, ${retreat.venue.city}`}
             </p>
-            <FeedbackLink
-              locale={locale}
-              ctx="class"
-              item={retreat.id}
-              class="link relative z-10 text-sm"
-            />
+            <p class="card-aside">
+              <FeedbackLink
+                locale={locale}
+                ctx="class"
+                item={retreat.id}
+                class="link-quiet relative z-10"
+              />
+            </p>
           </li>
         );
       })}

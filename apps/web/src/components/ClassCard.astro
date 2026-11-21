@@ -94,7 +94,6 @@ const labels = {
           </li>
         ))}
       </ul>
-      <FeedbackLink locale={locale} ctx="class" item={record.id} />
       <ClassNext
         client:visible
         slots={record.recurrences}
@@ -160,4 +159,14 @@ const labels = {
       </a>
     )}
   </p>
+  {record.status === 'active' && (
+    <p class="card-aside">
+      <FeedbackLink
+        locale={locale}
+        ctx="class"
+        item={record.id}
+        class="link-quiet relative z-10"
+      />
+    </p>
+  )}
 </li>

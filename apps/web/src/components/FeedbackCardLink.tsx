@@ -14,7 +14,7 @@ export default function FeedbackCardLink({
 }) {
   return feedbackEnabled ? (
     <a
-      className="link icon-link no-print relative z-10 text-sm"
+      className="link-quiet icon-link no-print relative z-10 ms-auto"
       href={feedbackMailto(page, item)}
       data-feedback={ctx}
       data-feedback-page={page}

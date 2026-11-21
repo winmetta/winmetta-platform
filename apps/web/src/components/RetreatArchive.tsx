@@ -198,12 +198,14 @@ export default function RetreatArchive({ items, labels }: Props) {
               {item.teachers.map((t) => t.name).join(', ')}
               {item.venue ? ` · ${item.venue}` : ''}
             </p>
-            <FeedbackCardLink
-              locale={labels.locale}
-              ctx="class"
-              item={item.id}
-              page={`/${labels.locale}/classes/retreats/`}
-            />
+            <p className="card-aside">
+              <FeedbackCardLink
+                locale={labels.locale}
+                ctx="class"
+                item={item.id}
+                page={`/${labels.locale}/classes/retreats/`}
+              />
+            </p>
           </li>
         ))}
       </ul>

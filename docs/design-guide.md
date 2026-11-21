@@ -14,6 +14,7 @@ A reader decides what to tap by how a thing looks, so **only things that do some
 | Secondary button | `.btn .btn-outline` | A secondary action: Copy citation, Show more, Try again | Information |
 | Link | `.link` (brand color, semibold, no underline until hover) | Going to another page or file | Actions that change the page |
 | Text action | `.text-action` (a real `<button>` styled as an icon and words in the link color, no frame) | A small action next to content: **Copy citation** (copy icon, then a check icon and "Copied") | The main action of a card, or navigation |
+| Quiet link | `.link-quiet` (small, muted, no bold; hover underline) in a `.card-aside` or `.card-actions` row | A secondary utility link inside a card: **Something wrong?** | Content, or anything the reader came to do |
 | Chip | `.chip` | A clickable filter, tag link or toggle (`<a>` or `<button>`) | Anything that is not clickable |
 | Badge | `.badge` | Read-only facts: a count, a state ("Read by OCR"), a page number, a size | Anything clickable |
 
@@ -22,6 +23,7 @@ Rules that follow:
 - A badge has no pointer cursor, no hover state and no `title`-only meaning: if it carries information a reader needs, the words are visible on the page (tooltips do not exist on touch screens).
 - Do not turn a chip into a badge by removing its link, or a badge into a chip by adding a click. Change the class with the behaviour.
 - Small, repeated actions such as Copy are text actions with the symbol readers know from other sites (the two-sheets copy icon beside the words, never the icon alone), not framed buttons; they still use a real `<button>` so keyboard and screen readers work, and they show the result in place (icon turns into a check, text into "Copied").
+- **Secondary utility links (report a problem, feedback) are asides, not content:** a quiet link at the bottom right of the card, after the content and the main action in reading and tab order, never between the title, the details and the main action. In a card with an action row, put it in the same row (`.card-actions`, with `ms-auto`, so it wraps to the right); otherwise it is the card's last element (`.card-aside`).
 - At most one primary button per card or form. Order: primary first, then secondary.
 - A control that is not available is hidden, or disabled with a visible reason; it is not left clickable and silent.
 

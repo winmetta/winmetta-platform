@@ -25,21 +25,28 @@ const { record, locale, from = 'other' } = Astro.props;
       <span class="muted font-normal"> ({record.titleNote})</span>
     )}
   </h3>
-  <p class="flex items-center gap-3 text-sm">
-    <span class="badge">
-      {formatSize(record.sizeBytes, locales[locale].formatLocale)}
-    </span>
-    <a
-      class="btn btn-outline"
-      href={fileUrl(libraryCdnBase, record.key)}
-      aria-label={`${t(locale, 'download')}: ${record.title}`}
-      rel="noopener"
-      data-umami-event="library_pdf_download"
-      data-umami-event-book={record.id}
-      data-umami-event-from={from}
-    >
-      {t(locale, 'download')}
-    </a>
-  </p>
-  <FeedbackLink locale={locale} ctx="library" item={record.id} />
+  <div class="card-actions">
+    <p class="flex items-center gap-3 text-sm">
+      <span class="badge">
+        {formatSize(record.sizeBytes, locales[locale].formatLocale)}
+      </span>
+      <a
+        class="btn btn-outline"
+        href={fileUrl(libraryCdnBase, record.key)}
+        aria-label={`${t(locale, 'download')}: ${record.title}`}
+        rel="noopener"
+        data-umami-event="library_pdf_download"
+        data-umami-event-book={record.id}
+        data-umami-event-from={from}
+      >
+        {t(locale, 'download')}
+      </a>
+    </p>
+    <FeedbackLink
+      locale={locale}
+      ctx="library"
+      item={record.id}
+      class="link-quiet ms-auto"
+    />
+  </div>
 </li>
