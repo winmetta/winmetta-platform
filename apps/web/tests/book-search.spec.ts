@@ -149,6 +149,33 @@ test.describe('search inside PDFs enabled', () => {
     ).toHaveCount(0);
   });
 
+  test('a failed Show more keeps the pages already shown and retries that page', async ({
+    page,
+  }) => {
+    let secondPageFails = true;
+    const pages: string[] = [];
+    await page.route('**/api/search?*', (route) => {
+      const n = new URL(route.request().url()).searchParams.get('page') ?? '1';
+      pages.push(n);
+      if (n === '1') return ok(route, [hit(1)], true);
+      if (secondPageFails) return failure(route, 503, 'index_unavailable');
+      return ok(route, [hit(2)], false);
+    });
+    await page.goto('/en/dhamma-library/?pdf=truths');
+    await expect(page.locator('[data-book-hit]')).toHaveCount(1);
+    await section(page)
+      .getByRole('button', { name: 'Show more pages' })
+      .click();
+    await expect(section(page).getByRole('alert')).toContainText(
+      'not available right now',
+    );
+    await expect(page.locator('[data-book-hit]')).toHaveCount(1);
+    secondPageFails = false;
+    await section(page).getByRole('button', { name: 'Try again' }).click();
+    await expect(page.locator('[data-book-hit]')).toHaveCount(2);
+    expect(pages).toEqual(['1', '2', '2']);
+  });
+
   test('says so when nothing matches, when the query is too short and when the service is down', async ({
     page,
   }) => {

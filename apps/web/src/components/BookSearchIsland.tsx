@@ -95,6 +95,8 @@ export default function BookSearchIsland({ labels, formatLocale }: Props) {
   const [hasMore, setHasMore] = useState(false);
   const [page, setPage] = useState(1);
   const [copied, setCopied] = useState('');
+  // The next page failed to load: the pages already shown stay, with a retry for that page.
+  const [moreFailed, setMoreFailed] = useState(false);
   const submitted = useRef('');
   const input = useRef<HTMLInputElement>(null);
   const controller = useRef<AbortController | null>(null);
@@ -106,13 +108,16 @@ export default function BookSearchIsland({ labels, formatLocale }: Props) {
     if (nextPage === 1) {
       submitted.current = q;
       setStatus('loading');
+      setMoreFailed(false);
     }
     const answer = await ask(q, nextPage, abort.signal);
     if (abort.signal.aborted) return;
     if (!answer.ok) {
-      setStatus(answer.failure);
+      if (nextPage > 1) setMoreFailed(true);
+      else setStatus(answer.failure);
       return;
     }
+    setMoreFailed(false);
     setHits((current) =>
       nextPage === 1 ? answer.hits : [...current, ...answer.hits],
     );
@@ -267,7 +272,17 @@ export default function BookSearchIsland({ labels, formatLocale }: Props) {
             })}
           </ul>
           <p className="muted">{labels.printedNote}</p>
-          {hasMore ? (
+          {moreFailed ? (
+            <p role="alert" className="space-x-3">
+              <span>{labels.unavailable}</span>
+              <Button
+                type="button"
+                onClick={() => void run(submitted.current, page + 1)}
+              >
+                {labels.retry}
+              </Button>
+            </p>
+          ) : hasMore ? (
             <Button
               type="button"
               variant="outline"
