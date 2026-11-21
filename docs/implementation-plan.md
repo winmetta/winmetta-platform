@@ -383,7 +383,7 @@ One reviewed PR each, in this order.
 * [ ] **1. Docs.** This section, [book-search.md](book-search.md), the developer-guide tool setup, the tech-architecture note and the AGENTS.md pointers; `.cache/` in `.gitignore`.
 * [x] **2. Shared text package.** Add `packages/*` to the workspaces; move `normalize.ts`, `burmese.ts` and `search-text.ts` into `packages/search-text` and import them from `apps/web`; add `ftsTokens()` with tests. The library and posts golden tests pass unchanged.
 * [x] **3. Indexer.** `apps/book-search` with `book-search:setup` (checks Tesseract and Poppler, downloads the pinned models and verifies their hashes), `book-search:fetch` (pilot PDFs from the public CDN) and `book-search:index` (text layer, quality check, OCR, resumable JSONL), with tests for the quality check and the OCR smoke test.
-* [ ] **4. Builder.** `book-search:build`: the SQLite schema, `optimize`, `VACUUM`, integrity and completeness checks, the `unicode61` check, versioned file name and SHA-256, with fixture tests.
+* [x] **4. Builder.** `book-search:build`: the SQLite schema, `optimize`, `VACUUM`, integrity and completeness checks, versioned file name, SHA-256 and the indexing report, with fixture tests. The golden queries run from step 5 and in the pilot.
 * [ ] **5. API, client and CLI.** The search core and query parser, the local server (`book-search:serve`), the base-URL client and the CLI (`book-search`), with server, client, CLI and contract tests that run in CI without Tesseract.
 * [ ] **6. Pilot.** Index the 30 pilot books, collect at least 30 golden queries from Burmese and English readers, and record the report in [book-search.md](book-search.md) §10.
 
