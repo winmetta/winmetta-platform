@@ -227,12 +227,35 @@ The stage 1 report, added to this file when the pilot is done, records:
 - **`#page=N`** opens the right page in desktop Chrome, Firefox and Safari, but most mobile browsers ignore it.
 - **Local only:** the index and API exist only on the developer's machine; readers cannot use them yet.
 
-## 12. Later stages (notes, not defined)
+## 12. Later stages
 
-Each of these becomes a defined stage only when the maintainer chooses it after stage 1. Nothing here is designed or scheduled.
+Stage 1 is the local indexer, API and tests above. Two later stages were chosen by the maintainer on 2026-11-21 and are described in this section: the AWS backend and the Dhamma Library page (§13). The others stay notes, not designs.
+
+### AWS backend (chosen 2026-11-21)
+
+The same handler (`apps/book-search/src/api/handler.ts`) runs in a Lambda, reached only through `https://app.winmetta.org/api/search` and `/api/search/health` (same origin, no CORS, no public API, no WAF). Defined in `infra/pulumi/book-search.ts` behind the stack flag `bookSearchEnabled`; the Lambda is `infra/book-search/`.
+
+- **Index storage:** a new private, versioned, encrypted bucket holds `releases/library-search-<version>.sqlite` and its `.sha256`. `npm run book-search:publish` uploads a built index with a conditional write, so a release is never overwritten (dry run unless `--yes`). The stack setting `bookSearchIndexVersion` names the release to serve; setting the previous name is the rollback.
+- **Cold start:** the function downloads the index and its checksum into `/tmp`, refuses a file that does not match, opens it read-only, and keeps it for the life of the container. If loading fails it answers 503 `index_unavailable` and tries again on the next request. The pilot index (five books) is about 1.3 MB; the full library would be about 4 GB (§10), which this design cannot serve: it needs sharding, a container image or another host first.
+- **Limits and protection:** reserved concurrency (default 5), five-minute CloudFront caching by query string, validation before any database work (unknown parameters, length, terms), two CloudWatch alarms (daily invocations, hourly errors), and a CloudFront Function that refuses cross-site and non-GET requests before the cache. The kill switch is the build flag that hides the search on the page (§13) and, at the edge, `bookSearchConcurrency` set to 0.
+- **Privacy:** no query is logged anywhere: the Lambda logs only whether the index loaded, CloudFront access logging is off, and the analytics events carry no search text. The Privacy page says searches are processed on the server and not stored (§13).
+
+What this does not stop: a script that sends requests to `app.winmetta.org/api/search` without a browser can fake any header. The concurrency cap and the alarms bound the cost; the effect of abuse is slower search. A public API (its own host, per-IP rules, optional keys) is a later decision if a real need appears.
+
+### Notes, not defined
+
+Each of these becomes a defined stage only when the maintainer chooses it. Nothing here is designed or scheduled.
 
 - **Google Cloud Vision OCR:** run Cloud Vision as a second OCR engine and store its results in the same local state store and index (`engine` already records which engine read a page). Needs a Google Cloud project, billing and credentials, which need approval.
 - **Compare Tesseract and Cloud Vision** on a few pages: character error rate against hand-checked text, failed pages, time and cost per page, then decide the engine for the backfill.
-- **AWS backend for the API:** the same contract as a Lambda function reached only through `https://app.winmetta.org/api/search` (same origin, no public API, no WAF for now; reserved concurrency, CloudFront caching, query limits, a budget alarm and a kill switch), with the SQLite file in a new private index bucket and the state store synced to it. Pulumi, with approval before any apply.
-- **Dhamma Library page:** a "Search inside PDFs" mode next to the catalog search, with **Open PDF** and **Copy citation**, and the Privacy page updated.
+- **Sync the state store** to a private bucket so the indexing work survives the loss of the laptop.
 - **Also noted:** stable book ids, the upload command and regeneration PR ([implementation-plan.md](implementation-plan.md) §6.2), the full backfill of every PDF, and a public API with its own host, WAF and optional keys if a real need appears.
+
+## 13. Dhamma Library page (chosen 2026-11-21)
+
+A **Search inside PDFs** mode on `/<locale>/dhamma-library/`, next to the catalog search, which stays the default and keeps working with no JavaScript and no service. Built behind the build flag `PUBLIC_BOOK_SEARCH` (off unless set), so the page can ship before the service is live and the flag is the kill switch.
+
+- **Behaviour:** a toggle between "Search titles and tags" and "Search inside PDFs". The inside-PDF mode asks the same-origin `/api/search` only after the reader submits a query (never while typing), shows each result as the book title, the physical PDF page, a snippet and whether the text came from OCR, with **Open PDF** (the `#page=N` link) and **Copy citation**. The mode and query live in the address (`?mode=pdf&q=…`), so a search can be shared; switching language keeps them like every other filter.
+- **Citation:** the copied text is the title, the page and the page link, written as `<title>, PDF page N, <link>`. The page is labelled the physical PDF page, because the printed page number can differ.
+- **When the service is down or slow:** a short message saying inside-PDF search is unavailable, with the catalog search still working. Only the books indexed so far are searched, and the page says so ("N books are indexed so far"), with a link to the catalog for everything else.
+- **Privacy:** the query goes only to `/api/search`; it is never sent to analytics (the events record that a PDF search happened and the number of results, not the words), and the Privacy page (English and Burmese) says searches are processed on the server and not stored. The Burmese wording needs review by a Burmese speaker before the Beta label is removed (implementation-plan.md §6.1).

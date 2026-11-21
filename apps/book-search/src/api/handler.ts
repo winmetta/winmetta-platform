@@ -57,7 +57,9 @@ export function handleRequest(
   }
   if (url.pathname !== '/api/search' && url.pathname !== '/api/search/health')
     return failure(404, 'not_found');
-  if (request.method !== 'GET') return failure(405, 'method_not_allowed');
+  // CloudFront only offers GET and HEAD together; a HEAD answer has no body for the client.
+  if (request.method !== 'GET' && request.method !== 'HEAD')
+    return failure(405, 'method_not_allowed');
   if (request.headers['sec-fetch-site'] === 'cross-site')
     return failure(403, 'forbidden_origin');
   if (!context.index) return failure(503, 'index_unavailable');

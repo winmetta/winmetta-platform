@@ -8,7 +8,7 @@
 
 ## 0. Scope: v1 Is a Static Web App
 
-Per [prd.md](prd.md) §4.7 and §7, v1 is **one responsive web app designed for mobile and desktop, built with Astro** (static-first, React islands for interactive pieces). Most content — LLB curriculum, Dhamma Library metadata, class directory — is static and lives in the repo as content collections. That means **no backend server and no database in Phases 0–2**: fewer moving parts for a volunteer team to run, cheaper, and easier to move. Two small, deliberate exceptions follow without changing that: the analytics-only server of Phase 4 (§4.4) and the planned feedback endpoint (§4.5), neither of which holds learner accounts or content. Book search stage 1 (§4.6) adds a local search server for development only; nothing of it is deployed.
+Per [prd.md](prd.md) §4.7 and §7, v1 is **one responsive web app designed for mobile and desktop, built with Astro** (static-first, React islands for interactive pieces). Most content — LLB curriculum, Dhamma Library metadata, class directory — is static and lives in the repo as content collections. That means **no backend server and no database in Phases 0–2**: fewer moving parts for a volunteer team to run, cheaper, and easier to move. Two small, deliberate exceptions follow without changing that: the analytics-only server of Phase 4 (§4.4) and the planned feedback endpoint (§4.5), neither of which holds learner accounts or content. Book search (§4.6) adds a third, again stateless: a read-only search Lambda over a private SQLite index.
 
 A backend (Fastify + PostgreSQL), accounts, offline support and native apps are all documented as [future work](#10-future-directions-tentative), added only when a real need appears.
 
@@ -224,13 +224,14 @@ Visitors can report a typo, wrong content, a wrong class schedule or a broken bo
 * **The Sādhu button** sends only an analytics event; there is no count on the site and no server state.
 * This is the first request path other than the static site and the analytics host, so the staging and integration-test advice in §7 and §10 stays in force for the first real API.
 
-### 4.6. Book search inside PDFs (stage 1 planned 2026-11-20, local only)
+### 4.6. Book search inside PDFs (stage 1 local; AWS backend added 2026-11-21)
 
 Readers will be able to search the text inside library PDFs and cite the exact physical page. Stage 1 proves it on a developer's machine; the design, data model, API contract and tests are in [book-search.md](book-search.md), and the checklist in implementation-plan.md §5C. The summary:
 
 * **Indexing:** Poppler reads each page's text layer; pages without a usable one (missing, Zawgyi, legacy font or broken order) are rendered and read by Tesseract with pinned `tessdata_best` Burmese and English models. Page results go to a JSONL state store, which a build step turns into one versioned SQLite FTS5 file. Nothing is committed but the code, the schema and the golden queries.
 * **Shared text code:** the website's normalization and Burmese syllable tokenizer move to `packages/search-text`, so catalog search, Dhamma Posts search and book search normalize text the same way.
 * **API:** `GET /api/search` and `GET /api/search/health`, served in stage 1 by a local `node:http` server on `127.0.0.1` with Node's built-in `node:sqlite`. The API client takes a base URL, so the same client, CLI and tests can later call a deployed backend.
+* **AWS backend (2026-11-21):** the same handler runs in a Lambda behind an IAM-authenticated Function URL, reached through the existing distribution at `/api/search` (same origin, no CORS, no public API, no WAF), with the released SQLite index in a new private S3 bucket. Defined in Pulumi behind `bookSearchEnabled`, like the feedback endpoint (§4.5); see [book-search.md](book-search.md) §12. This is a third small, deliberate exception to "no backend" (§0): it holds no accounts, stores nothing and logs no query.
 * **Not in stage 1:** AWS resources, the website UI and other OCR engines. Possible later stages (Google Cloud Vision, an engine comparison, a same-origin Lambda at `app.winmetta.org/api/search`, a Dhamma Library "Search inside PDFs" mode) are notes in [book-search.md](book-search.md) §12, not designs. A deployed search endpoint would be a third exception to "no backend" (§0) and needs its own decision.
 
 ---

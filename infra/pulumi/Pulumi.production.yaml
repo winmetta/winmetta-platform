@@ -5,3 +5,4 @@ config:
   winmetta-platform:githubSubjectPrefix: repo:winmetta@325823115/winmetta-platform@1391779321
   winmetta-platform:analyticsEnabled: "true"
   winmetta-platform:feedbackEnabled: "true"
+  winmetta-platform:bookSearchEnabled: "true"

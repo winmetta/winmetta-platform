@@ -273,6 +273,14 @@ describe('handleRequest on a built index', () => {
       expect(JSON.stringify(r.body)).not.toMatch(/truths|sqlite|database/i);
     }
   });
+  it('answers HEAD like GET, as CloudFront forwards both', () => {
+    expect(
+      handleRequest(
+        { method: 'HEAD', url: '/api/search?q=truths', headers: {} },
+        context,
+      ).status,
+    ).toBe(200);
+  });
   it('answers a request target the URL parser rejects with 400, not an exception', () => {
     for (const url of ['//[', 'http://[', '//a b:99999999']) {
       const r = handleRequest({ method: 'GET', url, headers: {} }, context);

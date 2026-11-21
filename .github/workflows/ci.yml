@@ -28,6 +28,7 @@ jobs:
             package-lock.json
             infra/pulumi/package-lock.json
             infra/feedback/package-lock.json
+            infra/book-search/package-lock.json
       - name: Use the declared npm version
         run: npm install --global "$(node -p "require('./package.json').packageManager")"
       - run: npm ci
@@ -87,6 +88,11 @@ jobs:
       - run: npm run feedback:typecheck
       - run: npm run feedback:test
       - run: npm run feedback:build
+      - name: Install the book-search function dependencies
+        run: npm ci --prefix infra/book-search
+      - run: npm run book-search-lambda:typecheck
+      - run: npm run book-search-lambda:test
+      - run: npm run book-search-lambda:build
       - name: Install the Pulumi program's dependencies
         run: npm ci
         working-directory: infra/pulumi

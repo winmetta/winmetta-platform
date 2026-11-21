@@ -168,6 +168,20 @@ can publish only to the feedback topic and write only its own logs.
 | `feedbackConcurrency` | `2`; accepted values `0`, `1`, `2`; zero stops invocations |
 | `feedbackAlertTopicArn` | Required only without analytics; otherwise the analytics alert topic is reused |
 
+### Book search (`book-search.ts`)
+
+Behind the stack flag `bookSearchEnabled` (default `false`): a private, versioned, encrypted S3 bucket for released SQLite indexes (`releases/` is read-only for the function, and releases are never overwritten), the `winmetta-app-book-search` Lambda (Node 24, arm64, reserved concurrency, IAM-authenticated Function URL) and two CloudWatch alarms. The distribution gets two behaviors, `/api/search` and `/api/search/*`, for GET and HEAD only, with a CloudFront Function that refuses cross-site requests, and a cache policy keyed by query string (five minutes, no cookies or headers). No WAF and no public API: the route is for pages of this site. Design: [docs/book-search.md](../../docs/book-search.md) §12.
+
+| Config | Default / purpose |
+| --- | --- |
+| `bookSearchEnabled` | Defaults to `false` |
+| `bookSearchIndexVersion` | The released index to serve, such as `2026-11-20-r1`; empty means the function answers 503. Setting the previous version is the rollback |
+| `bookSearchConcurrency` | `5`; integer 0 to 20; zero stops invocations |
+| `bookSearchBucketName` | `winmetta-app-production-book-search-index` |
+| `libraryCdnBase` | `https://dhamma-library.b-cdn.net`, the base of the PDF links in results |
+
+The archive is built with `npm run book-search-lambda:build` after installing `infra/book-search`; CI and the preview workflow do both. Publishing an index and applying the stack are operations steps for the private runbook.
+
 The deployment archive is built with the root command `npm run feedback:build`
 after installing `infra/feedback` dependencies. CI installs, tests and builds it
 before the Pulumi tests. Mock tests do not contact AWS. The public design lists
