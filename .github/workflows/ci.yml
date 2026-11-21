@@ -82,6 +82,8 @@ jobs:
       - run: npm test
       - name: Test the analytics collection proxy
         run: node --test infra/analytics/test/collector.test.mjs
+      - name: Test the dev server options
+        run: node --test scripts/dev-options.test.mjs scripts/dev-setup.test.mjs
       # infra/pulumi is not an npm workspace (the root commands skip it), so check it here.
       - name: Install the feedback endpoint dependencies
         run: npm ci --prefix infra/feedback

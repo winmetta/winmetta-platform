@@ -32,7 +32,7 @@ install:
 
 # ---------------------------------------------------------------- Develop
 
-# Start the web dev server at http://localhost:4321 (add --force to replace a running one).
+# Start the web dev server at http://localhost:4321 with local stubs for feedback and Search inside PDFs (the newest built index). Options: --no-feedback, --no-book-search, --force (replace a running server).
 [group('develop')]
 dev *args:
     npm run dev -- {{ args }}
@@ -132,18 +132,6 @@ feedback-e2e:
         npm run build --workspace @winmetta/web
         npm run test:smoke --workspace @winmetta/web -- feedback.spec.ts
     done
-
-# Dev server with the feedback dialog and Sādhu on, plus a local endpoint stub (the real handler; prints each report here instead of sending email).
-[group('feedback')]
-[script('bash')]
-feedback-dev *args:
-    set -euo pipefail
-    port="${FEEDBACK_STUB_PORT:-4322}"
-    node scripts/feedback-stub.mjs &
-    stub=$!
-    trap 'kill "$stub" 2>/dev/null || true' EXIT
-    PUBLIC_FEEDBACK=true PUBLIC_FEEDBACK_POSTS_REVIEWED=true \
-        FEEDBACK_STUB_URL="http://127.0.0.1:$port" npm run dev -- {{ args }}
 
 # Install the feedback Lambda's own dependencies when missing (setup only installs the root ones).
 [private]

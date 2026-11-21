@@ -17,7 +17,7 @@
     "dev": {
       "cache": false,
       "persistent": true,
-      "env": ["FEEDBACK_STUB_URL"]
+      "env": ["FEEDBACK_STUB_URL", "BOOK_SEARCH_STUB_URL"]
     },
     "typecheck": {
       "dependsOn": ["^typecheck"]

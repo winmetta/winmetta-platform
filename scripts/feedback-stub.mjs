@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Local stand-in for the feedback endpoint (`just feedback-dev`). It runs the real Lambda handler
+// Local stand-in for the feedback endpoint (started by `npm run dev` / `just dev`). It runs the real Lambda handler
 // (infra/feedback/src/handler.ts: same validation, size limit and bot checks) but, instead of
 // publishing to SNS, prints the email it would have sent. No AWS, nothing stored or sent.
 // The dev server proxies /api/feedback here when FEEDBACK_STUB_URL is set (apps/web/astro.config.mjs).

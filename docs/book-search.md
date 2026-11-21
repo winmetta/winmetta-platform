@@ -64,7 +64,7 @@ npm run book-search:index -- <bookId>... [--pages 1-6] [--ocr auto|always|never]
 npm run book-search:build [-- <bookId>...] [--version <name>] [--allow-incomplete]
 ```
 
-`--force` redoes the pages in the `--pages` range (every page without it) and keeps the other pages' records, unless the PDF or the extractor version changed, which makes all records stale. `--ocr never` records only text-layer pages; pages that need OCR are left unrecorded (counted as "need OCR") so a later `auto` run does them, and `--force` is refused with it. `--pilot` names the books in `apps/book-search/pilot/books.json` (added with the pilot, §10). `index` with no ids indexes every PDF already in `pdfs/`. It exits 2 if any page failed with an error; those pages are not recorded and are retried on the next run.
+`--force` redoes the pages in the `--pages` range (every page without it) and keeps the other pages' records, unless the PDF or the extractor version changed, which makes all records stale. `--ocr never` records only text-layer pages; pages that need OCR are left unrecorded (counted as "need OCR") so a later `auto` run does them, and `--force` is refused with it. `npm run dev` (and `just dev`) serves the newest built index to the page through a local proxy for `/api/search`, so Search inside PDFs works in the dev server; `--no-book-search` turns it off. `--pilot` names the books in `apps/book-search/pilot/books.json` (added with the pilot, §10). `index` with no ids indexes every PDF already in `pdfs/`. It exits 2 if any page failed with an error; those pages are not recorded and are retried on the next run.
 
 ## 4. Page records (state store)
 
