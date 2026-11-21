@@ -30,7 +30,7 @@ If a control seems to need a frame to be noticed, the layout is the problem, not
 | Quiet link | `.link-quiet` in a `.card-aside` or `.card-actions` row | Something wrong? | Content, or anything the reader came to do |
 | Folder name | `.folder-name` (symbol and name), as a text action, a tree link or a label | Dhamma Library folders in result cards, "Try these folders", the folder tree, the active filter | A filled pill or chip |
 | Chip | `.chip` | A clickable Dhamma post topic | Folders, anything that is not clickable |
-| Badge | `.badge` | PDF page 60, Read by OCR, 5.4 MB, a count | Anything clickable |
+| Badge | `.badge` | PDF page 60, Read by OCR, a count; a file size has a document symbol before it (`FileIcon`, or `LinkIcon name="file"` in Astro) and sits right after its Download button | Anything clickable |
 
 Rules that follow:
 

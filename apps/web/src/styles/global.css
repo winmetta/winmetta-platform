@@ -343,12 +343,13 @@
   .live-icon:focus::after {
     @apply block;
   }
-  .badge .link-icon {
-    @apply size-4;
+  .badge .link-icon,
+  .badge svg {
+    @apply size-4 shrink-0;
   }
   /* Read-only information (a count, a state, a page number): no pointer, no hover. */
   .badge {
-    @apply inline-flex items-center rounded-full bg-sand px-3 py-0.5 text-sm font-medium;
+    @apply inline-flex items-center gap-1.5 rounded-full bg-sand px-3 py-0.5 text-sm font-medium;
     color: var(--text-muted);
   }
 

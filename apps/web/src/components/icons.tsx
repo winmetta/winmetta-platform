@@ -29,6 +29,13 @@ export const CheckIcon = () => (
     <path d="m5 12 5 5L20 7" />
   </Svg>
 );
+/** A document, before a file size. */
+export const FileIcon = () => (
+  <Svg>
+    <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+    <path d="M14 3v5h5" />
+  </Svg>
+);
 /** A folder, before a folder name (docs/design-guide.md §1). */
 export const FolderIcon = () => (
   <Svg>

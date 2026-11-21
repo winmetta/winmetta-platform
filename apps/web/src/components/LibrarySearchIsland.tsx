@@ -23,7 +23,7 @@ import {
   trackSettled,
 } from '../lib/analytics';
 import { hasZawgyiMarker } from '../lib/zawgyi';
-import { CloseIcon, FolderIcon, MoreIcon, RetryIcon } from './icons';
+import { CloseIcon, FileIcon, FolderIcon, MoreIcon, RetryIcon } from './icons';
 import { TextAction } from './ui/text-action';
 
 export interface Labels {
@@ -129,7 +129,8 @@ function Card({
           >
             {labels.download}
           </a>
-          <span className="badge">
+          <span className="badge" data-file-size>
+            <FileIcon />
             {formatSize(record.sizeBytes, formatLocale)}
           </span>
         </p>

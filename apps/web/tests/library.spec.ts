@@ -242,3 +242,34 @@ test('in-place actions are text actions with an icon, not framed buttons', async
   await catalog.getByRole('button', { name: 'Remove folder filter' }).click();
   await expect(page).not.toHaveURL(/tag=/);
 });
+
+test('a file size is a badge with a document symbol, right after the Download button', async ({
+  page,
+}) => {
+  await page.goto('/en/dhamma-library/?q=dhamma');
+  const card = page
+    .locator('[data-library-search] li.card', {
+      has: page.locator('[data-file-size]'),
+    })
+    .first();
+  const size = card.locator('[data-file-size]');
+  await expect(size).toHaveClass(/badge/);
+  await expect(size.locator('svg')).toHaveCount(1);
+  await expect(size).toHaveText(/\d/);
+  const download = (await card
+    .getByRole('link', { name: /Download PDF/ })
+    .boundingBox())!;
+  const badge = (await size.boundingBox())!;
+  expect(badge.x).toBeGreaterThan(download.x + download.width);
+  // The same in a folder page's card.
+  await page.goto('/en/dhamma-library/folders/f001/');
+  const folderCard = page
+    .locator('li.card', { has: page.locator('[data-file-size]') })
+    .first();
+  await expect(folderCard.locator('[data-file-size] svg')).toHaveCount(1);
+  const d2 = (await folderCard
+    .getByRole('link', { name: /Download PDF/ })
+    .boundingBox())!;
+  const b2 = (await folderCard.locator('[data-file-size]').boundingBox())!;
+  expect(b2.x).toBeGreaterThan(d2.x + d2.width);
+});
