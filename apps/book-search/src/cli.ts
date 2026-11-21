@@ -130,7 +130,7 @@ async function runIndex(
     );
     errors += summary.errors;
     log(
-      `${book.id}: ${summary.pages} pages, ${summary.done} extracted, ${summary.skipped} already done, ${summary.errors} errors; ` +
+      `${book.id}: ${summary.pages} pages, ${summary.done} extracted, ${summary.skipped} already done, ${summary.errors} errors, ${summary.needsOcr} need OCR; ` +
         `methods ${JSON.stringify(summary.byMethod)}, status ${JSON.stringify(summary.byStatus)}`,
     );
   }

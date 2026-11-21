@@ -63,7 +63,7 @@ npm run book-search:fetch -- <bookId>...       # copy PDFs from the public CDN (
 npm run book-search:index -- <bookId>... [--pages 1-6] [--ocr auto|always|never] [--force]
 ```
 
-`--force` redoes the pages in the `--pages` range (every page without it) and keeps the other pages' records, unless the PDF or the extractor version changed, which makes all records stale. `--pilot` names the books in `apps/book-search/pilot/books.json` (added with the pilot, §10). `index` with no ids indexes every PDF already in `pdfs/`. It exits 2 if any page failed with an error; those pages are not recorded and are retried on the next run.
+`--force` redoes the pages in the `--pages` range (every page without it) and keeps the other pages' records, unless the PDF or the extractor version changed, which makes all records stale. `--ocr never` records only text-layer pages; pages that need OCR are left unrecorded (counted as "need OCR") so a later `auto` run does them, and `--force` is refused with it. `--pilot` names the books in `apps/book-search/pilot/books.json` (added with the pilot, §10). `index` with no ids indexes every PDF already in `pdfs/`. It exits 2 if any page failed with an error; those pages are not recorded and are retried on the next run.
 
 ## 4. Page records (state store)
 

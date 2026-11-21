@@ -41,30 +41,47 @@ async function options(
 }
 
 describe.skipIf(!hasPoppler)('indexBook (text layer)', () => {
-  it('records every page: text pages indexed, a nearly empty page failed without OCR', async () => {
+  it('records text pages and leaves a page that needs OCR pending when OCR is never', async () => {
     const dir = await tempDir();
     const pdf = await writePdf(dir, [sentence, `${sentence} again`, '12']);
     const book = fixtureBook();
     const summary = await indexBook(book, pdf, await options(dir));
-    expect(summary).toMatchObject({ pages: 3, done: 3, skipped: 0, errors: 0 });
-    expect(summary.byStatus).toEqual({ ok: 2, failed: 1 });
+    expect(summary).toMatchObject({
+      pages: 3,
+      done: 2,
+      errors: 0,
+      needsOcr: 1,
+    });
+    expect(summary.byStatus).toEqual({ ok: 2 });
     const records = await loadState(
       statePath(path.join(dir, 'state'), book.id),
     );
     expect(records.map((r) => [r.page, r.method, r.status])).toEqual([
       [1, 'text', 'ok'],
       [2, 'text', 'ok'],
-      [3, 'text', 'failed'],
     ]);
     expect(records[0]?.passages).toEqual([
       { ordinal: 1, script: 'latn', text: sentence },
     ]);
-    expect(records[2]?.reasons).toEqual(['too_little_text', 'ocr_disabled']);
     expect(records[0]).toMatchObject({
       bookId: book.id,
       key: book.key,
       confidence: null,
     });
+    // The pending page is still pending: a second run looks at it again.
+    expect(await indexBook(book, pdf, await options(dir))).toMatchObject({
+      done: 0,
+      skipped: 2,
+      needsOcr: 1,
+    });
+  });
+
+  it('refuses --force together with --ocr never', async () => {
+    const dir = await tempDir();
+    const pdf = await writePdf(dir, [sentence]);
+    await expect(
+      indexBook(fixtureBook(), pdf, await options(dir, { force: true })),
+    ).rejects.toThrow(/--ocr never/);
   });
 
   it('resumes: pages already in the state file are not redone', async () => {
@@ -101,7 +118,7 @@ describe.skipIf(!hasPoppler)('indexBook (text layer)', () => {
     const forced = await indexBook(
       book,
       pdf,
-      await options(dir, { force: true }),
+      await options(dir, { force: true, ocr: 'auto' }),
     );
     expect(forced.done).toBe(1);
     const records = await loadState(
@@ -119,7 +136,11 @@ describe.skipIf(!hasPoppler)('indexBook (text layer)', () => {
     const forced = await indexBook(
       book,
       pdf,
-      await options(dir, { force: true, pages: { from: 2, to: 2 } }),
+      await options(dir, {
+        force: true,
+        ocr: 'auto',
+        pages: { from: 2, to: 2 },
+      }),
     );
     expect(forced).toMatchObject({ done: 1, skipped: 0 });
     const records = await loadState(

@@ -25,7 +25,8 @@ export interface IndexOptions {
   tmpDir: string;
   tessdataDir: string;
   versions: ToolVersions;
-  /** auto: OCR only pages whose text layer is unusable; always: OCR every page; never: no OCR. */
+  /** auto: OCR only pages whose text layer is unusable; always: OCR every page; never: text layer
+   * only, leaving pages that need OCR unrecorded so a later `auto` run does them. */
   ocr: 'auto' | 'always' | 'never';
   /** Redo every page even if the state file has it. */
   force?: boolean;
@@ -40,6 +41,8 @@ export interface IndexSummary {
   done: number;
   skipped: number;
   errors: number;
+  /** Pages left unrecorded because their text layer is unusable and OCR is `never`. */
+  needsOcr: number;
   byMethod: Record<string, number>;
   byStatus: Record<string, number>;
 }
@@ -58,6 +61,10 @@ export async function indexBook(
   pdfFile: string,
   options: IndexOptions,
 ): Promise<IndexSummary> {
+  if (options.force && options.ocr === 'never')
+    throw new Error(
+      '--force with --ocr never would replace OCR results; use --ocr auto',
+    );
   const file = statePath(options.stateDir, book.id);
   const sha256 = await sha256File(pdfFile);
   const pageCount = await pdfPageCount(pdfFile);
@@ -89,6 +96,7 @@ export async function indexBook(
     done: 0,
     skipped: to - from + 1 - pending.length,
     errors: 0,
+    needsOcr: 0,
     byMethod: {},
     byStatus: {},
   };
@@ -102,6 +110,10 @@ export async function indexBook(
         layerText: layer[page - 1] ?? '',
         options,
       });
+      if (!record) {
+        summary.needsOcr += 1;
+        continue;
+      }
       await appendRecord(file, record);
       summary.done += 1;
       summary.byMethod[record.method] =
@@ -167,7 +179,8 @@ interface PageJob {
   options: IndexOptions;
 }
 
-async function extractPage(job: PageJob): Promise<PageRecord> {
+/** One page's record, or undefined when it needs OCR and OCR is `never` (the page stays pending). */
+async function extractPage(job: PageJob): Promise<PageRecord | undefined> {
   const { book, options, page } = job;
   const base = {
     v: 1 as const,
@@ -198,16 +211,7 @@ async function extractPage(job: PageJob): Promise<PageRecord> {
       passages,
     };
   }
-  if (options.ocr === 'never')
-    return {
-      ...base,
-      method: 'text',
-      engine: textEngine(options.versions),
-      status: 'failed',
-      confidence: null,
-      reasons: [...verdict.reasons, 'ocr_disabled'],
-      passages: [],
-    };
+  if (options.ocr === 'never') return undefined;
 
   const prefix = path.join(options.tmpDir, `${book.id}-${page}`);
   try {
