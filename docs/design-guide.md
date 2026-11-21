@@ -29,7 +29,7 @@ If a control seems to need a frame to be noticed, the layout is the problem, not
 | Link | `.link` (brand color, semibold, no underline until hover) | Going to another page | Actions that change the page |
 | Quiet link | `.link-quiet` in a `.card-aside` or `.card-actions` row | Something wrong? | Content, or anything the reader came to do |
 | Folder name | `.folder-name` (symbol and name), as a text action, a tree link or a label | Dhamma Library folders in result cards, "Try these folders", the folder tree, the active filter | A filled pill or chip |
-| Chip | `.chip` | A clickable Dhamma post topic | Folders, anything that is not clickable | Anything that is not clickable |
+| Chip | `.chip` | A clickable Dhamma post topic | Folders, anything that is not clickable |
 | Badge | `.badge` | PDF page 60, Read by OCR, 5.4 MB, a count | Anything clickable |
 
 Rules that follow:
