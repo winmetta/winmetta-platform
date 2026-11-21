@@ -71,11 +71,21 @@ function readMeta(db: DatabaseSync, key: string): string | undefined {
 }
 
 export function health(index: OpenedIndex): HealthResponse {
+  // Older releases stored the PDF page total, which can exceed the recorded page count.
+  const recorded = readMeta(index.db, 'recorded_pages');
+  const pages =
+    recorded === undefined
+      ? Number(
+          index.db.prepare('SELECT count(*) AS pages FROM pages').get()?.[
+            'pages'
+          ],
+        )
+      : Number(recorded);
   return {
     v: 1,
     indexVersion: index.indexVersion,
     books: Number(readMeta(index.db, 'books')),
-    pages: Number(readMeta(index.db, 'pages')),
+    pages,
     passages: Number(readMeta(index.db, 'passages')),
   };
 }

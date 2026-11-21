@@ -296,6 +296,7 @@ export async function buildIndex(options: BuildOptions): Promise<BuildResult> {
       built_at: now.toISOString(),
       books: String(totals.books),
       pages: String(totals.pages),
+      recorded_pages: String(totals.recorded),
       passages: String(totals.passages),
     }))
       insertMeta.run(key, value);
