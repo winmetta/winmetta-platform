@@ -86,7 +86,7 @@ Keep code in `apps/web` until a second consumer needs it. Only then extract a pa
 
 | Command | What it does |
 | --- | --- |
-| `npm run dev` | Dev server on 127.0.0.1:4321. Only one can run per project; a second start prints the URL and PID of the running one. `npm run dev -- --force` replaces it. |
+| `npm run dev` | Dev server on 127.0.0.1:4321, with local stand-ins for the feedback endpoint and the book-search API (on your newest built index, [book-search.md](book-search.md)). It sets up what they need: with no index yet it builds a small one from two public English books in seconds (needs Poppler; on a terminal with Homebrew it offers to install it, otherwise it says how and starts without book search), so the feedback dialog and Search inside PDFs work offline. `--no-feedback` and `--no-book-search` turn a feature off and skip its stub. Only one dev server can run per project; a second start prints the URL and PID of the running one. `--force` replaces it. `just dev` takes the same options. |
 | `npm run dev:stop` | Stop the running dev server. |
 | `npm run lint` | ESLint plus a Prettier check. |
 | `npm run format` | Format the repo with Prettier. Run it from the repo root: Prettier reads `.prettierignore` only from the current directory, so running it inside `apps/web` rewrites generated files such as the library manifest. |

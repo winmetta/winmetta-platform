@@ -10,33 +10,26 @@ import { validateMessages } from './src/i18n/messages.ts';
 const localEnv = new URL('../../.env.local', import.meta.url);
 if (existsSync(localEnv)) loadEnvFile(localEnv);
 
-// `just feedback-dev` sets FEEDBACK_STUB_URL: forward POST /api/feedback to the local stub
-// (scripts/feedback-stub.mjs) so the dialog has an endpoint. With trailingSlash "always", Astro's
-// dev server answers a path without a slash (this one) with a 404 from a middleware it puts at the
-// front of the stack, so the plugin runs last and puts its own handler ahead of that.
-function feedbackStub() {
-  const target = process.env.FEEDBACK_STUB_URL;
+// `npm run dev` / `just dev` start local stand-ins for the site's two small services and set
+// FEEDBACK_STUB_URL and BOOK_SEARCH_STUB_URL (scripts/dev.mjs). The dev server forwards
+// POST /api/feedback (scripts/feedback-stub.mjs) and GET /api/search (the book-search API on
+// the newest local index) there, so the dialog and Search inside PDFs have an endpoint.
+// With trailingSlash "always", Astro's dev server answers a path without a slash (these ones)
+// with a 404 from a middleware it puts at the front of the stack, so each plugin runs last and
+// puts its own handler ahead of that.
+function stubProxy(name, target, handles, send) {
   if (!target) return [];
   const forward = async (req, res, next) => {
-    if (req.url?.split('?')[0] !== '/api/feedback') return next();
-    const chunks = [];
-    for await (const chunk of req) chunks.push(chunk);
+    if (!handles(req)) return next();
     try {
-      const reply = await fetch(target, {
-        method: req.method,
-        headers: { 'content-type': 'application/json' },
-        body: ['GET', 'HEAD'].includes(req.method)
-          ? undefined
-          : Buffer.concat(chunks),
-      });
-      res.writeHead(reply.status).end();
+      await send(req, res, target);
     } catch {
       res.writeHead(502).end();
     }
   };
   return [
     {
-      name: 'feedback-stub',
+      name,
       configureServer: {
         order: 'post',
         handler(server) {
@@ -49,6 +42,51 @@ function feedbackStub() {
     },
   ];
 }
+
+const pathOf = (req) => req.url?.split('?')[0] ?? '';
+
+async function forwardFeedback(req, res, target) {
+  const chunks = [];
+  for await (const chunk of req) chunks.push(chunk);
+  const reply = await fetch(target, {
+    method: req.method,
+    headers: { 'content-type': 'application/json' },
+    body: ['GET', 'HEAD'].includes(req.method)
+      ? undefined
+      : Buffer.concat(chunks),
+  });
+  res.writeHead(reply.status).end();
+}
+
+async function forwardBookSearch(req, res, target) {
+  const reply = await fetch(`${target}${req.url}`, {
+    method: req.method,
+    headers: { accept: 'application/json' },
+  });
+  res
+    .writeHead(reply.status, {
+      'content-type': reply.headers.get('content-type') ?? 'application/json',
+      'cache-control': 'no-store',
+    })
+    .end(Buffer.from(await reply.arrayBuffer()));
+}
+
+const devStubs = () => [
+  ...stubProxy(
+    'feedback-stub',
+    process.env.FEEDBACK_STUB_URL,
+    (req) => pathOf(req) === '/api/feedback',
+    forwardFeedback,
+  ),
+  ...stubProxy(
+    'book-search-stub',
+    process.env.BOOK_SEARCH_STUB_URL,
+    (req) =>
+      ['GET', 'HEAD'].includes(req.method) &&
+      (pathOf(req) === '/api/search' || pathOf(req).startsWith('/api/search/')),
+    forwardBookSearch,
+  ),
+];
 
 validateMessages();
 export default defineConfig({
@@ -70,7 +108,7 @@ export default defineConfig({
     }),
   ],
   vite: {
-    plugins: [tailwind(), ...feedbackStub()],
+    plugins: [tailwind(), ...devStubs()],
     // Pre-bundle everything the islands import, so a long-running dev server never reloads its
     // dependencies mid-session ("Outdated Optimize Dep" 504s leave islands unhydrated).
     optimizeDeps: {
