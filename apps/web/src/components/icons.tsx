@@ -1,0 +1,50 @@
+// The small symbols used next to words in text actions (docs/design-guide.md §1). All are
+// decorative: the words carry the meaning, so they are hidden from screen readers.
+import type { ReactNode } from 'react';
+
+const Svg = ({ children }: { children: ReactNode }) => (
+  <svg
+    aria-hidden="true"
+    focusable="false"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    {children}
+  </svg>
+);
+
+/** The usual copy symbol: two overlapping sheets. */
+export const CopyIcon = () => (
+  <Svg>
+    <rect x="9" y="9" width="11" height="11" rx="2" />
+    <path d="M5 15V6a2 2 0 0 1 2-2h9" />
+  </Svg>
+);
+export const CheckIcon = () => (
+  <Svg>
+    <path d="m5 12 5 5L20 7" />
+  </Svg>
+);
+/** Remove, clear and reset. */
+export const CloseIcon = () => (
+  <Svg>
+    <path d="M6 6l12 12M18 6 6 18" />
+  </Svg>
+);
+/** Try again. */
+export const RetryIcon = () => (
+  <Svg>
+    <path d="M20 11a8 8 0 1 0-2.3 5.7" />
+    <path d="M20 5v6h-6" />
+  </Svg>
+);
+/** Show more. */
+export const MoreIcon = () => (
+  <Svg>
+    <path d="m6 9 6 6 6-6" />
+  </Svg>
+);

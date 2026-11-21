@@ -210,3 +210,27 @@ test('narrow screens do not scroll sideways with results', async ({ page }) => {
     ),
   ).toBe(true);
 });
+
+test('in-place actions are text actions with an icon, not framed buttons', async ({
+  page,
+}) => {
+  await page.goto('/en/dhamma-library/?q=dhamma&tag=Rare-Buddhist-Books-1');
+  const catalog = page.locator('[data-library-search]');
+  for (const name of ['Clear search', 'Remove folder filter']) {
+    const action = catalog.getByRole('button', { name });
+    await expect(action).toBeVisible();
+    await expect(action).toHaveClass(/text-action/);
+    await expect(action).not.toHaveClass(/btn/);
+    await expect(action.locator('svg')).toHaveCount(1);
+  }
+  // The folder name is information, not a control.
+  await expect(
+    catalog.locator('.badge', { hasText: 'Rare-Buddhist-Books-1' }),
+  ).toBeVisible();
+  // Getting a file stays a framed (outline) button.
+  await expect(
+    catalog.getByRole('link', { name: /Download PDF/ }).first(),
+  ).toHaveClass(/btn-outline/);
+  await catalog.getByRole('button', { name: 'Remove folder filter' }).click();
+  await expect(page).not.toHaveURL(/tag=/);
+});

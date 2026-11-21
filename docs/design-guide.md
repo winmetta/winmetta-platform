@@ -4,29 +4,42 @@ Rules for the look and behaviour of the site, so that every page, and every feat
 
 Principles behind every rule: calm and legible, nothing that pulls attention for its own sake, the same thing always looks and is worded the same way, and a reader with a slow phone, a small screen or a Burmese interface is never an afterthought.
 
-## 1. Clickable or not: what each element means
+## 1. Clickable or not, and button or not
 
-A reader decides what to tap by how a thing looks, so **only things that do something may look like they do something.** If clicking an element does nothing, it must be a badge or plain text.
+A reader decides what to tap by how a thing looks, so **only things that do something may look like they do something**, and **the look says what kind of thing it is.** If clicking an element does nothing, it must be a badge or plain text.
 
-| Element | Class | Use it for | Never for |
+### Decide what it is
+
+Ask in this order and stop at the first yes:
+
+1. **Does it only show a fact** (a count, a state, a page number, a size)? A **badge**. Never clickable, never styled as clickable.
+2. **Does it take the reader to another page** (or to a file's own page)? A **link**.
+3. **Does it submit a form, or get or start something for the reader** (download or open a file, join a meeting)? A **framed button**: filled (`.btn-primary`) for the one main submit of a page or form, outline (`.btn-outline`) for the card's own action in a list (Download PDF, Open PDF at this page).
+4. **Does it only act on what is already on screen** (copy, clear a search, remove a filter, reset, try again, show more, print)? A **text action**: the usual symbol, then the words, in the link color, with no frame. It is still a real `<button>` in the HTML.
+5. **Is it a clickable filter or tag** a reader picks from a set? A **chip**.
+
+If a control seems to need a frame to be noticed, the layout is the problem, not the control.
+
+| Element | Class | Examples | Never for |
 | --- | --- | --- | --- |
-| Primary button | `.btn .btn-primary` | The one main action of a card or form: Search, Open PDF | Status, labels, navigation to another page |
-| Secondary button | `.btn .btn-outline` | A secondary action: Copy citation, Show more, Try again | Information |
-| Link | `.link` (brand color, semibold, no underline until hover) | Going to another page or file | Actions that change the page |
-| Text action | `.text-action` (a real `<button>` styled as an icon and words in the link color, no frame) | A small action next to content: **Copy citation** (copy icon, then a check icon and "Copied") | The main action of a card, or navigation |
-| Quiet link | `.link-quiet` (small, muted, no bold; hover underline) in a `.card-aside` or `.card-actions` row | A secondary utility link inside a card: **Something wrong?** | Content, or anything the reader came to do |
-| Chip | `.chip` | A clickable filter, tag link or toggle (`<a>` or `<button>`) | Anything that is not clickable |
-| Badge | `.badge` | Read-only facts: a count, a state ("Read by OCR"), a page number, a size | Anything clickable |
+| Primary button | `.btn .btn-primary` | Search (submit) | Status, labels, repeated down a list |
+| Outline button | `.btn .btn-outline` | Download PDF, Open PDF at this page, View app | In-place operations, information |
+| Text action | `.text-action` (React: `TextAction` with an icon from `icons.tsx`) | Copy citation (copy icon, then a check and "Copied"), Clear search and Remove folder filter (×), Try again (retry arrow), Show more (chevron) | The main action of a card, navigation |
+| Link | `.link` (brand color, semibold, no underline until hover) | Going to another page | Actions that change the page |
+| Quiet link | `.link-quiet` in a `.card-aside` or `.card-actions` row | Something wrong? | Content, or anything the reader came to do |
+| Chip | `.chip` | A folder or topic tag the reader can pick | Anything that is not clickable |
+| Badge | `.badge` | PDF page 60, Read by OCR, 5.4 MB, a count | Anything clickable |
 
 Rules that follow:
 
 - A badge has no pointer cursor, no hover state and no `title`-only meaning: if it carries information a reader needs, the words are visible on the page (tooltips do not exist on touch screens).
 - Do not turn a chip into a badge by removing its link, or a badge into a chip by adding a click. Change the class with the behaviour.
-- Small, repeated actions such as Copy are text actions with the symbol readers know from other sites (the two-sheets copy icon beside the words, never the icon alone), not framed buttons; they still use a real `<button>` so keyboard and screen readers work, and they show the result in place (icon turns into a check, text into "Copied").
+- Text actions use the symbol readers know from other sites, always with words beside it (never the icon alone), and show their result in place (the icon turns into a check, the text into "Copied"). Symbols come from `components/icons.tsx` (or the same paths inline in an Astro file); add a new one there.
 - **Secondary utility links (report a problem, feedback) are asides, not content:** a quiet link at the bottom right of the card, after the content and the main action in reading and tab order, never between the title, the details and the main action. In a card with an action row, put it in the same row (`.card-actions`, with `ms-auto`, so it wraps to the right); otherwise it is the card's last element (`.card-aside`), rendered only when the feature is on, so a card without it has no empty wrapper and no extra gap.
-- **The same action looks the same everywhere.** Getting a library PDF (**Download PDF** in the catalog, **Open PDF at this page** in a search result) is an outline button (`.btn-outline`) in both, in the same place in the card's action row, followed by its small extras (the size badge, the copy action). In lists with many cards the card's own action is outline so the list stays calm; a filled `.btn-primary` is for the one main action of a page or a form (Search), not repeated down a list. Before adding a button, find the existing one for the same action and copy it.
-- At most one primary button per card or form. Order: primary first, then secondary.
+- **The same action looks the same everywhere.** Getting a library PDF is an outline button in the catalog and in a search result, in the same place in the card's action row, followed by its small extras (the size badge, the copy action). A filled `.btn-primary` is for the one main action of a page or a form, not repeated down a list. Before adding a control, find the existing one for the same action and copy it.
+- At most one filled button per card or form. Order in a row: the button first, then text actions, then the quiet link at the right.
 - A control that is not available is hidden, or disabled with a visible reason; it is not left clickable and silent.
+- Known controls still to bring in line with this section (migrate them when a page is touched): Print and Share on posts, the feedback dialog's Cancel.
 
 ## 2. Spacing and layout
 

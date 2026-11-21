@@ -11,7 +11,9 @@ import {
   type FailureKind,
 } from '../lib/book-search';
 import { formatCount } from '../lib/library-url';
+import { CheckIcon, CopyIcon, MoreIcon, RetryIcon } from './icons';
 import { Button } from './ui/button';
+import { TextAction } from './ui/text-action';
 
 export interface BookSearchLabels {
   title: string;
@@ -87,35 +89,6 @@ async function copyText(text: string): Promise<boolean> {
     return done;
   }
 }
-
-/** The usual copy symbol: two overlapping sheets. */
-const CopyIcon = () => (
-  <svg
-    aria-hidden="true"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect x="9" y="9" width="11" height="11" rx="2" />
-    <path d="M5 15V6a2 2 0 0 1 2-2h9" />
-  </svg>
-);
-const CheckIcon = () => (
-  <svg
-    aria-hidden="true"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="m5 12 5 5L20 7" />
-  </svg>
-);
 
 export default function BookSearchIsland({ labels, formatLocale }: Props) {
   const [query, setQuery] = useState('');
@@ -247,12 +220,12 @@ export default function BookSearchIsland({ labels, formatLocale }: Props) {
       {status === 'unavailable' ? (
         <p role="alert" className="space-x-3">
           <span>{labels.unavailable}</span>
-          <Button
-            type="button"
+          <TextAction
+            icon={<RetryIcon />}
             onClick={() => void run(submitted.current || query.trim(), 1)}
           >
             {labels.retry}
-          </Button>
+          </TextAction>
         </p>
       ) : null}
 
@@ -288,16 +261,12 @@ export default function BookSearchIsland({ labels, formatLocale }: Props) {
                     >
                       {labels.open}
                     </a>
-                    <button
-                      type="button"
-                      className="text-action"
+                    <TextAction
+                      icon={copied === key ? <CheckIcon /> : <CopyIcon />}
                       onClick={() => void onCopy(hit)}
                     >
-                      {copied === key ? <CheckIcon /> : <CopyIcon />}
-                      <span>
-                        {copied === key ? labels.copied : labels.copy}
-                      </span>
-                    </button>
+                      {copied === key ? labels.copied : labels.copy}
+                    </TextAction>
                   </p>
                 </li>
               );
@@ -307,21 +276,20 @@ export default function BookSearchIsland({ labels, formatLocale }: Props) {
           {moreFailed ? (
             <p role="alert" className="space-x-3">
               <span>{labels.unavailable}</span>
-              <Button
-                type="button"
+              <TextAction
+                icon={<RetryIcon />}
                 onClick={() => void run(submitted.current, page + 1)}
               >
                 {labels.retry}
-              </Button>
+              </TextAction>
             </p>
           ) : hasMore ? (
-            <Button
-              type="button"
-              variant="outline"
+            <TextAction
+              icon={<MoreIcon />}
               onClick={() => void run(submitted.current, page + 1)}
             >
               {labels.more}
-            </Button>
+            </TextAction>
           ) : null}
         </div>
       ) : null}

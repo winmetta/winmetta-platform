@@ -12,7 +12,8 @@ import {
   type RetreatItem,
   type RetreatState,
 } from '../lib/retreat-filter';
-import { Button } from './ui/button';
+import { CloseIcon } from './icons';
+import { TextAction } from './ui/text-action';
 
 export interface ArchiveLabels {
   locale: Locale;
@@ -169,13 +170,12 @@ export default function RetreatArchive({ items, labels }: Props) {
       >
         <p>{fill(labels.count, shown.length)}</p>
         {isActive(state) ? (
-          <Button
-            type="button"
-            variant="outline"
+          <TextAction
+            icon={<CloseIcon />}
             onClick={() => update({ ...emptyState })}
           >
             {labels.reset}
-          </Button>
+          </TextAction>
         ) : null}
       </div>
       {shown.length === 0 ? <p>{labels.noResults}</p> : null}

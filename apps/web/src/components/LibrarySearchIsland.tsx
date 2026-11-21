@@ -23,7 +23,8 @@ import {
   trackSettled,
 } from '../lib/analytics';
 import { hasZawgyiMarker } from '../lib/zawgyi';
-import { Button } from './ui/button';
+import { CloseIcon, MoreIcon, RetryIcon } from './icons';
+import { TextAction } from './ui/text-action';
 
 export interface Labels {
   searchLabel: string;
@@ -319,16 +320,15 @@ export default function LibrarySearchIsland({
           </span>
         </label>
         {active ? (
-          <Button
-            type="button"
-            variant="outline"
+          <TextAction
+            icon={<CloseIcon />}
             onClick={() => {
               update({ q: '', tag: '' });
               input.current?.focus();
             }}
           >
             {labels.resetSearch}
-          </Button>
+          </TextAction>
         ) : null}
       </div>
 
@@ -338,13 +338,9 @@ export default function LibrarySearchIsland({
           <span lang={languageOf(tag)} className="badge">
             {tag}
           </span>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => update({ tag: '' })}
-          >
+          <TextAction icon={<CloseIcon />} onClick={() => update({ tag: '' })}>
             {labels.removeFolder}
-          </Button>
+          </TextAction>
         </p>
       ) : null}
 
@@ -360,9 +356,9 @@ export default function LibrarySearchIsland({
       {status === 'error' ? (
         <p role="alert" className="space-x-3">
           <span>{labels.searchError}</span>
-          <Button type="button" onClick={() => void load()}>
+          <TextAction icon={<RetryIcon />} onClick={() => void load()}>
             {labels.searchRetry}
-          </Button>
+          </TextAction>
         </p>
       ) : null}
 
@@ -377,13 +373,12 @@ export default function LibrarySearchIsland({
             {exact.slice(0, visible).map(card('exact'))}
           </ul>
           {exact.length > visible ? (
-            <Button
-              type="button"
-              variant="outline"
+            <TextAction
+              icon={<MoreIcon />}
               onClick={() => setVisible(visible + PAGE)}
             >
               {labels.showMore}
-            </Button>
+            </TextAction>
           ) : null}
         </>
       ) : null}
