@@ -25,6 +25,8 @@
     "book-search:fetch": "node apps/book-search/src/cli.ts fetch",
     "book-search:index": "node apps/book-search/src/cli.ts index",
     "book-search:build": "node apps/book-search/src/cli.ts build",
+    "book-search:serve": "node apps/book-search/src/search-cli.ts serve",
+    "book-search": "node apps/book-search/src/search-cli.ts",
     "posts:new": "node scripts/new-post.mjs",
     "posts:validate": "node scripts/validate-posts.mjs",
     "feedback:build": "npm run build --prefix infra/feedback",
