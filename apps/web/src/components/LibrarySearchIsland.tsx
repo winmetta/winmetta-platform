@@ -281,7 +281,11 @@ export default function LibrarySearchIsland({
     );
 
   return (
-    <section className="space-y-4" aria-busy={status === 'loading'}>
+    <section
+      className="space-y-4"
+      aria-busy={status === 'loading'}
+      data-library-search
+    >
       <div className="flex flex-wrap items-end gap-3">
         <label className="grow space-y-1">
           <span className="block font-medium">{labels.searchLabel}</span>

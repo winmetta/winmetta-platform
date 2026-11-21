@@ -100,7 +100,10 @@ test('library search finds a study app and opens its recommendation', async ({
 
 test('library search finds an app using a Burmese alias', async ({ page }) => {
   await page.goto('/my/dhamma-library/');
-  await page.getByRole('searchbox').fill('ပါဠိ အဘိဓာန်');
+  await page
+    .locator('[data-library-search]')
+    .getByRole('searchbox')
+    .fill('ပါဠိ အဘိဓာန်');
   await expect(
     page.getByRole('heading', { name: 'Digital Pāḷi Dictionary' }),
   ).toBeVisible();
@@ -110,7 +113,9 @@ test('finds Burmese books and keeps the query in the URL', async ({ page }) => {
   await page.goto('/en/dhamma-library/');
   await search(page).fill(book);
   await expect(page.locator('h3', { hasText: book }).first()).toBeVisible();
-  await expect(page.getByRole('status')).toContainText('Results:');
+  await expect(
+    page.locator('[data-library-search]').getByRole('status'),
+  ).toContainText('Results:');
   await expect(page).toHaveURL(/\?q=%E1%80%93/);
   const link = page.getByRole('link', { name: /Download PDF/ }).first();
   expect(await link.getAttribute('href')).toMatch(

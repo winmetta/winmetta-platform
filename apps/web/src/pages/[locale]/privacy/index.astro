@@ -1,5 +1,6 @@
 ---
 import { feedbackEnabled } from '../../../lib/feedback';
+import { bookSearchEnabled } from '../../../lib/book-search';
 import Shell from '../../../layouts/Shell.astro';
 import { locales, localeCodes, type Locale } from '../../../i18n/locales';
 import { t } from '../../../i18n/messages';
@@ -19,7 +20,7 @@ const updated = new Intl.DateTimeFormat(locales[locale].formatLocale, {
   dateStyle: 'long',
   numberingSystem: 'latn',
   timeZone: 'UTC',
-}).format(new Date('2026-11-19T00:00:00Z'));
+}).format(new Date('2026-11-21T00:00:00Z'));
 const sections = [
   ['privacyNoneTitle', 'privacyNone'],
   ['privacyAnalyticsTitle', 'privacyAnalytics'],
@@ -28,6 +29,9 @@ const sections = [
     : []),
   ...(feedbackEnabled
     ? [['privacyFeedbackTitle', 'privacyFeedback'] as const]
+    : []),
+  ...(bookSearchEnabled
+    ? [['privacyBookSearchTitle', 'privacyBookSearch'] as const]
     : []),
   ['privacyStoredTitle', 'privacyStored'],
   ['privacySearchUrlTitle', 'privacySearchUrl'],

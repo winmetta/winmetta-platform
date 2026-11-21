@@ -87,10 +87,11 @@ test('Privacy states what the site does and shows a Latin-digit date', async ({
   await page.goto('/en/privacy/');
   const feedback = process.env.PUBLIC_FEEDBACK === 'true';
   const ipLogging = process.env.PUBLIC_ANALYTICS_IP_LOGGING === 'true';
+  const bookSearch = process.env.PUBLIC_BOOK_SEARCH === 'true';
   await expect(page.getByRole('heading', { level: 2 })).toHaveCount(
-    7 + Number(feedback) + Number(ipLogging),
+    7 + Number(feedback) + Number(ipLogging) + Number(bookSearch),
   );
-  await expect(page.locator('main')).toContainText('November 19, 2026');
+  await expect(page.locator('main')).toContainText('November 21, 2026');
   await expect(page.locator('main')).toContainText('Website analytics');
   await expect(page.locator('#privacyAnalyticsIpTitle')).toHaveCount(
     Number(ipLogging),
