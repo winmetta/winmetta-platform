@@ -70,9 +70,12 @@ jobs:
         if: steps.changes.outputs.infra == 'true'
         run: npm ci
         working-directory: infra/pulumi
+      # The book-search function bundles code from the npm workspaces (apps/book-search, the
+      # shared text package and zod), so the root dependencies are needed to build it.
       - name: Build the function archives
         if: steps.changes.outputs.infra == 'true'
         run: |
+          npm ci
           npm ci --prefix infra/feedback
           npm run feedback:build
           npm ci --prefix infra/book-search
