@@ -1,6 +1,6 @@
 # Book search: searching inside library PDFs
 
-**Status:** stage 1 planned 2026-11-20, not started. Stage 1 runs entirely on a developer's machine: nothing is deployed and no AWS resource is created. The checklist is in [implementation-plan.md](implementation-plan.md) §5C. Later stages are only notes (§12); the maintainer decides each next step when the previous one is done.
+**Status:** the pilot index serves five books. Full-library releases are built locally and published as versioned indexes. The AWS design and rollout checks are in §12. The implementation checklist is in [implementation-plan.md](implementation-plan.md) §5C.
 
 **Why:** the Dhamma Library catalog search finds a book by its title, tags and folder ([tech-architecture.md](tech-architecture.md) §3). Readers also need to find a passage _inside_ a book and cite the exact page in notes, articles or Dhamma Posts. Most books are Burmese, many are scans without a text layer, and some text layers are Zawgyi or legacy fonts, so the text has to come from OCR as well as from the PDF itself.
 
@@ -19,7 +19,7 @@
 5. Tests for the tokenizer, the query parser, the builder, the server, the client and the CLI.
 6. A pilot on 30 PDFs, with the numbers recorded (§10).
 
-**Out:** anything on AWS (S3 sync of the state store, the index bucket, Lambda, CloudFront), any change to the website, Google Cloud Vision, the upload command and the full backfill. They are listed in §12, not designed.
+**Later work:** §12 covers the AWS backend, full backfill and index publication. §13 covers the Dhamma Library page. State-store backup and Google Cloud Vision remain future options.
 
 ## 2. How it works
 
@@ -61,10 +61,14 @@ Commands (implemented in `apps/book-search`; a book is named by its manifest id)
 npm run book-search:setup                      # check Tesseract and Poppler, download and verify the models
 npm run book-search:fetch -- <bookId>...       # copy PDFs from the public CDN (size checked against the manifest)
 npm run book-search:index -- <bookId>... [--pages 1-6] [--ocr auto|always|never] [--force]
+npm run book-search:backfill -- --workers 4   # fetch and index every catalog PDF, resuming saved pages
+npm run book-search:build -- --all            # require page records for every book in the manifest
 npm run book-search:build [-- <bookId>...] [--version <name>] [--allow-incomplete]
 ```
 
 `--force` redoes the pages in the `--pages` range (every page without it) and keeps the other pages' records, unless the PDF or the extractor version changed, which makes all records stale. `--ocr never` records only text-layer pages; pages that need OCR are left unrecorded (counted as "need OCR") so a later `auto` run does them, and `--force` is refused with it. `npm run dev` (and `just dev`) serves the newest built index to the page through a local proxy for `/api/search`, so Search inside PDFs works in the dev server; `--no-book-search` turns it off. `--pilot` names the books in `apps/book-search/pilot/books.json` (added with the pilot, §10). `index` with no ids indexes every PDF already in `pdfs/`. It exits 2 if any page failed with an error; those pages are not recorded and are retried on the next run.
+
+The backfill processes books in order of file size with four workers by default. It continues after a book fails, writes results to `backfill-progress.jsonl`, and exits with status 2 when a book needs attention. Rerun it to resume once the problem is resolved. On an interrupted run, check the PID in `backfill.lock` and remove a stale lock before restarting. The work folder needs room for the PDFs, records, and SQLite build files. The catalog generator collapses duplicate copies. Compare the current catalog against the source inventory before building a full release.
 
 ## 4. Page records (state store)
 
@@ -111,7 +115,7 @@ A passage is stored twice: exactly as read in `passages.display_text` (snippets 
 
 **Passage language.** `passages.language` follows the script: Burmese script is `my`; Latin text is `en` in an English book and `und` in any other book (it may be English or romanized Pāḷi, which cannot be told apart reliably); mixed text takes the book's language. A `lang` filter in the API uses this column.
 
-**How the build runs** (`apps/book-search/src/builder.ts`). Books are the ids named, else every book that has page records. Before anything is written the builder checks each book and refuses to build, listing every problem, when a book has no records, a page beyond the PDF's page count (read with `pdfinfo` from the fetched PDF), a page recorded twice, records from more than one PDF file or from another extractor version, or pages with no record. `--allow-incomplete` skips only the last check and lists the missing pages in the report. It then creates `dist/library-search-<version>.sqlite.building`, inserts everything in one transaction, runs FTS5 `optimize`, `VACUUM` and `PRAGMA integrity_check`, checks the row counts of `books`, `pages`, `passages` and `passages_fts` against what it inserted, and only then renames the file to `dist/library-search-<YYYY-MM-DD>-r<n>.sqlite` (the date is UTC; `<n>` is the next free number). It never overwrites an existing release, and a failed build leaves no file. Next to the database it writes `<name>.sqlite.sha256` and `<name>.report.json`, the indexing report: per book the page count, recorded pages, passages, counts by method and status, and the missing pages as ranges, plus totals and the file size. `meta` also records the manifest revision (the first 12 hex characters of the SHA-256 of `manifest.json`), the extractor version and the engines that read the pages.
+**How the build runs** (`apps/book-search/src/builder.ts`). Books are the ids named, else every book that has page records. The builder validates and inserts one book at a time, keeping the SQLite work file unpublished. It refuses to publish, listing every problem, when a book has no records, a page beyond the PDF's page count (read with `pdfinfo` from the fetched PDF), a page recorded twice, records from more than one PDF file or from another extractor version, or pages with no record. `--allow-incomplete` skips only the last check and lists the missing pages in the report. It then creates `dist/library-search-<version>.sqlite.building`, inserts everything in one transaction, runs FTS5 `optimize`, `VACUUM` and `PRAGMA integrity_check`, checks the row counts of `books`, `pages`, `passages` and `passages_fts` against what it inserted, and hashes the file in bounded chunks. It only then renames the file to `dist/library-search-<YYYY-MM-DD>-r<n>.sqlite` (the date is UTC; `<n>` is the next free number). It never overwrites an existing release, and a failed build leaves no file. Next to the database it writes `<name>.sqlite.sha256` and `<name>.report.json`, the indexing report: per book the page count, recorded pages, passages, counts by method and status, and the missing pages as ranges, plus totals and the file size. `meta` also records the manifest revision (the first 12 hex characters of the SHA-256 of `manifest.json`), the extractor version and the engines that read the pages.
 
 The golden queries (§9) run after the search core exists (plan step 5) and are used for the pilot (step 6), so the builder does not run them.
 
@@ -235,7 +239,7 @@ The stage 1 report records:
 - **No Pāḷi detection** inside Burmese-script books (§4), and no fuzzy matching: unlike catalog search, FTS5 matches whole tokens and phrases only.
 - **`#page=N`** opens the right page in desktop Chrome, Firefox and Safari, but most mobile browsers ignore it.
 - **Hyphenated line breaks** in a text layer (`contem- plation`) split a word into two tokens, so the whole word is not found. A repair is a later improvement: joining them would also glue real compounds, so it needs a rule.
-- **Only a few books are indexed** (five in the first release). The full library (about 4 GB of index at the pilot's rate, 750,000 pages assumed) cannot be served by this Lambda design (§12), and OCR at 6 seconds a page would take months on one core.
+- **Full corpus costs and timing** depend on the real page count, the percentage of scanned pages, and OCR quality. The five-book pilot puts a 750,000-page estimate at roughly 4 GB. At six seconds per OCR page, processing the scans takes months on one core.
 - **The golden queries are the indexer author's**, not readers' (§10).
 
 ## 12. Later stages
@@ -246,8 +250,10 @@ Stage 1 is the local indexer, API and tests above. Two later stages were chosen 
 
 The same handler (`apps/book-search/src/api/handler.ts`) runs in a Lambda, reached only through `https://app.winmetta.org/api/search` and `/api/search/health` (same origin, no CORS, no public API, no WAF). Defined in `infra/pulumi/book-search.ts` behind the stack flag `bookSearchEnabled`; the Lambda is `infra/book-search/`.
 
-- **Index storage:** a new private, versioned, encrypted bucket holds `releases/library-search-<version>.sqlite` and its `.sha256`. `npm run book-search:publish` uploads a built index with a conditional write, so a release is never overwritten (dry run unless `--yes`). The stack setting `bookSearchIndexVersion` names the release to serve; setting the previous name is the rollback.
-- **Cold start:** the function downloads the index and its checksum into `/tmp`, refuses a file that does not match, opens it read-only, and keeps it for the life of the container. If loading fails it answers 503 `index_unavailable` and tries again on the next request. The pilot index (five books) is about 1.3 MB; the full library would be about 4 GB (§10), which this design cannot serve: it needs sharding, a container image or another host first.
+- **Index storage:** a new private, versioned, encrypted bucket holds `releases/library-search-<version>.sqlite` and its `.sha256`. `npm run book-search:publish` verifies the local SHA-256 and uploads a built index and its sidecar with conditional writes. Large indexes use multipart uploads with checksums on the parts. A retry can reuse an object with the expected checksum metadata (dry run unless `--yes`). The stack setting `bookSearchIndexVersion` names the release to serve; setting the previous name is the rollback.
+- **Pilot storage:** the function downloads the SQLite file and checksum into `/tmp` and verifies the digest on cold start. The pilot uses this mode by default.
+- **Full corpus storage:** `bookSearchUseMountedIndex` mounts the same versioned releases from [S3 Files](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem-s3files.html) in two private subnets. The function opens the database as immutable and read-only. It checks for the checksum sidecar and matching SQLite release version at startup. The publisher verifies the complete checksum locally and S3 verifies the upload. Health reads counts recorded and verified by the builder. S3 Files lets SQLite read the needed pages without copying and hashing the entire database at every cold start.
+- **Rollout checks:** test the mounted pilot first, then verify the full release against every book in the manifest. Measure cold and warm searches in both languages, including common terms and numbered pages. Compare the health response with the local build report and verify PDF page links before deploying the web app. Roll back by selecting the previous release. A failed open returns 503 and is retried on the next request.
 - **Limits and protection:** reserved concurrency (default 5), five-minute CloudFront caching by query string, validation before any database work (unknown parameters, length, terms), two CloudWatch alarms (daily invocations, hourly errors), and a CloudFront Function that refuses cross-site and non-GET requests before the cache. The kill switch is the build flag that hides the search on the page (§13) and, at the edge, `bookSearchConcurrency` set to 0.
 - **Privacy:** no query is logged anywhere: the Lambda logs only whether the index loaded, CloudFront access logging is off, and the analytics events carry no search text. The Privacy page says searches are processed on the server and not stored (§13).
 
@@ -260,7 +266,7 @@ Each of these becomes a defined stage only when the maintainer chooses it. Nothi
 - **Google Cloud Vision OCR:** run Cloud Vision as a second OCR engine and store its results in the same local state store and index (`engine` already records which engine read a page). Needs a Google Cloud project, billing and credentials, which need approval.
 - **Compare Tesseract and Cloud Vision** on a few pages: character error rate against hand-checked text, failed pages, time and cost per page, then decide the engine for the backfill.
 - **Sync the state store** to a private bucket so the indexing work survives the loss of the laptop.
-- **Also noted:** stable book ids, the upload command and regeneration PR ([implementation-plan.md](implementation-plan.md) §6.2), the full backfill of every PDF, and a public API with its own host, WAF and optional keys if a real need appears.
+- **Also noted:** stable book ids, the upload command and regeneration PR ([implementation-plan.md](implementation-plan.md) §6.2), and a public API with its own host, WAF and optional keys if a real need appears.
 
 ## 13. Dhamma Library page (chosen 2026-11-21)
 

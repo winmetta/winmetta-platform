@@ -15,6 +15,9 @@ export const handler = createHandler({
     return response.Body.transformToByteArray();
   },
   tmpDir: '/tmp/book-search',
+  ...(process.env.BOOK_SEARCH_MOUNT
+    ? { mount: process.env.BOOK_SEARCH_MOUNT }
+    : {}),
   version: process.env.BOOK_SEARCH_INDEX_VERSION ?? '',
   cdnBase:
     process.env.PUBLIC_LIBRARY_CDN_BASE ?? 'https://dhamma-library.b-cdn.net',

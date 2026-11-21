@@ -2,6 +2,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
+import { bookSearchMount, createBookSearchFiles } from './book-search-files';
 
 // Book search backend (docs/book-search.md §12): a private bucket for the released SQLite
 // index files, and one Lambda behind an IAM-authenticated Function URL that CloudFront reaches
@@ -14,6 +15,7 @@ interface BookSearchArgs {
   /** Released index to serve, such as `2026-11-20-r1`; empty keeps the function answering 503. */
   indexVersion: string;
   concurrency: number;
+  useMountedIndex: boolean;
   cdnBase: string;
 }
 
@@ -62,7 +64,7 @@ export function createBookSearch(args: BookSearchArgs) {
     },
     { provider, dependsOn: [versioning] },
   );
-  new aws.s3.BucketPolicy(
+  const bucketPolicy = new aws.s3.BucketPolicy(
     'book-search-index',
     {
       bucket: bucket.id,
@@ -103,6 +105,20 @@ export function createBookSearch(args: BookSearchArgs) {
     },
     opts,
   );
+  const files = args.useMountedIndex
+    ? createBookSearchFiles(bucket, provider, bucketPolicy)
+    : undefined;
+  const vpcAccess = files
+    ? new aws.iam.RolePolicyAttachment(
+        'book-search-vpc',
+        {
+          role: role.name,
+          policyArn:
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole',
+        },
+        opts,
+      )
+    : undefined;
   const policy = new aws.iam.RolePolicy(
     'book-search',
     {
@@ -117,9 +133,35 @@ export function createBookSearch(args: BookSearchArgs) {
           },
           {
             Effect: 'Allow',
-            Action: 's3:GetObject',
+            Action: files
+              ? ['s3:GetObject', 's3:GetObjectVersion']
+              : 's3:GetObject',
             Resource: pulumi.interpolate`${bucket.arn}/releases/*`,
           },
+          ...(files
+            ? [
+                {
+                  Effect: 'Allow',
+                  Action: 's3:ListBucket',
+                  Resource: bucket.arn,
+                },
+                {
+                  Effect: 'Allow',
+                  Action: 's3files:ClientMount',
+                  Resource: files.filesystem.arn,
+                  Condition: {
+                    StringEquals: {
+                      's3files:AccessPointArn': files.access.arn,
+                    },
+                  },
+                },
+                {
+                  Effect: 'Deny',
+                  Action: 's3files:ClientWrite',
+                  Resource: files.filesystem.arn,
+                },
+              ]
+            : []),
         ],
       }),
     },
@@ -141,6 +183,12 @@ export function createBookSearch(args: BookSearchArgs) {
       memorySize: 512,
       ephemeralStorage: { size: 512 },
       timeout: 10,
+      ...(files
+        ? {
+            vpcConfig: files.vpcConfig,
+            fileSystemConfig: files.fileSystemConfig,
+          }
+        : {}),
       reservedConcurrentExecutions: args.concurrency,
       code: new pulumi.asset.AssetArchive({
         'index.cjs': new pulumi.asset.FileAsset(bundle),
@@ -148,13 +196,21 @@ export function createBookSearch(args: BookSearchArgs) {
       environment: {
         variables: {
           BOOK_SEARCH_BUCKET: bucket.bucket,
+          ...(files ? { BOOK_SEARCH_MOUNT: bookSearchMount } : {}),
           BOOK_SEARCH_INDEX_VERSION: args.indexVersion,
           PUBLIC_LIBRARY_CDN_BASE: args.cdnBase,
         },
       },
       tags,
     },
-    { provider, dependsOn: [policy, log] },
+    {
+      provider,
+      dependsOn: [
+        policy,
+        log,
+        ...(files && vpcAccess ? [vpcAccess, ...files.dependencies] : []),
+      ],
+    },
   );
   const url = new aws.lambda.FunctionUrl(
     'book-search',

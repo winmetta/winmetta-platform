@@ -1,6 +1,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import { existsSync, readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { pathToFileURL } from 'node:url';
 import { fileUrl } from '../../../web/src/lib/library-index.ts';
 import type {
   HealthResponse,
@@ -36,7 +37,7 @@ export interface OpenedIndex {
 /** Opens a built index read-only; refuses a file made with another schema version. */
 export function openIndex(
   file: string,
-  options: { verifySha?: boolean } = {},
+  options: { verifySha?: boolean; immutable?: boolean } = {},
 ): OpenedIndex {
   if (options.verifySha) {
     const shaFile = `${file}.sha256`;
@@ -48,30 +49,34 @@ export function openIndex(
     if (expected !== actual)
       throw new Error(`${file} does not match its .sha256`);
   }
-  const db = new DatabaseSync(file, { readOnly: true });
-  const meta = (key: string): string | undefined =>
-    (
-      db.prepare('SELECT value FROM meta WHERE key = ?').get(key) as
-        { value: string } | undefined
-    )?.value;
-  if (meta('schema_version') !== String(SCHEMA_VERSION)) {
+  const url = pathToFileURL(file);
+  if (options.immutable) url.searchParams.set('immutable', '1');
+  const db = new DatabaseSync(url, { readOnly: true });
+  try {
+    const schemaVersion = readMeta(db, 'schema_version');
+    if (schemaVersion !== String(SCHEMA_VERSION))
+      throw new Error(
+        `${file} has schema version ${schemaVersion}, expected ${SCHEMA_VERSION}`,
+      );
+    return { db, indexVersion: readMeta(db, 'index_version') ?? 'unknown' };
+  } catch (error) {
     db.close();
-    throw new Error(
-      `${file} has schema version ${meta('schema_version')}, expected ${SCHEMA_VERSION}`,
-    );
+    throw error;
   }
-  return { db, indexVersion: meta('index_version') ?? 'unknown' };
+}
+
+function readMeta(db: DatabaseSync, key: string): string | undefined {
+  const row = db.prepare('SELECT value FROM meta WHERE key = ?').get(key);
+  return typeof row?.['value'] === 'string' ? row['value'] : undefined;
 }
 
 export function health(index: OpenedIndex): HealthResponse {
-  const n = (sql: string): number =>
-    Number(Object.values(index.db.prepare(sql).get() ?? {})[0]);
   return {
     v: 1,
     indexVersion: index.indexVersion,
-    books: n('SELECT count(*) FROM books'),
-    pages: n('SELECT count(*) FROM pages'),
-    passages: n('SELECT count(*) FROM passages'),
+    books: Number(readMeta(index.db, 'books')),
+    pages: Number(readMeta(index.db, 'pages')),
+    passages: Number(readMeta(index.db, 'passages')),
   };
 }
 
@@ -88,7 +93,7 @@ interface Row {
 
 const SEARCH_SQL = `
 WITH hits AS (
-  SELECT p.id, p.book_id, p.page, p.display_text, bm25(passages_fts) AS score
+  SELECT p.id, p.book_id, p.page, bm25(passages_fts) AS score
   FROM passages_fts
   JOIN passages p ON p.id = passages_fts.rowid
   WHERE passages_fts MATCH ?1 AND (?2 = 'any' OR p.language = ?2)
@@ -97,9 +102,10 @@ best AS (
   SELECT *, ROW_NUMBER() OVER (PARTITION BY book_id, page ORDER BY score, id) AS rn
   FROM hits
 )
-SELECT b.id AS book_id, b.title, b.key, b.language, best.page, best.display_text,
+SELECT b.id AS book_id, b.title, b.key, b.language, best.page, p.display_text,
        pg.method, pg.confidence
 FROM best
+JOIN passages p ON p.id = best.id
 JOIN books b ON b.id = best.book_id
 JOIN pages pg ON pg.book_id = best.book_id AND pg.page = best.page
 WHERE best.rn = 1

@@ -136,6 +136,7 @@ const bookSearchResources = bookSearchEnabled
         'winmetta-app-production-book-search-index',
       indexVersion: config.get('bookSearchIndexVersion') ?? '',
       concurrency: bookSearchConcurrency,
+      useMountedIndex: config.getBoolean('bookSearchUseMountedIndex') ?? false,
       cdnBase:
         config.get('libraryCdnBase') ?? 'https://dhamma-library.b-cdn.net',
     })

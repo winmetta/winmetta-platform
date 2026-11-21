@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { mkdtemp, readFile } from 'node:fs/promises';
+import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { createHandler } from '../src/handler.ts';
@@ -113,4 +113,27 @@ test('hash helper matches what the build wrote', async () => {
     .update(await readFile(file))
     .digest('hex');
   assert.equal((await readFile(`${file}.sha256`, 'utf8')).split(/\s+/)[0], sha);
+});
+
+test('opens a complete mounted release without downloading objects', async () => {
+  const mount = await mkdtemp(path.join(tmpdir(), 'book-search-mount-'));
+  const { handler, objects, calls } = await setup({ mount });
+  const file = path.join(mount, 'library-search-2026-11-20-r1.sqlite');
+  await writeFile(
+    file,
+    objects.get('releases/library-search-2026-11-20-r1.sqlite'),
+  );
+
+  const request = event('/api/search/health');
+  assert.equal((await handler(request)).statusCode, 503);
+  await writeFile(
+    `${file}.sha256`,
+    objects.get('releases/library-search-2026-11-20-r1.sqlite.sha256'),
+  );
+
+  assert.equal(JSON.parse((await handler(request)).body).books, 2);
+  const search = await handler(event('/api/search?q=%22noble%20truths%22'));
+  assert.equal(search.statusCode, 200);
+  assert.equal(JSON.parse(search.body).results[0].page, 1);
+  assert.deepEqual(calls, []);
 });
