@@ -14,6 +14,7 @@ import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
 
 import { createAnalytics } from './analytics';
+import { createBookSearch } from './book-search';
 import { createFeedback } from './feedback';
 
 const config = new pulumi.Config();
@@ -112,6 +113,52 @@ export const feedback = feedbackResources
       functionName: feedbackResources.functionName,
     }
   : 'not created (feedbackEnabled is false)';
+
+// --- Book search (docs/book-search.md): index bucket and Lambda behind /api/search ----
+const bookSearchEnabled = config.getBoolean('bookSearchEnabled') ?? false;
+if (bookSearchEnabled && !delegationConfirmed)
+  throw new Error('Book search requires the site distribution.');
+const bookSearchConcurrency = config.getNumber('bookSearchConcurrency') ?? 5;
+if (
+  !Number.isInteger(bookSearchConcurrency) ||
+  bookSearchConcurrency < 0 ||
+  bookSearchConcurrency > 20
+)
+  throw new Error('bookSearchConcurrency must be an integer from 0 to 20.');
+const bookSearchResources = bookSearchEnabled
+  ? createBookSearch({
+      provider,
+      alertTopicArn:
+        analyticsResources?.alertTopicArn ??
+        config.require('feedbackAlertTopicArn'),
+      bucketName:
+        config.get('bookSearchBucketName') ??
+        'winmetta-app-production-book-search-index',
+      indexVersion: config.get('bookSearchIndexVersion') ?? '',
+      concurrency: bookSearchConcurrency,
+      cdnBase:
+        config.get('libraryCdnBase') ?? 'https://dhamma-library.b-cdn.net',
+    })
+  : undefined;
+const bookSearchOac = bookSearchResources
+  ? new aws.cloudfront.OriginAccessControl(
+      'book-search',
+      {
+        originAccessControlOriginType: 'lambda',
+        signingBehavior: 'always',
+        signingProtocol: 'sigv4',
+        description:
+          'Authenticated CloudFront access to the book-search Lambda',
+      },
+      opts,
+    )
+  : undefined;
+export const bookSearch = bookSearchResources
+  ? {
+      bucket: bookSearchResources.bucketName,
+      functionName: bookSearchResources.functionName,
+    }
+  : 'not created (bookSearchEnabled is false)';
 
 // --- Site bucket: private, versioned, readable only through CloudFront --------------
 const bucket = new aws.s3.Bucket(
@@ -247,6 +294,46 @@ const cachingOptimized = aws.cloudfront.getCachePolicyOutput(
   { provider },
 );
 
+// Book search: refuse cross-site requests at the edge, and cache results by query string for
+// five minutes (the Lambda sends Cache-Control: public, max-age=300 for good answers only).
+const bookSearchGuard = bookSearchResources
+  ? new aws.cloudfront.Function(
+      'book-search-guard',
+      {
+        name: 'winmetta-app-book-search-guard',
+        runtime: 'cloudfront-js-2.0',
+        comment: 'Refuse cross-site and non-GET requests to /api/search',
+        publish: true,
+        code: fs.readFileSync(
+          path.join(__dirname, 'functions', 'book-search-guard.js'),
+          'utf8',
+        ),
+      },
+      opts,
+    )
+  : undefined;
+const bookSearchCachePolicy = bookSearchResources
+  ? new aws.cloudfront.CachePolicy(
+      'book-search',
+      {
+        name: 'winmetta-app-book-search',
+        comment:
+          'Book search results, keyed by query string, no cookies or headers',
+        defaultTtl: 300,
+        minTtl: 0,
+        maxTtl: 3600,
+        parametersInCacheKeyAndForwardedToOrigin: {
+          cookiesConfig: { cookieBehavior: 'none' },
+          headersConfig: { headerBehavior: 'none' },
+          queryStringsConfig: { queryStringBehavior: 'all' },
+          enableAcceptEncodingGzip: true,
+          enableAcceptEncodingBrotli: true,
+        },
+      },
+      opts,
+    )
+  : undefined;
+
 const originId = 'site-bucket';
 let distribution: aws.cloudfront.Distribution | undefined;
 let certificateArn: pulumi.Output<string> | undefined;
@@ -315,36 +402,71 @@ if (delegationConfirmed) {
               },
             ]
           : []),
+        ...(bookSearchResources && bookSearchOac
+          ? [
+              {
+                originId: 'book-search',
+                domainName: bookSearchResources.originDomain,
+                originAccessControlId: bookSearchOac.id,
+                customOriginConfig: {
+                  httpPort: 80,
+                  httpsPort: 443,
+                  originProtocolPolicy: 'https-only',
+                  originSslProtocols: ['TLSv1.2'],
+                },
+              },
+            ]
+          : []),
         {
           originId,
           domainName: bucket.bucketRegionalDomainName,
           originAccessControlId: originAccessControl.id,
         },
       ],
-      orderedCacheBehaviors: feedbackResources
-        ? [
-            {
-              pathPattern: '/api/feedback',
-              targetOriginId: 'feedback',
+      orderedCacheBehaviors: [
+        ...(feedbackResources
+          ? [
+              {
+                pathPattern: '/api/feedback',
+                targetOriginId: 'feedback',
+                viewerProtocolPolicy: 'https-only',
+                allowedMethods: [
+                  'GET',
+                  'HEAD',
+                  'OPTIONS',
+                  'PUT',
+                  'PATCH',
+                  'POST',
+                  'DELETE',
+                ],
+                cachedMethods: ['GET', 'HEAD'],
+                // OAC uses the viewer payload hash when signing POST requests. AWS rejects
+                // explicitly allowlisting this header in an origin request policy. The
+                // managed CachingDisabled policy forwards no cookies or query strings.
+                cachePolicyId: '4135ea2d-6df8-44a3-9df3-4b5a84be39ad',
+                responseHeadersPolicyId: headersPolicy.id,
+              },
+            ]
+          : []),
+        ...(bookSearchResources && bookSearchGuard && bookSearchCachePolicy
+          ? ['/api/search', '/api/search/*'].map((pathPattern) => ({
+              pathPattern,
+              targetOriginId: 'book-search',
               viewerProtocolPolicy: 'https-only',
-              allowedMethods: [
-                'GET',
-                'HEAD',
-                'OPTIONS',
-                'PUT',
-                'PATCH',
-                'POST',
-                'DELETE',
-              ],
+              allowedMethods: ['GET', 'HEAD'],
               cachedMethods: ['GET', 'HEAD'],
-              // OAC uses the viewer payload hash when signing POST requests. AWS rejects
-              // explicitly allowlisting this header in an origin request policy. The
-              // managed CachingDisabled policy forwards no cookies or query strings.
-              cachePolicyId: '4135ea2d-6df8-44a3-9df3-4b5a84be39ad',
+              cachePolicyId: bookSearchCachePolicy.id,
               responseHeadersPolicyId: headersPolicy.id,
-            },
-          ]
-        : [],
+              compress: true,
+              functionAssociations: [
+                {
+                  eventType: 'viewer-request',
+                  functionArn: bookSearchGuard.arn,
+                },
+              ],
+            }))
+          : []),
+      ],
       defaultCacheBehavior: {
         targetOriginId: originId,
         viewerProtocolPolicy: 'redirect-to-https',
@@ -443,6 +565,27 @@ if (delegationConfirmed) {
         name,
         {
           function: feedbackResources.functionResource.name,
+          action,
+          principal: 'cloudfront.amazonaws.com',
+          sourceArn: distribution.arn,
+          ...(action === 'lambda:InvokeFunctionUrl'
+            ? { functionUrlAuthType: 'AWS_IAM' }
+            : { invokedViaFunctionUrl: true }),
+        },
+        opts,
+      );
+    }
+  }
+
+  if (bookSearchResources) {
+    for (const [name, action] of [
+      ['book-search-url', 'lambda:InvokeFunctionUrl'],
+      ['book-search-invoke', 'lambda:InvokeFunction'],
+    ] as const) {
+      new aws.lambda.Permission(
+        name,
+        {
+          function: bookSearchResources.functionResource.name,
           action,
           principal: 'cloudfront.amazonaws.com',
           sourceArn: distribution.arn,

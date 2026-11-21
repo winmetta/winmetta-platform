@@ -25,13 +25,17 @@
     "book-search:fetch": "node apps/book-search/src/cli.ts fetch",
     "book-search:index": "node apps/book-search/src/cli.ts index",
     "book-search:build": "node apps/book-search/src/cli.ts build",
+    "book-search:publish": "node apps/book-search/src/publish.ts",
     "book-search:serve": "node apps/book-search/src/search-cli.ts serve",
     "book-search": "node apps/book-search/src/search-cli.ts",
     "posts:new": "node scripts/new-post.mjs",
     "posts:validate": "node scripts/validate-posts.mjs",
     "feedback:build": "npm run build --prefix infra/feedback",
     "feedback:test": "npm test --prefix infra/feedback",
-    "feedback:typecheck": "npm run typecheck --prefix infra/feedback"
+    "feedback:typecheck": "npm run typecheck --prefix infra/feedback",
+    "book-search-lambda:build": "npm run build --prefix infra/book-search",
+    "book-search-lambda:test": "npm test --prefix infra/book-search",
+    "book-search-lambda:typecheck": "npm run typecheck --prefix infra/book-search"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
