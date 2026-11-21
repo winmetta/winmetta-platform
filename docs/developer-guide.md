@@ -29,6 +29,43 @@ The scripts are safe to re-run. The root `AGENTS.md` (linked by `bootstrap-winme
 
 No Docker, database or env file is needed. Run `npm run dev` and open <http://localhost:4321>.
 
+### Book search tools (optional)
+
+Only book search ([book-search.md](book-search.md), implementation-plan.md §5C) needs these; the website does not. They are native tools, not npm packages. mise does not provide Tesseract, and offers Poppler only through its conda backend (checked 2026-11-20), so install both with Homebrew:
+
+```bash
+brew install tesseract poppler
+```
+
+Versions verified on 2026-11-20: Tesseract 5.5.4 (latest release on GitHub and in Homebrew) and Poppler 26.11.0 (Homebrew), which provides `pdfinfo`, `pdftotext` and `pdftoppm`. Check them with `tesseract --version` and `pdftotext -v`. On Debian or Ubuntu, install `tesseract-ocr` and `poppler-utils` with `apt` instead, and check the versions the same way.
+
+**Pinned OCR models.** Book search does not use the models that come with the Homebrew package. It uses the Burmese (`mya`) and English (`eng`) models from [`tesseract-ocr/tessdata_best`](https://github.com/tesseract-ocr/tessdata_best) (Apache-2.0), pinned to one commit so OCR results are reproducible, in the gitignored work folder. From the repo root:
+
+```bash
+mkdir -p .cache/book-search/tessdata
+curl -fL -o .cache/book-search/tessdata/mya.traineddata https://raw.githubusercontent.com/tesseract-ocr/tessdata_best/e12c65a915945e4c28e237a9b52bc4a8f39a0cec/mya.traineddata
+curl -fL -o .cache/book-search/tessdata/eng.traineddata https://raw.githubusercontent.com/tesseract-ocr/tessdata_best/e12c65a915945e4c28e237a9b52bc4a8f39a0cec/eng.traineddata
+```
+
+Then check that each file is exactly the pinned one. `git hash-object` prints the Git blob id, which must match this table; delete the file and download it again if it does not:
+
+```bash
+git hash-object .cache/book-search/tessdata/mya.traineddata .cache/book-search/tessdata/eng.traineddata
+```
+
+| Model | Size (bytes) | Git blob id at commit `e12c65a` |
+| --- | --- | --- |
+| `mya.traineddata` | 14,971,060 | `4adbb96ab500fb339f988de33eb8bb5717e8e6a6` |
+| `eng.traineddata` | 15,400,601 | `176dc3220de7db34d3b3aecbfa42043a6038348b` |
+
+Finally, check that Tesseract finds both models:
+
+```bash
+tesseract --tessdata-dir .cache/book-search/tessdata --list-langs
+```
+
+It should list `eng` and `mya`. The models are never committed. To change the pin, pick a new `tessdata_best` commit, update the commit and both blob ids here and the commit in [book-search.md](book-search.md) §4, and rebuild the index: the `engine` field of every page record names the models that read it. Stage 1 adds `npm run book-search:setup`, which performs the same steps and fails on a hash mismatch; these manual steps stay as the reference.
+
 ## 3. Repository layout
 
 | Path | Purpose |

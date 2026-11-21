@@ -8,7 +8,7 @@
 
 ## 0. Scope: v1 Is a Static Web App
 
-Per [prd.md](prd.md) §4.7 and §7, v1 is **one responsive web app designed for mobile and desktop, built with Astro** (static-first, React islands for interactive pieces). Most content — LLB curriculum, Dhamma Library metadata, class directory — is static and lives in the repo as content collections. That means **no backend server and no database in Phases 0–2**: fewer moving parts for a volunteer team to run, cheaper, and easier to move. Two small, deliberate exceptions follow without changing that: the analytics-only server of Phase 4 (§4.4) and the planned feedback endpoint (§4.5), neither of which holds learner accounts or content.
+Per [prd.md](prd.md) §4.7 and §7, v1 is **one responsive web app designed for mobile and desktop, built with Astro** (static-first, React islands for interactive pieces). Most content — LLB curriculum, Dhamma Library metadata, class directory — is static and lives in the repo as content collections. That means **no backend server and no database in Phases 0–2**: fewer moving parts for a volunteer team to run, cheaper, and easier to move. Two small, deliberate exceptions follow without changing that: the analytics-only server of Phase 4 (§4.4) and the planned feedback endpoint (§4.5), neither of which holds learner accounts or content. Book search stage 1 (§4.6) adds a local search server for development only; nothing of it is deployed.
 
 A backend (Fastify + PostgreSQL), accounts, offline support and native apps are all documented as [future work](#10-future-directions-tentative), added only when a real need appears.
 
@@ -92,10 +92,12 @@ winmetta-platform/
 │   │   │   └── content/       # localized pages, curated resources, library manifest and folder tags, classes; curricula later
 │   │   ├── astro.config.mjs
 │   │   └── package.json
+│   ├── book-search/           # book search stage 1: PDF indexer, SQLite builder, local API server, API client and CLI (§4.6)
 │   ├── mobile/                # future
 │   ├── desktop/               # future
 │   └── api/                   # future, only if needed
 ├── packages/                  # created when first needed, not up front
+│   ├── search-text/           # normalization and Burmese tokenizer shared by apps/web and apps/book-search (book search stage 1)
 │   ├── tsconfig/              # shared base tsconfig
 │   ├── domain/
 │   ├── i18n/
@@ -157,7 +159,7 @@ Represent the query, tag and page in URL parameters so deep links, history and l
 2. Replacing an existing file relies on S3 versioning for recovery and a Bunny cache purge for the changed paths.
 3. The maintainer, or a manually triggered or scheduled GitHub Actions job using an OIDC role with read-only S3 access, re-runs the generator and opens a PR containing the manifest diff: added, changed and removed files, a duplicate report and new tags.
 4. CI validates the schemas, the golden queries and the index size budget. A Burmese-speaking reviewer checks titles, tags, new folders and every Zawgyi conversion in `zawgyi-review.json`, recording corrections in `overrides.json`. Golden search tests that name a book removed or renamed in S3 are updated to a title that still exists, never loosened. Merging to `main` deploys.
-5. The generator is the only way new files appear on the site; there is no hand-edited listing HTML. Full-text and OCR indexing, transcripts and the class archive are separate future work.
+5. The generator is the only way new files appear on the site; there is no hand-edited listing HTML. Full-text and OCR search inside PDFs is book search (§4.6); transcripts and the class archive are separate future work.
 
 ### Curriculum naming
 
@@ -221,6 +223,15 @@ Visitors can report a typo, wrong content, a wrong class schedule or a broken bo
 * **The form** is an in-place `<dialog>` opened from a link on the page that has the problem; without JavaScript the link is a `mailto:`.
 * **The Sādhu button** sends only an analytics event; there is no count on the site and no server state.
 * This is the first request path other than the static site and the analytics host, so the staging and integration-test advice in §7 and §10 stays in force for the first real API.
+
+### 4.6. Book search inside PDFs (stage 1 planned 2026-11-20, local only)
+
+Readers will be able to search the text inside library PDFs and cite the exact physical page. Stage 1 proves it on a developer's machine; the design, data model, API contract and tests are in [book-search.md](book-search.md), and the checklist in implementation-plan.md §5C. The summary:
+
+* **Indexing:** Poppler reads each page's text layer; pages without a usable one (missing, Zawgyi, legacy font or broken order) are rendered and read by Tesseract with pinned `tessdata_best` Burmese and English models. Page results go to a JSONL state store, which a build step turns into one versioned SQLite FTS5 file. Nothing is committed but the code, the schema and the golden queries.
+* **Shared text code:** the website's normalization and Burmese syllable tokenizer move to `packages/search-text`, so catalog search, Dhamma Posts search and book search normalize text the same way.
+* **API:** `GET /api/search` and `GET /api/search/health`, served in stage 1 by a local `node:http` server on `127.0.0.1` with Node's built-in `node:sqlite`. The API client takes a base URL, so the same client, CLI and tests can later call a deployed backend.
+* **Not in stage 1:** AWS resources, the website UI and other OCR engines. Possible later stages (Google Cloud Vision, an engine comparison, a same-origin Lambda at `app.winmetta.org/api/search`, a Dhamma Library "Search inside PDFs" mode) are notes in [book-search.md](book-search.md) §12, not designs. A deployed search endpoint would be a third exception to "no backend" (§0) and needs its own decision.
 
 ---
 
