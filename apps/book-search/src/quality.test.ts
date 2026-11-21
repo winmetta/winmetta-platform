@@ -50,6 +50,28 @@ describe('checkTextLayer', () => {
     // In an English book the same text cannot be told from English: a known gap.
     expect(checkTextLayer(ascii, 'en').usable).toBe(true);
   });
+  it('rejects a long page of ASCII-mapped legacy-font text that has a few short words by chance', () => {
+    const pieces = [
+      'ajrmufajr',
+      'tdrf&mjypf',
+      'avQmfPfoifh',
+      'onf',
+      'raumif;aoma<u;',
+      'cpD;ywfajr',
+      'udkcH&onf',
+      'qkdtHhusdusL;',
+      'vnf;/',
+      'a',
+      'jzpfonf/',
+      'wdkYrSm',
+    ];
+    const garbage = Array.from(
+      { length: 48 },
+      (_, i) => pieces[i % pieces.length],
+    ).join(' ');
+    expect(checkTextLayer(garbage, 'my').reasons).toEqual(['legacy_font']);
+    expect(checkTextLayer(english.repeat(3), 'my').usable).toBe(true);
+  });
   it('sends romanized Pali in a Burmese book to OCR (costs time, loses nothing)', () => {
     expect(
       checkTextLayer(

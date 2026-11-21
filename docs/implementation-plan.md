@@ -385,7 +385,7 @@ One reviewed PR each, in this order.
 * [x] **3. Indexer.** `apps/book-search` with `book-search:setup` (checks Tesseract and Poppler, downloads the pinned models and verifies their hashes), `book-search:fetch` (pilot PDFs from the public CDN) and `book-search:index` (text layer, quality check, OCR, resumable JSONL), with tests for the quality check and the OCR smoke test.
 * [x] **4. Builder.** `book-search:build`: the SQLite schema, `optimize`, `VACUUM`, integrity and completeness checks, versioned file name, SHA-256 and the indexing report, with fixture tests. The golden queries run from step 5 and in the pilot.
 * [x] **5. API, client and CLI.** The search core and query parser, the local server (`book-search:serve`), the base-URL client and the CLI (`book-search`), with server, client, CLI and contract tests that run in CI without Tesseract.
-* [ ] **6. Pilot.** Index the 30 pilot books, collect at least 30 golden queries from Burmese and English readers, and record the report in [book-search.md](book-search.md) §10.
+* [~] **6. Pilot (partly).** Done on 2026-11-21 with five books and 15 golden queries written from the indexed text (14 of 15 found in the first five); the plan's 30 books and reader-supplied queries are not done. Results are in [book-search.md](book-search.md) §10. Original text: Index the 30 pilot books, collect at least 30 golden queries from Burmese and English readers, and record the report in [book-search.md](book-search.md) §10.
 
 ### Acceptance
 

@@ -1,0 +1,25 @@
+{
+  "note": "The pilot books of docs/book-search.md §10: five small library PDFs chosen on 2026-11-21 so the first full run takes minutes, not days. The 30-book pilot of the plan needs reader input and is not done.",
+  "books": [
+    {
+      "id": "35795bec9fe8",
+      "reason": "Burmese; a legacy-font text layer on every page (read by OCR); verse text"
+    },
+    {
+      "id": "5c9d96d37e06",
+      "reason": "Burmese; legacy-font text layer and clean scans; mixed quality"
+    },
+    {
+      "id": "712ab83326a1",
+      "reason": "Burmese; scanned pages with no text layer (OCR only); noisy print"
+    },
+    {
+      "id": "9cbce55159ec",
+      "reason": "English; born-digital text layer with ligatures and Pāḷi terms with diacritics"
+    },
+    {
+      "id": "a8b5239ba041",
+      "reason": "English; born-digital, Pāḷi terms with diacritics, two image-only pages"
+    }
+  ]
+}

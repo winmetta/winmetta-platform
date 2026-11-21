@@ -26,6 +26,7 @@
     "book-search:index": "node apps/book-search/src/cli.ts index",
     "book-search:build": "node apps/book-search/src/cli.ts build",
     "book-search:publish": "node apps/book-search/src/publish.ts",
+    "book-search:golden": "node apps/book-search/src/golden.ts",
     "book-search:serve": "node apps/book-search/src/search-cli.ts serve",
     "book-search": "node apps/book-search/src/search-cli.ts",
     "posts:new": "node scripts/new-post.mjs",

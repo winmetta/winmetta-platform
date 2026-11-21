@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 export const repoRoot = fileURLToPath(new URL('../../..', import.meta.url));
 
 /** Bump when extraction rules change, so old page records are not mixed with new ones. */
-export const EXTRACTOR_VERSION = 1;
+export const EXTRACTOR_VERSION = 2;
 
 /** Public CDN the library PDFs are served from (the website's PUBLIC_LIBRARY_CDN_BASE). */
 export const DEFAULT_CDN_BASE = 'https://dhamma-library.b-cdn.net';
@@ -34,3 +34,6 @@ export const pilotBooksPath = path.join(
   repoRoot,
   'apps/book-search/pilot/books.json',
 );
+
+/** The API the CLI and the golden queries call when no base URL is given: the local server. */
+export const DEFAULT_BASE_URL = 'http://127.0.0.1:8787';

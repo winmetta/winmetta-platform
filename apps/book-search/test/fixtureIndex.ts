@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { buildIndex } from '../src/builder.ts';
+import { EXTRACTOR_VERSION } from '../src/config.ts';
 import type { Book } from '../src/library.ts';
 import type { PageRecord } from '../src/record.ts';
 import { appendRecord, statePath } from '../src/state.ts';
@@ -33,7 +34,7 @@ const record = (
   page,
   method: 'text',
   engine: 'pdftotext 1',
-  extractorVersion: 1,
+  extractorVersion: EXTRACTOR_VERSION,
   status: 'ok',
   confidence: null,
   reasons: [],
