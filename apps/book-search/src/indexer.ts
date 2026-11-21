@@ -63,26 +63,14 @@ export async function indexBook(
   const pageCount = await pdfPageCount(pdfFile);
   const from = Math.max(1, options.pages?.from ?? 1);
   const to = Math.min(pageCount, options.pages?.to ?? pageCount);
-  let records = await loadState(file);
-  const first = records[0];
-  const stale =
-    first !== undefined &&
-    (first.sha256 !== sha256 || first.extractorVersion !== EXTRACTOR_VERSION);
-  if (stale && !options.force)
-    throw new Error(
-      `${book.id}: state was made from a different PDF or extractor version; run with --force to redo it`,
-    );
-  if (stale) {
-    records = [];
-    await resetState(file);
-  } else if (options.force) {
-    // Redo only the requested pages; records outside the range are still good.
-    const kept = records.filter((r) => r.page < from || r.page > to);
-    if (kept.length !== records.length) {
-      await rewriteState(file, kept);
-      records = kept;
-    }
-  }
+  const records = await prepareState(
+    file,
+    sha256,
+    from,
+    to,
+    options.force ?? false,
+    book.id,
+  );
   const done = new Set(records.map((record) => record.page));
 
   const pending = Array.from(
@@ -136,6 +124,38 @@ export async function indexBook(
     }
   }
   return summary;
+}
+
+/**
+ * Loads a book's records and applies --force: records from a different PDF or extractor
+ * version are stale (refused unless forced, then dropped); a plain --force drops only the
+ * pages in the requested range.
+ */
+async function prepareState(
+  file: string,
+  sha256: string,
+  from: number,
+  to: number,
+  force: boolean,
+  bookId: string,
+): Promise<PageRecord[]> {
+  const records = await loadState(file);
+  const first = records[0];
+  const stale =
+    first !== undefined &&
+    (first.sha256 !== sha256 || first.extractorVersion !== EXTRACTOR_VERSION);
+  if (stale && !force)
+    throw new Error(
+      `${bookId}: state was made from a different PDF or extractor version; run with --force to redo it`,
+    );
+  if (stale) {
+    await resetState(file);
+    return [];
+  }
+  if (!force) return records;
+  const kept = records.filter((r) => r.page < from || r.page > to);
+  if (kept.length !== records.length) await rewriteState(file, kept);
+  return kept;
 }
 
 interface PageJob {
