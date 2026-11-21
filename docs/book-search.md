@@ -135,12 +135,12 @@ The local server and the future AWS backend implement the same contract, so the 
 
 | Parameter | Rule |
 | --- | --- |
-| `q` | Required, 1–200 characters after normalization, at most 8 terms. A Burmese term needs at least two syllables. `"…"` is a phrase. |
+| `q` | Required, 1–200 characters after normalization, at most 8 terms. A Burmese term needs at least two syllables or three characters (so `ဓမ္မ` works and a single letter does not). `"…"` is a phrase. |
 | `lang` | `any` (default), `my`, `en`, `pi` or `und`; filters on the passage language |
 | `limit` | 1–20, default 10 |
 | `page` | 1–10, default 1 |
 
-Unknown parameters are rejected. The query parser accepts only terms and quoted phrases and quotes every token itself, so FTS5 syntax typed by a user (`OR`, `NEAR`, `*`, `^`, `"`) is searched as text, never run as an operator. Values are bound parameters. Results are ranked with `bm25()`.
+Unknown parameters are rejected. The query parser accepts only terms and quoted phrases and quotes every token itself, so FTS5 syntax typed by a user (`OR`, `NEAR`, `*`, `^`, `"`) is searched as text, never run as an operator. Values are bound parameters. Results are ranked with `bm25()`, one result per PDF page (its best passage), so a page is cited once.
 
 ```json
 {
@@ -173,11 +173,12 @@ Unknown parameters are rejected. The query parser accepts only terms and quoted 
 
 ## 8. API client and CLI
 
-- **Client** (`apps/book-search/src/client/`): `createSearchClient({ baseUrl, fetch?, timeoutMs? })` with `search(params)` and `health()`. It appends `/api/search` to `baseUrl`, validates responses with Zod and throws a `SearchApiError` carrying the HTTP status and error code. Nothing in it is specific to the local server or to AWS.
+- **Client** (`apps/book-search/src/client.ts`): `createSearchClient({ baseUrl, fetch?, timeoutMs? })` with `search(params)` and `health()`. It appends `/api/search` to `baseUrl`, validates responses with Zod and throws a `SearchApiError` carrying the HTTP status and error code. Nothing in it is specific to the local server or to AWS.
 - **CLI:**
 
   ```bash
-  npm run book-search -- search "ဓမ္မ ဒေသနာ" --lang my --limit 10
+  npm run book-search:serve                      # local server on 127.0.0.1:8787, newest built index
+npm run book-search -- search "ဓမ္မ ဒေသနာ" --lang my --limit 10
   npm run book-search -- search "dhamma" --base-url http://127.0.0.1:8787 --json
   npm run book-search -- health
   ```
