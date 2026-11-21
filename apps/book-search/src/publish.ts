@@ -1,9 +1,10 @@
-import { readdir, stat } from 'node:fs/promises';
+import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { workDir, workPaths } from './config.ts';
 import { openIndex } from './api/search.ts';
-import { run } from './tools.ts';
+import { sha256File } from './pdf.ts';
+import { publishObject } from './publish-object.ts';
 
 export interface Upload {
   file: string;
@@ -55,29 +56,27 @@ async function main(): Promise<number> {
     return values.help ? 0 : 1;
   }
   const file = path.resolve(values.file ?? (await newestIndex()));
-  const index = openIndex(file, { verifySha: true });
-  index.db.close();
   const uploads = planPublish(file);
+  const checksum = await sha256File(file);
+  const expected = (await readFile(`${file}.sha256`, 'utf8')).split(/\s+/)[0];
+  if (checksum !== expected)
+    throw new Error(`${file} does not match its .sha256`);
+  const index = openIndex(file);
+  index.db.close();
+  if (path.basename(file) !== `library-search-${index.indexVersion}.sqlite`)
+    throw new Error('The filename does not match the index version');
   for (const upload of uploads) {
     const size = (await stat(upload.file)).size;
     console.log(
       `${values.yes ? 'Uploading' : 'Would upload'} ${upload.file} (${size} bytes) to s3://${values.bucket}/${upload.key}`,
     );
     if (!values.yes) continue;
-    await run('aws', [
-      's3api',
-      'put-object',
-      '--bucket',
+    await publishObject(
       values.bucket,
-      '--key',
-      upload.key,
-      '--body',
-      upload.file,
-      '--if-none-match',
-      '*',
-      '--output',
-      'json',
-    ]);
+      upload,
+      size,
+      upload.file === file ? checksum : await sha256File(upload.file),
+    );
   }
   console.log(
     values.yes

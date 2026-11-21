@@ -21,6 +21,7 @@ Books are named by manifest id, or --pilot for apps/book-search/pilot/books.json
 books uses every book that has page records.
 
 Options:
+  --all              build every manifest book and require complete page records
   --pilot            use the pilot list
   --ocr <mode>       auto (default), always or never
   --pages <a-b>      only these physical pages
@@ -58,6 +59,7 @@ interface Parsed {
   command: string | undefined;
   ids: string[];
   pilot: boolean;
+  all: boolean;
   ocr: string;
   pages: string | undefined;
   force: boolean;
@@ -71,6 +73,7 @@ function parseCli(): Parsed {
     allowPositionals: true,
     options: {
       pilot: { type: 'boolean' },
+      all: { type: 'boolean' },
       ocr: { type: 'string' },
       pages: { type: 'string' },
       force: { type: 'boolean' },
@@ -84,6 +87,7 @@ function parseCli(): Parsed {
     command,
     ids,
     pilot: values.pilot ?? false,
+    all: values.all ?? false,
     ocr: values.ocr ?? 'auto',
     pages: values.pages,
     force: values.force ?? false,
@@ -106,6 +110,7 @@ async function chooseBooks(
   paths: ReturnType<typeof workPaths>,
 ): Promise<Book[]> {
   const manifest = await loadManifest();
+  if (args.all) return manifest;
   const wanted = args.pilot ? await loadPilotIds() : args.ids;
   if (wanted.length > 0) return pickBooks(manifest, wanted);
   if (args.command === 'index')
@@ -168,6 +173,17 @@ async function main(): Promise<number> {
   if (!['fetch', 'index', 'build'].includes(args.command)) {
     console.error(`Unknown command "${args.command}"\n\n${usage}`);
     return 1;
+  }
+  if (
+    args.all &&
+    (args.command !== 'build' ||
+      args.pilot ||
+      args.ids.length > 0 ||
+      args.allowIncomplete)
+  ) {
+    throw new Error(
+      '--all is for a complete build and cannot be combined with book IDs, --pilot or --allow-incomplete',
+    );
   }
   const books = await chooseBooks(args, paths);
   if (books.length === 0) {

@@ -5,6 +5,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { ftsTokens, normalizeSearch } from '@winmetta/search-text';
 import { describe, expect, it } from 'vitest';
 import { tempDir } from '../test/helpers.ts';
+import { health, openIndex } from './api/search.ts';
 import { buildIndex, nextVersion, passageLanguage, ranges } from './builder.ts';
 import { EXTRACTOR_VERSION } from './config.ts';
 import type { Book } from './library.ts';
@@ -288,6 +289,17 @@ describe('buildIndex', () => {
       recorded: 3,
       missingPages: '4-6',
     });
+    const current = openIndex(result.file);
+    expect(health(current).pages).toBe(3);
+    current.db.close();
+
+    // Simulate a previously published partial index.
+    const writable = new DatabaseSync(result.file);
+    writable.exec("DELETE FROM meta WHERE key = 'recorded_pages'");
+    writable.close();
+    const legacy = openIndex(result.file);
+    expect(health(legacy).pages).toBe(3);
+    legacy.db.close();
   });
 
   it('refuses a book with no records, a page beyond the PDF, or a page recorded twice', async () => {

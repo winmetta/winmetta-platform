@@ -180,6 +180,8 @@ Behind the stack flag `bookSearchEnabled` (default `false`): a private, versione
 | `bookSearchBucketName` | `winmetta-app-production-book-search-index` |
 | `libraryCdnBase` | `https://dhamma-library.b-cdn.net`, the base of the PDF links in results |
 
+`bookSearchUseMountedIndex` (default false) attaches a read-only S3 Files access point to the function in two private subnets. It serves versioned SQLite releases from the existing index bucket, including releases that exceed the pilot's Lambda disk and memory limits. See [book search](../../docs/book-search.md#12-later-stages) for rollout checks.
+
 The archive is built with `npm run book-search-lambda:build` after installing `infra/book-search`; CI and the preview workflow do both. Publishing an index and applying the stack are operations steps for the private runbook.
 
 The deployment archive is built with the root command `npm run feedback:build`

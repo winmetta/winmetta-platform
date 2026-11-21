@@ -14,7 +14,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { ftsTokens } from '@winmetta/search-text';
 import { EXTRACTOR_VERSION, manifestPath } from './config.ts';
 import type { Book } from './library.ts';
-import { pdfPageCount } from './pdf.ts';
+import { pdfPageCount, sha256File } from './pdf.ts';
 import type { PageRecord } from './record.ts';
 import { SCHEMA_SQL, SCHEMA_VERSION } from './schema.ts';
 import { loadState, statePath } from './state.ts';
@@ -99,12 +99,6 @@ export async function nextVersion(distDir: string, now: Date): Promise<string> {
   return `${day}-r${n}`;
 }
 
-async function sha256Of(file: string): Promise<string> {
-  return createHash('sha256')
-    .update(await readFile(file))
-    .digest('hex');
-}
-
 /** What is missing or wrong with one book's records, as a list of problems (empty when fine). */
 function checkRecords(pages: number, records: PageRecord[]): string[] {
   const problems: string[] = [];
@@ -130,40 +124,47 @@ interface LoadedBook {
 }
 
 /**
- * Reads every book's records and checks them against its PDF; throws one error listing every
- * problem, before anything has been written.
+ * Validates and yields one book at a time. A failure prevents publishing the build.
  */
-async function loadBooks(
+async function* loadBooks(
   options: BuildOptions,
   pageCountOf: (book: Book) => Promise<number>,
-): Promise<LoadedBook[]> {
+): AsyncGenerator<LoadedBook> {
   const sorted = [...options.books].sort((a, b) => a.id.localeCompare(b.id));
-  const loaded: LoadedBook[] = [];
   const failures: string[] = [];
   for (const book of sorted) {
-    const records = await loadState(statePath(options.stateDir, book.id));
-    if (records.length === 0) {
-      failures.push(`${book.id}: no page records (run book-search:index)`);
-      continue;
-    }
-    const pages = await pageCountOf(book);
-    const problems = checkRecords(pages, records);
-    const recorded = new Set(records.map((r) => r.page));
-    const missing = pages - [...recorded].filter((p) => p <= pages).length;
-    if (missing > 0 && !options.allowIncomplete)
-      problems.push(`${missing} of ${pages} pages have no record`);
-    for (const problem of problems) failures.push(`${book.id}: ${problem}`);
-    loaded.push({
-      book,
-      pages,
-      records: records.sort((a, b) => a.page - b.page),
-    });
+    const loaded = await readBook(book, options, pageCountOf).catch(
+      (error: unknown) => {
+        failures.push(
+          `${book.id}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+        return undefined;
+      },
+    );
+    if (loaded) yield loaded;
   }
   if (failures.length > 0)
     throw new Error(
-      `Not building, nothing was written:\n  ${failures.join('\n  ')}`,
+      `Not building, nothing was published:\n  ${failures.join('\n  ')}`,
     );
-  return loaded;
+}
+
+async function readBook(
+  book: Book,
+  options: BuildOptions,
+  pageCountOf: (book: Book) => Promise<number>,
+): Promise<LoadedBook> {
+  const records = await loadState(statePath(options.stateDir, book.id));
+  if (records.length === 0)
+    throw new Error('no page records (run book-search:index)');
+  const pages = await pageCountOf(book);
+  const problems = checkRecords(pages, records);
+  const recorded = new Set(records.map((r) => r.page));
+  const missing = pages - [...recorded].filter((p) => p <= pages).length;
+  if (missing > 0 && !options.allowIncomplete)
+    problems.push(`${missing} of ${pages} pages have no record`);
+  if (problems.length > 0) throw new Error(problems.join('; '));
+  return { book, pages, records: records.sort((a, b) => a.page - b.page) };
 }
 
 /**
@@ -193,8 +194,6 @@ export async function buildIndex(options: BuildOptions): Promise<BuildResult> {
   const workFile = `${finalFile}.building`;
   await rm(workFile, { force: true });
 
-  const loaded = await loadBooks(options, pageCountOf);
-
   const db = new DatabaseSync(workFile);
   const reports: BookReport[] = [];
   const engines = new Set<string>();
@@ -213,7 +212,10 @@ export async function buildIndex(options: BuildOptions): Promise<BuildResult> {
       'INSERT INTO passages_fts (rowid, my_tokens, latin_tokens) VALUES (?, ?, ?)',
     );
     db.exec('BEGIN');
-    for (const { book, pages, records } of loaded) {
+    for await (const { book, pages, records } of loadBooks(
+      options,
+      pageCountOf,
+    )) {
       insertBook.run(
         book.id,
         book.key,
@@ -294,6 +296,7 @@ export async function buildIndex(options: BuildOptions): Promise<BuildResult> {
       built_at: now.toISOString(),
       books: String(totals.books),
       pages: String(totals.pages),
+      recorded_pages: String(totals.recorded),
       passages: String(totals.passages),
     }))
       insertMeta.run(key, value);
@@ -303,8 +306,8 @@ export async function buildIndex(options: BuildOptions): Promise<BuildResult> {
     verify(db, totals);
     db.close();
 
+    const sha256 = await sha256File(workFile);
     await rename(workFile, finalFile);
-    const sha256 = await sha256Of(finalFile);
     await writeFile(
       `${finalFile}.sha256`,
       `${sha256}  ${path.basename(finalFile)}\n`,
