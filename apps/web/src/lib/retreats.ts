@@ -3,7 +3,7 @@ import retreats from '../content/retreats.json';
 import { localizedContent } from '../i18n/content';
 import { locales, type Locale } from '../i18n/locales';
 import { retreatRoute } from '../i18n/routes';
-import { normalizeSearch } from './normalize';
+import { normalizeSearch } from '@winmetta/search-text';
 import type { RetreatItem } from './retreat-filter';
 import { retreatSchema, type Retreat } from './schemas';
 import { teacherById, teacherName } from './teachers';

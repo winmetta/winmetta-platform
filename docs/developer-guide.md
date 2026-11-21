@@ -73,12 +73,13 @@ It should list `eng` and `mya`. The models are never committed. To change the pi
 | `apps/web` | The only app: Astro static site with React islands. |
 | `apps/web/src/i18n` | Locale registry, keyed messages (`messages/en.json`, `messages/my.json`), route helpers, localized-content fallback. |
 | `apps/web/src/lib` | Zod schemas, schedule helper, library filter, site config. |
+| `packages/search-text` | Search normalization, Burmese syllable tokenizer and FTS token helpers shared by the website and book search; imported as `@winmetta/search-text`. |
 | `apps/web/src/fixtures` | Synthetic content used by the content collections in Phase 0. |
 | `apps/web/tests` | Playwright smoke tests. |
 | `scripts/setup-local-dev.sh` | Repo setup: Node, npm, dependencies, Playwright browser. |
 | `infra/pulumi/` | Phase 2 and later (Pulumi, TypeScript); not present yet. |
 
-Keep code in `apps/web` until a second consumer needs it. Only then extract a package under `packages/`.
+Keep code in `apps/web` until a second consumer needs it. Only then extract a package under `packages/` (today only `search-text`).
 
 ## 4. Commands
 

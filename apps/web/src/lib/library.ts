@@ -1,5 +1,5 @@
 import type { Resource } from './schemas';
-import { normalizeSearch as normalize } from './normalize';
+import { normalizeSearch as normalize } from '@winmetta/search-text';
 export interface LibraryFilters {
   query?: string;
   category?: string;

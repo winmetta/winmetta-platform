@@ -1,7 +1,6 @@
 import MiniSearch, { type Options } from 'minisearch';
-import { normalizeSearch } from './normalize.ts';
-import type { LibraryFile } from './schemas.ts';
 import {
+  normalizeSearch,
   buildQueries,
   compact,
   indexTerms,
@@ -9,7 +8,8 @@ import {
   similarity,
   TERM_SEPARATOR,
   titleTier,
-} from './search-text.ts';
+} from '@winmetta/search-text';
+import type { LibraryFile } from './schemas.ts';
 
 /** The fields search and result cards need; the browser downloads only these. */
 export type SearchRecord = Pick<

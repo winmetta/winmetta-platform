@@ -5,7 +5,7 @@
 // links keep working. The English name is the main tag; the Burmese and Chinese names are
 // aliases: posts may list a tag by any of its names or its slug. No name may belong to two tags
 // (compared with the search normalization, so `Pali terms` equals `Pāḷi terms` and ဥ equals ဉ).
-import { normalizeSearch } from '../normalize.ts';
+import { normalizeSearch } from '@winmetta/search-text';
 import { postTagSchema } from '../schemas.ts';
 import { hasZawgyiMarker } from '../zawgyi.ts';
 import { postLanguages, type PostLanguage } from './languages.ts';

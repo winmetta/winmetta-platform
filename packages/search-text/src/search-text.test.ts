@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildQueries, chunkTerms, indexTerms } from './search-text';
+import { buildQueries, chunkTerms, indexTerms } from './search-text.ts';
 
 describe('Chinese terms', () => {
   it('indexes every character and every overlapping pair', () => {
