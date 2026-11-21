@@ -278,7 +278,7 @@ export default function BookSearchIsland({ labels, formatLocale }: Props) {
                   <p lang={hit.language}>{hit.snippet}</p>
                   <p className="flex flex-wrap items-center gap-3">
                     <a
-                      className="btn btn-primary"
+                      className="btn btn-outline"
                       href={hit.pdfUrl}
                       target="_blank"
                       rel="noopener noreferrer"

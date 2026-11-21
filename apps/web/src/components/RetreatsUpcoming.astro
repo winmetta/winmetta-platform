@@ -1,5 +1,6 @@
 ---
 import FeedbackLink from './FeedbackLink.astro';
+import { feedbackEnabled } from '../lib/feedback';
 // Upcoming retreats, or the "none scheduled" notice when there are none.
 import BrandIcon from './BrandIcon.astro';
 import { format, t, type MessageKey } from '../i18n/messages';
@@ -83,14 +84,16 @@ const upcoming = retreats
               {retreat.venue &&
                 ` · ${retreat.venue.name[locale] ?? retreat.venue.name.en ?? ''}, ${retreat.venue.city}`}
             </p>
-            <p class="card-aside">
-              <FeedbackLink
-                locale={locale}
-                ctx="class"
-                item={retreat.id}
-                class="link-quiet relative z-10"
-              />
-            </p>
+            {feedbackEnabled && (
+              <p class="card-aside">
+                <FeedbackLink
+                  locale={locale}
+                  ctx="class"
+                  item={retreat.id}
+                  class="link-quiet relative z-10"
+                />
+              </p>
+            )}
           </li>
         );
       })}

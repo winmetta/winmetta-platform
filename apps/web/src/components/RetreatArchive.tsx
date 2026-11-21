@@ -1,4 +1,5 @@
 import FeedbackCardLink from './FeedbackCardLink';
+import { feedbackEnabled } from '../lib/feedback';
 import type { Locale } from '../i18n/locales';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -198,14 +199,16 @@ export default function RetreatArchive({ items, labels }: Props) {
               {item.teachers.map((t) => t.name).join(', ')}
               {item.venue ? ` · ${item.venue}` : ''}
             </p>
-            <p className="card-aside">
-              <FeedbackCardLink
-                locale={labels.locale}
-                ctx="class"
-                item={item.id}
-                page={`/${labels.locale}/classes/retreats/`}
-              />
-            </p>
+            {feedbackEnabled ? (
+              <p className="card-aside">
+                <FeedbackCardLink
+                  locale={labels.locale}
+                  ctx="class"
+                  item={item.id}
+                  page={`/${labels.locale}/classes/retreats/`}
+                />
+              </p>
+            ) : null}
           </li>
         ))}
       </ul>

@@ -1,5 +1,6 @@
 ---
 import FeedbackLink from './FeedbackLink.astro';
+import { feedbackEnabled } from '../lib/feedback';
 import BrandIcon from './BrandIcon.astro';
 import { languageList } from '../lib/languages';
 import LinkIcon from './LinkIcon.astro';
@@ -159,7 +160,7 @@ const labels = {
       </a>
     )}
   </p>
-  {record.status === 'active' && (
+  {feedbackEnabled && record.status === 'active' && (
     <p class="card-aside">
       <FeedbackLink
         locale={locale}

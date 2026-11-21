@@ -88,6 +88,9 @@ test.describe('search inside PDFs enabled', () => {
         'https://cdn.example/book1.pdf#page=11',
       );
       await expect(hits.nth(0).locator('a')).toHaveText(openText);
+      // The PDF action looks like the catalog's Download PDF: an outline button, not a filled one.
+      await expect(hits.nth(0).locator('a')).toHaveClass(/btn-outline/);
+      await expect(hits.nth(0).locator('a')).not.toHaveClass(/btn-primary/);
       await expect(hits.nth(0).locator('a')).toHaveAttribute('rel', /noopener/);
       // OCR is marked only where the text came from OCR.
       await expect(hits.nth(0).locator('.badge')).toHaveCount(1);
