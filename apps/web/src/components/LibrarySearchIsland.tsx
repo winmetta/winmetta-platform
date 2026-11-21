@@ -7,7 +7,7 @@ import type {
   SearchRecord,
 } from '../lib/library-search';
 import { fileUrl, languageOf } from '../lib/library-index';
-import { normalizeSearch } from '../lib/normalize';
+import { normalizeSearch } from '@winmetta/search-text';
 import {
   formatCount,
   formatSize,

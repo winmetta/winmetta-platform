@@ -1,5 +1,5 @@
 // Search and filter state for the retreat archive. Pure helpers shared by the island and its tests.
-import { normalizeSearch } from './normalize';
+import { normalizeSearch } from '@winmetta/search-text';
 
 /** Emoji shown beside a retreat's format: online 💻, in person 📍, both 💻 📍. Decorative. */
 export const formatIcon = (format: RetreatItem['format']): string =>

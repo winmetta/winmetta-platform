@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { burmeseSyllables, splitScripts } from './burmese';
+import { burmeseSyllables, splitScripts } from './burmese.ts';
 describe('burmeseSyllables', () => {
   it('segments common words into syllables', () => {
     expect(burmeseSyllables('မြန်မာစာ')).toEqual(['မြန်', 'မာ', 'စာ']);

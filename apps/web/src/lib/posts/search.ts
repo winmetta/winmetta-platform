@@ -1,6 +1,6 @@
 // Full-text search over Dhamma posts: titles, tag names and body text in every post language,
 // built at build time (search-data.ts) and loaded lazily by the posts index (PostSearch.astro).
-// Same terms and query rules as the Dhamma Library (search-text.ts); queries typed in
+// Same terms and query rules as the Dhamma Library (packages/search-text); queries typed in
 // Traditional Chinese are converted to Simplified, which every post uses.
 import MiniSearch, { type Options } from 'minisearch';
 import type { PostLanguage } from './languages.ts';
@@ -12,7 +12,7 @@ import {
   similarity,
   TERM_SEPARATOR,
   titleTier,
-} from '../search-text.ts';
+} from '@winmetta/search-text';
 
 /** What the browser needs to show a result: the same as a post list item. */
 export interface PostSearchRecord {

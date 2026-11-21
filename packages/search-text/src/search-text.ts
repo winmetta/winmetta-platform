@@ -153,3 +153,27 @@ export function buildQueries(
     },
   };
 }
+
+/** Tokens stored in the book-search FTS5 columns: Burmese syllables and everything else. */
+export interface FtsTokens {
+  /** One token per Burmese syllable, in order, so a query becomes a phrase of syllables. */
+  my: string[];
+  /** Latin words and digits; Chinese characters one by one. */
+  latin: string[];
+}
+
+/** FTS5 tokenizer option for the book-search tables. The default `unicode61` does not treat
+ * Myanmar vowel signs, virama and asat (categories Mn and Mc) as token characters, so it cuts
+ * a syllable such as `မ္မ` into single consonants; these categories keep each syllable whole. */
+export const FTS_TOKENIZE = "unicode61 categories 'L* N* Co Mn Mc'";
+
+/** Splits text into the tokens book search stores and searches (after `normalizeSearch`). */
+export function ftsTokens(text: string): FtsTokens {
+  const tokens: FtsTokens = { my: [], latin: [] };
+  for (const unit of units(text)) {
+    if (unit.kind === 'my') tokens.my.push(...unit.syllables);
+    else if (unit.kind === 'han') tokens.latin.push(...unit.chars);
+    else tokens.latin.push(unit.text);
+  }
+  return tokens;
+}

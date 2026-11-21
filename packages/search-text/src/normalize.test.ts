@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeSearch } from './normalize';
+import { normalizeSearch } from './normalize.ts';
 describe('normalizeSearch', () => {
   it('treats ဥ (U+1025) and ဉ (U+1009) as the same letter', () => {
     expect(normalizeSearch('ဥပဒေ')).toBe(normalizeSearch('ဉပဒေ'));

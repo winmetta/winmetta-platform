@@ -93,7 +93,7 @@ The indexer appends one JSON line per page to `state/<bookId>.jsonl` as each pag
 | `passages` | `id` (integer primary key), `book_id`, `page`, `ordinal`, `language`, `script`, `display_text` |
 | `passages_fts` | FTS5, contentless (`content=''`), columns `my_tokens` and `latin_tokens`, row id = `passages.id`. Language filters join `passages`; snippets come from `passages.display_text` |
 
-A passage is stored twice: exactly as read in `passages.display_text` (snippets and citations), and as space-separated search tokens in `passages_fts`. For example, `ဓမ္မ ဒေသနာ` is indexed in `my_tokens` as `ဓ မ္မ ဒေ သ နာ`.
+A passage is stored twice: exactly as read in `passages.display_text` (snippets and citations), and as space-separated search tokens in `passages_fts`. For example, `ဓမ္မ ဒေသနာ` is indexed in `my_tokens` as `ဓမ္မ ဒေ သ နာ`.
 
 After the inserts the builder runs FTS5 `optimize`, `VACUUM`, `PRAGMA integrity_check`, checks that every book in the pilot list has a row in `books` and a `pages` row for every page, and runs the golden queries (§9). It writes `dist/library-search-<YYYY-MM-DD>-r<n>.sqlite` and a `.sha256` file next to it. The SQLite file is never committed.
 
@@ -107,7 +107,7 @@ The website, the builder and the search API share one copy of the text code. Sta
 - Burmese split into syllables with the existing syllable regex, one token per syllable, so a query of two or more syllables becomes an FTS5 phrase and matches regardless of the spaces the book used;
 - Latin and digits as words.
 
-The library and Dhamma Posts golden tests (`library-search.test.ts`, `posts/search.test.ts`) must pass unchanged after the move. FTS5's `unicode61` tokenizer sees the tokens already split by spaces; a builder test checks that it never splits a Burmese syllable further (every Myanmar letter, sign and mark in U+1000–U+109F), and the tokenizer gets `tokenchars` if one does.
+The library and Dhamma Posts golden tests (`library-search.test.ts`, `posts/search.test.ts`) must pass unchanged after the move. FTS5's default `unicode61` tokenizer does **not** keep a Burmese syllable whole: it treats vowel signs, virama and asat (categories Mn and Mc) as separators, so `ဓမ္မ` is indexed as `ဓ`, `မ` (checked 2026-11-20 with Node's SQLite 3.53.4). The FTS5 tables therefore use `tokenize="unicode61 categories 'L* N* Co Mn Mc'"`, exported as `FTS_TOKENIZE` from `packages/search-text`, and a test there proves both facts. A stacked consonant stays inside its syllable (`ဓမ္မ ဒေ သ နာ` for `ဓမ္မ ဒေသနာ`), which is the syllable regex's rule.
 
 ## 7. Search API (v1)
 

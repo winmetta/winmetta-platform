@@ -1,5 +1,5 @@
 import type { LibraryFile } from './schemas.ts';
-import { normalizeSearch } from './normalize.ts';
+import { normalizeSearch } from '@winmetta/search-text';
 // Leading folder numbers: Burmese or ASCII digits, then "။" or ".".
 const numberPrefix = /^[0-9၀-၉]+[။.]\s*/;
 // Display text: NFC, no zero-width characters, collapsed spaces.
