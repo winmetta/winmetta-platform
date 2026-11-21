@@ -165,7 +165,7 @@ Unknown parameters are rejected. The query parser accepts only terms and quoted 
 
 - `page` is the **physical PDF page** (1-based), which can differ from the printed page number. `pdfUrl` is built with the catalog's own `fileUrl(PUBLIC_LIBRARY_CDN_BASE, key)` (`apps/web/src/lib/library-index.ts`, which percent-encodes every key segment), then `#page=N` is appended, so a result links to the same file address as the catalog.
 - The snippet is a window of `display_text` around the first match, at most 200 characters.
-- **Errors** are `{ "v": 1, "error": { "code": "…" } }` with status 400 (`query_missing`, `query_too_short`, `query_too_long`, `too_many_terms`, `bad_param`), 404 for another path, 405 for a method other than GET, and 503 `index_unavailable`.
+- **Errors** are `{ "v": 1, "error": { "code": "…" } }` with status 400 (`query_missing`, `query_too_short`, `query_too_long`, `too_many_terms`, `bad_param`), 404 for another path, 405 for a method other than GET, 403 `forbidden_origin` for a request the browser marks cross-site, 500 `internal_error` for an unexpected failure (no detail), and 503 `index_unavailable`.
 
 **`GET /api/search/health`** returns `{ "v": 1, "indexVersion", "books", "pages", "passages" }`.
 
@@ -178,7 +178,7 @@ Unknown parameters are rejected. The query parser accepts only terms and quoted 
 
   ```bash
   npm run book-search:serve                      # local server on 127.0.0.1:8787, newest built index
-npm run book-search -- search "ဓမ္မ ဒေသနာ" --lang my --limit 10
+  npm run book-search -- search "ဓမ္မ ဒေသနာ" --lang my --limit 10
   npm run book-search -- search "dhamma" --base-url http://127.0.0.1:8787 --json
   npm run book-search -- health
   ```

@@ -55,13 +55,14 @@ export function handleRequest(
   if (request.headers['sec-fetch-site'] === 'cross-site')
     return failure(403, 'forbidden_origin');
   if (!context.index) return failure(503, 'index_unavailable');
-  if (url.pathname === '/api/search/health')
-    return json(200, health(context.index));
   try {
+    if (url.pathname === '/api/search/health')
+      return json(200, health(context.index));
     const query = parseQuery(url.searchParams);
     return json(200, search(context.index, query, context.cdnBase), true);
   } catch (error) {
     if (error instanceof QueryError) return failure(400, error.code);
-    throw error;
+    // Any other failure (for example a SQLite error) is a generic 500: no detail, no query.
+    return failure(500, 'internal_error');
   }
 }

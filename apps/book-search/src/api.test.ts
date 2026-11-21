@@ -259,6 +259,20 @@ describe('handleRequest on a built index', () => {
       'index_unavailable',
     );
   });
+  it('answers an unexpected failure with a generic 500 instead of throwing', async () => {
+    const { file } = await buildFixtureIndex();
+    const broken = openIndex(file);
+    broken.db.close();
+    const context2 = { index: broken, cdnBase: 'https://cdn.example' };
+    for (const url of ['/api/search?q=truths', '/api/search/health']) {
+      const r = handleRequest({ method: 'GET', url, headers: {} }, context2);
+      expect(r.status).toBe(500);
+      expect(errorResponseSchema.parse(r.body).error.code).toBe(
+        'internal_error',
+      );
+      expect(JSON.stringify(r.body)).not.toMatch(/truths|sqlite|database/i);
+    }
+  });
   it('allows same-origin and header-less requests, and sends no CORS headers', () => {
     expect(
       get('/api/search?q=abc', { 'sec-fetch-site': 'same-origin' }).status,

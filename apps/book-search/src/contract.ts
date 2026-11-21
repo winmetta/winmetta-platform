@@ -22,6 +22,7 @@ export const ERROR_CODES = [
   'not_found',
   'method_not_allowed',
   'index_unavailable',
+  'internal_error',
 ] as const;
 export type ErrorCode = (typeof ERROR_CODES)[number];
 
