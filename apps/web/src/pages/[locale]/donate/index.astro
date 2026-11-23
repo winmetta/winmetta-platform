@@ -3,6 +3,7 @@
 // donors give to directly. Unlinked and noindex until PUBLIC_DONATE is on.
 import Shell from '../../../layouts/Shell.astro';
 import CopyText from '../../../components/CopyText';
+import LinkIcon from '../../../components/LinkIcon.astro';
 import { localeCodes, type Locale } from '../../../i18n/locales';
 import { format, t } from '../../../i18n/messages';
 import { teacherRoute } from '../../../i18n/routes';
@@ -63,7 +64,8 @@ const copyLabels = { copy: text('donateCopy'), copied: text('donateCopied') };
         class="card zelle-panel space-y-3 md:col-span-2"
         aria-labelledby="zelle"
       >
-        <h3 id="zelle" class="text-xl font-bold">
+        <h3 id="zelle" class="flex items-center gap-2 text-xl font-bold">
+          <LinkIcon name="transfer" class="size-7 text-brand" />
           {text('donateZelleTitle')}
         </h3>
         <p class="max-w-prose">{text('donateZelleWhat')}</p>
@@ -90,7 +92,8 @@ const copyLabels = { copy: text('donateCopy'), copied: text('donateCopied') };
         </dl>
       </section>
       <section class="card space-y-3" aria-labelledby="check">
-        <h3 id="check" class="text-lg font-bold">
+        <h3 id="check" class="flex items-center gap-2 text-lg font-bold">
+          <LinkIcon name="mail" class="size-6 text-brand" />
           {text('donateCheckTitle')}
         </h3>
         <p>{text('donateCheckWhat')}</p>
@@ -184,7 +187,8 @@ const copyLabels = { copy: text('donateCopy'), copied: text('donateCopied') };
           <dl class="space-y-2">
             {payee.zelle.map((zelle) => (
               <div class="zelle-panel">
-                <dt class="muted">
+                <dt class="muted flex items-center gap-1">
+                  <LinkIcon name="transfer" class="text-brand" />
                   {text('donateZelleTitle')}
                   {zelle.label && ` · ${zelle.label[locale]}`}
                 </dt>

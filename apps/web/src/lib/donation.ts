@@ -32,11 +32,6 @@ export const donationSupports = [
     body: 'donateSupportClasses',
   },
   {
-    id: 'materials',
-    title: 'donateSupportMaterialsTitle',
-    body: 'donateSupportMaterials',
-  },
-  {
     id: 'website',
     title: 'donateSupportWebsiteTitle',
     body: 'donateSupportWebsite',

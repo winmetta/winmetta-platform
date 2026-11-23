@@ -20,10 +20,10 @@ for (const l of locales) {
     await expect(
       page.locator('section[aria-labelledby="abroad"] a[href^="mailto:"]'),
     ).toBeVisible();
-    // Five "why give" cards, then the other organizations, each linking its teachers.
+    // Four "why give" cards, then the other organizations, each linking its teachers.
     await expect(
       page.locator('section[aria-labelledby="supports"] li.card'),
-    ).toHaveCount(5);
+    ).toHaveCount(4);
     const other = page.locator('section[aria-labelledby="other"]');
     await expect(other.locator('li.card')).toHaveCount(3);
     await expect(
