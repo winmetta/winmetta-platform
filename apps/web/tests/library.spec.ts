@@ -71,6 +71,39 @@ test('study apps are reachable from the library in both languages', async ({
   await expect(page).toHaveURL(/\/my\/dhamma-library\/$/);
 });
 
+test('digital Pāḷi texts are reachable from the library in both languages', async ({
+  page,
+}) => {
+  await page.goto('/en/dhamma-library/');
+  await page
+    .getByRole('link', { name: 'Find digital Pāḷi texts to reuse' })
+    .click();
+  await expect(page).toHaveURL(/\/en\/dhamma-library\/digital-texts\/$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'Digital Pāḷi Texts',
+  );
+  await expect(page.locator('main li.card')).toHaveCount(6);
+  await expect(
+    page.getByRole('link', {
+      name: 'Burmese-script files: VRI Chaṭṭha Saṅgāyana Tipiṭaka XML',
+    }),
+  ).toHaveAttribute(
+    'href',
+    'https://github.com/VipassanaTech/tipitaka-xml/tree/main/mymr',
+  );
+  await expect(
+    page.locator('#site-nav').getByRole('link', {
+      name: 'Digital Texts',
+      includeHidden: true,
+    }),
+  ).toHaveAttribute('href', '/en/dhamma-library/digital-texts/');
+  await page.locator('a[data-locale="my"]').click();
+  await expect(page).toHaveURL(/\/my\/dhamma-library\/digital-texts\/$/);
+  await expect(
+    page.getByRole('heading', { name: 'ဒစ်ဂျစ်တယ် ပါဠိစာပေများ' }),
+  ).toBeVisible();
+});
+
 test('search data downloads only when search is used', async ({ page }) => {
   const urls = dataRequests(page);
   await page.goto('/en/dhamma-library/');

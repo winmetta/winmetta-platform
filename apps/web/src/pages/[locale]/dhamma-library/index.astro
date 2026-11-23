@@ -65,9 +65,14 @@ const bookSearchLabels = {
   <header class="space-y-4">
     <h1 class="text-3xl font-bold sm:text-4xl">{text('libraryTitle')}</h1>
     <p class="lead">{text('libraryIntro')}</p>
-    <a class="link" href={`/${locale}/dhamma-library/apps/`}>
-      {text('studyAppsLink')} →
-    </a>
+    <p class="flex flex-wrap gap-x-6 gap-y-2">
+      <a class="link" href={`/${locale}/dhamma-library/apps/`}>
+        {text('studyAppsLink')} →
+      </a>
+      <a class="link" href={`/${locale}/dhamma-library/digital-texts/`}>
+        {text('digitalTextsLink')} →
+      </a>
+    </p>
   </header>
   <noscript>
     <p class="card">{text('searchNeedsJs')}</p>
