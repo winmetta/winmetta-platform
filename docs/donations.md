@@ -15,7 +15,7 @@ Nothing here is legal or tax advice. The tax and receipt wording needs the Treas
 
 **Data:** `apps/web/src/content/donation.json`, validated by `donationSchema` in `apps/web/src/lib/schemas.ts`. The loader checks that every teacher id exists. Only **organization** addresses go here. A person's phone number or personal email never goes in this public repo (AGENTS.md §2), even when the WordPress page shows it. For those payees the card links to the WordPress page (`detailsUrl`). Ask an organization before adding it, and remove it when it asks.
 
-**Gate:** the page is always built, but stays unlinked, `noindex` and out of the sitemap until `PUBLIC_DONATE=true`. That flag adds the footer link and the About card. Turn it on in the `production` environment only after all of these:
+**Gate:** the page is always built, but stays unlinked, `noindex` and out of the sitemap until `PUBLIC_DONATE=true`. That flag adds the footer link and the About card. Local `npm run dev` / `just dev` always turns it on (`scripts/dev-options.mjs`), so developers see the linked page. Turn it on in the `production` environment only after all of these:
 
 - [ ] The board or Treasurer approves the tax, receipt and discretion wording, after a CPA check.
 - [ ] The board agrees to name the service vendors publicly (otherwise use generic wording such as "video meetings" and "web hosting").
