@@ -269,3 +269,43 @@ export const postSchema = z.object({
 });
 export type PostTagRecord = z.infer<typeof postTagSchema>;
 export type PostRecord = z.infer<typeof postSchema>;
+// Donation page (docs/donations.md): Win Metta's own details and other organizations that
+// donors give to directly. Only organization addresses go here: never a person's phone number
+// or personal email (AGENTS.md §2); link to the page that lists those instead.
+const email = z.email();
+const bilingual = z.object({ en: text, my: text });
+const address = z.array(text).min(1);
+export const donationSchema = z.object({
+  winMetta: z.object({
+    zelle: email,
+    zelleName: text,
+    checkPayee: text,
+    mailingAddress: address,
+    ein: z.string().regex(/^\d{2}-\d{7}$/),
+    receiptEmail: email,
+  }),
+  otherPayees: z
+    .array(
+      z
+        .object({
+          id,
+          names: bilingual,
+          place: bilingual,
+          teachers: z.array(id),
+          zelle: z.object({ address: email, registeredName: text }).optional(),
+          check: z.object({ payee: text, address }).optional(),
+          detailsUrl: url.optional(),
+        })
+        .refine(
+          (payee) => payee.zelle || payee.check || payee.detailsUrl,
+          'A payee needs Zelle, check or a details link',
+        ),
+    )
+    .refine(
+      (payees) =>
+        new Set(payees.map((payee) => payee.id)).size === payees.length,
+      'Payee ids must be unique',
+    ),
+});
+export type Donation = z.infer<typeof donationSchema>;
+export type OtherPayee = Donation['otherPayees'][number];

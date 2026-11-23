@@ -396,6 +396,17 @@ One reviewed PR each, in this order.
 
 ---
 
+## 5D. Dāna page and donation receipts (planned 2026-11-23)
+
+**Goal:** tell donors why their dāna matters and how to give, on this site in both languages, and later give donors proper receipts with little volunteer work. Design: [donations.md](donations.md).
+
+* [x] **A. Dāna page.** `/<locale>/donate/` with why to give, Zelle and check, memo purposes, the tax and receipt note, and other monasteries under a disclaimer. Built behind `PUBLIC_DONATE` (unlinked and `noindex` until then).
+* [ ] **A go-live.** The wording and listing approvals in [donations.md](donations.md) §1, then the maintainer sets `PUBLIC_DONATE` in `production`.
+* [ ] **B. Manual receipt generator** for `@winmetta.org` users (Google Apps Script, private repo; [donations.md](donations.md) §2).
+* [ ] **C. Automatic receipts** from the giving platform and Chase Zelle alerts ([donations.md](donations.md) §3).
+
+---
+
 ## 6. Backlog (not scheduled)
 
 Phases 0–3 are done. Everything else lives here, in two groups: **open todos** left from the finished phases, and **future phases**, which are candidate directions rather than commitments. Nothing here is dated: the maintainer decides the order and scope as the work comes, and a future phase gets its own numbered section (like §5) when it starts. Product reasoning is in [prd.md](prd.md) §7; tentative technical notes are in [tech-architecture.md](tech-architecture.md) §10.

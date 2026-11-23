@@ -1,0 +1,227 @@
+---
+// Dāna page (docs/donations.md): why to give, how to give to Win Metta, and other monasteries
+// donors give to directly. Unlinked and noindex until PUBLIC_DONATE is on.
+import Shell from '../../../layouts/Shell.astro';
+import CopyText from '../../../components/CopyText';
+import { localeCodes, type Locale } from '../../../i18n/locales';
+import { format, t } from '../../../i18n/messages';
+import { teacherRoute } from '../../../i18n/routes';
+import {
+  donateEnabled,
+  donationData,
+  donationPurposes,
+  donationSupports,
+} from '../../../lib/donation';
+import { teacherById, teacherName } from '../../../lib/teachers';
+export function getStaticPaths() {
+  return localeCodes.map((locale) => ({
+    params: { locale },
+    props: { locale },
+  }));
+}
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const text = (key: Parameters<typeof t>[1]) => t(locale, key);
+const { winMetta, otherPayees } = donationData;
+const copyLabels = { copy: text('donateCopy'), copied: text('donateCopied') };
+---
+
+<Shell
+  locale={locale}
+  title={text('donateTitle')}
+  page="donate"
+  noindex={!donateEnabled}
+>
+  <header class="space-y-4">
+    <h1 class="text-3xl font-bold sm:text-4xl">{text('donateTitle')}</h1>
+    <p class="lead">{text('donateIntro')}</p>
+  </header>
+
+  <section class="space-y-4" aria-labelledby="supports">
+    <h2 id="supports" class="text-2xl font-bold">
+      {text('donateSupportTitle')}
+    </h2>
+    <ul class="grid gap-4 md:grid-cols-2" role="list">
+      {donationSupports.map((item) => (
+        <li class="card space-y-3">
+          <h3 class="text-lg font-bold">{text(item.title)}</h3>
+          <p>{text(item.body)}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="space-y-4" aria-labelledby="give">
+    <h2 id="give" class="text-2xl font-bold">
+      {text('donateHowTitle')}
+    </h2>
+    <div class="grid gap-4 md:grid-cols-2">
+      <section class="card space-y-3" aria-labelledby="zelle">
+        <h3 id="zelle" class="text-lg font-bold">
+          {text('donateZelleTitle')}
+        </h3>
+        <dl class="space-y-2">
+          <div>
+            <dt class="muted">{text('donateZelleAddress')}</dt>
+            <dd class="flex flex-wrap items-center gap-x-3">
+              <span class="font-semibold break-all">{winMetta.zelle}</span>
+              <div>
+                <CopyText
+                  client:load
+                  value={winMetta.zelle}
+                  label={`${text('donateCopy')} ${winMetta.zelle}`}
+                  {...copyLabels}
+                />
+              </div>
+            </dd>
+          </div>
+          <div>
+            <dt class="muted">{text('donateZelleName')}</dt>
+            <dd>{winMetta.zelleName}</dd>
+          </div>
+        </dl>
+      </section>
+      <section class="card space-y-3" aria-labelledby="check">
+        <h3 id="check" class="text-lg font-bold">
+          {text('donateCheckTitle')}
+        </h3>
+        <dl class="space-y-2">
+          <div>
+            <dt class="muted">{text('donateCheckPayee')}</dt>
+            <dd class="font-semibold">{winMetta.checkPayee}</dd>
+          </div>
+          <div>
+            <dt class="muted">{text('donateCheckMail')}</dt>
+            <dd>
+              <address class="not-italic">
+                {winMetta.mailingAddress.map((line) => (
+                  <span class="block">{line}</span>
+                ))}
+              </address>
+            </dd>
+          </div>
+        </dl>
+      </section>
+      <section class="card space-y-3 md:col-span-2" aria-labelledby="memo">
+        <h3 id="memo" class="text-lg font-bold">
+          {text('donateMemoTitle')}
+        </h3>
+        <p>{text('donateMemo')}</p>
+        <ul class="list-disc space-y-1 ps-6">
+          {donationPurposes.map((key) => (
+            <li>{text(key)}</li>
+          ))}
+        </ul>
+      </section>
+      <section class="card space-y-3 md:col-span-2" aria-labelledby="tax">
+        <h3 id="tax" class="text-lg font-bold">
+          {text('donateTaxTitle')}
+        </h3>
+        <p class="max-w-prose">
+          {format(text('donateTax'), { ein: winMetta.ein })}
+        </p>
+        <p class="max-w-prose">
+          {text('donateReceipt')}{' '}
+          <a class="link" href={`mailto:${winMetta.receiptEmail}`}>
+            {winMetta.receiptEmail}
+          </a>
+        </p>
+        <p class="max-w-prose">{text('donateDesignated')}</p>
+      </section>
+    </div>
+  </section>
+
+  <section class="space-y-4" aria-labelledby="other">
+    <h2 id="other" class="text-2xl font-bold">
+      {text('donateOtherTitle')}
+    </h2>
+    <p class="max-w-prose">{text('donateOtherNote')}</p>
+    <ul class="grid gap-4 md:grid-cols-2" role="list">
+      {otherPayees.map((payee) => (
+        <li class="card space-y-3">
+          <div>
+            <h3 class="text-lg font-bold">{payee.names[locale]}</h3>
+            <p class="muted">{payee.place[locale]}</p>
+          </div>
+          {payee.teachers.length > 0 && (
+            <p>
+              <span class="muted">{text('donateOtherTeachers')}: </span>
+              {payee.teachers.map((id, index) => {
+                const teacher = teacherById(id);
+                return (
+                  teacher && (
+                    <>
+                      {index > 0 && ', '}
+                      <a class="link" href={teacherRoute(locale, id)}>
+                        {teacherName(teacher, locale)}
+                      </a>
+                    </>
+                  )
+                );
+              })}
+            </p>
+          )}
+          {(payee.zelle || payee.check) && (
+            <dl class="space-y-2">
+              {payee.zelle && (
+                <div>
+                  <dt class="muted">
+                    {text('donateZelleTitle')} · {text('donateZelleAddress')}
+                  </dt>
+                  <dd class="flex flex-wrap items-center gap-x-3">
+                    <span class="font-semibold break-all">
+                      {payee.zelle.address}
+                    </span>
+                    <div>
+                      <CopyText
+                        client:load
+                        value={payee.zelle.address}
+                        label={`${text('donateCopy')} ${payee.zelle.address}`}
+                        {...copyLabels}
+                      />
+                    </div>
+                  </dd>
+                  <dd>
+                    <span class="muted">{text('donateZelleName')}: </span>
+                    {payee.zelle.registeredName}
+                  </dd>
+                </div>
+              )}
+              {payee.check && (
+                <div>
+                  <dt class="muted">
+                    {text('donateCheckTitle')} · {text('donateCheckPayee')}
+                  </dt>
+                  <dd class="font-semibold">{payee.check.payee}</dd>
+                  <dd>
+                    <address class="not-italic">
+                      {payee.check.address.map((line) => (
+                        <span class="block">{line}</span>
+                      ))}
+                    </address>
+                  </dd>
+                </div>
+              )}
+            </dl>
+          )}
+          {payee.detailsUrl && (
+            <p>
+              <a class="link" href={payee.detailsUrl} rel="noopener">
+                {text('donateOtherDetails')}
+              </a>
+            </p>
+          )}
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <p>
+    {text('donateQuestions')}{' '}
+    <a class="link" href={`mailto:${winMetta.receiptEmail}`}>
+      {winMetta.receiptEmail}
+    </a>
+  </p>
+</Shell>

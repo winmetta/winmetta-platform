@@ -3,6 +3,8 @@ import Shell from '../../../layouts/Shell.astro';
 import { localeCodes, type Locale } from '../../../i18n/locales';
 import { t } from '../../../i18n/messages';
 import { isBeta } from '../../../lib/site';
+import { donateEnabled } from '../../../lib/donation';
+import { route } from '../../../i18n/routes';
 export function getStaticPaths() {
   return localeCodes.map((locale) => ({
     params: { locale },
@@ -45,6 +47,19 @@ const text = (key: Parameters<typeof t>[1]) => t(locale, key);
       </h2>
       <p>{text('aboutFree')}</p>
     </section>
+    {donateEnabled && (
+      <section class="card space-y-3 md:col-span-2" aria-labelledby="dana">
+        <h2 id="dana" class="text-xl font-bold">
+          {text('aboutDanaTitle')}
+        </h2>
+        <p class="max-w-prose">{text('aboutDana')}</p>
+        <p>
+          <a class="link" href={route(locale, 'donate')}>
+            {text('aboutDanaLink')}
+          </a>
+        </p>
+      </section>
+    )}
     {isBeta && (
       <section
         id="beta"

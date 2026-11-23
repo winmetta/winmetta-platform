@@ -142,6 +142,7 @@ jobs:
           PUBLIC_FEEDBACK: 'true'
           PUBLIC_FEEDBACK_POSTS_REVIEWED: 'true'
           PUBLIC_BOOK_SEARCH: 'true'
+          PUBLIC_DONATE: 'true'
           PUBLIC_ANALYTICS: 'true'
           PUBLIC_ANALYTICS_HOST: https://analytics.example.test
           PUBLIC_ANALYTICS_WEBSITE_ID: '00000000-0000-4000-8000-000000000000'
