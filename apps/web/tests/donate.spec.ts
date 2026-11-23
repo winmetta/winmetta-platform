@@ -16,6 +16,10 @@ for (const l of locales) {
     await expect(main).toContainText('winmetta.org@gmail.com');
     await expect(main).toContainText('42-2837605');
     await expect(main).toContainText('256 Campana Ave');
+    // Zelle and checks are explained, and donors outside the USA are told how to ask.
+    await expect(
+      page.locator('section[aria-labelledby="abroad"] a[href^="mailto:"]'),
+    ).toBeVisible();
     // Five "why give" cards, then the other organizations, each linking its teachers.
     await expect(
       page.locator('section[aria-labelledby="supports"] li.card'),

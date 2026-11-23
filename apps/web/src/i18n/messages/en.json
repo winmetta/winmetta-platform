@@ -366,5 +366,9 @@
   "aboutDanaTitle": "Supported by dāna",
   "aboutDana": "Win Metta has no fees. Donations pay for Zoom and the other online services behind our classes, retreats and study groups, for hosting this website and the Dhamma Library, for the tools volunteers use, and for the Sayadaws and teachers who teach.",
   "aboutDanaLink": "How to give",
-  "donateZelleLead": "The quickest way to give: send from your bank’s app to this address. Please put your name and the purpose in the memo."
+  "donateZelleLead": "The quickest way to give: send from your bank’s app to this address. Please put your name and the purpose in the memo.",
+  "donateZelleWhat": "Zelle is a free way to send money between bank accounts in the USA. It is built into the mobile apps and websites of most US banks, such as Chase, Bank of America and Wells Fargo, and it needs a US bank account.",
+  "donateCheckWhat": "Mail a paper check written from a US bank account to the address below.",
+  "donateAbroadTitle": "Giving from outside the USA",
+  "donateAbroad": "Zelle and checks work only with US bank accounts. If you live outside the USA and would like to give, please write to us and we will tell you how."
 }

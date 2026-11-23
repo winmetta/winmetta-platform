@@ -66,7 +66,8 @@ const copyLabels = { copy: text('donateCopy'), copied: text('donateCopied') };
         <h3 id="zelle" class="text-xl font-bold">
           {text('donateZelleTitle')}
         </h3>
-        <p>{text('donateZelleLead')}</p>
+        <p class="max-w-prose">{text('donateZelleWhat')}</p>
+        <p class="max-w-prose">{text('donateZelleLead')}</p>
         <dl class="space-y-2">
           <div>
             <dt class="muted">{text('donateZelleAddress')}</dt>
@@ -92,6 +93,7 @@ const copyLabels = { copy: text('donateCopy'), copied: text('donateCopied') };
         <h3 id="check" class="text-lg font-bold">
           {text('donateCheckTitle')}
         </h3>
+        <p>{text('donateCheckWhat')}</p>
         <dl class="space-y-2">
           <div>
             <dt class="muted">{text('donateCheckPayee')}</dt>
@@ -119,6 +121,17 @@ const copyLabels = { copy: text('donateCopy'), copied: text('donateCopied') };
             <li>{text(key)}</li>
           ))}
         </ul>
+      </section>
+      <section class="card space-y-3 md:col-span-2" aria-labelledby="abroad">
+        <h3 id="abroad" class="text-lg font-bold">
+          {text('donateAbroadTitle')}
+        </h3>
+        <p class="max-w-prose">
+          {text('donateAbroad')}{' '}
+          <a class="link" href={`mailto:${winMetta.receiptEmail}`}>
+            {winMetta.receiptEmail}
+          </a>
+        </p>
       </section>
       <section class="card space-y-3 md:col-span-2" aria-labelledby="tax">
         <h3 id="tax" class="text-lg font-bold">
