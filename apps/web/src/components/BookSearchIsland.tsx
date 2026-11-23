@@ -14,6 +14,7 @@ import { formatCount } from '../lib/library-url';
 import { CheckIcon, CopyIcon, MoreIcon, RetryIcon } from './icons';
 import { Button } from './ui/button';
 import { TextAction } from './ui/text-action';
+import { copyText } from '../lib/clipboard';
 
 export interface BookSearchLabels {
   title: string;
@@ -69,24 +70,6 @@ async function ask(
     return { ok: true, hits: parsed.results, hasMore: parsed.hasMore };
   } catch {
     return { ok: false, failure: 'unavailable' };
-  }
-}
-
-async function copyText(text: string): Promise<boolean> {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    const area = document.createElement('textarea');
-    area.value = text;
-    area.setAttribute('readonly', '');
-    area.style.position = 'fixed';
-    area.style.opacity = '0';
-    document.body.appendChild(area);
-    area.select();
-    const done = document.execCommand('copy');
-    area.remove();
-    return done;
   }
 }
 

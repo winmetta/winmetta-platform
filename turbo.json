@@ -11,7 +11,8 @@
         "PUBLIC_LIBRARY_CDN_BASE",
         "PUBLIC_FEEDBACK",
         "PUBLIC_FEEDBACK_POSTS_REVIEWED",
-        "PUBLIC_BOOK_SEARCH"
+        "PUBLIC_BOOK_SEARCH",
+        "PUBLIC_DONATE"
       ]
     },
     "dev": {

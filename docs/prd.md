@@ -111,7 +111,7 @@ Explicitly deferred, not abandoned:
 
 ## 5. Funding & Sustainability Plan
 
-* **Dāna / donations:** Win Metta is a 501(c)(3); tax-deductible donations continue as the base funding model. Core learning content and the Dhamma Library remain free and unpaywalled, consistent with the Dāna & Open Access principle.
+* **Dāna / donations:** Win Metta is a 501(c)(3); tax-deductible donations continue as the base funding model. The site's Dāna page and the receipt plan are in [donations.md](donations.md). Core learning content and the Dhamma Library remain free and unpaywalled, consistent with the Dāna & Open Access principle.
 * **Grant opportunities specific to this angle** (distinct from — and more viable than — a generic dana-only meditation-app model):
   * Immigrant/refugee community integration and heritage-language preservation grants. Burmese refugees were the largest single refugee-origin group admitted to the US from 2011–2023, which makes Win Metta's literacy mission a plausible fit for state library, refugee-resettlement-agency, and ethnic-community-foundation grant programs.
   * Buddhist and Asian-American cultural preservation foundation grants.

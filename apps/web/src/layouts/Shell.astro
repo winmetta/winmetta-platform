@@ -3,6 +3,7 @@ import FeedbackDialog from '../components/FeedbackDialog.astro';
 import FeedbackLink from '../components/FeedbackLink.astro';
 import '../styles/global.css';
 import { feedbackEnabled } from '../lib/feedback';
+import { donateEnabled } from '../lib/donation';
 import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 import Analytics from '../components/Analytics.astro';
 import { locales, localeCodes, type Locale } from '../i18n/locales';
@@ -226,6 +227,15 @@ const postLanguageScript = postLanguagesHeadScript(defaultPostLanguage(locale));
           >
             {t(locale, 'navZoomHelp')}
           </a>
+          {donateEnabled && (
+            <a
+              href={route(locale, 'donate')}
+              class="footer-link"
+              aria-current={page === 'donate' ? 'page' : undefined}
+            >
+              {t(locale, 'navDonate')}
+            </a>
+          )}
           <FeedbackLink locale={locale} class="footer-link" />
           <a href="https://winmetta.org/" class="footer-link" rel="noopener">
             winmetta.org

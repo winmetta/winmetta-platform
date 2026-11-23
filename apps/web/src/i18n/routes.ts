@@ -13,6 +13,7 @@ export const pagePaths = {
   studyApps: 'dhamma-library/apps/',
   digitalTexts: 'dhamma-library/digital-texts/',
   posts: 'dhamma-posts/',
+  donate: 'donate/',
 } as const;
 export type PageId = keyof typeof pagePaths;
 export function route(locale: Locale, page: PageId = 'home'): string {

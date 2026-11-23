@@ -1,0 +1,62 @@
+{
+  "winMetta": {
+    "zelle": "winmetta.org@gmail.com",
+    "zelleName": "Win Metta",
+    "checkPayee": "Win Metta",
+    "mailingAddress": ["256 Campana Ave", "Daly City, CA 94015"],
+    "ein": "42-2837605",
+    "receiptEmail": "contact@winmetta.org"
+  },
+  "otherPayees": [
+    {
+      "id": "mettananda-vihara",
+      "names": {
+        "en": "Mettānanda Vihāra",
+        "my": "မေတ္တာနန္ဒ ဝိဟာရ"
+      },
+      "place": {
+        "en": "Oakland, California",
+        "my": "အိုကလန်၊ ကယ်လီဖိုးနီးယား"
+      },
+      "teachers": ["ghositabhivamsa"],
+      "zelle": {
+        "address": "mettananda.usa@gmail.com",
+        "registeredName": "Myanmar American Buddhist Association"
+      },
+      "check": {
+        "payee": "Myanmar American Buddhist Association",
+        "address": ["2707 Seminary Ave", "Oakland, CA 94605"]
+      }
+    },
+    {
+      "id": "kusalakari-monastery",
+      "names": {
+        "en": "Kusalakārī Monastery",
+        "my": "ကုသလကာရီ ကျောင်း"
+      },
+      "place": {
+        "en": "Fremont, California",
+        "my": "ဖရီးမောင့်၊ ကယ်လီဖိုးနီးယား"
+      },
+      "teachers": ["garudhamma"],
+      "zelle": {
+        "address": "kusalakarifremont@gmail.com",
+        "registeredName": "KUSALAKARI CORP"
+      },
+      "detailsUrl": "https://winmetta.org/dhamma-donation/"
+    },
+    {
+      "id": "alodawpyie-meditation-center",
+      "names": {
+        "en": "Alodawpyie Meditation Center",
+        "my": "အလိုတော်ပြည့် ရိပ်သာ"
+      },
+      "place": {
+        "en": "Apache Junction, Arizona",
+        "my": "အပါချီ ဂျန်ရှင်၊ အရီဇိုးနား"
+      },
+      "teachers": ["kelasa"],
+      "detailsUrl": "https://winmetta.org/dhamma-donation/"
+    }
+  ]
+}
