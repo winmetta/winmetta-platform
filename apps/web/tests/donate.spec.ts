@@ -32,10 +32,13 @@ for (const l of locales) {
   });
 }
 
-test('the footer and About link the Dāna page only when it is on', async ({
+test('the header, footer and About link the Dāna page only when it is on', async ({
   page,
 }) => {
   await page.goto('/en/about/');
+  await expect(page.locator('#site-nav a[href="/en/donate/"]')).toHaveCount(
+    donate ? 1 : 0,
+  );
   await expect(page.locator('footer a[href="/en/donate/"]')).toHaveCount(
     donate ? 1 : 0,
   );
@@ -50,6 +53,9 @@ test('the footer and About link the Dāna page only when it is on', async ({
     );
   } else {
     await expect(page.locator('footer a[aria-current="page"]')).toHaveText(
+      'Donate',
+    );
+    await expect(page.locator('#site-nav a[aria-current="page"]')).toHaveText(
       'Donate',
     );
   }
