@@ -4,6 +4,8 @@ Single-colour marks of YouTube, Facebook and Zoom from the Simple Icons set (sim
 
 The Apple, Android and Linux icons are also from Simple Icons 16.34.0, retrieved 2026-11-19. They identify the app platforms on the Dhamma Study Apps page.
 
+The GitHub icon is also from Simple Icons 16.34.0, retrieved 2026-11-23. It marks links to source code on the Digital Pāḷi Texts page.
+
 | File         | Official brand page                                                | Official colour |
 | ------------ | ------------------------------------------------------------------ | --------------- |
 | youtube.svg  | https://www.youtube.com/howyoutubeworks/resources/brand-resources/ | #FF0000         |
@@ -12,5 +14,6 @@ The Apple, Android and Linux icons are also from Simple Icons 16.34.0, retrieved
 | apple.svg    | https://www.apple.com/                                             | Monochrome      |
 | android.svg  | https://www.android.com/                                           | Monochrome      |
 | linux.svg    | https://www.linuxfoundation.org/                                   | Monochrome      |
+| github.svg   | https://github.com/logos                                           | Monochrome      |
 
 The marks are trademarks of their owners. They are used only to point to those services, unaltered except for fill colour, and never to suggest endorsement. Follow each brand page's guidelines (clear space, no distortion) if usage grows.

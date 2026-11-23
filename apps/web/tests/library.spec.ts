@@ -91,6 +91,10 @@ test('digital Pāḷi texts are reachable from the library in both languages', a
     'href',
     'https://github.com/VipassanaTech/tipitaka-xml/tree/main/mymr',
   );
+  const sources = page.getByRole('link', { name: /^Source on GitHub: / });
+  await expect(sources).toHaveCount(5);
+  for (const link of await sources.all())
+    await expect(link.locator('img[src*="GitHub"]')).toHaveCount(1);
   await expect(
     page.locator('#site-nav').getByRole('link', {
       name: 'Digital Texts',
@@ -100,7 +104,7 @@ test('digital Pāḷi texts are reachable from the library in both languages', a
   await page.locator('a[data-locale="my"]').click();
   await expect(page).toHaveURL(/\/my\/dhamma-library\/digital-texts\/$/);
   await expect(
-    page.getByRole('heading', { name: 'ဒစ်ဂျစ်တယ် ပါဠိစာပေများ' }),
+    page.getByRole('heading', { name: 'ယူနီကုဒ် ပါဠိစာပေများ' }),
   ).toBeVisible();
 });
 
