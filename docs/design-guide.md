@@ -55,6 +55,7 @@ Rules that follow:
 ## 3. Headings, text and colour
 
 - One `h1` per page. Headings go down one level at a time (`h2` for a section, `h3` inside it, `h4` for the title of a card inside an `h3` section); never pick a level for its size, style it with a class.
+- Payment details a donor must notice first (the Zelle blocks on the Dāna page) use `.zelle-panel`: sky background with a brand edge, no hover, since it is information and not a control; the value to type or copy is `.zelle-address`.
 - Colors come from the tokens in `global.css`; no new hex values. `--grey` (#959897) is never used for text or control borders (it fails contrast). Information is never carried by color alone.
 - Set `lang` on text whose language differs from the interface (titles, snippets, tags), so screen readers and Burmese line-height rules apply.
 - Numbers follow the interface language: Burmese digits in Burmese (၁၂ အုပ်, ၉.၅ MB), Latin digits in English (`formatCount`, `formatSize`; never `toString()` or a raw number in a message). A counted thing uses its counter after the number (books are `အုပ်`, not `စာအုပ်`). Dates, times and class schedules keep the Latin digits they were decided to have.

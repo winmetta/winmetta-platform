@@ -11,13 +11,17 @@ interface Props {
     | 'teacher'
     | 'folder'
     | 'file'
-    | 'computer';
+    | 'computer'
+    | 'transfer'
+    | 'mail';
+  /** Extra classes, e.g. a larger size beside a heading. */
+  class?: string;
 }
-const { name } = Astro.props;
+const { name, class: extra } = Astro.props;
 ---
 
 <svg
-  class="link-icon"
+  class:list={['link-icon', extra]}
   viewBox="0 0 24 24"
   fill="none"
   stroke="currentColor"
@@ -27,6 +31,19 @@ const { name } = Astro.props;
   aria-hidden="true"
   focusable="false"
 >
+  {name === 'transfer' && (
+    <>
+      <rect x="3" y="2" width="10" height="20" rx="2" />
+      <path d="M7 18h2" />
+      <path d="M13 9h8m-3-3 3 3-3 3" />
+    </>
+  )}
+  {name === 'mail' && (
+    <>
+      <rect x="2" y="5" width="20" height="14" rx="2" />
+      <path d="m3 7 9 6 9-6" />
+    </>
+  )}
   {name === 'computer' && (
     <>
       <rect x="3" y="4" width="18" height="13" rx="2" />

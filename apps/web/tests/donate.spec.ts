@@ -16,26 +16,39 @@ for (const l of locales) {
     await expect(main).toContainText('winmetta.org@gmail.com');
     await expect(main).toContainText('42-2837605');
     await expect(main).toContainText('256 Campana Ave');
-    // Five "why give" cards, then the other organizations, each linking its teachers.
+    // Zelle and checks are explained, and donors outside the USA are told how to ask.
+    await expect(
+      page.locator('section[aria-labelledby="abroad"] a[href^="mailto:"]'),
+    ).toBeVisible();
+    // Four "why give" cards, then the other organizations, each linking its teachers.
     await expect(
       page.locator('section[aria-labelledby="supports"] li.card'),
-    ).toHaveCount(5);
+    ).toHaveCount(4);
     const other = page.locator('section[aria-labelledby="other"]');
     await expect(other.locator('li.card')).toHaveCount(3);
     await expect(
       other.locator(`a[href="/${l.code}/classes/sayadaws/garudhamma/"]`),
     ).toBeVisible();
-    // No phone numbers are published (AGENTS.md §2).
-    expect(await main.innerText()).not.toMatch(
-      /\(?\d{3}\)?[-. ]\d{3}[-. ]\d{4}/,
-    );
+    // Every payee's details are on the page itself, not behind a winmetta.org link.
+    await expect(other).toContainText('garudhamma@gmail.com');
+    await expect(other).toContainText('(480) 252-2799');
+    await expect(
+      other.locator('a[href*="winmetta.org/dhamma-donation"]'),
+    ).toHaveCount(0);
+    // The only phone number is the approved Zelle number (AGENTS.md §2 donation exception).
+    expect(
+      (await main.innerText()).match(/\(?\d{3}\)?[-. ]\d{3}[-. ]\d{4}/g),
+    ).toEqual(['(480) 252-2799']);
   });
 }
 
-test('the footer and About link the Dāna page only when it is on', async ({
+test('the header, footer and About link the Dāna page only when it is on', async ({
   page,
 }) => {
   await page.goto('/en/about/');
+  await expect(page.locator('#site-nav a[href="/en/donate/"]')).toHaveCount(
+    donate ? 1 : 0,
+  );
   await expect(page.locator('footer a[href="/en/donate/"]')).toHaveCount(
     donate ? 1 : 0,
   );
@@ -50,6 +63,9 @@ test('the footer and About link the Dāna page only when it is on', async ({
     );
   } else {
     await expect(page.locator('footer a[aria-current="page"]')).toHaveText(
+      'Donate',
+    );
+    await expect(page.locator('#site-nav a[aria-current="page"]')).toHaveText(
       'Donate',
     );
   }
@@ -88,4 +104,16 @@ test('the Dāna page fits a 320px screen in Burmese', async ({ page }) => {
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
+});
+
+test('Copy gives Zelle the digits of a phone number', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/en/donate/');
+  await page.getByRole('button', { name: 'Copy (480) 252-2799' }).click();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    '4802522799',
+  );
 });

@@ -384,6 +384,14 @@
   .card-link {
     @apply hover:-translate-y-0.5 hover:border-mist;
   }
+  /* Payment details to notice first (Zelle on the Dāna page): sky background and a brand edge.
+     Information, not a control, so no hover. `.zelle-address` is the value donors type or copy. */
+  .zelle-panel {
+    @apply rounded-xl border-s-4 border-brand bg-sky p-4;
+  }
+  .zelle-address {
+    @apply text-lg font-bold break-all text-foreground sm:text-xl;
+  }
   .card-link a::after {
     content: '';
     @apply absolute inset-0 rounded-2xl;

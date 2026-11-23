@@ -20,17 +20,16 @@ for (const payee of donationData.otherPayees) {
   }
 }
 
+/** Zelle takes a phone number as digits only; an email address is copied as it is. */
+export const zelleCopyValue = (address: string): string =>
+  address.includes('@') ? address : address.replace(/\D/g, '');
+
 /** What dāna pays for, in page order: a title and a body message key each. */
 export const donationSupports = [
   {
     id: 'classes',
     title: 'donateSupportClassesTitle',
     body: 'donateSupportClasses',
-  },
-  {
-    id: 'materials',
-    title: 'donateSupportMaterialsTitle',
-    body: 'donateSupportMaterials',
   },
   {
     id: 'website',

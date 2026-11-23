@@ -19,13 +19,19 @@
         "my": "အိုကလန်၊ ကယ်လီဖိုးနီးယား"
       },
       "teachers": ["ghositabhivamsa"],
-      "zelle": {
-        "address": "mettananda.usa@gmail.com",
-        "registeredName": "Myanmar American Buddhist Association"
-      },
+      "zelle": [
+        {
+          "address": "mettananda.usa@gmail.com",
+          "registeredName": "Myanmar American Buddhist Association"
+        }
+      ],
       "check": {
         "payee": "Myanmar American Buddhist Association",
-        "address": ["2707 Seminary Ave", "Oakland, CA 94605"]
+        "address": [
+          "Mettananda Vihara",
+          "2707 Seminary Ave",
+          "Oakland, CA 94605"
+        ]
       }
     },
     {
@@ -39,11 +45,24 @@
         "my": "ဖရီးမောင့်၊ ကယ်လီဖိုးနီးယား"
       },
       "teachers": ["garudhamma"],
-      "zelle": {
-        "address": "kusalakarifremont@gmail.com",
-        "registeredName": "KUSALAKARI CORP"
-      },
-      "detailsUrl": "https://winmetta.org/dhamma-donation/"
+      "zelle": [
+        {
+          "label": {
+            "en": "Kusalakārī Monastery",
+            "my": "ကုသလကာရီ ကျောင်း"
+          },
+          "address": "kusalakarifremont@gmail.com",
+          "registeredName": "KUSALAKARI CORP"
+        },
+        {
+          "label": {
+            "en": "Sayadaw U Garudhamma",
+            "my": "ဆရာတော် ဦးဂရုဓမ္မ"
+          },
+          "address": "garudhamma@gmail.com",
+          "registeredName": "GARU DHAMMA"
+        }
+      ]
     },
     {
       "id": "alodawpyie-meditation-center",
@@ -56,7 +75,12 @@
         "my": "အပါချီ ဂျန်ရှင်၊ အရီဇိုးနား"
       },
       "teachers": ["kelasa"],
-      "detailsUrl": "https://winmetta.org/dhamma-donation/"
+      "zelle": [
+        {
+          "address": "(480) 252-2799",
+          "registeredName": "ALODAWPYIE MEDITATION CENTER, APACHE JUNCTION, AZ"
+        }
+      ]
     }
   ]
 }

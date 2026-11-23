@@ -46,6 +46,8 @@ const navItems = [
     ],
   },
   { page: 'posts', label: 'navPosts' },
+  // The Dāna page is linked only once its wording is approved (docs/donations.md).
+  ...(donateEnabled ? ([{ page: 'donate', label: 'navDonate' }] as const) : []),
 ] as const;
 const inLibrary =
   page === 'library' ||
