@@ -59,15 +59,19 @@ const copyLabels = { copy: text('donateCopy'), copied: text('donateCopied') };
       {text('donateHowTitle')}
     </h2>
     <div class="grid gap-4 md:grid-cols-2">
-      <section class="card space-y-3" aria-labelledby="zelle">
-        <h3 id="zelle" class="text-lg font-bold">
+      <section
+        class="card zelle-panel space-y-3 md:col-span-2"
+        aria-labelledby="zelle"
+      >
+        <h3 id="zelle" class="text-xl font-bold">
           {text('donateZelleTitle')}
         </h3>
+        <p>{text('donateZelleLead')}</p>
         <dl class="space-y-2">
           <div>
             <dt class="muted">{text('donateZelleAddress')}</dt>
             <dd class="flex flex-wrap items-center gap-x-3">
-              <span class="font-semibold break-all">{winMetta.zelle}</span>
+              <span class="zelle-address">{winMetta.zelle}</span>
               <div>
                 <CopyText
                   client:load
@@ -80,7 +84,7 @@ const copyLabels = { copy: text('donateCopy'), copied: text('donateCopied') };
           </div>
           <div>
             <dt class="muted">{text('donateZelleName')}</dt>
-            <dd>{winMetta.zelleName}</dd>
+            <dd class="font-semibold">{winMetta.zelleName}</dd>
           </div>
         </dl>
       </section>
@@ -105,7 +109,7 @@ const copyLabels = { copy: text('donateCopy'), copied: text('donateCopied') };
           </div>
         </dl>
       </section>
-      <section class="card space-y-3 md:col-span-2" aria-labelledby="memo">
+      <section class="card space-y-3" aria-labelledby="memo">
         <h3 id="memo" class="text-lg font-bold">
           {text('donateMemoTitle')}
         </h3>
@@ -166,13 +170,13 @@ const copyLabels = { copy: text('donateCopy'), copied: text('donateCopied') };
           )}
           <dl class="space-y-2">
             {payee.zelle.map((zelle) => (
-              <div>
+              <div class="zelle-panel">
                 <dt class="muted">
                   {text('donateZelleTitle')}
                   {zelle.label && ` · ${zelle.label[locale]}`}
                 </dt>
                 <dd class="flex flex-wrap items-center gap-x-3">
-                  <span class="font-semibold break-all">{zelle.address}</span>
+                  <span class="zelle-address">{zelle.address}</span>
                   <div>
                     <CopyText
                       client:load
