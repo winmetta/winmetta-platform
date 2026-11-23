@@ -25,10 +25,16 @@ for (const l of locales) {
     await expect(
       other.locator(`a[href="/${l.code}/classes/sayadaws/garudhamma/"]`),
     ).toBeVisible();
-    // No phone numbers are published (AGENTS.md §2).
-    expect(await main.innerText()).not.toMatch(
-      /\(?\d{3}\)?[-. ]\d{3}[-. ]\d{4}/,
-    );
+    // Every payee's details are on the page itself, not behind a winmetta.org link.
+    await expect(other).toContainText('garudhamma@gmail.com');
+    await expect(other).toContainText('(480) 252-2799');
+    await expect(
+      other.locator('a[href*="winmetta.org/dhamma-donation"]'),
+    ).toHaveCount(0);
+    // The only phone number is the approved Zelle number (AGENTS.md §2 donation exception).
+    expect(
+      (await main.innerText()).match(/\(?\d{3}\)?[-. ]\d{3}[-. ]\d{4}/g),
+    ).toEqual(['(480) 252-2799']);
   });
 }
 
@@ -94,4 +100,16 @@ test('the Dāna page fits a 320px screen in Burmese', async ({ page }) => {
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
+});
+
+test('Copy gives Zelle the digits of a phone number', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/en/donate/');
+  await page.getByRole('button', { name: 'Copy (480) 252-2799' }).click();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    '4802522799',
+  );
 });

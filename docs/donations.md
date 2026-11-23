@@ -13,14 +13,14 @@ Nothing here is legal or tax advice. The tax and receipt wording needs the Treas
 - **Tax receipts.** The 501(c)(3) status and EIN, and where to email for a receipt. It also says that a gift naming a Sayadaw, monastery or program is followed where possible, but the board makes the final decision on its use. That discretion and control is what keeps a designated gift deductible and avoids Win Metta acting as a pass-through. This replaces the old instruction to text a person's phone; no personal phone number is published.
 - **Give directly to a monastery.** Other organizations that donors give to directly, under a note that these gifts are not gifts to Win Metta and get no Win Metta receipt. Each card links the related teacher pages.
 
-**Data:** `apps/web/src/content/donation.json`, validated by `donationSchema` in `apps/web/src/lib/schemas.ts`. The loader checks that every teacher id exists. Only **organization** addresses go here. A person's phone number or personal email never goes in this public repo (AGENTS.md §2), even when the WordPress page shows it. For those payees the card links to the WordPress page (`detailsUrl`). Ask an organization before adding it, and remove it when it asks.
+**Data:** `apps/web/src/content/donation.json`, validated by `donationSchema` in `apps/web/src/lib/schemas.ts`. The loader checks that every teacher id exists. It holds the same Zelle and check details that Win Metta publishes, with each payee's approval, on https://winmetta.org/dhamma-donation/, including a monk's Zelle email and a center's Zelle phone number. That is the donation exception in AGENTS.md §2; nothing else personal goes here. A payee can have several Zelle accounts (each with an optional bilingual `label` saying whose it is); a phone number is written `(480) 555-0100`, and Copy gives Zelle its digits. Add a payee only with its approval, and remove it when it asks.
 
 **Gate:** the page is always built, but stays unlinked, `noindex` and out of the sitemap until `PUBLIC_DONATE=true`. That flag adds the Donate link in the header navigation and the footer, and the About card. Local `npm run dev` / `just dev` always turns it on (`scripts/dev-options.mjs`), so developers see the linked page. Turn it on in the `production` environment only after all of these:
 
 - [ ] The board or Treasurer approves the tax, receipt and discretion wording, after a CPA check.
 - [ ] The board agrees to name the service vendors publicly (otherwise use generic wording such as "video meetings" and "web hosting").
 - [ ] A native Burmese reader reviews every `donate*` and `aboutDana*` message in `my.json`.
-- [ ] Each listed organization agrees to be listed with the details shown.
+- [x] Each listed organization agrees to be listed with the details shown: they are the details already approved and published on the winmetta.org donation page (confirmed 2026-11-23).
 - [ ] The Privacy page needs no change: the page collects nothing and sends no analytics events beyond the page view.
 
 ## 2. Stage B: manual receipt generator (planned, not built)

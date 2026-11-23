@@ -11,6 +11,7 @@ import {
   donationData,
   donationPurposes,
   donationSupports,
+  zelleCopyValue,
 } from '../../../lib/donation';
 import { teacherById, teacherName } from '../../../lib/teachers';
 export function getStaticPaths() {
@@ -163,56 +164,46 @@ const copyLabels = { copy: text('donateCopy'), copied: text('donateCopied') };
               })}
             </p>
           )}
-          {(payee.zelle || payee.check) && (
-            <dl class="space-y-2">
-              {payee.zelle && (
-                <div>
-                  <dt class="muted">
-                    {text('donateZelleTitle')} · {text('donateZelleAddress')}
-                  </dt>
-                  <dd class="flex flex-wrap items-center gap-x-3">
-                    <span class="font-semibold break-all">
-                      {payee.zelle.address}
-                    </span>
-                    <div>
-                      <CopyText
-                        client:load
-                        value={payee.zelle.address}
-                        label={`${text('donateCopy')} ${payee.zelle.address}`}
-                        {...copyLabels}
-                      />
-                    </div>
-                  </dd>
-                  <dd>
-                    <span class="muted">{text('donateZelleName')}: </span>
-                    {payee.zelle.registeredName}
-                  </dd>
-                </div>
-              )}
-              {payee.check && (
-                <div>
-                  <dt class="muted">
-                    {text('donateCheckTitle')} · {text('donateCheckPayee')}
-                  </dt>
-                  <dd class="font-semibold">{payee.check.payee}</dd>
-                  <dd>
-                    <address class="not-italic">
-                      {payee.check.address.map((line) => (
-                        <span class="block">{line}</span>
-                      ))}
-                    </address>
-                  </dd>
-                </div>
-              )}
-            </dl>
-          )}
-          {payee.detailsUrl && (
-            <p>
-              <a class="link" href={payee.detailsUrl} rel="noopener">
-                {text('donateOtherDetails')}
-              </a>
-            </p>
-          )}
+          <dl class="space-y-2">
+            {payee.zelle.map((zelle) => (
+              <div>
+                <dt class="muted">
+                  {text('donateZelleTitle')}
+                  {zelle.label && ` · ${zelle.label[locale]}`}
+                </dt>
+                <dd class="flex flex-wrap items-center gap-x-3">
+                  <span class="font-semibold break-all">{zelle.address}</span>
+                  <div>
+                    <CopyText
+                      client:load
+                      value={zelleCopyValue(zelle.address)}
+                      label={`${text('donateCopy')} ${zelle.address}`}
+                      {...copyLabels}
+                    />
+                  </div>
+                </dd>
+                <dd>
+                  <span class="muted">{text('donateZelleName')}: </span>
+                  {zelle.registeredName}
+                </dd>
+              </div>
+            ))}
+            {payee.check && (
+              <div>
+                <dt class="muted">
+                  {text('donateCheckTitle')} · {text('donateCheckPayee')}
+                </dt>
+                <dd class="font-semibold">{payee.check.payee}</dd>
+                <dd>
+                  <address class="not-italic">
+                    {payee.check.address.map((line) => (
+                      <span class="block">{line}</span>
+                    ))}
+                  </address>
+                </dd>
+              </div>
+            )}
+          </dl>
         </li>
       ))}
     </ul>

@@ -270,9 +270,14 @@ export const postSchema = z.object({
 export type PostTagRecord = z.infer<typeof postTagSchema>;
 export type PostRecord = z.infer<typeof postSchema>;
 // Donation page (docs/donations.md): Win Metta's own details and other organizations that
-// donors give to directly. Only organization addresses go here: never a person's phone number
-// or personal email (AGENTS.md §2); link to the page that lists those instead.
+// donors give to directly. Zelle details here are the ones the organization approved for the
+// winmetta.org donation page (the donation exception in AGENTS.md §2); nothing else personal.
 const email = z.email();
+/** A Zelle recipient is an email address or a US phone number written as (480) 555-0100. */
+const zelleAddress = z.union([
+  email,
+  z.string().regex(/^\(\d{3}\) \d{3}-\d{4}$/),
+]);
 const bilingual = z.object({ en: text, my: text });
 const address = z.array(text).min(1);
 export const donationSchema = z.object({
@@ -292,13 +297,21 @@ export const donationSchema = z.object({
           names: bilingual,
           place: bilingual,
           teachers: z.array(id),
-          zelle: z.object({ address: email, registeredName: text }).optional(),
+          zelle: z
+            .array(
+              z.object({
+                /** Whose account it is, when a card lists more than one. */
+                label: bilingual.optional(),
+                address: zelleAddress,
+                registeredName: text,
+              }),
+            )
+            .default([]),
           check: z.object({ payee: text, address }).optional(),
-          detailsUrl: url.optional(),
         })
         .refine(
-          (payee) => payee.zelle || payee.check || payee.detailsUrl,
-          'A payee needs Zelle, check or a details link',
+          (payee) => payee.zelle.length > 0 || payee.check,
+          'A payee needs Zelle or check details',
         ),
     )
     .refine(
