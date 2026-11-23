@@ -62,6 +62,8 @@ npm run book-search:setup                      # check Tesseract and Poppler, do
 npm run book-search:fetch -- <bookId>...       # copy PDFs from the public CDN (size checked against the manifest)
 npm run book-search:index -- <bookId>... [--pages 1-6] [--ocr auto|always|never] [--force]
 npm run book-search:backfill -- --workers 4   # fetch and index every catalog PDF, resuming saved pages
+npm run book-search:backfill -- --pilot       # fetch and index the pilot list
+npm run book-search:backfill -- <bookId>...    # fetch and index selected books
 npm run book-search:build -- --all            # require page records for every book in the manifest
 npm run book-search:build [-- <bookId>...] [--version <name>] [--allow-incomplete]
 ```
@@ -258,6 +260,16 @@ The same handler (`apps/book-search/src/api/handler.ts`) runs in a Lambda, reach
 - **Privacy:** no query is logged anywhere: the Lambda logs only whether the index loaded, CloudFront access logging is off, and the analytics events carry no search text. The Privacy page says searches are processed on the server and not stored (§13).
 
 What this does not stop: a script that sends requests to `app.winmetta.org/api/search` without a browser can fake any header. The concurrency cap and the alarms bound the cost; the effect of abuse is slower search. A public API (its own host, per-IP rules, optional keys) is a later decision if a real need appears.
+
+### Azure backfill pilot (proposed)
+
+Use a temporary Linux VM to run the existing Poppler and Tesseract pipeline against the public CDN. The job produces the same resumable per-book JSONL files and versioned SQLite release used by the AWS search API. Microsoft lists Burmese for language detection, but omits it from the supported printed-text extraction languages in Document Intelligence Read. The existing pipeline already handles scanned Burmese, legacy text layers and links to physical PDF pages. [Microsoft's OCR language support](https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/language-support/ocr?view=doc-intel-4.0.0)
+
+1. Run `book-search:setup` on the VM with the tools in [the developer guide](developer-guide.md#book-search-tools-optional). Use a fresh `BOOK_SEARCH_WORK_DIR` and a fixed repository revision so the pilot measures extraction and records exactly which manifest was used.
+2. Run `npm run book-search:backfill -- --pilot --workers 5`, then `npm run book-search:build -- --pilot`. Record elapsed time, the tool versions, and the build report's page counts and statuses. Serve the pilot database locally on the VM and run `npm run book-search:golden`. Compare with the baseline in §10 and spot-check the linked pages.
+3. Save the pilot's page records, index, checksum and report before deallocating the VM. Measure a larger sample across languages and file sizes before sizing the full run. Check CDN throughput, disk space for the PDFs and build, and OCR throughput at the intended worker count. For a full release, use `book-search:build -- --all` so every manifest book must pass the build checks.
+
+A North American full pass reads about 114 GiB from the CDN. At bunny.net's Standard rate of $0.01/GB it is roughly $1.20 for one download of the library, plus any AWS origin transfer for cache misses and the cost of retries. Price Azure compute, managed disks and artifact transfer separately using the benchmark. [bunny.net CDN pricing](https://bunny.net/pricing/cdn/) · [Azure Retail Prices API](https://learn.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices)
 
 ### Notes, not defined
 

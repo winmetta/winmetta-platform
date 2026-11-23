@@ -4,11 +4,15 @@ import { parseArgs } from 'node:util';
 import { cdnBase, workDir, workPaths } from './config.ts';
 import { fetchBook } from './fetch.ts';
 import { indexBook } from './indexer.ts';
-import { loadManifest } from './library.ts';
+import { loadManifest, loadPilotIds, pickBooks, type Book } from './library.ts';
 import { MODELS, verifyModel } from './models.ts';
 import { toolVersions } from './tools.ts';
 
-async function runBackfill(directory: string, workers: number): Promise<void> {
+async function runBackfill(
+  directory: string,
+  workers: number,
+  books: Book[],
+): Promise<void> {
   const paths = workPaths(directory);
   const versions = await toolVersions();
   for (const model of MODELS) {
@@ -17,9 +21,6 @@ async function runBackfill(directory: string, workers: number): Promise<void> {
         `OCR model ${model.lang} is missing or invalid. Run book-search:setup.`,
       );
   }
-  const books = (await loadManifest()).sort(
-    (a, b) => a.sizeBytes - b.sizeBytes,
-  );
   const progress = path.join(directory, 'backfill-progress.jsonl');
   const log = (line: string) => console.log(new Date().toISOString(), line);
   const pending = books.values();
@@ -72,10 +73,23 @@ async function runBackfill(directory: string, workers: number): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  const { values } = parseArgs({ options: { workers: { type: 'string' } } });
+  const { values, positionals } = parseArgs({
+    allowPositionals: true,
+    options: { pilot: { type: 'boolean' }, workers: { type: 'string' } },
+  });
   const workers = Number(values.workers ?? '4');
   if (!Number.isSafeInteger(workers) || workers < 1)
     throw new Error('--workers must be a positive integer');
+  if (values.pilot && positionals.length > 0)
+    throw new Error('--pilot cannot be combined with book IDs');
+  const manifest = await loadManifest();
+  const ids = values.pilot ? await loadPilotIds() : positionals;
+  const books = (
+    values.pilot || ids.length > 0
+      ? pickBooks(manifest, [...new Set(ids)])
+      : manifest
+  ).sort((a, b) => a.sizeBytes - b.sizeBytes);
+  if (books.length === 0) throw new Error('No books selected for backfill');
   process.env.OMP_THREAD_LIMIT ??= '1';
   const directory = workDir();
   await mkdir(directory, { recursive: true });
@@ -91,7 +105,7 @@ async function main(): Promise<void> {
   );
   try {
     await lock.writeFile(`${process.pid}\n`);
-    await runBackfill(directory, workers);
+    await runBackfill(directory, Math.min(workers, books.length), books);
   } finally {
     await lock.close();
     await unlink(lockPath);
