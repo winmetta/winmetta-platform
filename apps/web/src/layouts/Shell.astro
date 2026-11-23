@@ -39,13 +39,17 @@ const navItems = [
   {
     page: 'library',
     label: 'navLibrary',
-    children: [{ page: 'studyApps', label: 'navStudyApps' }],
+    children: [
+      { page: 'studyApps', label: 'navStudyApps' },
+      { page: 'digitalTexts', label: 'navDigitalTexts' },
+    ],
   },
   { page: 'posts', label: 'navPosts' },
 ] as const;
 const inLibrary =
   page === 'library' ||
   page === 'studyApps' ||
+  page === 'digitalTexts' ||
   Boolean(path?.startsWith('dhamma-library/'));
 const inPosts = page === 'posts' || Boolean(path?.startsWith('dhamma-posts/'));
 // Dhamma post languages ("Read in"): ?lang= first, then the saved choice, then the interface

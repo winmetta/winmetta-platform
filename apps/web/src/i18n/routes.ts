@@ -11,6 +11,7 @@ export const pagePaths = {
   zoomHelp: 'zoom-help/',
   library: 'dhamma-library/',
   studyApps: 'dhamma-library/apps/',
+  digitalTexts: 'dhamma-library/digital-texts/',
   posts: 'dhamma-posts/',
 } as const;
 export type PageId = keyof typeof pagePaths;
