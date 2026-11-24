@@ -12,7 +12,7 @@ const locales = [
     code: 'my',
     home: 'Win Metta နှင့်အတူ ဓမ္မကို လေ့လာပါ',
     about: 'Win Metta အကြောင်း',
-    privacy: 'ကိုယ်ရေးအချက်အလက်လုံခြုံမှု',
+    privacy: 'ကိုယ်ရေးအချက်အလက် မူဝါဒ',
   },
 ] as const;
 
