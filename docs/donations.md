@@ -2,9 +2,9 @@
 
 Planned 2026-11-23. Win Metta is a 501(c)(3) public charity and dāna is its base funding model ([prd.md](prd.md) §5). This doc covers what the platform shows donors and how receipts will be made. Internal details stay in the private `winmetta-platform-private` repo: who approves wording, group mailbox addresses, the receipt-number policy, bank and Zelle settings, and the receipt tool's code. This repo holds only public product design.
 
-Nothing here is legal or tax advice. The tax and receipt wording needs the Treasurer's approval, and a CPA should check it before `PUBLIC_DONATE` is turned on.
+Nothing here is legal or tax advice. The tax and receipt wording was approved before the page went live; have a CPA check any later change to it.
 
-## 1. Stage A: the Dāna page (built)
+## 1. Stage A: the Dāna page (live)
 
 `/<locale>/donate/` (`apps/web/src/pages/[locale]/donate/index.astro`), a static page in English and Burmese. It replaces, on this site, the WordPress page https://winmetta.org/dhamma-donation/, which stays as it is.
 
@@ -17,13 +17,13 @@ Nothing here is legal or tax advice. The tax and receipt wording needs the Treas
 
 **Data:** `apps/web/src/content/donation.json`, validated by `donationSchema` in `apps/web/src/lib/schemas.ts`. The loader checks that every teacher id exists. It holds the same Zelle and check details that Win Metta publishes, with each payee's approval, on https://winmetta.org/dhamma-donation/, including a monk's Zelle email and a center's Zelle phone number. That is the donation exception in AGENTS.md §2; nothing else personal goes here. A payee can have several Zelle accounts (each with an optional bilingual `label` saying whose it is); a phone number is written `(480) 555-0100`, and Copy gives Zelle its digits. Add a payee only with its approval, and remove it when it asks.
 
-**Gate:** the page is always built, but stays unlinked, `noindex` and out of the sitemap until `PUBLIC_DONATE=true`. That flag adds the Donate link in the header navigation and the footer, and the About card. Local `npm run dev` / `just dev` always turns it on (`scripts/dev-options.mjs`), so developers see the linked page. Turn it on in the `production` environment only after all of these:
+**Gate:** the page is always built, but stays unlinked, `noindex` and out of the sitemap until `PUBLIC_DONATE=true`. That flag adds the Donate link in the header navigation and the footer, and the About card. Local `npm run dev` / `just dev` always turns it on (`scripts/dev-options.mjs`), so developers see the linked page. It was turned on in the `production` environment on 2026-11-24 (UTC; the evening of 2026-11-23 Pacific time), after these gates:
 
-- [ ] The board or Treasurer approves the tax, receipt and discretion wording, after a CPA check.
-- [ ] The board agrees to name the service vendors publicly (otherwise use generic wording such as "video meetings" and "web hosting").
-- [ ] A native Burmese reader reviews every `donate*` and `aboutDana*` message in `my.json`.
+- [x] The board or Treasurer approves the tax, receipt and discretion wording (approved 2026-11-23).
+- [x] The service vendors are named publicly: the page went live with them named, which the maintainer took as approval (to stop naming them, use generic wording such as "video meetings" and "web hosting").
+- [x] A native Burmese reader reviews every `donate*` and `aboutDana*` message in `my.json` (applied 2026-11-23).
 - [x] Each listed organization agrees to be listed with the details shown: they are the details already approved and published on the winmetta.org donation page (confirmed 2026-11-23).
-- [ ] The Privacy page needs no change: the page collects nothing and sends no analytics events beyond the page view.
+- [x] The Privacy page needs no change: the page collects nothing and sends no analytics events beyond the page view.
 
 ## 2. Stage B: manual receipt generator (planned, not built)
 
