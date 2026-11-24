@@ -51,6 +51,7 @@ describe.skipIf(!hasPoppler)('indexBook (text layer)', () => {
       done: 2,
       errors: 0,
       needsOcr: 1,
+      needsOcrReasons: { too_little_text: 1 },
     });
     expect(summary.byStatus).toEqual({ ok: 2 });
     const records = await loadState(

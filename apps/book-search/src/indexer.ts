@@ -43,6 +43,8 @@ export interface IndexSummary {
   errors: number;
   /** Pages left unrecorded because their text layer is unusable and OCR is `never`. */
   needsOcr: number;
+  /** Why those pages need OCR: pages by the text-layer check that failed (a page can fail several). */
+  needsOcrReasons: Record<string, number>;
   byMethod: Record<string, number>;
   byStatus: Record<string, number>;
 }
@@ -97,6 +99,7 @@ export async function indexBook(
     skipped: to - from + 1 - pending.length,
     errors: 0,
     needsOcr: 0,
+    needsOcrReasons: {},
     byMethod: {},
     byStatus: {},
   };
@@ -110,8 +113,11 @@ export async function indexBook(
         layerText: layer[page - 1] ?? '',
         options,
       });
-      if (!record) {
+      if ('needsOcr' in record) {
         summary.needsOcr += 1;
+        for (const reason of record.needsOcr)
+          summary.needsOcrReasons[reason] =
+            (summary.needsOcrReasons[reason] ?? 0) + 1;
         continue;
       }
       await appendRecord(file, record);
@@ -179,8 +185,10 @@ interface PageJob {
   options: IndexOptions;
 }
 
-/** One page's record, or undefined when it needs OCR and OCR is `never` (the page stays pending). */
-async function extractPage(job: PageJob): Promise<PageRecord | undefined> {
+/** One page's record, or the failed text-layer checks when it needs OCR and OCR is `never` (the page stays pending). */
+async function extractPage(
+  job: PageJob,
+): Promise<PageRecord | { needsOcr: string[] }> {
   const { book, options, page } = job;
   const base = {
     v: 1 as const,
@@ -211,7 +219,7 @@ async function extractPage(job: PageJob): Promise<PageRecord | undefined> {
       passages,
     };
   }
-  if (options.ocr === 'never') return undefined;
+  if (options.ocr === 'never') return { needsOcr: verdict.reasons };
 
   const prefix = path.join(options.tmpDir, `${book.id}-${page}`);
   try {
