@@ -103,6 +103,8 @@ export default defineConfig({
       // listings repeat the newest-first pages in reverse (they are also noindex).
       filter: (page) =>
         !page.endsWith('/404/') &&
+        // Settings is a personal control page (noindex), not content.
+        !page.endsWith('/settings/') &&
         new URL(page).pathname !== '/' &&
         !/\/dhamma-posts\/(?:tags\/[^/]+\/)?oldest\//.test(page) &&
         // The Dāna page is noindex until its wording is approved (PUBLIC_DONATE, docs/donations.md).

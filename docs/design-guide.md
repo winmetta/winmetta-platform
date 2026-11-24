@@ -21,24 +21,25 @@ Ask in this order and stop at the first yes:
 
 If a control seems to need a frame to be noticed, the layout is the problem, not the control.
 
-| Element | Class | Examples | Never for |
-| --- | --- | --- | --- |
-| Primary button | `.btn .btn-primary` | Search (submit) | Status, labels, repeated down a list |
-| Outline button | `.btn .btn-outline` | Download PDF, Open PDF at this page, View app | In-place operations, information |
-| Text action | `.text-action` (React: `TextAction` with an icon from `icons.tsx`) | Copy citation (copy icon, then a check and "Copied"), Clear search and Remove folder filter (×), Try again (retry arrow), Show more (chevron) | The main action of a card, navigation |
-| Link | `.link` (brand color, semibold, no underline until hover) | Going to another page | Actions that change the page |
-| Quiet link | `.link-quiet` in a `.card-aside` or `.card-actions` row | Something wrong? | Content, or anything the reader came to do |
-| Folder name | `.folder-name` (symbol and name), as a text action, a tree link or a label | Dhamma Library folders in result cards, "Try these folders", the folder tree, the active filter | A filled pill or chip |
-| Chip | `.chip` | A clickable Dhamma post topic | Folders, anything that is not clickable |
-| Menu control | `.menu-button` (the three-line symbol, which becomes a cross when open, then the word "Menu"; a text action in the header) | The phone navigation toggle | Anything but the header |
-| Badge | `.badge` (plain muted text and symbol) | PDF page 60, Read by OCR, a count; a file size has a document symbol before it (`FileIcon`, or `LinkIcon name="file"` in Astro) and sits right after its Download button | Anything clickable |
+| Element            | Class                                                                                                                      | Examples                                                                                                                                                                 | Never for                                         |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
+| Primary button     | `.btn .btn-primary`                                                                                                        | Search (submit)                                                                                                                                                          | Status, labels, repeated down a list              |
+| Outline button     | `.btn .btn-outline`                                                                                                        | Download PDF, Open PDF at this page, View app                                                                                                                            | In-place operations, information                  |
+| Destructive button | `.btn .btn-danger`                                                                                                         | Reset my settings                                                                                                                                                        | Anything that does not delete or clear saved data |
+| Text action        | `.text-action` (React: `TextAction` with an icon from `icons.tsx`)                                                         | Copy citation (copy icon, then a check and "Copied"), Clear search and Remove folder filter (×), Try again (retry arrow), Show more (chevron)                            | The main action of a card, navigation             |
+| Link               | `.link` (brand color, semibold, no underline until hover)                                                                  | Going to another page                                                                                                                                                    | Actions that change the page                      |
+| Quiet link         | `.link-quiet` in a `.card-aside` or `.card-actions` row                                                                    | Something wrong?                                                                                                                                                         | Content, or anything the reader came to do        |
+| Folder name        | `.folder-name` (symbol and name), as a text action, a tree link or a label                                                 | Dhamma Library folders in result cards, "Try these folders", the folder tree, the active filter                                                                          | A filled pill or chip                             |
+| Chip               | `.chip`                                                                                                                    | A clickable Dhamma post topic                                                                                                                                            | Folders, anything that is not clickable           |
+| Menu control       | `.menu-button` (the three-line symbol, which becomes a cross when open, then the word "Menu"; a text action in the header) | The phone navigation toggle                                                                                                                                              | Anything but the header                           |
+| Badge              | `.badge` (plain muted text and symbol)                                                                                     | PDF page 60, Read by OCR, a count; a file size has a document symbol before it (`FileIcon`, or `LinkIcon name="file"` in Astro) and sits right after its Download button | Anything clickable                                |
 
 Rules that follow:
 
 - A badge has no pointer cursor, no hover state and no `title`-only meaning: if it carries information a reader needs, the words are visible on the page (tooltips do not exist on touch screens).
 - Do not turn a chip into a badge by removing its link, or a badge into a chip by adding a click. Change the class with the behaviour.
 - Text actions use the symbol readers know from other sites, always with words beside it (never the icon alone) and close to it (4 px, `gap-1`; folder names 6 px), and show their result in place (the icon turns into a check, the text into "Copied"). Symbols come from `components/icons.tsx` (or the same paths inline in an Astro file); add a new one there.
-- **Secondary utility links (report a problem, feedback) are asides, not content:** a quiet link at the bottom right of the card, after the content and the main action in reading and tab order, never between the title, the details and the main action. In a card with an action row, put it in the same row (`.card-actions`, with `ms-auto`, so it wraps to the right); otherwise it is the card's last element (`.card-aside`), rendered only when the feature is on, so a card without it has no empty wrapper and no extra gap.
+- **Secondary utility links (report a problem, feedback) are asides, not content:** a quiet link at the bottom right of the card, after the content and the main action in reading and tab order, never between the title, the details and the main action. In a card with an action row, put it in the same row (`.card-actions`, with `ms-auto`, so it wraps to the right); otherwise it is the card's last element (`.card-aside`), pinned to the card's bottom right corner with little space under it (CSS makes a card that has one a column and pushes the aside to the bottom, so cards of different heights in one grid row all end on the same line), rendered only when the feature is on, so a card without it has no empty wrapper and no extra gap.
 - **The same action looks the same everywhere.** Getting a library PDF is an outline button in the catalog and in a search result, in the same place in the card's action row, followed by its small extras (the size badge, the copy action). A filled `.btn-primary` is for the one main action of a page or a form, not repeated down a list. Before adding a control, find the existing one for the same action and copy it.
 - At most one filled button per card or form. Order in a row: the button first, then text actions, then the quiet link at the right.
 - A control that is not available is hidden, or disabled with a visible reason; it is not left clickable and silent.
@@ -51,6 +52,15 @@ Rules that follow:
 - Use the Tailwind spacing scale; no pixel values, no spacer elements, no `<br>`.
 - Content never scrolls sideways: rows `flex-wrap`, long words and URLs may wrap, and every new page or component is checked at a 375 px width (Playwright: `scrollWidth <= clientWidth`).
 - Every control is at least 44 px tall and wide (`min-h-11`), with room between neighbours so a thumb hits the right one.
+
+### Header and navigation
+
+- **First-level links have an icon, everywhere.** Every first-level link in the wide header bar and in the phone menu has an outline icon before its words (`NavIcon.astro`: Classes, Dhamma Study Groups, Dhamma Library, Dhamma Posts, Donate; Settings uses the gear, `GearIcon.astro`). Submenu links stay text only. A new first-level link needs an icon in `NavIcon.astro`.
+- **Dropdown arrow:** a drawn chevron (a rotated corner in CSS, in the muted text colour), never a ▾ text glyph, which was too small and read as a dot. It shows on the wide bar only; the phone menu lists the submenu links open.
+- **Phone menu:** below 48 rem, with JavaScript, a Menu button (three lines and the word) shows and hides the navigation; without JavaScript the links stay visible. Settings moves into the menu as gear and word after the last first-level link, and the header gear is hidden then (without JavaScript the gear stays and the menu entry is hidden, so there is never a duplicate).
+- **Language switch and Settings gear:** the switch is its own sand pill (`.segmented`), compact at every width (40 px buttons, small text), and the gear is a separate round icon (`.header-icon`) beside it. Both sit in one plain wrapper (`.header-tools`, no background) so they always wrap to the next line together, never apart.
+- **The language switch changes only the locale segment of the address** and saves the choice (see the language rule in AGENTS.md and the Settings page); the root `/` opens the saved language.
+- **Class names are shared:** the gear's class is `.header-icon`, not `.icon-link`, because `.icon-link` is the symbol-plus-text link used in cards (§8).
 
 ## 3. Headings, text and colour
 
@@ -85,12 +95,17 @@ Core content works with no login and, where possible, with no JavaScript; a feat
 - The query lives in the address (`?q=`, `?pdf=`) so a search can be shared and survives a language switch; other parameters are preserved.
 - Nothing the reader types is sent to analytics or logs: events carry a count range and a script label, never the words (docs/analytics.md).
 
+### Settings pages
+
+Settings use the **row layout of macOS System Settings and Windows 11 Settings, not cards**: a flat list divided by hairlines (`.settings-list`), one row per setting (`.settings-row`) with its name as a bold title (`h2`, `text-xl font-bold`) and a short muted explanation on the start side (`.settings-text`) and its control on the end side: a segmented choice (`.segmented.settings-choice`, buttons with `aria-pressed`, as the post language picker) for a few options, a red `.btn-danger` (red outline and text, filled red on hover) for a destructive action such as Reset or Clear, never the blue outline of a normal action, a switch or checkbox for on/off. Rows have generous padding (`py-8`) and are separated by hairlines between rows only (none above the first or below the last), never boxed, shaded or rounded. On a narrow screen the control wraps under the text at full width. A reset needs no confirm dialog when it is cheap and reversible: it runs at once, the button is disabled (muted, `not-allowed`) whenever nothing is saved and after a reset, and a green `✓ …` line (`.settings-done`, `role="status"`) sits beside it, stacked below on a phone. A setting takes effect when changed (no Save button) and says so in a `role="status"` line; the Settings link is the header gear, which on a phone (when the Menu button shows) moves into the menu as gear and word after the last link; the page title carries the gear icon (`GearIcon`), the same one as the header link. Add a new setting as a new row, not a new card.
+
 ## 7. Calm by design
 
 No streaks, badges for achievement, counters that invite comparison, autoplay, pop-ups or animation beyond a short transition. The `.badge` class is for facts, not for rewards.
 
 ## 8. Reuse, then verify
 
-- Use the existing classes and components first (`.btn`, `.card`, `.chip`, `.badge`, `.field`, `.link`, `Button`). Add a new class only when a second place needs it, and add it to the table in §1.
+- **Before adding a CSS class, search for its name** (`rg "\.name\b" apps/web/src`, and in the markup): a shared name silently restyles every other use. `.icon-link` (symbol before a text link) once collided with a header gear icon and squashed every class card link; the gear is `.header-icon`.
+- Use the existing classes and components first (`.btn`, `.card`, `.settings-row`, `.chip`, `.badge`, `.field`, `.link`, `Button`). Add a new class only when a second place needs it, and add it to the table in §1.
 - Before opening a PR for a visual change: look at it (a screenshot at desktop and at 375 px width), in English and Burmese, and with the service stubbed as down. Add a browser test for anything that was wrong and could come back.
 - If a reviewer or the maintainer finds a new kind of inconsistency, add the rule here in the same PR that fixes it.

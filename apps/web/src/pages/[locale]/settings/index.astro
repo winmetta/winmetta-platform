@@ -1,0 +1,137 @@
+---
+import GearIcon from '../../../components/GearIcon.astro';
+import Shell from '../../../layouts/Shell.astro';
+import { locales, localeCodes, type Locale } from '../../../i18n/locales';
+import { t } from '../../../i18n/messages';
+import { postLanguagesStorageKey } from '../../../lib/posts/languages';
+export function getStaticPaths() {
+  return localeCodes.map((locale) => ({
+    params: { locale },
+    props: { locale },
+  }));
+}
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const text = (key: Parameters<typeof t>[1]) => t(locale, key);
+---
+
+<Shell locale={locale} title={text('settingsTitle')} page="settings" noindex>
+  <header class="space-y-4">
+    <h1 class="flex items-center gap-3 text-3xl font-bold sm:text-4xl">
+      <GearIcon class="size-8 shrink-0 text-brand" />
+      {text('settingsTitle')}
+    </h1>
+    <p class="lead">{text('settingsIntro')}</p>
+  </header>
+  <div
+    class="max-w-3xl space-y-4"
+    data-settings
+    data-posts-key={postLanguagesStorageKey}
+  >
+    <div class="settings-list">
+      <div class="settings-row">
+        <div class="settings-text">
+          <h2 id="settingsLanguageTitle">{text('settingsLanguageTitle')}</h2>
+          <p>{text('settingsLanguageHelp')}</p>
+        </div>
+        <div
+          class="segmented settings-choice"
+          role="group"
+          aria-labelledby="settingsLanguageTitle"
+        >
+          <button type="button" value="" aria-pressed="true">
+            {text('settingsLanguageAsk')}
+          </button>
+          {localeCodes.map((code) => (
+            <button type="button" value={code} lang={code} aria-pressed="false">
+              {locales[code].name}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div class="settings-row">
+        <div class="settings-text">
+          <h2 id="settingsResetTitle">{text('settingsResetTitle')}</h2>
+          <p>{text('settingsResetHelp')}</p>
+        </div>
+        <div class="settings-action">
+          <button type="button" class="btn btn-danger" data-reset>
+            {text('settingsReset')}
+          </button>
+          <span role="status" class="settings-done" data-reset-status></span>
+        </div>
+      </div>
+    </div>
+    <p role="status" class="settings-done" data-status></p>
+    <template data-saved>{text('settingsSaved')}</template>
+    <template data-done>{text('settingsResetDone')}</template>
+    <template data-blocked>{text('settingsNoStorage')}</template>
+  </div>
+</Shell>
+<script>
+  import { isLocale } from '../../../i18n/locales';
+  import {
+    readLocalePreference,
+    saveLocalePreference,
+    clearLocalePreference,
+  } from '../../../i18n/routes';
+  const root = document.querySelector<HTMLElement>('[data-settings]');
+  if (root) {
+    const choices = root.querySelectorAll<HTMLButtonElement>(
+      '.settings-choice button',
+    );
+    const status = root.querySelector<HTMLElement>('[data-status]')!;
+    const resetStatus = root.querySelector<HTMLElement>('[data-reset-status]')!;
+    const reset = root.querySelector<HTMLButtonElement>('[data-reset]')!;
+    const postsKey = root.dataset.postsKey!;
+    const message = (kind: 'saved' | 'done' | 'blocked') =>
+      root.querySelector<HTMLTemplateElement>(`[data-${kind}]`)?.content
+        .textContent ?? '';
+    const hasSaved = () => {
+      try {
+        return (
+          readLocalePreference() !== undefined ||
+          localStorage.getItem(postsKey) !== null
+        );
+      } catch {
+        return false;
+      }
+    };
+    // Nothing saved means nothing to reset: the button stays disabled until a choice is saved.
+    const sync = () => (reset.disabled = !hasSaved());
+    const show = (value: string) =>
+      choices.forEach((button) =>
+        button.setAttribute('aria-pressed', String(button.value === value)),
+      );
+    show(readLocalePreference() ?? '');
+    sync();
+    choices.forEach((button) =>
+      button.addEventListener('click', () => {
+        const value = button.value;
+        resetStatus.textContent = '';
+        const ok = isLocale(value)
+          ? (saveLocalePreference(value), readLocalePreference() === value)
+          : clearLocalePreference();
+        // Verify the write: blocked storage must not claim success.
+        if (ok) show(value);
+        status.textContent = message(ok ? 'saved' : 'blocked');
+        sync();
+      }),
+    );
+    // No confirm dialog: the reset is cheap and the reader can choose again at once.
+    reset.addEventListener('click', () => {
+      let ok = clearLocalePreference();
+      try {
+        localStorage.removeItem(postsKey);
+      } catch {
+        ok = false;
+      }
+      show('');
+      status.textContent = '';
+      resetStatus.textContent = message(ok ? 'done' : 'blocked');
+      sync();
+    });
+  }
+</script>

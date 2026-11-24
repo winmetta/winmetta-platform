@@ -5,6 +5,8 @@ import '../styles/global.css';
 import { feedbackEnabled } from '../lib/feedback';
 import { donateEnabled } from '../lib/donation';
 import LanguageSwitcher from '../components/LanguageSwitcher.astro';
+import NavIcon from '../components/NavIcon.astro';
+import GearIcon from '../components/GearIcon.astro';
 import Analytics from '../components/Analytics.astro';
 import { locales, localeCodes, type Locale } from '../i18n/locales';
 import { pagePaths, route, type PageId } from '../i18n/routes';
@@ -30,24 +32,28 @@ const canonical = new URL(href(locale), Astro.site);
 const navItems = [
   {
     page: 'classes',
+    icon: 'classes',
     label: 'navClasses',
     children: [
       { page: 'teachers', label: 'navTeachers' },
       { page: 'retreats', label: 'navRetreats' },
     ],
   },
-  { page: 'studyGroups', label: 'navStudyGroups' },
+  { page: 'studyGroups', icon: 'studyGroups', label: 'navStudyGroups' },
   {
     page: 'library',
+    icon: 'library',
     label: 'navLibrary',
     children: [
       { page: 'studyApps', label: 'navStudyApps' },
       { page: 'digitalTexts', label: 'navDigitalTexts' },
     ],
   },
-  { page: 'posts', label: 'navPosts' },
+  { page: 'posts', icon: 'posts', label: 'navPosts' },
   // The Dāna page is linked only once its wording is approved (docs/donations.md).
-  ...(donateEnabled ? ([{ page: 'donate', label: 'navDonate' }] as const) : []),
+  ...(donateEnabled
+    ? ([{ page: 'donate', icon: 'donate', label: 'navDonate' }] as const)
+    : []),
 ] as const;
 const inLibrary =
   page === 'library' ||
@@ -166,6 +172,7 @@ const postLanguageScript = postLanguagesHeadScript(defaultPostLanguage(locale));
                     : undefined)
                 }
               >
+                <NavIcon name={item.icon} />
                 {t(locale, item.label)}
               </a>
             );
@@ -195,8 +202,27 @@ const postLanguageScript = postLanguagesHeadScript(defaultPostLanguage(locale));
               link
             );
           })}
+          <a
+            href={route(locale, 'settings')}
+            class="nav-link nav-settings"
+            aria-current={page === 'settings' ? 'page' : undefined}
+          >
+            <GearIcon class="nav-icon" />
+            {t(locale, 'navSettings')}
+          </a>
         </nav>
-        <LanguageSwitcher locale={locale} />
+        <div class="header-tools">
+          <LanguageSwitcher locale={locale} />
+          <a
+            href={route(locale, 'settings')}
+            class="header-icon"
+            aria-label={t(locale, 'navSettings')}
+            title={t(locale, 'navSettings')}
+            aria-current={page === 'settings' ? 'page' : undefined}
+          >
+            <GearIcon />
+          </a>
+        </div>
       </div>
     </header>
     <main id="main" class="page">
@@ -221,6 +247,13 @@ const postLanguageScript = postLanguagesHeadScript(defaultPostLanguage(locale));
             aria-current={page === 'privacy' ? 'page' : undefined}
           >
             {t(locale, 'navPrivacy')}
+          </a>
+          <a
+            href={route(locale, 'settings')}
+            class="footer-link"
+            aria-current={page === 'settings' ? 'page' : undefined}
+          >
+            {t(locale, 'navSettings')}
           </a>
           <a
             href={route(locale, 'zoomHelp')}
