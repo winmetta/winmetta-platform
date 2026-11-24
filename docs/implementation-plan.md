@@ -401,7 +401,7 @@ One reviewed PR each, in this order.
 **Goal:** tell donors why their dāna matters and how to give, on this site in both languages, and later give donors proper receipts with little volunteer work. Design: [donations.md](donations.md).
 
 * [x] **A. Dāna page.** `/<locale>/donate/` with why to give, Zelle and check, memo purposes, the tax and receipt note, and other monasteries under a disclaimer. Built behind `PUBLIC_DONATE` (unlinked and `noindex` until then).
-* [ ] **A go-live.** The wording and listing approvals in [donations.md](donations.md) §1, then the maintainer sets `PUBLIC_DONATE` in `production`.
+* [x] **A go-live.** The wording and listing approvals in [donations.md](donations.md) §1 passed, and `PUBLIC_DONATE` was turned on in `production` on 2026-11-24 (UTC).
 * [ ] **B. Manual receipt generator** for `@winmetta.org` users (Google Apps Script, private repo; [donations.md](donations.md) §2).
 * [ ] **C. Automatic receipts** from the giving platform and Chase Zelle alerts ([donations.md](donations.md) §3).
 
