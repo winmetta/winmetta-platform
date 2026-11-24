@@ -4,6 +4,7 @@ import { parseArgs } from 'node:util';
 import { cdnBase, workDir, workPaths } from './config.ts';
 import { fetchBook } from './fetch.ts';
 import { indexBook } from './indexer.ts';
+import { parseOcrMode, type OcrMode } from './ocr-mode.ts';
 import { loadManifest, loadPilotIds, pickBooks, type Book } from './library.ts';
 import { MODELS, verifyModel } from './models.ts';
 import { toolVersions } from './tools.ts';
@@ -12,14 +13,17 @@ async function runBackfill(
   directory: string,
   workers: number,
   books: Book[],
+  ocr: OcrMode,
 ): Promise<void> {
   const paths = workPaths(directory);
   const versions = await toolVersions();
-  for (const model of MODELS) {
-    if ((await verifyModel(paths.tessdata, model)) !== 'ok')
-      throw new Error(
-        `OCR model ${model.lang} is missing or invalid. Run book-search:setup.`,
-      );
+  if (ocr === 'auto') {
+    for (const model of MODELS) {
+      if ((await verifyModel(paths.tessdata, model)) !== 'ok')
+        throw new Error(
+          `OCR model ${model.lang} is missing or invalid. Run book-search:setup.`,
+        );
+    }
   }
   const progress = path.join(directory, 'backfill-progress.jsonl');
   const log = (line: string) => console.log(new Date().toISOString(), line);
@@ -41,7 +45,7 @@ async function runBackfill(
           tmpDir: paths.tmp,
           tessdataDir: paths.tessdata,
           versions,
-          ocr: 'auto',
+          ocr,
           log,
         });
         await appendFile(progress, JSON.stringify(summary) + '\n');
@@ -75,8 +79,13 @@ async function runBackfill(
 async function main(): Promise<void> {
   const { values, positionals } = parseArgs({
     allowPositionals: true,
-    options: { pilot: { type: 'boolean' }, workers: { type: 'string' } },
+    options: {
+      ocr: { type: 'string' },
+      pilot: { type: 'boolean' },
+      workers: { type: 'string' },
+    },
   });
+  const ocr = parseOcrMode(values.ocr);
   const workers = Number(values.workers ?? '4');
   if (!Number.isSafeInteger(workers) || workers < 1)
     throw new Error('--workers must be a positive integer');
@@ -105,7 +114,7 @@ async function main(): Promise<void> {
   );
   try {
     await lock.writeFile(`${process.pid}\n`);
-    await runBackfill(directory, Math.min(workers, books.length), books);
+    await runBackfill(directory, Math.min(workers, books.length), books, ocr);
   } finally {
     await lock.close();
     await unlink(lockPath);
