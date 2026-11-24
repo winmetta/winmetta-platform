@@ -5,6 +5,7 @@ import {
   failureKind,
   parseResponse,
   readPdfQuery,
+  SEARCH_PARAM,
   searchUrl,
   writePdfQuery,
   type BookHit,
@@ -180,6 +181,8 @@ export default function BookSearchIsland({ labels, formatLocale }: Props) {
           <input
             ref={input}
             type="search"
+            // Named, so a search sent before hydration reloads with ?pdf=… and runs on load.
+            name={SEARCH_PARAM}
             className="field"
             value={query}
             placeholder={labels.placeholder}

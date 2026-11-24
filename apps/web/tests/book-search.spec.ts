@@ -115,6 +115,20 @@ test.describe('search inside PDFs enabled', () => {
     });
   }
 
+  test.describe('before the script loads', () => {
+    // Without JavaScript the form submits natively, as it does when Search is pressed before
+    // hydration on a slow connection; the words must reach ?pdf= so the page searches on load.
+    test.use({ javaScriptEnabled: false });
+
+    test('a search keeps the words in ?pdf=', async ({ page }) => {
+      await page.goto('/en/dhamma-library/');
+      await section(page).getByRole('searchbox').fill('noble truths');
+      await section(page).getByRole('button', { name: 'Search' }).click();
+      await page.waitForURL(/[?&]pdf=/);
+      expect(new URL(page.url()).searchParams.get('pdf')).toBe('noble truths');
+    });
+  });
+
   test('a link with ?pdf= searches on load and keeps the other parameters', async ({
     page,
   }) => {
