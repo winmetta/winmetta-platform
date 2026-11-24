@@ -91,7 +91,7 @@ test('Privacy states what the site does and shows a Latin-digit date', async ({
   await expect(page.getByRole('heading', { level: 2 })).toHaveCount(
     7 + Number(feedback) + Number(ipLogging) + Number(bookSearch),
   );
-  await expect(page.locator('main')).toContainText('November 21, 2026');
+  await expect(page.locator('main')).toContainText('November 23, 2026');
   await expect(page.locator('main')).toContainText('Website analytics');
   await expect(page.locator('#privacyAnalyticsIpTitle')).toHaveCount(
     Number(ipLogging),

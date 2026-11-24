@@ -24,6 +24,8 @@
   --brand: #356a82;
   --brand-strong: #264f63;
   --text-muted: #55595a;
+  --success: #2e6f40; /* 6:1 on white */
+  --danger: #b3261e; /* 6.5:1 on white, white text on it 6.5:1 */
   --border-strong: #7f8381;
 
   --radius: 1rem;
@@ -187,6 +189,26 @@
       @apply justify-start;
     }
   }
+  /* Settings: the header gear on wide screens; inside the phone menu, after the other links, as
+     icon and word. Without JavaScript the menu is always open, so the gear stays. */
+  .nav-link.nav-settings {
+    @apply hidden;
+  }
+  /* First-level links carry an icon, in the wide bar and in the phone menu. */
+  .nav-icon {
+    @apply block size-5 shrink-0;
+  }
+  .nav-link {
+    @apply gap-2.5;
+  }
+  @media (width < 48rem) {
+    html.js .nav-link.nav-settings {
+      @apply inline-flex;
+    }
+    html.js .header-icon {
+      @apply hidden;
+    }
+  }
   .nav-link {
     @apply inline-flex min-h-11 items-center rounded-full px-4 font-medium transition-colors hover:bg-sky;
   }
@@ -208,10 +230,11 @@
   .nav-sublink[aria-current] {
     @apply bg-sky font-semibold;
   }
+  /* A drawn chevron (a rotated corner): the ▾ glyph was too small and read as a dot. */
   .nav-group > .nav-link::after {
-    content: '▾';
-    @apply ms-1.5 text-xs;
-    color: var(--text-muted);
+    content: '';
+    @apply ms-2 size-2 shrink-0 -translate-y-0.5 rotate-45 border-e-2 border-b-2;
+    border-color: var(--text-muted);
   }
   @media (width < 48rem) {
     .nav-sub {
@@ -232,6 +255,68 @@
   }
   .segmented a[aria-current] {
     @apply bg-white font-semibold shadow-sm;
+  }
+  /* Language pill and Settings gear sit in one plain wrapper, so they wrap to the next line together. */
+  .header-tools {
+    @apply inline-flex shrink-0 items-center gap-1;
+  }
+  /* The compact pill at every width, so the header stays low. */
+  .header-tools .segmented {
+    @apply gap-0.5 p-0.5;
+  }
+  .header-tools .segmented a {
+    @apply min-h-10 px-2.5 text-sm;
+  }
+  .header-icon {
+    @apply inline-flex size-11 items-center justify-center rounded-full text-brand transition-colors hover:bg-sky hover:text-brand-strong;
+  }
+  .header-icon svg {
+    @apply size-6;
+  }
+  .header-icon[aria-current] {
+    @apply bg-sky;
+  }
+  /* Settings: flat rows between hairlines, title and help on the start side, the control on the
+     end side (the macOS System Settings and Windows 11 Settings pattern). No cards. */
+  .settings-list {
+    @apply divide-y divide-stone;
+  }
+  .settings-row {
+    @apply flex flex-wrap items-center justify-between gap-x-8 gap-y-4 py-8;
+  }
+  /* The first row has no line above it, so no extra space either. */
+  .settings-row:first-child {
+    @apply pt-0;
+  }
+  .settings-text {
+    @apply min-w-60 flex-1 space-y-1;
+  }
+  .settings-text h2 {
+    @apply text-xl font-bold;
+  }
+  .settings-text p {
+    @apply text-sm;
+    color: var(--text-muted);
+  }
+  /* Button and its confirmation share a line, and stack on a phone. */
+  .settings-action {
+    @apply flex flex-wrap items-center gap-x-4 gap-y-2;
+  }
+  .settings-done {
+    @apply font-semibold;
+    color: var(--success);
+  }
+  /* Nothing to reset: muted and not clickable, with the not-allowed cursor. */
+  .btn-danger:disabled {
+    @apply pointer-events-auto cursor-not-allowed;
+  }
+  .btn-danger:disabled:hover {
+    @apply translate-y-0 bg-white;
+    color: var(--danger);
+  }
+  /* The three choices wrap rather than overflow on a phone. */
+  .settings-choice {
+    @apply max-w-full flex-wrap rounded-3xl;
   }
   .site-footer {
     @apply mt-16 bg-sand;
@@ -328,6 +413,16 @@
   }
   .btn-outline {
     @apply border border-brand bg-white text-brand hover:bg-sky hover:text-brand-strong;
+  }
+  /* Destructive action (reset, clear saved data): red outline and text, filled red on hover. */
+  .btn-danger {
+    @apply border-2 bg-white font-semibold;
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+  .btn-danger:hover {
+    background: var(--danger);
+    @apply text-white;
   }
   /* Interactive: a filter, a tag link or a toggle. Anything that does nothing when clicked is a
      .badge (or plain text), never a .chip or .btn (docs/design-guide.md §1). */
@@ -453,6 +548,14 @@
   }
   .card-aside {
     @apply flex justify-end;
+  }
+  /* A card with an aside is a column and the aside sticks to its bottom right corner, so cards
+     of different heights in one grid row all end on the same line; less space under it. */
+  .card:has(> .card-aside) {
+    @apply flex flex-col pb-3;
+  }
+  .card:has(> .card-aside) > .card-aside {
+    @apply mt-auto pt-3;
   }
   .card-actions {
     @apply flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-2;

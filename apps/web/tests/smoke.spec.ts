@@ -121,3 +121,49 @@ test('on a phone the Menu control is an icon with the word, not a framed button,
   await expect(menu).toHaveAttribute('aria-expanded', 'true');
   expect(await visibleSymbols()).toEqual(['menu-close']);
 });
+
+test('root opens the saved language and Settings resets it', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await expect(page).toHaveURL(/\/$/);
+  await page.goto('/en/');
+  await page.getByRole('link', { name: 'မြန်မာ', exact: true }).click();
+  await page.getByRole('link', { name: 'English', exact: true }).click();
+  await expect(page).toHaveURL(/\/en\/$/);
+  await page.goto('/?utm=x');
+  await expect(page).toHaveURL(/\/en\/\?utm=x$/);
+  // A direct link to another page is never redirected.
+  await page.goto('/my/about/');
+  await expect(page).toHaveURL(/\/my\/about\/$/);
+  await page.getByRole('link', { name: 'ဆက်တင်များ' }).first().click();
+  await expect(page.getByRole('button', { name: /English/ })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await page
+    .getByRole('button', { name: 'ဆက်တင်များကို မူလအတိုင်း ပြန်ထားမည်' })
+    .click();
+  await expect(page.getByText('✓')).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'ဆက်တင်များကို မူလအတိုင်း ပြန်ထားမည်' }),
+  ).toBeDisabled();
+  await page.goto('/');
+  await expect(page).toHaveURL(/\/$/);
+  expect(
+    await page.evaluate(() => localStorage.getItem('winmetta.locale')),
+  ).toBeNull();
+});
+
+test('Settings Reset is disabled until something is saved', async ({
+  page,
+}) => {
+  await page.goto('/en/settings/');
+  const reset = page.getByRole('button', { name: 'Reset my settings' });
+  await expect(reset).toBeDisabled();
+  await page.getByRole('button', { name: /English/ }).click();
+  await expect(reset).toBeEnabled();
+  await reset.click();
+  await expect(page.getByText('✓ Preferences reset to default.')).toBeVisible();
+  await expect(reset).toBeDisabled();
+});

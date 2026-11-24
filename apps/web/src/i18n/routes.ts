@@ -4,6 +4,7 @@ export const pagePaths = {
   home: '',
   about: 'about/',
   privacy: 'privacy/',
+  settings: 'settings/',
   classes: 'classes/',
   studyGroups: 'study-groups/',
   retreats: 'classes/retreats/',
@@ -60,10 +61,41 @@ export function switchLocale(url: URL, locale: Locale): string {
   else return route(locale) + url.search + url.hash;
   return parts.join('/') + url.search + url.hash;
 }
+/** localStorage key for the language the reader chose; the root page opens it (rootRedirectScript). */
+export const localePreferenceKey = 'winmetta.locale';
+export function readLocalePreference(): Locale | undefined {
+  try {
+    const value = window.localStorage.getItem(localePreferenceKey);
+    return value && isLocale(value) ? value : undefined;
+  } catch {
+    return undefined;
+  }
+}
 export function saveLocalePreference(locale: Locale): void {
   try {
-    window.localStorage.setItem('winmetta.locale', locale);
+    window.localStorage.setItem(localePreferenceKey, locale);
   } catch {
     /* Preference storage is optional. */
   }
+}
+/** Returns false when the browser blocks storage, so the caller can say nothing was cleared. */
+export function clearLocalePreference(): boolean {
+  try {
+    window.localStorage.removeItem(localePreferenceKey);
+    return true;
+  } catch {
+    return false;
+  }
+}
+/**
+ * Inline script for the root language chooser's <head>: a saved language sends the reader to that
+ * language's home page before the chooser paints. `replace` keeps the chooser out of the Back
+ * history; the query and fragment are kept. Only the root runs it, so a direct link to any other
+ * page is never redirected. It cannot import anything (it is inlined), so it takes its inputs.
+ */
+export function rootRedirectScript(
+  codes: readonly string[],
+  key = localePreferenceKey,
+): string {
+  return `(function(){try{var l=localStorage.getItem(${JSON.stringify(key)});if(${JSON.stringify(codes)}.indexOf(l)>-1)location.replace('/'+l+'/'+location.search+location.hash)}catch(e){}})()`;
 }

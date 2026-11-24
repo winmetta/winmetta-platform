@@ -1,0 +1,48 @@
+---
+// Outline icons for the phone menu's first-level links (Feather and Lucide, MIT); decorative, the
+// link's text is its name. Shown only inside the phone menu (.nav-icon in global.css).
+type Name = 'classes' | 'studyGroups' | 'library' | 'posts' | 'donate';
+interface Props {
+  name: Name;
+}
+const paths: Record<Name, string[]> = {
+  classes: [
+    'M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z',
+    'M22 10v6',
+    'M6 12.5V16a6 3 0 0 0 12 0v-3.5',
+  ],
+  studyGroups: [
+    'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2',
+    'M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z',
+    'M23 21v-2a4 4 0 0 0-3-3.87',
+    'M16 3.13a4 4 0 0 1 0 7.75',
+  ],
+  library: ['m16 6 4 14', 'M12 6v14', 'M8 8v12', 'M4 4v16'],
+  posts: [
+    'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z',
+    'M14 2v6h6',
+    'M16 13H8',
+    'M16 17H8',
+    'M10 9H8',
+  ],
+  donate: [
+    'M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z',
+  ],
+};
+---
+
+<svg
+  class="nav-icon"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  {paths[Astro.props.name].map((d) => (
+    <path d={d} />
+  ))}
+</svg>
