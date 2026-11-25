@@ -20,7 +20,7 @@ const updated = new Intl.DateTimeFormat(locales[locale].formatLocale, {
   dateStyle: 'long',
   numberingSystem: 'latn',
   timeZone: 'UTC',
-}).format(new Date('2026-11-23T00:00:00Z'));
+}).format(new Date('2026-11-25T00:00:00Z'));
 const sections = [
   ['privacyNoneTitle', 'privacyNone'],
   ['privacyAnalyticsTitle', 'privacyAnalytics'],
@@ -38,6 +38,17 @@ const sections = [
   ['privacyHostingTitle', 'privacyHosting'],
   ['privacyLinksTitle', 'privacyLinks'],
 ] as const;
+// A body line starting with "- " is a bullet; other lines are paragraphs.
+// Consecutive bullets form one list.
+const blocks = (body: string) =>
+  body.split('\n').reduce<(string | string[])[]>((out, line) => {
+    if (!line.startsWith('- ')) return [...out, line];
+    const last = out.at(-1);
+    if (Array.isArray(last)) last.push(line.slice(2));
+    else out.push([line.slice(2)]);
+    return out;
+  }, []);
+const [contactBefore, contactAfter] = text('privacyContact').split('{email}');
 ---
 
 <Shell locale={locale} title={text('privacyTitle')} page="privacy">
@@ -51,7 +62,17 @@ const sections = [
         <h2 id={title} class="text-xl font-bold">
           {text(title)}
         </h2>
-        <p>{text(body)}</p>
+        {blocks(text(body)).map((block) =>
+          Array.isArray(block) ? (
+            <ul class="list-disc space-y-2 ps-6">
+              {block.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>{block}</p>
+          ),
+        )}
       </section>
     ))}
     <section class="card space-y-2" aria-labelledby="privacyContactTitle">
@@ -59,10 +80,11 @@ const sections = [
         {text('privacyContactTitle')}
       </h2>
       <p>
-        {text('contactPrompt')}{' '}
+        {contactBefore}
         <a class="link" href="mailto:hello@winmetta.org">
           hello@winmetta.org
         </a>
+        {contactAfter}
       </p>
     </section>
     <p class="muted text-sm">

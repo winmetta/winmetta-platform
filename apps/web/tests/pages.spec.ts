@@ -91,7 +91,7 @@ test('Privacy states what the site does and shows a Latin-digit date', async ({
   await expect(page.getByRole('heading', { level: 2 })).toHaveCount(
     7 + Number(feedback) + Number(ipLogging) + Number(bookSearch),
   );
-  await expect(page.locator('main')).toContainText('November 23, 2026');
+  await expect(page.locator('main')).toContainText('November 25, 2026');
   await expect(page.locator('main')).toContainText('Website analytics');
   await expect(page.locator('#privacyAnalyticsIpTitle')).toHaveCount(
     Number(ipLogging),
@@ -144,7 +144,7 @@ test('privacy page discloses that search words appear in the page address', asyn
   await page.goto('/my/privacy/');
   await expect(
     page.getByRole('heading', {
-      name: 'စာမျက်နှာလိပ်စာထဲရှိ ရှာဖွေစကားလုံးများ',
+      name: 'စာမျက်နှာလိပ်စာ (URL) ထဲရှိ ရှာဖွေစကားလုံးများ',
     }),
   ).toBeVisible();
 });

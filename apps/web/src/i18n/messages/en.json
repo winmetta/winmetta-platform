@@ -104,6 +104,7 @@
   "privacyLinksTitle": "Other websites",
   "privacyLinks": "Some links lead to other websites, such as winmetta.org. Their privacy practices are their own.",
   "privacyContactTitle": "Questions",
+  "privacyContact": "Questions? Write to {email}",
   "privacyUpdated": "Last updated",
   "contactPrompt": "Questions? Write to",
   "contactLabel": "Contact",
