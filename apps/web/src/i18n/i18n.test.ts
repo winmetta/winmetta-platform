@@ -97,7 +97,7 @@ describe('inline links in messages', () => {
     expect(() =>
       validateMessages({
         ...messages,
-        my: { ...messages.my, donateIntro: 'ဓမ္မ' },
+        my: { ...messages.my, donateSupportClasses: 'ဓမ္မ' },
       }),
     ).toThrow('Link targets differ');
   });
