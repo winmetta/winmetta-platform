@@ -4,7 +4,7 @@ test('classes page lists live classes with join and watch links', async ({
   page,
 }) => {
   await page.goto('/en/classes/');
-  await expect(page.locator('h1')).toHaveText('Classes');
+  await expect(page.locator('h1')).toHaveText('Dhamma Classes');
   await expect(page.locator('main li.card[id]')).toHaveCount(9);
   await expect(page.locator('a[href*="zoom.us"]').first()).toBeVisible();
   await expect(
