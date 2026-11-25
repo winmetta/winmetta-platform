@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { messages, validateMessages } from './messages';
 import { localizedContent } from './content';
+import { inlineLinks } from './inline-links';
 import {
   route,
   switchLocale,
@@ -72,5 +73,32 @@ describe('locale contracts', () => {
       localizedContent({ en: 'source', my: 'ဘာသာပြန်' }, 'en', 'my').isFallback,
     ).toBe(false);
     expect(() => localizedContent({}, 'en', 'my')).toThrow();
+  });
+});
+
+describe('inline links in messages', () => {
+  it('turns page ids and https URLs into links and keeps the text around them', () => {
+    expect(
+      inlineLinks('my', 'See [classes](classes) and [Zoom](https://zoom.us/).'),
+    ).toEqual([
+      'See ',
+      { label: 'classes', href: '/my/classes/', external: false },
+      ' and ',
+      { label: 'Zoom', href: 'https://zoom.us/', external: true },
+      '.',
+    ]);
+    expect(inlineLinks('en', 'No links here.')).toEqual(['No links here.']);
+  });
+  it('fails on an unknown target, so a typo breaks the build', () => {
+    expect(() => inlineLinks('en', '[x](clases)')).toThrow('clases');
+    expect(() => inlineLinks('en', '[x](http://zoom.us/)')).toThrow();
+  });
+  it('requires every locale to link to the same places', () => {
+    expect(() =>
+      validateMessages({
+        ...messages,
+        my: { ...messages.my, donateIntro: 'ဓမ္မ' },
+      }),
+    ).toThrow('Link targets differ');
   });
 });
