@@ -1,7 +1,16 @@
 ---
-// Outline icons for the phone menu's first-level links (Feather and Lucide, MIT); decorative, the
-// link's text is its name. Shown only inside the phone menu (.nav-icon in global.css).
-type Name = 'classes' | 'studyGroups' | 'library' | 'posts' | 'donate';
+// Outline icons for every menu and submenu link (Feather and Lucide, MIT); decorative, the link's
+// text is its name.
+type Name =
+  | 'classes'
+  | 'teachers'
+  | 'retreats'
+  | 'studyGroups'
+  | 'library'
+  | 'studyApps'
+  | 'digitalTexts'
+  | 'posts'
+  | 'donate';
 interface Props {
   name: Name;
 }
@@ -11,6 +20,13 @@ const paths: Record<Name, string[]> = {
     'M22 10v6',
     'M6 12.5V16a6 3 0 0 0 12 0v-3.5',
   ],
+  teachers: ['M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8z', 'M4 21a8 8 0 0 1 16 0'],
+  retreats: [
+    'M3.5 21 14 3',
+    'M20.5 21 10 3',
+    'M15.5 21 12 15l-3.5 6',
+    'M2 21h20',
+  ],
   studyGroups: [
     'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2',
     'M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z',
@@ -18,6 +34,14 @@ const paths: Record<Name, string[]> = {
     'M16 3.13a4 4 0 0 1 0 7.75',
   ],
   library: ['m16 6 4 14', 'M12 6v14', 'M8 8v12', 'M4 4v16'],
+  studyApps: [
+    'M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z',
+    'M12 18h.01',
+  ],
+  digitalTexts: [
+    'M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z',
+    'M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z',
+  ],
   posts: [
     'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z',
     'M14 2v6h6',

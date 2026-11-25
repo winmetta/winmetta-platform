@@ -35,8 +35,8 @@ const navItems = [
     icon: 'classes',
     label: 'navClasses',
     children: [
-      { page: 'teachers', label: 'navTeachers' },
-      { page: 'retreats', label: 'navRetreats' },
+      { page: 'teachers', icon: 'teachers', label: 'navTeachers' },
+      { page: 'retreats', icon: 'retreats', label: 'navRetreats' },
     ],
   },
   { page: 'studyGroups', icon: 'studyGroups', label: 'navStudyGroups' },
@@ -45,8 +45,8 @@ const navItems = [
     icon: 'library',
     label: 'navLibrary',
     children: [
-      { page: 'studyApps', label: 'navStudyApps' },
-      { page: 'digitalTexts', label: 'navDigitalTexts' },
+      { page: 'studyApps', icon: 'studyApps', label: 'navStudyApps' },
+      { page: 'digitalTexts', icon: 'digitalTexts', label: 'navDigitalTexts' },
     ],
   },
   { page: 'posts', icon: 'posts', label: 'navPosts' },
@@ -192,6 +192,7 @@ const postLanguageScript = postLanguagesHeadScript(defaultPostLanguage(locale));
                             : undefined
                         }
                       >
+                        <NavIcon name={child.icon} />
                         {t(locale, child.label)}
                       </a>
                     </li>

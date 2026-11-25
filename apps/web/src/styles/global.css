@@ -194,11 +194,12 @@
   .nav-link.nav-settings {
     @apply hidden;
   }
-  /* First-level links carry an icon, in the wide bar and in the phone menu. */
+  /* Every menu and submenu link carries an icon, in the wide bar and in the phone menu. */
   .nav-icon {
     @apply block size-5 shrink-0;
   }
-  .nav-link {
+  .nav-link,
+  .nav-sublink {
     @apply gap-2.5;
   }
   @media (width < 48rem) {
