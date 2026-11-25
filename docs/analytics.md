@@ -189,7 +189,7 @@ Review of the design, with the residual risks accepted as low. This is our own r
 
 1. **Consent for device access (EU/UK ePrivacy, Article 5(3)):** applies only when information is stored on or read from the visitor's device. The design stores nothing and reads nothing from the device, so no consent or cookie banner is required. Kept true by checking storage before launch and after every Umami upgrade (section 4.1).
 2. **GDPR and UK GDPR:** the daily hash is built from IP address, user agent and a salt, and regulators may treat an IP-derived value as personal data while the salt exists. The original aggregate analytics design cited legitimate interest (Article 6(1)(f)) for running the site. The short-lived IP rollout separately retains raw addresses. The salt still rotates daily (`SALT_ROTATION=day`).
-3. **Transparency:** the Privacy page, in English and Burmese, states what is counted and why, the daily hash, the 13-month retention and a contact (`contact@winmetta.org`), changing in the same PR as the tracker (section 8).
+3. **Transparency:** the Privacy page, in English and Burmese, states what is counted and why, the daily hash, the 13-month retention and a contact (`hello@winmetta.org`), changing in the same PR as the tracker (section 8).
 4. **Objection:** Do Not Track is honored. No separate opt-out page, because it would itself need storage.
 5. **Retention:** 13 months at most for any copy of an event, backups included (live events 12 months, dumps 21 days, snapshots 14 days).
 6. **Processor and region:** the data stays in Win Metta's own AWS account in `us-east-1`; AWS is the only processor and no analytics company receives the data.

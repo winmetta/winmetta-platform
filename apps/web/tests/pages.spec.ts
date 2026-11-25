@@ -55,7 +55,7 @@ for (const l of locales) {
         .click();
       await expect(page.locator('h1')).toHaveText(l.privacy);
       await expect(
-        page.locator('main a[href^="mailto:contact@winmetta.org"]'),
+        page.locator('main a[href^="mailto:hello@winmetta.org"]'),
       ).toBeVisible();
     });
 
