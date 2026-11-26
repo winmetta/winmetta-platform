@@ -85,6 +85,10 @@ test('leaving asks first while something is running, and not otherwise', async (
   await expect(page).toHaveURL(/\/en\/mini-apps\/$/);
   // Something set: declining stays, accepting leaves.
   await page.goto('/en/mini-apps/meditation-bell/');
+  // The bell island writes the flag once it is ready, so wait for it before setting our own.
+  await expect(
+    page.locator('[data-bell-timer][data-ready="true"]'),
+  ).toBeVisible();
   await page.evaluate(() => {
     document.body.dataset.miniAppBusy = 'true';
   });
