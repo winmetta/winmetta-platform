@@ -11,7 +11,8 @@ import {
   type FromChoice,
 } from '../lib/text-converter';
 import { CheckIcon, CloseIcon, CopyIcon, RetryIcon, SwapIcon } from './icons';
-import { TextAction } from './ui/text-action';
+import type { ComponentProps, ReactNode } from 'react';
+import '../styles/mini-app.css';
 
 export interface Labels {
   from: string;
@@ -65,6 +66,22 @@ function noteText(note: ConvertNote, labels: Labels): string {
   }
 }
 
+/** The mini apps' outlined 44px button with an icon before its words (docs/design-guide.md §9). */
+function MiniButton({
+  icon,
+  children,
+  ...props
+}: Omit<ComponentProps<'button'>, 'className' | 'type'> & { icon: ReactNode }) {
+  return (
+    <button type="button" className="mini-button" {...props}>
+      {icon}
+      <span>{children}</span>
+    </button>
+  );
+}
+
+type Tone = 'error' | 'notice' | 'help';
+
 export default function TextConverterIsland({ labels }: { labels: Labels }) {
   const [status, setStatus] = useState<Status>('loading');
   const converter = useRef<Converter | null>(null);
@@ -107,18 +124,20 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
     [status, text, from, to],
   );
 
-  const lines: string[] = [];
-  if (view?.issue === 'too-long') lines.push(labels.tooLong);
-  if (view?.issue === 'choose-source') lines.push(labels.choose);
+  const lines: { text: string; tone: Tone }[] = [];
+  const say = (text: string, tone: Tone) => lines.push({ text, tone });
+  if (view?.issue === 'too-long') say(labels.tooLong, 'error');
+  if (view?.issue === 'choose-source') say(labels.choose, 'error');
   if (view?.detected && !view.noBurmese)
-    lines.push(
+    say(
       view.source === 'zawgyi' ? labels.foundZawgyi : labels.foundUnicode,
+      'notice',
     );
-  if (view?.noBurmese) lines.push(labels.noBurmese);
-  if (view?.same) lines.push(labels.same);
+  if (view?.noBurmese) say(labels.noBurmese, 'notice');
+  if (view?.same) say(labels.same, 'notice');
   if (view && !view.same && (to === 'zawgyi' || to === 'win-innwa'))
-    lines.push(labels.lossy);
-  for (const note of view?.notes ?? []) lines.push(noteText(note, labels));
+    say(labels.lossy, 'help');
+  for (const note of view?.notes ?? []) say(noteText(note, labels), 'help');
   const outputFont =
     view?.output && to === 'zawgyi'
       ? labels.fontZawgyi
@@ -150,11 +169,13 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
     onChange: (value: string) => void,
     auto: boolean,
   ) => (
-    <label className="block space-y-1" htmlFor={id}>
-      <span className="block font-medium">{label}</span>
+    <div>
+      <label className="mini-label" htmlFor={id}>
+        {label}
+      </label>
       <select
         id={id}
-        className="field"
+        className="mini-field"
         value={value}
         onChange={(event) => onChange(event.target.value)}
       >
@@ -163,25 +184,25 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
         <option value="zawgyi">{labels.zawgyi}</option>
         <option value="win-innwa">{labels.winInnwa}</option>
       </select>
-    </label>
+    </div>
   );
 
   if (status === 'error')
     return (
-      <div className="space-y-3" role="alert">
-        <p className="muted">{labels.loadError}</p>
-        <TextAction
+      <div className="mini-panel grid gap-3" role="alert">
+        <p className="mini-error">{labels.loadError}</p>
+        <MiniButton
           icon={<RetryIcon />}
           onClick={() => setAttempt(attempt + 1)}
         >
           {labels.retry}
-        </TextAction>
+        </MiniButton>
       </div>
     );
 
   return (
-    <div className="space-y-4" data-ready={status === 'ready'}>
-      <div className="grid items-end gap-3 sm:grid-cols-[1fr_auto_1fr]">
+    <div className="grid gap-4" data-ready={status === 'ready'}>
+      <div className="mini-panel grid items-end gap-3 sm:grid-cols-[1fr_auto_1fr]">
         {picker(
           'converter-from',
           labels.from,
@@ -189,14 +210,14 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
           (v) => setFrom(v as FromChoice),
           true,
         )}
-        <TextAction
+        <MiniButton
           icon={<SwapIcon />}
           aria-label={labels.swapLabel}
           onClick={doSwap}
           disabled={status !== 'ready'}
         >
           {labels.swap}
-        </TextAction>
+        </MiniButton>
         {picker(
           'converter-to',
           labels.to,
@@ -207,13 +228,13 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <label className="block font-medium" htmlFor="converter-input">
+        <div className="grid content-start gap-2">
+          <label className="mini-label" htmlFor="converter-input">
             {labels.input}
           </label>
           <textarea
             id="converter-input"
-            className="field min-h-56 break-all py-3"
+            className="mini-field break-all"
             value={input}
             placeholder={labels.inputPlaceholder}
             spellCheck={false}
@@ -221,7 +242,7 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
             onChange={(event) => setInput(event.target.value)}
           />
           <div className="flex items-center justify-between gap-3">
-            <TextAction
+            <MiniButton
               icon={<CloseIcon />}
               onClick={() => {
                 setInput('');
@@ -230,43 +251,52 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
               disabled={input.length === 0}
             >
               {labels.clear}
-            </TextAction>
-            <span className="badge" aria-hidden="true">
+            </MiniButton>
+            <span className="mini-help" aria-hidden="true">
               {input.length.toLocaleString()} / {MAX_CHARS.toLocaleString()}
             </span>
           </div>
         </div>
-        <div className="space-y-2">
-          <label className="block font-medium" htmlFor="converter-output">
+        <div className="grid content-start gap-2">
+          <label className="mini-label" htmlFor="converter-output">
             {labels.output}
           </label>
           <textarea
             id="converter-output"
-            className="field min-h-56 break-all py-3"
+            className="mini-field break-all"
             value={view?.output ?? ''}
             readOnly
             translate="no"
             spellCheck={false}
           />
           <div className="flex items-center">
-            <TextAction
+            <MiniButton
               icon={copied ? <CheckIcon /> : <CopyIcon />}
               aria-label={copied ? labels.copied : labels.copyLabel}
               onClick={copy}
               disabled={!view?.output}
             >
               {copied ? labels.copied : labels.copy}
-            </TextAction>
+            </MiniButton>
           </div>
         </div>
       </div>
 
-      <div role="status" aria-live="polite" className="space-y-2">
-        {status === 'loading' && <p className="muted">{labels.loading}</p>}
-        {outputFont && <p className="muted">{outputFont}</p>}
+      <div role="status" aria-live="polite" className="grid gap-2">
+        {status === 'loading' && <p className="mini-help">{labels.loading}</p>}
+        {outputFont && <p className="mini-help">{outputFont}</p>}
         {lines.map((line) => (
-          <p key={line} className="muted">
-            {line}
+          <p
+            key={line.text}
+            className={
+              line.tone === 'error'
+                ? 'mini-error'
+                : line.tone === 'notice'
+                  ? 'mini-notice'
+                  : 'mini-help'
+            }
+          >
+            {line.text}
           </p>
         ))}
       </div>

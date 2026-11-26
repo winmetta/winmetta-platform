@@ -3,7 +3,8 @@
 // direction, in the browser. Unlinked from the listing and noindex until go-live (docs/implementation-plan.md
 // §5F stage 4: the registry status changes from `coming`), whatever PUBLIC_MINI_APPS says.
 import MiniAppShell from '../../../../layouts/MiniAppShell.astro';
-import MiniAppIcon from '../../../../components/MiniAppIcon.astro';
+import MiniAppHeader from '../../../../components/MiniAppHeader.astro';
+import '../../../../styles/mini-app.css';
 import TextConverterIsland, {
   type Labels,
 } from '../../../../components/TextConverterIsland';
@@ -67,28 +68,23 @@ const libraries = [
   locale={locale}
   title={name}
   path="mini-apps/burmese-text-converter/"
-  noindex={app.status === 'coming'}
+  wide
 >
-  <header class="space-y-4">
-    <div class="flex items-center gap-4">
-      <MiniAppIcon icon={app.icon} size={48} />
-      <h1 class="text-3xl font-bold">{name}</h1>
-    </div>
-    <p class="lead">{text('converterIntro')}</p>
-  </header>
+  <MiniAppHeader slot="app-header" {locale} title={name} icon={app.icon} />
+  <p class="mini-help mt-3 mb-4">{text('converterIntro')}</p>
   <noscript>
-    <p class="card">{text('converterNeedsJs')}</p>
+    <p class="mini-panel">{text('converterNeedsJs')}</p>
   </noscript>
   {/* An island renders as `display: contents`: a wrapper gives it the page's vertical spacing. */}
   <div>
     <TextConverterIsland client:load labels={labels} />
   </div>
-  <p class="muted pb-6 text-sm">
-    {text('converterBuiltWith')}
+  <p class="mini-help mt-6 pb-4">
+    {text('converterBuiltWith')}{' '}
     {libraries.map(([library, href], index) => (
       <>
         {index > 0 && ', '}
-        <a class="link" href={href} rel="noopener">
+        <a href={href} rel="noopener">
           {library}
         </a>
       </>
