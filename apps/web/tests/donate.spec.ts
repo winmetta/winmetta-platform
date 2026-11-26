@@ -42,13 +42,12 @@ for (const l of locales) {
   });
 }
 
-test('the header, footer and About link the Dāna page only when it is on', async ({
+test('the footer and About link the Dāna page only when it is on, and the header does not', async ({
   page,
 }) => {
   await page.goto('/en/about/');
-  await expect(page.locator('#site-nav a[href="/en/donate/"]')).toHaveCount(
-    donate ? 1 : 0,
-  );
+  // Not in the header for now (it would wrap the bar next to Mini Apps).
+  await expect(page.locator('#site-nav a[href="/en/donate/"]')).toHaveCount(0);
   await expect(page.locator('footer a[href="/en/donate/"]')).toHaveCount(
     donate ? 1 : 0,
   );
@@ -63,9 +62,6 @@ test('the header, footer and About link the Dāna page only when it is on', asyn
     );
   } else {
     await expect(page.locator('footer a[aria-current="page"]')).toHaveText(
-      'Donate',
-    );
-    await expect(page.locator('#site-nav a[aria-current="page"]')).toHaveText(
       'Donate',
     );
   }

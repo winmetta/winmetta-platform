@@ -53,10 +53,9 @@ const navItems = [
     ],
   },
   { page: 'posts', icon: 'posts', label: 'navPosts' },
-  // The Dāna page is linked only once its wording is approved (docs/donations.md).
-  ...(donateEnabled
-    ? ([{ page: 'donate', icon: 'donate', label: 'navDonate' }] as const)
-    : []),
+  // The Dāna page is not in the header for now: with Mini Apps it would wrap the bar onto a second
+  // line on desktop. It stays in the footer and on About (docs/implementation-plan.md §6.2: Classes
+  // and Study Groups are planned to become mini apps, which frees the room).
   // The mini apps are linked only once they are approved (PUBLIC_MINI_APPS, meditation-bell.md §2).
   ...(miniAppsEnabled
     ? ([{ page: 'miniApps', icon: 'miniApps', label: 'navMiniApps' }] as const)

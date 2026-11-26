@@ -8,7 +8,7 @@ test('the listing shows a tile per mini app, linking only the ones that exist', 
   page,
 }) => {
   await page.goto('/en/mini-apps/');
-  await expect(page.locator('h1')).toHaveText('Mini apps');
+  await expect(page.locator('h1')).toHaveText('Mini Apps');
   const tiles = page.locator('ul.mini-grid > li');
   await expect(tiles).toHaveCount(2);
   const bell = page.locator('a.mini-tile');
@@ -55,7 +55,7 @@ test('the bell page has its own layout, back link, language switch and canonical
   await expect(page.locator('.site-header, .site-footer')).toHaveCount(0);
   const back = page.locator('[data-mini-bar] a[href="/en/mini-apps/"]');
   await expect(back).toBeVisible();
-  await expect(back).toContainText('Mini apps');
+  await expect(back).toContainText('Mini Apps');
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
     /\/en\/mini-apps\/meditation-bell\/$/,
