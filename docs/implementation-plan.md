@@ -199,7 +199,7 @@ Do the steps in this order; each one lists what it needs first and how to tell i
 | 2 | One-time AWS bootstrap | Step 0 | The state bucket, KMS key and OIDC provider exist and `pulumi login` works for a maintainer. | Done |
 | 3 | Pulumi program, staged first apply | Steps 1 and 2 | `app.winmetta.org` serves a build over HTTPS from CloudFront. | Done |
 | 4 | Verify hosting behavior by hand | Step 3 | Trailing-slash, 404, cache-header and `robots.txt` checks pass on the live distribution. | Done |
-| 5 | Deploy workflow, IAM roles, post-deploy smoke test | Steps 1 and 4 | A merge to `main` deploys to production after approval, and the smoke test runs against the live site. | Done |
+| 5 | Deploy workflow, IAM roles, post-deploy smoke test | Steps 1 and 4 | A merge to `main` deploys to production once CI passes (after approval until 2026-11-25), and the smoke test runs against the live site. | Done |
 | 6 | Runbook and ruleset hardening | Step 5 | The runbook is written and the ruleset requires the `checks` status check and conversation resolution. | Done (the rollback drill and later hardening are in the backlog, §6.1) |
 | 7 | Launch: indexing on | Steps 5 and 6 | `PUBLIC_ALLOW_INDEXING=true` is deployed. | Done 2026-10-23, before the launch reviews (now in the backlog, §6.1) |
 | 8 | Reviews, announcement and the end of beta | Step 7 | The open todos in the backlog (§6.1) are ticked or consciously dropped, and the Beta label is removed. | Open (tracked in §6.1) |
