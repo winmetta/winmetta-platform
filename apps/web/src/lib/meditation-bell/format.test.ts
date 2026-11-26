@@ -12,6 +12,12 @@ describe('formatCountdown', () => {
     expect(formatCountdown(59_001)).toBe('01:00');
     expect(formatCountdown(-5)).toBe('00:00');
   });
+  it('keeps the full fractional display through second and minute boundaries', () => {
+    expect(formatCountdown(59_001, true)).toBe('00:59.001');
+    expect(formatCountdown(60_000, true)).toBe('01:00.000');
+    expect(formatCountdown(120 * 60_000 + 999, true)).toBe('120:00.999');
+    expect(formatCountdown(-2, true)).toBe('00:00.000');
+  });
 });
 
 describe('format12Hour', () => {

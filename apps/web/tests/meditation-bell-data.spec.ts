@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { backupKey, storageKey } from '../src/lib/meditation-bell/schema';
+import {
+  backupKey,
+  defaultState,
+  storageKey,
+} from '../src/lib/meditation-bell/schema';
+import { isDay } from '../src/lib/meditation-bell/days';
 import { localePreferenceKey } from '../src/i18n/routes';
 
 test('Settings clears only bell data after confirmation and stops an open timer', async ({
@@ -188,4 +193,60 @@ test('the sound preview unlocks a restored schedule and sound edits retain check
   );
   expect(saved.schedule.checkedAt).toBe(checkedAt);
   expect(saved.endBell.rings).toBe(2);
+});
+
+test('a backward clock correction does not silence the next weekly bell', async ({
+  page,
+}) => {
+  const now = new Date('2026-11-25T19:00:00Z');
+  await page.clock.install({ time: now });
+  const bell = defaultState();
+  bell.schedule = {
+    on: true,
+    checkedAt: now.getTime() + 86_400_000,
+    week: bell.schedule.week,
+  };
+  const target = await page.evaluate((time) => {
+    const date = new Date(time + 60_000);
+    return {
+      day: new Intl.DateTimeFormat('en', { weekday: 'short' }).format(date),
+      time: [date.getHours(), date.getMinutes()]
+        .map((part) => String(part).padStart(2, '0'))
+        .join(':'),
+    };
+  }, now.getTime());
+  if (!isDay(target.day)) throw new Error('Invalid test weekday');
+  bell.schedule.week[target.day].push({
+    id: 'weekly',
+    time: target.time,
+    label: '',
+    sound: 'winmetta-short',
+    rings: 1,
+  });
+  await page.addInitScript(
+    ({ key, data }) => {
+      localStorage.setItem(key, JSON.stringify(data));
+      const start = OscillatorNode.prototype.start;
+      OscillatorNode.prototype.start = function (...args) {
+        const root = document.documentElement;
+        root.dataset.oscillators = String(
+          Number(root.dataset.oscillators ?? '0') + 1,
+        );
+        return start.apply(this, args);
+      };
+    },
+    { key: storageKey, data: bell },
+  );
+  await page.goto('/en/mini-apps/meditation-bell/');
+  await page.getByRole('button', { name: 'Enable sound' }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        (key) => JSON.parse(localStorage.getItem(key)!).schedule.checkedAt,
+        storageKey,
+      ),
+    )
+    .toBeLessThan(now.getTime() + 60_000);
+  await page.clock.fastForward('01:03');
+  await expect(page.locator('html')).toHaveAttribute('data-oscillators', '5');
 });

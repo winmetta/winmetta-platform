@@ -173,13 +173,48 @@ function SettingsPanel({
 interface DisplayProps {
   labels: Labels;
   timer: timers.Timer;
-  left: number;
+  now: number;
+  visible: boolean;
   status: string | undefined;
   alarmText: string;
 }
 
-/** The progress ring (countdown) or the large clock (alarm), with the status line. */
-function Display({ labels, timer, left, status, alarmText }: DisplayProps) {
+function CountdownDigits({ left }: { left: number }) {
+  const [whole, fraction] = formatCountdown(left, true).split('.');
+  return (
+    <>
+      {whole}
+      <span className="bell-fraction">.{fraction}</span>
+    </>
+  );
+}
+
+/** Repaint the readout independently from the timer controls and the scheduler. */
+function Display({
+  labels,
+  timer,
+  now,
+  visible,
+  status,
+  alarmText,
+}: DisplayProps) {
+  const endAt = timer.status === 'running' && visible ? timer.endAt : null;
+  const [frame, setFrame] = useState<{ endAt: number; now: number }>();
+  useEffect(() => {
+    if (endAt === null) return;
+    let request: number;
+    const paint = () => {
+      const at = Date.now();
+      setFrame({ endAt, now: at });
+      if (at < endAt) request = window.requestAnimationFrame(paint);
+    };
+    request = window.requestAnimationFrame(paint);
+    return () => window.cancelAnimationFrame(request);
+  }, [endAt]);
+  const left = timers.msLeft(
+    timer,
+    frame && frame.endAt === endAt ? Math.max(frame.now, now) : now,
+  );
   const mode = timer.mode;
   const running = timer.status === 'running';
   const paused = timer.status === 'paused';
@@ -207,7 +242,7 @@ function Display({ labels, timer, left, status, alarmText }: DisplayProps) {
           </svg>
           <div className="bell-ring__readout">
             <span className="bell-ring__time" data-testid="bell-time">
-              {formatCountdown(left)}
+              <CountdownDigits left={left} />
             </span>
             <p className="bell-status" data-testid="bell-status">
               {status}
@@ -230,7 +265,7 @@ function Display({ labels, timer, left, status, alarmText }: DisplayProps) {
               role="timer"
               aria-label={labels.bellRingAria}
             >
-              {formatCountdown(left)}
+              <CountdownDigits left={left} />
             </span>
           )}
           {!running && (
@@ -585,6 +620,15 @@ function BellTimerSession({
   }, [labels, notify, setTimer]);
 
   useEffect(() => {
+    if (!loaded || timer.status !== 'running' || timer.endAt === null) return;
+    const timeout = window.setTimeout(
+      check,
+      Math.max(0, timer.endAt - Date.now()),
+    );
+    return () => window.clearTimeout(timeout);
+  }, [loaded, timer.endAt, timer.status, check]);
+
+  useEffect(() => {
     if (!loaded) return;
     check();
     const interval = window.setInterval(() => {
@@ -759,10 +803,10 @@ function BellTimerSession({
     }
   };
 
-  const resetOrClear = (how: 'reset' | 'cleared') => {
-    endedBy(how);
+  const resetTimer = () => {
+    endedBy(mode === 'alarm' ? 'cleared' : 'reset');
     setError(undefined);
-    if (mode === 'alarm' && how === 'cleared') {
+    if (mode === 'alarm') {
       setTimer(timers.createTimer('alarm', timers.minutesToMs(defaultMinutes)));
       setAlarmText('');
       setAlarmPreset(undefined);
@@ -795,7 +839,6 @@ function BellTimerSession({
     notify(labels.bellNoticeSaved ?? '');
   };
 
-  const left = timers.msLeft(timer, now);
   const status = labels[timerStatusLabel[timer.status]];
   const selectedMinutes = selectedPreset(timer, countdownSource, alarmPreset);
 
@@ -936,7 +979,8 @@ function BellTimerSession({
         <Display
           labels={labels}
           timer={timer}
-          left={left}
+          now={now}
+          visible={view === 'timer'}
           status={status}
           alarmText={alarmText}
         />
@@ -1001,25 +1045,10 @@ function BellTimerSession({
               {labels.bellStart}
             </button>
           )}
-          {mode === 'countdown' ? (
-            <button
-              type="button"
-              className="bell-button"
-              onClick={() => resetOrClear('reset')}
-            >
-              <ResetIcon />
-              {labels.bellReset}
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="bell-button"
-              onClick={() => resetOrClear('cleared')}
-            >
-              <ClearIcon />
-              {labels.bellClear}
-            </button>
-          )}
+          <button type="button" className="bell-button" onClick={resetTimer}>
+            <ResetIcon />
+            {labels.bellReset}
+          </button>
         </div>
       </section>
       <section

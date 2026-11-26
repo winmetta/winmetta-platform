@@ -494,7 +494,6 @@
   "bellPause": "Pause",
   "bellResume": "Resume",
   "bellReset": "Reset",
-  "bellClear": "Clear",
   "bellRingNow": "Ring now",
   "bellPresets": "Minutes",
   "bellPresetMinutes": "{n} min",

@@ -34,7 +34,10 @@ export function useWeeklyBells({
     const now = DateTime.local();
     const at = now.toMillis();
     const last = schedule.checkedAt ?? at;
-    if (at < last) return;
+    if (at < last) {
+      checkpoint(at);
+      return;
+    }
     // A weekly schedule repeats. After a long absence the latest week's missed bells suffice.
     const from = Math.max(last, now.minus({ days: 7 }).toMillis());
     const due = dueBells(schedule.week, DateTime.fromMillis(from), now);

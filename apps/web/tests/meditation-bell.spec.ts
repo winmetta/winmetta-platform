@@ -24,7 +24,7 @@ test('shows the countdown with English buttons in both locales', async ({
 }) => {
   for (const code of ['en', 'my']) {
     await open(page, `/${code}/mini-apps/meditation-bell/`);
-    await expect(time(page)).toHaveText('20:00');
+    await expect(time(page)).toHaveText('20:00.000');
     await expect(status(page)).toHaveText('Ready');
     for (const name of [
       'Start',
@@ -47,14 +47,14 @@ test('a preset sets the length and a 5 minute countdown rings at the end', async
 }) => {
   await open(page);
   await page.getByRole('button', { name: '5 min', exact: true }).click();
-  await expect(time(page)).toHaveText('05:00');
+  await expect(time(page)).toHaveText('05:00.000');
   await page.getByRole('button', { name: 'Start', exact: true }).click();
   await expect(status(page)).toHaveText('Sitting');
-  await page.clock.runFor('02:00');
-  await expect(time(page)).toHaveText('03:00');
-  await page.clock.runFor('03:02');
+  await page.clock.fastForward('02:00');
+  await expect(time(page)).toHaveText(/^(02:59|03:00)\.\d{3}$/);
+  await page.clock.fastForward('03:02');
   await expect(status(page)).toHaveText('Bell rang');
-  await expect(time(page)).toHaveText('00:00');
+  await expect(time(page)).toHaveText('00:00.000');
 });
 
 test('custom minutes accept 1 to 960 and anything else shows an error and starts nothing', async ({
@@ -72,7 +72,7 @@ test('custom minutes accept 1 to 960 and anything else shows an error and starts
   }
   await field.fill('960');
   await page.getByRole('button', { name: 'Start', exact: true }).click();
-  await expect(time(page)).toHaveText('960:00');
+  await expect(time(page)).toHaveText(/^(959:59|960:00)\.\d{3}$/);
   await expect(page.locator('#bell-error')).toHaveCount(0);
 });
 
@@ -87,14 +87,14 @@ test('pause keeps the time left and resume carries on', async ({ page }) => {
   await open(page);
   await page.getByRole('button', { name: '3 min', exact: true }).click();
   await page.getByRole('button', { name: 'Start', exact: true }).click();
-  await page.clock.runFor('01:00');
+  await page.clock.fastForward('01:00');
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
   await expect(status(page)).toHaveText('Paused');
   const left = await time(page).textContent();
-  await page.clock.runFor('10:00');
+  await page.clock.fastForward('10:00');
   await expect(time(page)).toHaveText(left ?? '');
   await page.getByRole('button', { name: 'Resume', exact: true }).click();
-  await page.clock.runFor('02:05');
+  await page.clock.fastForward('02:05');
   await expect(status(page)).toHaveText('Bell rang');
 });
 
@@ -102,9 +102,9 @@ test('reset returns to the chosen length', async ({ page }) => {
   await open(page);
   await page.getByRole('button', { name: '10 min', exact: true }).click();
   await page.getByRole('button', { name: 'Start', exact: true }).click();
-  await page.clock.runFor('01:00');
+  await page.clock.fastForward('01:00');
   await page.getByRole('button', { name: 'Reset', exact: true }).click();
-  await expect(time(page)).toHaveText('10:00');
+  await expect(time(page)).toHaveText('10:00.000');
   await expect(status(page)).toHaveText('Ready');
 });
 
@@ -112,15 +112,15 @@ test('a reload during a countdown resumes it', async ({ page }) => {
   await open(page);
   await page.getByRole('button', { name: '5 min', exact: true }).click();
   await page.getByRole('button', { name: 'Start', exact: true }).click();
-  await page.clock.runFor('01:00');
+  await page.clock.fastForward('01:00');
   await page.clock.install({ time: new Date(start.getTime() + 60_000) });
   await page.reload();
   await expect(
     page.locator('[data-bell-timer][data-ready="true"]'),
   ).toBeVisible();
   await expect(status(page)).toHaveText('Sitting');
-  await expect(time(page)).toHaveText('04:00');
-  await page.clock.runFor('04:05');
+  await expect(time(page)).toHaveText(/^(03:59|04:00)\.\d{3}$/);
+  await page.clock.fastForward('04:05');
   await expect(status(page)).toHaveText('Bell rang');
 });
 
@@ -176,17 +176,24 @@ test('the alarm rings tomorrow for a time that has passed and refuses one over 1
   await page.clock.pauseAt(new Date(start.getTime() + 10_000));
   await page.getByRole('button', { name: 'Start', exact: true }).click();
   const remaining = page.getByRole('timer', { name: 'Time left' });
-  await expect(remaining).toHaveText('659:50');
+  await expect(remaining).toHaveText('659:50.000');
+  await page.clock.runFor(250);
+  await expect(remaining).toHaveText(/^659:49\.7\d{2}$/);
   await expect(status(page)).toHaveCount(0);
-  await page.clock.runFor('02:00');
+  await page.clock.fastForward('02:00');
   await expect(time(page)).toHaveText('6:00 AM');
-  await expect(remaining).toHaveText('657:50');
+  await expect(remaining).toHaveText(/^657:49\.7\d{2}$/);
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
   await page.reload();
   await expect(time(page)).toHaveText('6:00 AM');
   await expect(status(page)).toHaveText('Paused');
-  await page.clock.runFor('01:00');
-  await expect(remaining).toHaveText('657:50');
+  await page.clock.fastForward('01:00');
+  await expect(remaining).toHaveText('657:49.750');
+  const reset = page.getByRole('button', { name: 'Reset', exact: true });
+  await expect(reset.locator('svg')).toBeVisible();
+  await reset.click();
+  await expect(time(page)).toHaveText('––:––');
+  await expect(remaining).toHaveCount(0);
 });
 
 test('an alarm preset sets the clock to now plus the minutes', async ({
@@ -288,7 +295,7 @@ test('an unreadable saved value is kept aside and the bell starts fresh with a n
       localStorage.getItem('winmetta.meditationBell.backup'),
     ),
   ).toBe('{"version":99}');
-  await expect(time(page)).toHaveText('20:00');
+  await expect(time(page)).toHaveText('20:00.000');
 });
 
 test('no request leaves the browser except the page itself', async ({
@@ -318,6 +325,9 @@ test('the bell controls fit at 320 px and leave space above Ring now', async ({
   await page.setViewportSize({ width: 320, height: 700 });
   await open(page);
   const ring = page.getByRole('button', { name: 'Ring now', exact: true });
+  await expect(
+    page.getByRole('button', { name: '120 min', exact: true }),
+  ).toHaveCSS('font-size', '20px');
   await expect(ring).toHaveCSS('min-height', '56px');
   await expect(ring).toHaveCSS('margin-top', '24px');
   for (const colorScheme of ['light', 'dark'] as const) {
@@ -334,7 +344,16 @@ test('the bell controls fit at 320 px and leave space above Ring now', async ({
     await page.getByRole('button', { name: 'Countdown', exact: true }).click();
     await page.getByRole('button', { name: 'Schedule', exact: true }).click();
     const days = page.getByRole('group', { name: 'Days' }).getByRole('button');
-    await expect(days).toHaveCount(7);
+    await expect(days).toHaveText([
+      'Mon',
+      'Tue',
+      'Wed',
+      'Thu',
+      'Fri',
+      'Sat',
+      'Sun',
+    ]);
+    await expect(days.first()).toHaveCSS('font-size', '17px');
     const sunday = await days.last().boundingBox();
     expect(sunday).not.toBeNull();
     expect(sunday!.x + sunday!.width).toBeLessThanOrEqual(320);

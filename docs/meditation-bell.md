@@ -70,19 +70,19 @@ The app starts with a **Timer / Schedule** switch. In Timer, the toolbar below i
 
 ### 3.1 Countdown
 
-- **Display:** a progress ring with the time left as `mm:ss`, or `mmm:ss` once the timer is 100 minutes or longer (for example `09:00`, `120:00`), and a status line (Ready, Sitting, Paused, Bell rang).
+- **Display:** a progress ring with the time left as `mm:ss.SSS`, or `mmm:ss.SSS` at 100 minutes or longer (for example `09:00.000` or `120:00.000`), and a status line (Ready, Sitting, Paused, Bell rang).
 - **Presets:** 3, 5, 10, 15 (first row) and 30, 60, 90, 120 minutes (second row).
 - **Custom minutes:** whole minutes from 1 to **960** (16 hours). Anything else shows an error under the field and changes nothing.
 - **Start / Pause / Resume** and **Reset** (back to the chosen length). Choosing a preset stops a running timer and sets the new length.
 
 ### 3.2 Alarm
 
-Alarm uses an alarm-clock icon and a large wall-clock time. An unset alarm shows dashes and “Pick a time or a preset”. After Start, the target stays on screen and a separate minutes-and-seconds readout shows the time remaining. The remaining time freezes while paused.
+Alarm uses an alarm-clock icon and a large wall-clock time. An unset alarm shows dashes and “Pick a time or a preset”. After Start, the target stays on screen and a separate minutes, seconds and milliseconds readout shows the time remaining. The remaining time refreshes while the timer view is visible and freezes while paused.
 
 - **Presets** become "+N minutes from now" (the same eight values) and set the clock to now plus N, rounded to the minute.
 - **Ring at:** a time field. The alarm is the next time that clock time occurs: a time that has already passed today means tomorrow. The remaining time appears beneath the target.
 - **Limit:** at most **16 hours** ahead. A time further away (for example 2:00 PM when it is now 7:00 PM) shows "Pick a time within the next 16 hours" and sets nothing.
-- **Start / Pause / Resume** and **Clear** (removes the alarm). "Countdown" switches back.
+- **Start / Pause / Resume** and **Reset** (removes the alarm). "Countdown" switches back.
 
 ### 3.3 Sound and the manual bell
 
@@ -130,7 +130,7 @@ A full screen inside the app, with a back arrow.
 ### 4.4 How the schedule keeps time
 
 - Bell times are **local wall-clock times** in the device's time zone, so 6:00 AM stays 6:00 AM across daylight-saving changes and when the device moves zones. The next bell is computed with Luxon, already a dependency. A time skipped by a daylight-saving change rings at the next valid minute; a time that occurs twice rings once.
-- The scheduler checks absolute occurrences once per second while enabled and rechecks on focus and visibility changes. It saves a checkpoint to resume after reload. Open tabs pick up schedule changes from the same browser, and a Web Lock coordinates scheduled playback when available. After sound is enabled, bells due within the past two minutes ring and the app reports the most recent older missed bell from the last seven days.
+- The scheduler checks absolute occurrences once per second while enabled and rechecks on focus and visibility changes. It saves a checkpoint to resume after reload and rebases it when the device clock is set backward. Open tabs pick up schedule changes from the same browser, and a Web Lock coordinates scheduled playback when available. After sound is enabled, bells due within the past two minutes ring and the app reports the most recent older missed bell from the last seven days.
 - **Keep screen on:** the schedule page offers a "Keep screen on" switch (off by default) for a retreat-room display, using the same Wake Lock API.
 
 ---
@@ -188,14 +188,14 @@ The mini app's buttons and labels are **English in both locales**; only alerts, 
 
 ### 7.2 Day names and narrow screens
 
-- **Day buttons** use the longest form that fits: **"Monday"** on desktop and wide screens, **"Mon"** on tablets and wide phones, **"Mo"** only on narrow phones. The choice is made by the width available to the row (a container query), not by the device.
+- **Day buttons** show three-letter labels such as **"Mon"** at every width, with the full day name available to assistive technology.
 - The seven buttons share the row equally and may shrink (`minmax(0, 1fr)` grid columns), so Sunday is never cut off; this was a bug in the 2026-11-25 mockup at narrow widths. The same applies to the preset grid, the Add/Import/Export row and long bell labels, which are cut with an ellipsis.
 - **Messages, alerts, notices and the CSV import preview always use full day names** ("Monday"), whatever the width. The CSV file itself uses `Mon` to `Sun`.
 - Checked at 320 px, 375 px and desktop, in both locales with the light palette (AGENTS.md §6 asks for desktop and 375 px; the bell adds 320 px because of the seven-button row).
 
 ### 7.3 Design guide
 
-Meditation Bell uses a compact, mobile-first control layout and its own styles. Timer and Schedule share a top-level switch. The Timer toolbar has one action for changing modes. Countdown uses a thin progress ring, while Alarm shows the clock time and a numeric countdown underneath. Start fills its action row alongside Reset or Clear. Ring now sits on a separate full-width row. Presets, the rings choice and day buttons use pressed states to communicate selection.
+Meditation Bell uses a compact, mobile-first control layout and its own styles. Timer and Schedule share a top-level switch. The Timer toolbar has one action for changing modes. Countdown uses a thin progress ring, while Alarm shows the clock time and a numeric countdown underneath. Start fills its action row alongside Reset. Ring now sits on a separate full-width row. Presets, the rings choice and day buttons use pressed states to communicate selection.
 
 ---
 
@@ -270,7 +270,7 @@ The web version says this plainly in its help text and does not try to work arou
   - `schedule.ts`: next bell across the week, duplicates, add, edit and delete, daylight-saving cases.
   - `csv.ts`: parse (with per-row errors) and serialize (with the byte-order mark).
   - `sounds.ts`: the sound registry (id, name key, file, length, licence; section 8.2).
-  - `format.ts`: `mm:ss` / `mmm:ss`, 12-hour times, day names in their three lengths.
+  - `format.ts`: `mm:ss.SSS` / `mmm:ss.SSS`, 12-hour times, day names in their three lengths.
   - `days.ts`: the seven day ids (`Mon` to `Sun`) and their Luxon weekday numbers.
   - `player.ts`: the `BellPlayer` interface (`ring`, `schedule`, `cancel`) that a platform implements (section 9).
 - `apps/web/src/components/meditation-bell/`: the React island (Timer, Schedule, edit and import screens, the alert area) and the web bell player (Web Audio API, Wake Lock).

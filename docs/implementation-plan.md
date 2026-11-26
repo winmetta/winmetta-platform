@@ -416,7 +416,7 @@ One reviewed PR each, in this order.
 * Two modes, Timer and Schedule; a timer and the weekly schedule never run at the same time, and turning the schedule off never deletes it.
 * Mini app pages are standalone, mobile-first experiences with app-specific layouts and controls. The listing stays a normal site page.
 * Meditation Bell has a compact top bar with a back arrow to Mini Apps, the app icon and name as the page heading, and a globe language menu.
-* Under Timer / Schedule, Timer offers one top-right action: Set alarm from Countdown, or Countdown from Alarm. Keep the progress ring in Countdown. Alarm shows the target clock time and remaining minutes and seconds, and offers both minutes-from-now presets and a Ring at time field.
+* Under Timer / Schedule, Timer offers one top-right action: Set alarm from Countdown, or Countdown from Alarm. Keep the progress ring in Countdown, display milliseconds in both readouts, and use Reset in both modes. Alarm shows the target clock time and remaining minutes, seconds and milliseconds, and offers both minutes-from-now presets and a Ring at time field.
 * Ring now is a full-width, 56 px minimum-height manual action below the active view, with a 24 px gap above it.
 * Buttons and labels in English in both locales, Burmese only for alerts, notices and errors, Western digits everywhere ([meditation-bell.md](meditation-bell.md) §7).
 * Browser storage only, no backend; CSV export is the backup. Built behind `PUBLIC_MINI_APPS`.

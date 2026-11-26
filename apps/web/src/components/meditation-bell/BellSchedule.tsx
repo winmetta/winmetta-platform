@@ -55,9 +55,7 @@ function DayButtons({ label, selected, choose }: DayButtonsProps) {
           aria-pressed={selected.includes(day)}
           onClick={() => choose(day)}
         >
-          <span className="bell-day-full">{dayName(day)}</span>
-          <span className="bell-day-short">{dayName(day, 'short')}</span>
-          <span className="bell-day-narrow">{dayName(day, 'narrow')}</span>
+          {day}
         </button>
       ))}
     </div>

@@ -1,12 +1,17 @@
 // Display helpers (docs/meditation-bell.md §3.1, §7.2). Western digits in both locales.
 import type { Day } from './days';
 
-/** `mm:ss`, or `mmm:ss` from 100 minutes up (`09:00`, `120:00`). Rounds up to the next second. */
-export function formatCountdown(ms: number): string {
-  const total = Math.max(0, Math.ceil(ms / 1000));
-  const minutes = Math.floor(total / 60);
-  const seconds = total % 60;
-  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+/** Minutes and seconds, with up to three minute digits and optional millisecond precision. */
+export function formatCountdown(ms: number, milliseconds = false): string {
+  const remaining = Math.max(0, Math.ceil(ms));
+  const seconds = milliseconds
+    ? Math.floor(remaining / 1000)
+    : Math.ceil(remaining / 1000);
+  const minutes = String(Math.floor(seconds / 60)).padStart(2, '0');
+  const whole = `${minutes}:${String(seconds % 60).padStart(2, '0')}`;
+  return milliseconds
+    ? `${whole}.${String(remaining % 1000).padStart(3, '0')}`
+    : whole;
 }
 
 /** `6:00 AM`, `12:30 PM`; input is 24-hour `HH:MM`. */
