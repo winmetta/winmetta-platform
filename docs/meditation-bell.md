@@ -270,6 +270,8 @@ The web version says this plainly in its help text and does not try to work arou
   - `csv.ts`: parse (with per-row errors) and serialize (with the byte-order mark).
   - `sounds.ts`: the sound registry (id, name key, file, length, licence; section 8.2).
   - `format.ts`: `mm:ss` / `mmm:ss`, 12-hour times, day names in their three lengths.
+  - `days.ts`: the seven day ids (`Mon` to `Sun`) and their Luxon weekday numbers.
+  - `player.ts`: the `BellPlayer` interface (`ring`, `schedule`, `cancel`) that a platform implements (section 9).
 - `apps/web/src/components/meditation-bell/`: the React island (Timer, Schedule, edit and import screens, the alert area) and the web bell player (Web Audio API, Wake Lock).
 - `apps/web/src/pages/[locale]/mini-apps/index.astro` and `[locale]/mini-apps/meditation-bell/index.astro`.
 - **Unit tests (Vitest):** every module in `lib/meditation-bell/`, with fixed clocks and time zones (including a spring-forward and a fall-back day in `America/Los_Angeles`).

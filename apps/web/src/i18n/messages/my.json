@@ -401,5 +401,7 @@
   "miniAppLanguageEnglish": "English",
   "miniAppLanguageMyanmar": "Myanmar",
   "miniAppLeaveConfirm": "ဤအက်ပ်ငယ်တွင် သတ်မှတ်ထားသည်များ ရှိနေပါသေးသည်။ သတ်မှတ်ချက်များကို ဤစက်ထဲတွင် သိမ်းထားသော်လည်း ခေါင်းလောင်းသည် ဤစာမျက်နှာ ဖွင့်ထားစဉ်တွင်သာ မြည်ပါမည်။ ဤစာမျက်နှာမှ ထွက်မလား။",
-  "miniAppBellSoon": "တရားထိုင်ခေါင်းလောင်းကို ပြင်ဆင်နေပြီး မကြာမီ ရောက်ရှိလာပါမည်။"
+  "miniAppBellSoon": "တရားထိုင်ခေါင်းလောင်းကို ပြင်ဆင်နေပြီး မကြာမီ ရောက်ရှိလာပါမည်။",
+  "bellSoundWinmettaShort": "WinMetta bell (short)",
+  "bellSoundWinmettaLong": "WinMetta bell (long)"
 }

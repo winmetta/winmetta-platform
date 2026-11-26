@@ -401,5 +401,7 @@
   "miniAppLanguageEnglish": "English",
   "miniAppLanguageMyanmar": "Myanmar",
   "miniAppLeaveConfirm": "Something is still set in this mini app. Your settings are saved on this device, but a bell rings only while this page is open. Leave this page?",
-  "miniAppBellSoon": "The meditation bell is being built and will be here soon."
+  "miniAppBellSoon": "The meditation bell is being built and will be here soon.",
+  "bellSoundWinmettaShort": "WinMetta bell (short)",
+  "bellSoundWinmettaLong": "WinMetta bell (long)"
 }
