@@ -407,6 +407,45 @@ One reviewed PR each, in this order.
 
 ---
 
+## 5E. Mini apps and the meditation bell (planned 2026-11-25)
+
+**Goal:** add a listing of small self-contained tools at `/<locale>/mini-apps/`, and as the first one a meditation bell: a countdown timer, an alarm at a clock time, a manual bell and a weekly schedule with CSV import and export, all stored in the browser. Design, decisions and open questions: [meditation-bell.md](meditation-bell.md). It replaces, on this site, the bell from the archived `winmetta-retreat-web` repository.
+
+### Decisions (2026-11-25)
+
+* Two modes, Timer and Schedule; a timer and the weekly schedule never run at the same time, and turning the schedule off never deletes it.
+* Mini app pages use their own layout with no site header or footer, only a "← Mini apps" link and the EN | ကခဂ language switch; the listing page is a normal page.
+* Buttons and labels in English in both locales, Burmese only for alerts, notices and errors, Western digits everywhere ([meditation-bell.md](meditation-bell.md) §7).
+* Browser storage only, no backend; CSV export is the backup. Built behind `PUBLIC_MINI_APPS`.
+* Cookieless usage events for the timer and the schedule (bucketed, never labels, times or schedule contents), added to [analytics.md](analytics.md) §3 first.
+* Every mini app has a footer with a Feedback button that opens the site's existing feedback dialog.
+* Mini app icons are designed in Canva from basic shapes, exported as SVG; the shared rules are in [design-guide.md](design-guide.md) §9.
+* Sounds: a short and a long bell cut from Win Metta's own recording, plus public-domain (CC0) bells as each is cleared, all prepared by one `ffmpeg` script; a short start bell and a long end bell (3x by default) on the timer ([meditation-bell.md](meditation-bell.md) §8).
+* Desktop and mobile apps are not part of this plan; the bell logic is written without browser calls so they can reuse it later.
+
+### Stages
+
+One reviewed PR each, in this order.
+
+* [ ] **1. Docs.** [meditation-bell.md](meditation-bell.md), this section, the mini apps section of [design-guide.md](design-guide.md) (§9), the planned events and questions in [analytics.md](analytics.md) §3 and §3.1, and the AGENTS.md pointer.
+* [ ] **2. Mini apps foundation.** The icons designed in Canva and exported as SVG ([meditation-bell.md](meditation-bell.md) §2.1), the registry, the listing page, `MiniAppShell.astro` (top bar, language switch, leave warning, footer with the Feedback button), the menu link, the `PUBLIC_MINI_APPS` flag, sitemap and `noindex` handling, `en`/`my` messages, unit and browser tests. The bell page is a placeholder.
+* [ ] **3. Bell logic and sounds.** `lib/meditation-bell/` (stored-state schema, timer, alarm, schedule, CSV, sound registry, formatting) with unit tests, including daylight-saving days; `scripts/make-bell-sounds.sh` and the two WinMetta sounds, once Win Metta's ownership of the recording is confirmed. No UI.
+* [ ] **4. Timer UI.** Countdown, alarm, presets, custom minutes, the start and end bell settings, Ring bell now, audio unlock, wake lock, resume after reload and the missed-bell rule; the timer's analytics events; design-guide patterns for the new controls; browser tests.
+* [ ] **5. Schedule UI.** Weekly list, add/edit/delete, On/Off with the two confirmations, alerts at the top, CSV import preview and export, the schedule's analytics events, the Settings row and the Privacy paragraphs (stored data and what is counted); browser tests at 320 px.
+* [ ] **Later, any time: CC0 bells.** Each public-domain sound that passes [meditation-bell.md](meditation-bell.md) §8.3 is added in its own small PR (files, registry entry, `SOURCES.md`).
+* [ ] **6. Go-live.** Burmese-speaker review of every message, the listening check of every sound ([meditation-bell.md](meditation-bell.md) §8), the manual browser checks (§10), then `PUBLIC_MINI_APPS=true` in `production` with the maintainer's approval.
+
+### Acceptance
+
+* On desktop Chrome, Firefox and Safari, a 20-minute countdown and an alarm for tomorrow morning ring on time with the tab open, and a reload during either resumes it.
+* Starting a timer with the schedule on, and turning the schedule on during a timer, both ask first; the schedule's bells survive being turned off.
+* Importing the sample CSV shows its skipped rows, and exporting then importing a schedule gives the same schedule.
+* All seven day buttons fit at 320 px in both locales, and every alert names days in full.
+* No request leaves the browser for the bell apart from loading the page, its sound files and the analytics page view and events in [meditation-bell.md](meditation-bell.md) §11; checked in the browser's network panel that no event carries a label, a bell time or CSV text.
+* The footer Feedback button opens the dialog with the mini app filled in, and a test report arrives.
+
+---
+
 ## 6. Backlog (not scheduled)
 
 Phases 0–3 are done. Everything else lives here, in two groups: **open todos** left from the finished phases, and **future phases**, which are candidate directions rather than commitments. Nothing here is dated: the maintainer decides the order and scope as the work comes, and a future phase gets its own numbered section (like §5) when it starts. Product reasoning is in [prd.md](prd.md) §7; tentative technical notes are in [tech-architecture.md](tech-architecture.md) §10.
