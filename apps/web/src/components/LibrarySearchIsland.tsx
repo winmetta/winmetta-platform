@@ -22,7 +22,7 @@ import {
   track,
   trackSettled,
 } from '../lib/analytics';
-import { hasZawgyiMarker } from '../lib/zawgyi';
+import { hasZawgyiMarker } from '@winmetta/myanmar-convert/zawgyi';
 import { CloseIcon, FileIcon, FolderIcon, MoreIcon, RetryIcon } from './icons';
 import { TextAction } from './ui/text-action';
 

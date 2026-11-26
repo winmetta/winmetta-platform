@@ -18,7 +18,10 @@ import {
   folderEntrySchema,
   libraryFileSchema,
 } from '../apps/web/src/lib/schemas.ts';
-import { fixZawgyiTitle, hasZawgyiMarker } from '../apps/web/src/lib/zawgyi.ts';
+import {
+  fixZawgyiTitle,
+  hasZawgyiMarker,
+} from '@winmetta/myanmar-convert/zawgyi';
 
 // myanmar-tools is pinned to 1.1.3: 1.2.0 on npm ships unbuilt sources and cannot be required.
 const { ZawgyiDetector, ZawgyiConverter } = createRequire(import.meta.url)(

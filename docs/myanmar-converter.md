@@ -1,6 +1,6 @@
 # Burmese font converter (Unicode, Zawgyi, Win Innwa)
 
-**Status:** proposed 2026-11-25; nothing built and nothing approved yet. Research and decisions so far are below; the staged plan is in [implementation-plan.md](implementation-plan.md) §5F. It is the second mini app planned in [meditation-bell.md](meditation-bell.md) (its tile shows "Coming later" until this ships).
+**Status:** proposed 2026-11-25. The package (stage 2) was built on 2026-11-25 in `packages/myanmar-convert` ([its README](../packages/myanmar-convert/README.md)); the mini app is not built yet. Research and decisions are below; the staged plan is in [implementation-plan.md](implementation-plan.md) §5F. It is the second mini app planned in [meditation-bell.md](meditation-bell.md) (its tile shows "Coming later" until this ships).
 
 **Why:** much Burmese text that Win Metta's community works with is not Unicode. Older Dhamma books, class handouts and newsletters were typed in **Win Innwa** (1990s–2000s desktop publishing) or **Zawgyi** (phones and the web until about 2019), and some print layouts are still made in Win Innwa. Such text shows as gibberish, cannot be searched and cannot be pasted into the site, a Dhamma Post or most modern apps. Teachers and volunteers today use ad-supported converter websites that each handle only some directions. A free converter that runs in the browser, sends nothing anywhere and handles all three encodings in every direction serves the monastic community and costs almost nothing to host.
 
@@ -70,7 +70,7 @@ Older or unmaintained, for reference only: [mapmeld/my-winresearcher](https://gi
 | Unicode → Win Innwa | **Our own table**, ported from `trhura/python-myanmar` (MIT), checked against kanaung's rule files | Credited in the package's `NOTICE` (section 8) |
 | Win Innwa ↔ Zawgyi | Through Unicode | No separate table |
 
-**Before committing to knayi-myscript**, stage 2 compares it with python-myanmar's Win Innwa → Unicode output on the test set (section 7). If python-myanmar is clearly better, its table is ported for this direction too, so both Win Innwa directions come from one source.
+**knayi-myscript was compared with python-myanmar** for Win Innwa → Unicode on 2026-11-25. The 1,860 Burmese library titles without Latin letters were converted to Win Innwa with this package, then read back by each. knayi gave back 1,848 unchanged, python-myanmar 1,143: python-myanmar reads Win Innwa's `0` as the digit, not wa, misreads tall aa (`g`) and leaves some marks as Latin letters, and its table has gaps (empty entries, a zero-width space in one stacked letter). knayi stays for this direction. For Unicode → Win Innwa, knayi's table (which covers every Win Innwa 4 code point) is read in reverse, and python-myanmar's rules choose the glyph variants.
 
 Library choices are pinned to exact versions and updated through Dependabot PRs that must pass the test set.
 
@@ -84,19 +84,20 @@ Library choices are pinned to exact versions and updated through Dependabot PRs 
 type Encoding = 'unicode' | 'zawgyi' | 'win-innwa';
 
 convert(text: string, from: Encoding, to: Encoding): ConvertResult;
-detect(text: string): DetectResult; // 'unicode' | 'zawgyi' | 'unsure' | 'no-myanmar'
+detect(text: string): Detected; // 'unicode' | 'zawgyi' | 'unsure' | 'no-myanmar'
 ```
 
 - `ConvertResult` holds the text and notes for the caller to show: for example "this text looks like Unicode already", or "some characters have no Win Innwa form and were left as they are".
 - `convert` with `from === to` returns the text unchanged. Text with no Myanmar letters is returned unchanged unless the source is Win Innwa (which is ASCII by nature).
-- Long text is converted line by line, so one damaged line does not affect the rest and the page can report which lines look wrong.
+- Win Innwa → Unicode is converted line by line, because knayi trims the text it converts; each line's leading and trailing spaces are put back, so indentation and blank lines survive.
 
 ### 5.2 Layout
 
 - `src/convert.ts`: routing through Unicode and the pre- and post-processing steps.
-- `src/zawgyi.ts`: the Zawgyi markers, detector thresholds and `fixZawgyiTitle`, **moved from `apps/web/src/lib/zawgyi.ts`**. Every current importer switches to the package and `apps/web/src/lib/zawgyi.ts` is deleted, so there is one copy of the rules: on 2026-11-25 these are `apps/book-search/src/quality.ts`, `scripts/generate-library-manifest.mjs` and `scripts/import-teachers.mjs` (which today reach inside `apps/web`), and `apps/web/src/components/LibrarySearchIsland.tsx`, `apps/web/src/lib/posts/validate.ts` and `apps/web/src/lib/posts/tags.ts`. Search for importers again when the move is made. Behaviour does not change; `zawgyi.test.ts` moves with it.
-- `src/win-innwa/`: the Unicode → Win Innwa table and code, and any Win Innwa fixes.
-- `src/normalize.ts`: Unicode output is put in NFC and in the standard storage order (medials, vowels and marks), so converted text matches text typed in Unicode. It reuses `@winmetta/search-text`'s normalization where that fits rather than copying it.
+- `src/zawgyi.ts`: the Zawgyi markers, detector thresholds and `fixZawgyiTitle`, **moved from `apps/web/src/lib/zawgyi.ts`** (deleted), plus `classifyZawgyi`, the same two-gate rule without converting. Its importers use the dependency-free subpath `@winmetta/myanmar-convert/zawgyi`, so library search and the Dhamma Post checks do not load the converters: `apps/book-search/src/quality.ts`, `scripts/generate-library-manifest.mjs`, `scripts/import-teachers.mjs`, `apps/web/src/components/LibrarySearchIsland.tsx`, `apps/web/src/lib/posts/validate.ts` and `apps/web/src/lib/posts/tags.ts`. Behaviour did not change; `zawgyi.test.ts` moved with it.
+- `src/google.ts` and `src/zawgyi-fixes.ts`: myanmar-tools, created on first use, and the two fixes around it (section 5.4).
+- `src/win-innwa/`: `glyphs.ts` (the Unicode → Win Innwa table), `from-unicode.ts` (reads each Unicode syllable and writes it in Win Innwa typing order) and `to-unicode.ts` (knayi).
+- Unicode output is NFC. knayi already writes each syllable in Unicode storage order, and myanmar-tools follows the CLDR rules, so no further normalization step was needed.
 - No imports from `apps/*`, no DOM, no Node-only APIs, so it runs in the browser, in Node scripts and on Lambda, and can be moved to its own repository or published unchanged.
 
 ### 5.3 Detection rules
@@ -106,7 +107,12 @@ detect(text: string): DetectResult; // 'unicode' | 'zawgyi' | 'unsure' | 'no-mya
 
 ### 5.4 Adjustments
 
-Each fix is a small named step with a comment saying what it fixes and a test with the failing input. Expected kinds: characters typed in a non-standard order, Win Innwa variants within the family that map a key differently, Pāḷi stacked consonants and kinzi, and Unicode output order. Fixes that belong in a library are also reported upstream with the test case.
+Each fix is a small named step with a comment saying what it fixes and a test with the failing input. Fixes that belong in a library are also reported upstream with the test case. Found while building the package (2026-11-25), both in myanmar-tools 1.1.3, in `src/zawgyi-fixes.ts`:
+
+- **Unicode → Zawgyi puts ေ after a stacked consonant** (`ဒၵေ` for ဒ္ဒေ, where Zawgyi needs `ေဒၵ`), so a Zawgyi font draws it on the next letter and converting back gives နိဒ္ဒသေ for နိဒ္ဒေသ. Correct Zawgyi looks the same when the ေ belongs to the next letter (ဓမ္မစေ), so the output cannot be repaired afterwards: each such syllable is converted on its own and its ေ moved to the front.
+- **Zawgyi → Unicode reads a lone ၄ before a space as ၎**, so "အပိုင္း ၄" (part 4) became "အပိုင်း ၎". A lone ၄ is hidden from the converter and put back; ၄ followed by င (how Zawgyi typists write ၎င်း) still converts.
+
+Reporting both to google/myanmar-tools is a follow-up.
 
 ---
 
@@ -168,7 +174,6 @@ Book search sends "legacy font" pages to OCR today ([book-search.md](book-search
 
 - **Name and address:** "Burmese font converter" and `/mini-apps/font-converter/` (Myanmar users usually call this a "font converter"), or another name; and its Burmese name.
 - **Language rule:** fully translated (proposed), or the meditation bell's English-buttons rule ([meditation-bell.md](meditation-bell.md) §7).
-- **Which Win Innwa library:** knayi-myscript or a port of python-myanmar for Win Innwa → Unicode, decided by the comparison in stage 2.
 - **Win Innwa samples:** who can type or provide Win Innwa text with checked Unicode versions.
 - **Analytics:** whether to count conversions at all (section 6).
 - **npm organization:** whether to create the `winmetta` npm organization, and who owns it, before publishing (section 9).

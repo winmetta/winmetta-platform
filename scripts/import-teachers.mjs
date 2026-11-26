@@ -6,7 +6,7 @@
 //   node scripts/import-teachers.mjs
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { teacherSchema } from '../apps/web/src/lib/schemas.ts';
-import { hasZawgyiMarker } from '../apps/web/src/lib/zawgyi.ts';
+import { hasZawgyiMarker } from '@winmetta/myanmar-convert/zawgyi';
 
 const root = new URL('../apps/web/src/', import.meta.url);
 const today = new Date().toISOString().slice(0, 10);

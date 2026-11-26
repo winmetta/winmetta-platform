@@ -55,25 +55,48 @@ interface TextFix {
   text: string;
 }
 
+/**
+ * no-myanmar: no Burmese letters. zawgyi: marker and detector agree. suspicious and ambiguous: as in
+ * ZawgyiVerdict. unicode: neither the marker nor the detector points to Zawgyi.
+ */
+export type ZawgyiClass =
+  'no-myanmar' | 'unicode' | 'zawgyi' | 'suspicious' | 'ambiguous';
+
+function classify(
+  text: string,
+  detector: ZawgyiDetector,
+): { zawgyiClass: ZawgyiClass; probability: number } {
+  if (!myanmar.test(text)) return { zawgyiClass: 'no-myanmar', probability: 0 };
+  const probability = detector.getZawgyiProbability(text);
+  const marker = hasZawgyiMarker(text);
+  if (marker && probability >= CONVERT_THRESHOLD)
+    return { zawgyiClass: 'zawgyi', probability };
+  if (marker) return { zawgyiClass: 'suspicious', probability };
+  if (probability > AMBIGUOUS_THRESHOLD)
+    return { zawgyiClass: 'ambiguous', probability };
+  return { zawgyiClass: 'unicode', probability };
+}
+
+/** Classifies text with the two-gate rule, without converting it. */
+export const classifyZawgyi = (text: string, detector: ZawgyiDetector) =>
+  classify(text, detector).zawgyiClass;
+
 /** Classifies one piece of text on its own; only this text is ever converted. */
 function fixText(
   text: string,
   detector: ZawgyiDetector,
   converter: ZawgyiConverter,
 ): TextFix {
-  if (!myanmar.test(text)) return { verdict: 'unicode', probability: 0, text };
-  const probability = detector.getZawgyiProbability(text);
-  const marker = hasZawgyiMarker(text);
-  if (marker && probability >= CONVERT_THRESHOLD)
+  const { zawgyiClass, probability } = classify(text, detector);
+  if (zawgyiClass === 'zawgyi')
     return {
       verdict: 'converted',
       probability,
       text: converter.zawgyiToUnicode(text),
     };
-  if (marker) return { verdict: 'suspicious', probability, text };
-  if (probability > AMBIGUOUS_THRESHOLD)
-    return { verdict: 'ambiguous', probability, text };
-  return { verdict: 'unicode', probability, text };
+  if (zawgyiClass === 'no-myanmar' || zawgyiClass === 'unicode')
+    return { verdict: 'unicode', probability, text };
+  return { verdict: zawgyiClass, probability, text };
 }
 
 const severity: Record<ZawgyiVerdict, number> = {
