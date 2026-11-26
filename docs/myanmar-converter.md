@@ -120,11 +120,13 @@ Reporting both to google/myanmar-tools is a follow-up.
 
 **Built 2026-11-25** (`apps/web/src/components/TextConverterIsland.tsx`, logic in `apps/web/src/lib/text-converter.ts`, page `apps/web/src/pages/[locale]/mini-apps/burmese-text-converter/index.astro`). It follows the list below. Decisions taken while building, to confirm at go-live (section 11): the address keeps the registry's slug `burmese-text-converter` and the name "Burmese Text Converter" (Title Case, [design-guide.md](design-guide.md) §9 "Names"); the page is fully translated (`en`, `my`; the Burmese is a draft for reader review); no analytics event. Go-live (2026-11-26, after the reader review) makes the tile Beta; the page is then linked and indexable only when `PUBLIC_MINI_APPS` is on, like the bell. The converters load as a separate chunk when the page opens. myanmar-tools is a Node build that needs `Buffer`, so the package adds a tiny stand-in in browsers (`src/buffer-shim.ts`). Long text is shown with `word-break: break-all`, because the browser's Burmese line breaking made a 200,000-character paste freeze the page.
 
+**Editor pane (2026-11-26).** The page has two views, switched by an underlined tab pair like the bell's Timer and Schedule: **Converter** (above) and **Editor**. The Editor is a plain-text area with a "Text is in" choice (Unicode, Zawgyi, Win Innwa) that only changes the font the text is shown in, never the text. It has Clear and a Copy all button; the copied text is exactly what was typed, so it pastes into the Converter. The fonts are `apps/web/public/fonts/zawgyi-one.woff2` (subset to Myanmar and basic Latin, 29 KB) and `win-innwa.woff2` (all 176 glyphs, 24 KB), made from the TTF files the maintainer supplied, loaded by `src/styles/burmese-fonts.css` only when a text area that uses them is on the page (an installed copy of the font wins).
+
 Built on the mini apps foundation ([meditation-bell.md](meditation-bell.md) §2): registry entry, `MiniAppShell.astro`, footer Feedback button, `PUBLIC_MINI_APPS` flag.
 
 - **Layout:** a "From" choice (Auto: Unicode or Zawgyi, Unicode, Zawgyi, Win Innwa), a swap button, a "To" choice (Unicode, Zawgyi, Win Innwa), the input box and the output box side by side on desktop and stacked on phones, and Copy and Clear as text actions. Converts as you type, with a short delay for long text.
 - **Auto** detects Unicode or Zawgyi and says what it found ("Looks like Zawgyi"). When it is unsure, it says so and asks the user to choose.
-- **Showing the output:** the site does not ship the Zawgyi or Win Innwa fonts (their licences are unclear). Zawgyi and Win Innwa output is shown as plain text with a note: "This looks wrong here; paste it into a document that uses the Win Innwa (or Zawgyi-One) font." Unicode output is shown in Noto Sans Myanmar.
+- **Showing the output:** the Converter pane shows Zawgyi and Win Innwa output as plain text with a note (the Editor pane below does use the bundled fonts): "This looks wrong here; paste it into a document that uses the Win Innwa (or Zawgyi-One) font." Unicode output is shown in Noto Sans Myanmar.
 - **Notices:** when converting to Zawgyi or Win Innwa, a short note that these encodings cannot show every Unicode text exactly; when text already looks like the target encoding, a note before converting it again.
 - **Size limit:** about 200,000 characters, with a message, so a mistaken paste does not freeze the page.
 - **Privacy:** the text never leaves the browser and is not stored. The page says so.
@@ -150,7 +152,7 @@ Built on the mini apps foundation ([meditation-bell.md](meditation-bell.md) §2)
 - `myanmar-tools` (Apache-2.0) and `knayi-myscript` (MIT) are dependencies and keep their own licence files.
 - The Unicode → Win Innwa table ported from `trhura/python-myanmar` (MIT), and anything taken from kanaung's rule files (MIT), keep their copyright and licence text in the package's `NOTICE`, with the source commit.
 - The converter page has a short "Built with" note naming the libraries, with links.
-- The Win Innwa and Zawgyi fonts are not included anywhere.
+- The Zawgyi-One and Win Innwa fonts are bundled for the Editor pane only (§6, "Editor pane"). Their licence terms are not documented here: the maintainer decided on 2026-11-26 to ship them as the fonts every Burmese website used for years, and no licence text is shown on the page.
 
 ---
 

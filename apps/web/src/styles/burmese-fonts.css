@@ -1,0 +1,29 @@
+/* Fonts for reading Burmese text in the legacy encodings (docs/myanmar-converter.md §6).
+   Zawgyi-One is served from /fonts (subset to Myanmar and basic Latin, 29 KB) and downloaded only
+   when a text area that uses it is on the page. Win Innwa is served the same way (all its glyphs). */
+@font-face {
+  font-family: 'Zawgyi-One';
+  src:
+    local('Zawgyi-One'),
+    url('/fonts/zawgyi-one.woff2') format('woff2');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Win Innwa';
+  src:
+    local('Win Innwa'),
+    local('WinInnwa'),
+    url('/fonts/win-innwa.woff2') format('woff2');
+  font-display: swap;
+}
+
+.font-zawgyi {
+  font-family: 'Zawgyi-One', sans-serif;
+  line-height: 1.8;
+}
+
+.font-win-innwa {
+  font-family: 'Win Innwa', sans-serif;
+  line-height: 1.8;
+}

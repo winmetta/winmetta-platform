@@ -10,9 +10,17 @@ import {
   type Converter,
   type FromChoice,
 } from '../lib/text-converter';
-import { CheckIcon, CloseIcon, CopyIcon, RetryIcon, SwapIcon } from './icons';
+import {
+  CheckIcon,
+  CloseIcon,
+  CopyIcon,
+  EditIcon,
+  RetryIcon,
+  SwapIcon,
+} from './icons';
 import type { ComponentProps, ReactNode } from 'react';
 import '../styles/mini-app.css';
+import '../styles/burmese-fonts.css';
 
 export interface Labels {
   from: string;
@@ -47,6 +55,19 @@ export interface Labels {
   noteLatin: string;
   noteLooksUnicode: string;
   noteLooksZawgyi: string;
+  tabsLabel: string;
+  tabConverter: string;
+  tabEditor: string;
+  editorIntro: string;
+  editorEncoding: string;
+  editorText: string;
+  editorPlaceholder: string;
+  editorCopy: string;
+  editorCopyLabel: string;
+  editorNoteUnicode: string;
+  editorNoteZawgyi: string;
+  editorNoteWinInnwa: string;
+  editorPlain: string;
 }
 type Status = 'loading' | 'ready' | 'error';
 // Long text waits a moment after the last key, so typing stays smooth.
@@ -82,7 +103,7 @@ function MiniButton({
 
 type Tone = 'error' | 'notice' | 'help';
 
-export default function TextConverterIsland({ labels }: { labels: Labels }) {
+function ConverterPane({ labels }: { labels: Labels }) {
   const [status, setStatus] = useState<Status>('loading');
   const converter = useRef<Converter | null>(null);
   const [input, setInput] = useState('');
@@ -299,6 +320,139 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
             {line.text}
           </p>
         ))}
+      </div>
+    </div>
+  );
+}
+
+type EditorEncoding = 'unicode' | 'zawgyi' | 'win-innwa';
+const EDITOR_FONT: Record<EditorEncoding, string> = {
+  unicode: '',
+  zawgyi: 'font-zawgyi',
+  'win-innwa': 'font-win-innwa',
+};
+
+/** A plain-text editor that shows text in the font of its encoding. It never converts anything. */
+function EditorPane({ labels }: { labels: Labels }) {
+  const [encoding, setEncoding] = useState<EditorEncoding>('unicode');
+  const [text, setText] = useState('');
+  const [copied, setCopied] = useState(false);
+  const choices: [EditorEncoding, string][] = [
+    ['unicode', labels.unicode],
+    ['zawgyi', labels.zawgyi],
+    ['win-innwa', labels.winInnwa],
+  ];
+  const note = {
+    unicode: labels.editorNoteUnicode,
+    zawgyi: labels.editorNoteZawgyi,
+    'win-innwa': labels.editorNoteWinInnwa,
+  }[encoding];
+  const copy = () => {
+    if (!text) return;
+    void copyText(text).then((ok) => {
+      setCopied(ok);
+      if (ok) window.setTimeout(() => setCopied(false), 2000);
+    });
+  };
+  return (
+    <div className="grid gap-4">
+      <p className="mini-help">{labels.editorIntro}</p>
+      <div className="mini-panel grid gap-3">
+        <div className="mini-label" id="editor-encoding-label">
+          {labels.editorEncoding}
+        </div>
+        <div
+          className="grid grid-cols-3 gap-2"
+          role="group"
+          aria-labelledby="editor-encoding-label"
+        >
+          {choices.map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              className="mini-choice"
+              aria-pressed={encoding === value}
+              onClick={() => setEncoding(value)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <p className="mini-help" role="status">
+          {note}
+        </p>
+      </div>
+      <div className="grid gap-2">
+        <label className="mini-label" htmlFor="editor-text">
+          {labels.editorText}
+        </label>
+        <textarea
+          id="editor-text"
+          className={`mini-field break-all ${EDITOR_FONT[encoding]}`}
+          value={text}
+          placeholder={labels.editorPlaceholder}
+          spellCheck={false}
+          autoComplete="off"
+          translate="no"
+          maxLength={MAX_CHARS}
+          onChange={(event) => setText(event.target.value)}
+        />
+        <div className="flex items-center justify-between gap-3">
+          <MiniButton
+            icon={<CloseIcon />}
+            onClick={() => setText('')}
+            disabled={text.length === 0}
+          >
+            {labels.clear}
+          </MiniButton>
+          <span className="mini-help" aria-hidden="true">
+            {text.length.toLocaleString()} / {MAX_CHARS.toLocaleString()}
+          </span>
+          <MiniButton
+            icon={copied ? <CheckIcon /> : <CopyIcon />}
+            aria-label={copied ? labels.copied : labels.editorCopyLabel}
+            onClick={copy}
+            disabled={text.length === 0}
+          >
+            {copied ? labels.copied : labels.editorCopy}
+          </MiniButton>
+        </div>
+      </div>
+      <p className="mini-help">{labels.editorPlain}</p>
+    </div>
+  );
+}
+
+type Tab = 'converter' | 'editor';
+
+export default function TextConverterIsland({ labels }: { labels: Labels }) {
+  const [tab, setTab] = useState<Tab>('converter');
+  const tabs: [Tab, string, ReactNode][] = [
+    ['converter', labels.tabConverter, <SwapIcon key="c" />],
+    ['editor', labels.tabEditor, <EditIcon key="e" />],
+  ];
+  return (
+    <div className="grid gap-4">
+      <div className="mini-views" role="group" aria-label={labels.tabsLabel}>
+        {tabs.map(([value, label, icon]) => (
+          <button
+            key={value}
+            type="button"
+            className="mini-button"
+            aria-controls={`converter-pane-${value}`}
+            aria-pressed={tab === value}
+            onClick={() => setTab(value)}
+          >
+            {icon}
+            <span>{label}</span>
+          </button>
+        ))}
+      </div>
+      <div id="converter-pane-converter" hidden={tab !== 'converter'}>
+        <ConverterPane labels={labels} />
+      </div>
+      <div id="converter-pane-editor" hidden={tab !== 'editor'}>
+        <EditorPane labels={labels} />
       </div>
     </div>
   );

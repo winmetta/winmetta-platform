@@ -317,3 +317,23 @@ textarea.mini-field {
   border-color: var(--danger);
   background: #fdecea;
 }
+
+/* Two views of one app, as the bell's Timer and Schedule: an underlined tab pair. */
+.mini-views {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-bottom: 1px solid var(--mini-line);
+}
+
+.mini-app--custom .mini-views .mini-button {
+  border: 0;
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--mini-quiet);
+}
+
+.mini-app--custom .mini-views .mini-button[aria-pressed='true'] {
+  border-color: var(--mini-accent);
+  color: var(--mini-accent);
+}

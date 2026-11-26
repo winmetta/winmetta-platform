@@ -49,7 +49,20 @@ Known limits that are not errors: Win Innwa types wa (ဝ) and zero (၀) with t
 | `converterNoteLooksUnicode` | This text already looks like Unicode. Converting it as Zawgyi may damage it. | ဤစာသားသည် ယူနီကုဒ်နှင့် တူနေပြီးသား ဖြစ်ပါသည်။ ဇော်ဂျီအဖြစ် ပြောင်းလျှင် ပျက်စီးနိုင်ပါသည်။ |
 | `converterNoteLooksZawgyi` | This text has patterns that only Zawgyi uses. If it is Zawgyi, choose Zawgyi in From. | ဤစာသားတွင် ဇော်ဂျီသာ သုံးသော ပုံစံများ ပါနေပါသည်။ ဇော်ဂျီဖြစ်ပါက "မှ" တွင် ဇော်ဂျီကို ရွေးပါ။ |
 | `converterBuiltWith` | Built with | အသုံးပြုထားသည်များ |
-| `converterFontsNote` | The Zawgyi and Win Innwa fonts are not included. | ဇော်ဂျီနှင့် ဝင်းအင်းဝ ဖောင့်များကို ထည့်သွင်းမထားပါ။ |
+| `converterFontsNote` | The Editor shows Zawgyi text in the Zawgyi-One font and Win Innwa text in the Win Innwa font. | တည်းဖြတ်ရန်တွင် ဇော်ဂျီစာသားကို ဇော်ဂျီဝမ်းဖောင့်ဖြင့်လည်းကောင်း၊ ဝင်းအင်းဝစာသားကို ဝင်းအင်းဝဖောင့်ဖြင့်လည်းကောင်း ပြပါသည်။ |
+| `converterTabsLabel` | Choose a view | မြင်ကွင်းရွေးရန် |
+| `converterTabConverter` | Converter | ပြောင်းလဲရန် |
+| `converterTabEditor` | Editor | တည်းဖြတ်ရန် |
+| `editorIntro` | Type or paste plain text and read it in the font for its encoding. Your text stays in this browser: it is not sent anywhere or stored. | စာသားကို ရိုက်ထည့် သို့မဟုတ် ကူးထည့်ပြီး ၎င်း၏ ကုဒ်စနစ်နှင့်ကိုက်ညီသော ဖောင့်ဖြင့် ဖတ်ရှုပါ။ သင့်စာသားသည် ဤဘရောက်ဇာထဲတွင်သာ ရှိပြီး မည်သည့်နေရာသို့မျှ မပို့ပါ၊ မသိမ်းဆည်းပါ။ |
+| `editorEncoding` | Text is in | စာသား၏ ကုဒ်စနစ် |
+| `editorText` | Text | စာသား |
+| `editorPlaceholder` | Paste or type text here | စာသားကို ဤနေရာတွင် ကူးထည့်ပါ သို့မဟုတ် ရိုက်ထည့်ပါ |
+| `editorCopy` | Copy all | အားလုံးကူးယူရန် |
+| `editorCopyLabel` | Copy all the text | စာသားအားလုံးကို ကူးယူရန် |
+| `editorNoteUnicode` | Shown in a Unicode font. | ယူနီကုဒ်ဖောင့်ဖြင့် ပြထားပါသည်။ |
+| `editorNoteZawgyi` | Shown in the Zawgyi-One font. Pick this only for Zawgyi text. | ဇော်ဂျီဝမ်းဖောင့်ဖြင့် ပြထားပါသည်။ ဇော်ဂျီစာသားအတွက်သာ ရွေးပါ။ |
+| `editorNoteWinInnwa` | Shown in the Win Innwa font. | ဝင်းအင်းဝဖောင့်ဖြင့် ပြထားပါသည်။ |
+| `editorPlain` | Plain text only: no bold, sizes or colours. Copy all copies exactly what you typed, in its own encoding, so you can paste it into the Converter. | စာသားသက်သက်သာ ဖြစ်ပါသည်၊ စာလုံးအထူ၊ အရွယ်အစား၊ အရောင် မရှိပါ။ အားလုံးကူးယူရန်သည် သင်ရိုက်ထားသည့်အတိုင်း မူလကုဒ်စနစ်ဖြင့် ကူးယူသောကြောင့် ပြောင်းလဲရန်ထဲသို့ ကူးထည့်နိုင်ပါသည်။ |
 
 ## Part B: conversions
 

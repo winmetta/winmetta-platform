@@ -572,5 +572,18 @@
   "converterNoteLooksUnicode": "This text already looks like Unicode. Converting it as Zawgyi may damage it.",
   "converterNoteLooksZawgyi": "This text has patterns that only Zawgyi uses. If it is Zawgyi, choose Zawgyi in From.",
   "converterBuiltWith": "Built with",
-  "converterFontsNote": "The Zawgyi and Win Innwa fonts are not included."
+  "converterFontsNote": "The Editor shows Zawgyi text in the Zawgyi-One font and Win Innwa text in the Win Innwa font.",
+  "converterTabsLabel": "Choose a view",
+  "converterTabConverter": "Converter",
+  "converterTabEditor": "Editor",
+  "editorIntro": "Type or paste plain text and read it in the font for its encoding. Your text stays in this browser: it is not sent anywhere or stored.",
+  "editorEncoding": "Text is in",
+  "editorText": "Text",
+  "editorPlaceholder": "Paste or type text here",
+  "editorCopy": "Copy all",
+  "editorCopyLabel": "Copy all the text",
+  "editorNoteUnicode": "Shown in a Unicode font.",
+  "editorNoteZawgyi": "Shown in the Zawgyi-One font. Pick this only for Zawgyi text.",
+  "editorNoteWinInnwa": "Shown in the Win Innwa font.",
+  "editorPlain": "Plain text only: no bold, sizes or colours. Copy all copies exactly what you typed, in its own encoding, so you can paste it into the Converter."
 }
