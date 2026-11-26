@@ -1,7 +1,6 @@
 ---
 // The Burmese text converter (docs/myanmar-converter.md §6): Unicode, Zawgyi and Win Innwa in every
-// direction, in the browser. Unlinked from the listing and noindex until go-live (docs/implementation-plan.md
-// §5F stage 4: the registry status changes from `coming`), whatever PUBLIC_MINI_APPS says.
+// direction, in the browser. Unlinked and noindex until PUBLIC_MINI_APPS is on, like the other mini apps.
 import MiniAppShell from '../../../../layouts/MiniAppShell.astro';
 import MiniAppHeader from '../../../../components/MiniAppHeader.astro';
 import '../../../../styles/mini-app.css';
@@ -68,7 +67,6 @@ const libraries = [
   locale={locale}
   title={name}
   path="mini-apps/burmese-text-converter/"
-  noindex={app.status === 'coming'}
   wide
 >
   <MiniAppHeader slot="app-header" {locale} title={name} icon={app.icon} />

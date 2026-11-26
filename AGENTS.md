@@ -175,5 +175,5 @@ See prd.md §4.7 for full reasoning. Summary: learner-level analytics and cross-
 | Feedback form and Sādhu button (disabled pending deployment): contexts, endpoint, routing, privacy | [docs/feedback.md](docs/feedback.md) |
 | Dāna page, donation data rules and the receipt plan | [docs/donations.md](docs/donations.md) |
 | Mini apps and the meditation bell: listing page, mini app layout, timer, schedule, CSV, language rule | [docs/meditation-bell.md](docs/meditation-bell.md) |
-| Burmese font converter (package and hidden mini app built, go-live pending): Unicode, Zawgyi and Win Innwa package and mini app, library research, npm publishing | [docs/myanmar-converter.md](docs/myanmar-converter.md) |
+| Burmese font converter (package and Beta mini app): Unicode, Zawgyi and Win Innwa package and mini app, library research, npm publishing | [docs/myanmar-converter.md](docs/myanmar-converter.md) |
 | Internal org information and the operations runbook: people and roles, access, dashboard logins, alert routing, org decisions, deploy and rollback steps (private repo; access on request) | `winmetta-platform-private` repo, start at its `AGENTS.md`; [docs/runbook.md](docs/runbook.md) here is a pointer |

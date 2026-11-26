@@ -95,13 +95,3 @@ test('is translated in Burmese', async ({ page }) => {
   await expect(page.locator('h1')).toHaveText('မြန်မာစာ ပြောင်းလဲကိရိယာ');
   await expect(page.getByLabel('ပြောင်းလဲမည့် စာသား')).toBeVisible();
 });
-
-test('stays noindex until go-live, even when mini apps are on', async ({
-  page,
-}) => {
-  await open(page);
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
-    'content',
-    /noindex/,
-  );
-});
