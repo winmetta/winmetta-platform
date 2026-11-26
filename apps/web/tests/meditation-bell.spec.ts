@@ -313,12 +313,15 @@ test('an unreadable saved value is kept aside and the bell starts fresh with a n
 
 test('no request leaves the browser except the page itself', async ({
   page,
+  baseURL,
 }) => {
+  // The site under test is local, or the deployed host in the post-deploy check (BASE_URL).
+  const own = new URL(baseURL ?? 'http://127.0.0.1').hostname;
   const outside: string[] = [];
   page.on('request', (r) => {
     const u = new URL(r.url());
     if (
-      !['localhost', '127.0.0.1'].includes(u.hostname) &&
+      !['localhost', '127.0.0.1', own].includes(u.hostname) &&
       u.protocol.startsWith('http')
     )
       outside.push(r.url());
