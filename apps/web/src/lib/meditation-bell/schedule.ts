@@ -7,7 +7,7 @@ import { lateGraceMs } from './timer';
 
 export const maxLabelLength = 40;
 export const minRings = 1;
-export const maxRings = 3;
+export const maxRings = 6;
 
 export interface Bell {
   id: string;
@@ -98,6 +98,19 @@ export function deleteBell(week: Week, id: string): Week {
   for (const day of days) next[day] = week[day].filter((b) => b.id !== id);
   return next;
 }
+
+/** Every day with a bell like this one (same time, label, sound and rings), so a CSV import of
+ * the same bell on several days reads as one bell. */
+export const daysLikeBell = (week: Week, bell: Bell): Day[] =>
+  days.filter((day) =>
+    week[day].some(
+      (b) =>
+        b.time === bell.time &&
+        b.label === bell.label &&
+        b.sound === bell.sound &&
+        b.rings === bell.rings,
+    ),
+  );
 
 /** The days a bell (by id) is on. */
 export const daysOfBell = (week: Week, id: string): Day[] =>

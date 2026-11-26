@@ -126,7 +126,7 @@ test('an open bell page follows schedule changes from another tab', async ({
   await expect(
     page.locator('[data-bell-timer][data-ready="true"]'),
   ).toBeVisible();
-  await page.getByRole('button', { name: 'Schedule', exact: true }).click();
+  await page.getByRole('button', { name: /^Schedule/ }).click();
   await page.getByRole('switch', { name: 'Weekly schedule' }).click();
 
   const other = await context.newPage();
@@ -134,7 +134,8 @@ test('an open bell page follows schedule changes from another tab', async ({
   await expect(
     other.locator('[data-bell-timer][data-ready="true"]'),
   ).toBeVisible();
-  await other.getByRole('button', { name: 'Schedule', exact: true }).click();
+  await other.getByRole('button', { name: 'Enable sound' }).click();
+  await other.getByRole('button', { name: /^Schedule/ }).click();
   const toggle = other.getByRole('switch', { name: 'Weekly schedule' });
   await expect(toggle).toBeChecked();
   await toggle.click();
@@ -142,7 +143,7 @@ test('an open bell page follows schedule changes from another tab', async ({
     'data-mini-app-busy',
     'false',
   );
-  await page.getByRole('button', { name: 'Schedule', exact: true }).click();
+  await page.getByRole('button', { name: /^Schedule/ }).click();
   await expect(
     page.getByRole('switch', { name: 'Weekly schedule' }),
   ).not.toBeChecked();
@@ -156,14 +157,19 @@ test('the sound preview unlocks a restored schedule and sound edits retain check
   await expect(
     page.locator('[data-bell-timer][data-ready="true"]'),
   ).toBeVisible();
-  await page.getByRole('button', { name: 'Schedule', exact: true }).click();
+  await page.getByRole('button', { name: /^Schedule/ }).click();
   await page.getByRole('switch', { name: 'Weekly schedule' }).click();
   await page.reload();
   const enable = page.getByRole('button', { name: 'Enable sound' });
   await expect(enable).toBeVisible();
-  await page.getByRole('button', { name: 'Bells', exact: true }).click();
-  await page.getByRole('button', { name: 'Play: Start bell' }).click();
-  await expect(enable).toHaveCount(0);
+  await expect(page.getByRole('dialog')).toContainText(
+    'Enable sound so your scheduled bells can ring.',
+  );
+  await enable.click();
+  await expect(enable).toBeHidden();
+  await page
+    .getByRole('button', { name: 'Bells Settings', exact: true })
+    .click();
 
   const other = await context.newPage();
   await other.goto('/en/about/');
@@ -184,8 +190,8 @@ test('the sound preview unlocks a restored schedule and sound edits retain check
     'true',
   );
   await page
-    .getByRole('group', { name: 'Rings' })
-    .getByRole('button', { name: '2x' })
+    .getByRole('radiogroup', { name: 'Rings' })
+    .getByRole('radio', { name: '2x' })
     .click();
   const saved = await page.evaluate(
     (key) => JSON.parse(localStorage.getItem(key)!),
@@ -220,7 +226,7 @@ test('a backward clock correction does not silence the next weekly bell', async 
     id: 'weekly',
     time: target.time,
     label: '',
-    sound: 'winmetta-short',
+    sound: 'soft-chime',
     rings: 1,
   });
   await page.addInitScript(

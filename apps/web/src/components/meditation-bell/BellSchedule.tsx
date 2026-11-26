@@ -1,12 +1,21 @@
+import { DateTime } from 'luxon';
 import { useEffect, useRef, useState, type SubmitEvent } from 'react';
-import { dayName, format12Hour } from '../../lib/meditation-bell/format';
+import {
+  dayName,
+  format12Hour,
+  formatUntil,
+  summarizeDays,
+} from '../../lib/meditation-bell/format';
 import { days, weekdays, type Day } from '../../lib/meditation-bell/days';
 import {
   addBell,
+  daysLikeBell,
   daysOfBell,
   deleteBell,
   editBell,
   maxLabelLength,
+  maxRings,
+  nextBell,
   type Bell,
   type BellError,
 } from '../../lib/meditation-bell/schedule';
@@ -26,9 +35,10 @@ import {
   DownloadIcon,
   PlusIcon,
   UploadIcon,
+  StopIcon,
   VolumeIcon,
 } from './icons';
-import { ring } from './web-player';
+import { usePreview } from './use-preview';
 
 export interface ScheduleConfirmation {
   message: string;
@@ -41,21 +51,44 @@ interface DayButtonsProps {
   label: string | undefined;
   selected: readonly Day[];
   choose: (day: Day) => void;
+  /** The day holding the next bell: gets a dot and a spoken note. */
+  marked?: Day;
+  markedNote?: string;
+  invalid?: boolean;
 }
 
-function DayButtons({ label, selected, choose }: DayButtonsProps) {
+function DayButtons({
+  label,
+  selected,
+  choose,
+  marked,
+  markedNote,
+  invalid,
+}: DayButtonsProps) {
   return (
-    <div className="bell-days" role="group" aria-label={label}>
+    <div
+      className="bell-days"
+      role="group"
+      aria-label={label}
+      data-invalid={invalid || undefined}
+    >
       {days.map((day) => (
         <button
           key={day}
           type="button"
           className="bell-choice"
-          aria-label={dayName(day)}
+          aria-label={
+            day === marked && markedNote
+              ? `${dayName(day)}, ${markedNote}`
+              : dayName(day)
+          }
           aria-pressed={selected.includes(day)}
           onClick={() => choose(day)}
         >
           {day}
+          {day === marked && (
+            <span className="bell-day-dot" aria-hidden="true" />
+          )}
         </button>
       ))}
     </div>
@@ -110,6 +143,7 @@ function BellEditor({
   unlock,
 }: EditorProps) {
   const [draft, setDraft] = useState(initial);
+  const { playing, preview, stop } = usePreview(unlock);
   const [selected, setSelected] = useState(initialDays);
   const [error, setError] = useState<FormError>();
   const back = labels.bellScheduleBack;
@@ -170,6 +204,7 @@ function BellEditor({
             id="bell-schedule-label"
             className="bell-field"
             maxLength={maxLabelLength}
+            aria-invalid={error?.field === 'label'}
             value={draft.label}
             onChange={(event) => update({ label: event.target.value })}
           />
@@ -180,6 +215,7 @@ function BellEditor({
           <DayButtons
             label={labels.bellScheduleDays}
             selected={selected}
+            invalid={error?.field === 'days'}
             choose={(day) =>
               chooseDays(
                 selected.includes(day)
@@ -225,10 +261,11 @@ function BellEditor({
           <select
             id="bell-schedule-rings"
             className="bell-field"
+            aria-invalid={error?.field === 'rings'}
             value={draft.rings}
             onChange={(event) => update({ rings: Number(event.target.value) })}
           >
-            {[1, 2, 3].map((count) => (
+            {Array.from({ length: maxRings }, (_, i) => i + 1).map((count) => (
               <option key={count} value={count}>
                 {count}×
               </option>
@@ -239,11 +276,12 @@ function BellEditor({
         <button
           type="button"
           className="bell-button"
-          onClick={async () => {
-            if (await unlock()) await ring(draft.sound, draft.rings);
-          }}
+          onClick={() =>
+            playing ? stop() : preview('test', draft.sound, draft.rings)
+          }
         >
-          <VolumeIcon /> {labels.bellScheduleTest}
+          {playing ? <StopIcon /> : <VolumeIcon />}{' '}
+          {playing ? labels.bellStop : labels.bellScheduleTest}
         </button>
         <div className="bell-actions">
           <button type="submit" className="bell-button bell-button--start">
@@ -263,6 +301,116 @@ function BellEditor({
           </button>
         )}
       </form>
+    </div>
+  );
+}
+
+function daysText(selected: readonly Day[], labels: Labels): string {
+  const summary = summarizeDays(selected);
+  if (summary.kind === 'every') return labels.bellScheduleEveryDay ?? '';
+  if (summary.kind === 'weekdays') return labels.bellScheduleWeekdays ?? '';
+  return summary.text;
+}
+
+interface KeepAwakeDialogProps {
+  labels: Labels;
+  open: boolean;
+  confirm: () => void;
+  cancel: () => void;
+}
+
+/** Explains the cost of keeping the screen on before the switch is turned on. */
+function KeepAwakeDialog({
+  labels,
+  open,
+  confirm,
+  cancel,
+}: KeepAwakeDialogProps) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const element = dialog.current;
+    if (!element) return;
+    if (open && !element.open) element.showModal();
+    if (!open && element.open) element.close();
+  }, [open]);
+  return (
+    <dialog
+      ref={dialog}
+      className="bell-sound-dialog"
+      aria-labelledby="bell-wake-warning"
+      onCancel={(event) => {
+        event.preventDefault();
+        cancel();
+      }}
+    >
+      <p id="bell-wake-warning">{labels.bellWakeWarning}</p>
+      <div className="bell-actions">
+        <button
+          type="button"
+          className="bell-button bell-button--start"
+          onClick={confirm}
+        >
+          {labels.bellWakeConfirm}
+        </button>
+        <button type="button" className="bell-button" onClick={cancel}>
+          {labels.bellScheduleCancel}
+        </button>
+      </div>
+    </dialog>
+  );
+}
+
+interface NextBellCardProps {
+  labels: Labels;
+  on: boolean;
+  next: ReturnType<typeof nextBell>;
+  now: number;
+}
+
+/** Whether the schedule is running and which bell rings next, across the whole week. */
+function NextBellCard({ labels, on, next, now }: NextBellCardProps) {
+  if (!on)
+    return (
+      <p className="bell-next bell-next--off" data-testid="bell-next">
+        {labels.bellScheduleOffNote}
+      </p>
+    );
+  const current = DateTime.fromMillis(now);
+  const away = next
+    ? DateTime.fromMillis(next.at)
+        .startOf('day')
+        .diff(current.startOf('day'), 'days').days
+    : 0;
+  const when =
+    away < 1
+      ? labels.bellNextToday
+      : away < 2
+        ? labels.bellNextTomorrow
+        : next?.day;
+  return (
+    <div className="bell-next" data-testid="bell-next">
+      <p className="bell-running" role="status">
+        <span className="bell-dot" aria-hidden="true" />
+        {labels.bellRunning}
+      </p>
+      {next ? (
+        <>
+          <p className="bell-next-line">
+            <span>{labels.bellNextBell}: </span>
+            <strong>
+              {when} {format12Hour(next.bell.time)}
+            </strong>
+            {next.bell.label && <span> · {next.bell.label}</span>}
+          </p>
+          <p className="bell-next-in">
+            {fill(labels.bellNextIn ?? '', {
+              time: formatUntil(next.at - now),
+            })}
+          </p>
+        </>
+      ) : (
+        <p className="bell-next-line">{labels.bellNextNone}</p>
+      )}
     </div>
   );
 }
@@ -294,8 +442,17 @@ export default function BellSchedule({
 }: Props) {
   const [day, setDay] = useState<Day>('Mon');
   const [screen, setScreen] = useState<Screen>({ kind: 'list' });
+  const [askWake, setAskWake] = useState(false);
   const requestedStorage = useRef(false);
   const { week, on } = bell.schedule;
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!on) return;
+    setNow(Date.now());
+    const timer = window.setInterval(() => setNow(Date.now()), 15_000);
+    return () => window.clearInterval(timer);
+  }, [on]);
+  const next = on ? nextBell(week, DateTime.fromMillis(now)) : undefined;
 
   // This is a best-effort request, including for the first successful CSV import.
   useEffect(() => {
@@ -398,10 +555,13 @@ export default function BellSchedule({
           {on ? labels.bellScheduleOn : labels.bellOff}
         </button>
       </div>
+      <NextBellCard labels={labels} on={on} next={next} now={now} />
       <DayButtons
         label={labels.bellScheduleDays}
         selected={[day]}
         choose={setDay}
+        marked={next?.day}
+        markedNote={labels.bellNextBell}
       />
       <div aria-live="polite">
         {week[day].length ? (
@@ -413,11 +573,23 @@ export default function BellSchedule({
                   type="button"
                   onClick={() => setScreen({ kind: 'edit', bell: entry })}
                 >
+                  <span className="bell-entry-days">
+                    {daysText(daysLikeBell(week, entry), labels)}
+                  </span>
                   <time dateTime={entry.time}>{format12Hour(entry.time)}</time>
-                  <span className="bell-entry-label">{entry.label}</span>
-                  {entry.rings > 1 && (
-                    <span className="bell-entry-rings">{entry.rings}×</span>
-                  )}
+                  <span className="bell-entry-text">
+                    <span className="bell-entry-label">{entry.label}</span>
+                    <span className="bell-entry-side">
+                      {entry.rings > 1 && (
+                        <span className="bell-entry-rings">{entry.rings}×</span>
+                      )}
+                      {next?.day === day && next.bell.id === entry.id && (
+                        <span className="bell-next-tag">
+                          {labels.bellNextTag}
+                        </span>
+                      )}
+                    </span>
+                  </span>
                 </button>
               </li>
             ))}
@@ -454,16 +626,37 @@ export default function BellSchedule({
           {labels.bellCsvExport}
         </button>
       </div>
-      <label className="bell-wake">
-        <input
-          type="checkbox"
+      <div className="bell-wake">
+        <button
+          type="button"
           role="switch"
-          checked={keepAwake}
-          onChange={(event) => setKeepAwake(event.target.checked)}
-        />
-        {labels.bellScheduleWake}
-      </label>
+          aria-labelledby="bell-wake-label"
+          aria-describedby={on ? undefined : 'bell-wake-needs-schedule'}
+          aria-checked={keepAwake}
+          disabled={!on && !keepAwake}
+          className="bell-button bell-switch"
+          onClick={() => (keepAwake ? setKeepAwake(false) : setAskWake(true))}
+        >
+          <span className="bell-switch-track" aria-hidden="true" />
+          {keepAwake ? labels.bellScheduleOn : labels.bellOff}
+        </button>
+        <span id="bell-wake-label">{labels.bellScheduleWake}</span>
+      </div>
+      {!on && (
+        <p className="bell-schedule-hint" id="bell-wake-needs-schedule">
+          {labels.bellWakeNeedsSchedule}
+        </p>
+      )}
       <p className="bell-schedule-hint">{labels.bellScheduleBackup}</p>
+      <KeepAwakeDialog
+        labels={labels}
+        open={askWake}
+        confirm={() => {
+          setKeepAwake(true);
+          setAskWake(false);
+        }}
+        cancel={() => setAskWake(false)}
+      />
     </div>
   );
 }

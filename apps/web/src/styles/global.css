@@ -117,6 +117,10 @@
     outline-offset: 3px;
     border-radius: 0.5rem;
   }
+  /* Mini apps: no focus ring on a button or link after a click or tap; keys still show it. */
+  html[data-mini-app-input='pointer'] :is(button, a, summary):focus-visible {
+    outline: none;
+  }
   @media (prefers-reduced-motion: reduce) {
     * {
       transition: none !important;

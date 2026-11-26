@@ -4,6 +4,7 @@ import {
   addBell,
   bellCount,
   deleteBell,
+  daysLikeBell,
   dueBells,
   editBell,
   emptyWeek,
@@ -19,7 +20,7 @@ const bell = (id: string, time: string, extra: Partial<Bell> = {}): Bell => ({
   id,
   time,
   label: '',
-  sound: 'winmetta-long',
+  sound: 'deep-chime',
   rings: 3,
   ...extra,
 });
@@ -52,7 +53,7 @@ describe('add, edit and delete', () => {
   it('reports no time, no day, bad rings and long labels', () => {
     expect(validateBell(bell('a', ''), ['Mon'])).toEqual({ kind: 'no-time' });
     expect(validateBell(bell('a', '06:00'), [])).toEqual({ kind: 'no-day' });
-    expect(validateBell(bell('a', '06:00', { rings: 4 }), ['Mon'])).toEqual({
+    expect(validateBell(bell('a', '06:00', { rings: 7 }), ['Mon'])).toEqual({
       kind: 'invalid-rings',
     });
     expect(
@@ -154,5 +155,40 @@ describe('dueBells (missed-bell rule)', () => {
   it('does nothing when no bell fell due', () => {
     const d = dueBells(w, la('2026-11-25T06:01:00'), la('2026-11-25T06:05:00'));
     expect(d).toEqual({ ring: [], missed: [] });
+  });
+});
+
+describe('the next bell across the week', () => {
+  const week = () => {
+    let w = added(emptyWeek(), bell('a', '14:22', { label: 'test' }), [
+      'Mon',
+      'Tue',
+      'Wed',
+      'Thu',
+      'Fri',
+      'Sat',
+      'Sun',
+    ]);
+    w = added(w, bell('b', '16:44', { label: 'Break Time' }), ['Thu']);
+    return w;
+  };
+  it('is the every-day bell on Thursday when Wednesday is past 2:22 PM', () => {
+    const next = nextBell(week(), la('2026-11-25T15:00'));
+    expect(next?.day).toBe('Thu');
+    expect(next?.bell.time).toBe('14:22');
+  });
+  it('is later today while a bell is still ahead', () => {
+    const next = nextBell(week(), la('2026-11-25T14:00'));
+    expect(next?.day).toBe('Wed');
+    expect(next?.bell.time).toBe('14:22');
+  });
+  it('finds the days a bell runs on, including copies with other ids', () => {
+    const w = week();
+    expect(
+      daysLikeBell(w, bell('x', '16:44', { label: 'Break Time' })),
+    ).toEqual(['Thu']);
+    expect(daysLikeBell(w, bell('x', '14:22', { label: 'test' }))).toHaveLength(
+      7,
+    );
   });
 });

@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { dayName, format12Hour, formatCountdown } from './format';
+import {
+  dayName,
+  format12Hour,
+  formatCountdown,
+  formatUntil,
+  summarizeDays,
+} from './format';
 
 describe('formatCountdown', () => {
   it('uses mm:ss and widens to mmm:ss from 100 minutes', () => {
@@ -34,5 +40,43 @@ describe('dayName', () => {
     expect(dayName('Mon')).toBe('Monday');
     expect(dayName('Wed', 'short')).toBe('Wed');
     expect(dayName('Sun', 'narrow')).toBe('Su');
+  });
+});
+
+describe('formatUntil', () => {
+  it('rounds up to whole minutes and never says 0 min', () => {
+    expect(formatUntil(1)).toBe('1 min');
+    expect(formatUntil(5 * 60_000)).toBe('5 min');
+    expect(formatUntil(5 * 60_000 + 1)).toBe('6 min');
+    expect(formatUntil(60 * 60_000)).toBe('1 h');
+    expect(formatUntil((2 * 60 + 22) * 60_000)).toBe('2 h 22 min');
+    expect(formatUntil(27 * 60 * 60_000)).toBe('1 d 3 h');
+    expect(formatUntil(48 * 60 * 60_000)).toBe('2 d');
+  });
+});
+
+describe('summarizeDays', () => {
+  it('names every day and weekdays, and joins runs of three or more', () => {
+    expect(
+      summarizeDays(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']),
+    ).toEqual({
+      kind: 'every',
+    });
+    expect(summarizeDays(['Fri', 'Mon', 'Tue', 'Wed', 'Thu'])).toEqual({
+      kind: 'weekdays',
+    });
+    expect(summarizeDays(['Thu'])).toEqual({ kind: 'list', text: 'Thu' });
+    expect(summarizeDays(['Mon', 'Tue'])).toEqual({
+      kind: 'list',
+      text: 'Mon, Tue',
+    });
+    expect(summarizeDays(['Mon', 'Tue', 'Wed', 'Sat'])).toEqual({
+      kind: 'list',
+      text: 'Mon–Wed, Sat',
+    });
+    expect(summarizeDays(['Sat', 'Sun', 'Mon'])).toEqual({
+      kind: 'list',
+      text: 'Mon, Sat, Sun',
+    });
   });
 });

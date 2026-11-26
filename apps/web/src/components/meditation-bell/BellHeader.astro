@@ -17,11 +17,7 @@ const languageNames = {
 ---
 
 <header class="bell-header" data-mini-bar>
-  <a
-    href={route(locale, 'miniApps')}
-    class="bell-header-action"
-    aria-label={t(locale, 'miniAppBackLabel')}
-  >
+  <a href={route(locale, 'miniApps')} class="bell-header-action bell-back">
     <svg
       viewBox="0 0 24 24"
       aria-hidden="true"
@@ -33,6 +29,7 @@ const languageNames = {
     >
       <path d="m12 19-7-7 7-7M5 12h14"></path>
     </svg>
+    <span class="bell-back-text">{t(locale, 'miniAppBackText')}</span>
   </a>
   <h1>
     <MiniAppIcon {icon} size={26} />

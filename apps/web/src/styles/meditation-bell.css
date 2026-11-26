@@ -30,7 +30,7 @@
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
   align-items: center;
   min-height: 54px;
   padding-inline: 10px;
@@ -63,12 +63,47 @@
 }
 
 .bell-header-action svg {
+  flex: none;
   width: 20px;
   height: 20px;
 }
 
+.bell-back {
+  display: flex;
+  justify-self: start;
+  gap: 6px;
+  padding-inline: 8px 12px;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+/* Narrow phones keep the arrow only; the words stay as the accessible name. */
+@media (max-width: 22.5rem) {
+  .bell-back-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* The Burmese title is wider, so its header gives up the words sooner. */
+@media (max-width: 27rem) {
+  :lang(my) .bell-back-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
 .bell-language {
   position: relative;
+  justify-self: end;
 }
 
 .bell-language summary::-webkit-details-marker {
@@ -150,7 +185,32 @@
 .bell-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
+}
+
+/* Sound settings sit at the end of the page, under the help text, on the start side. */
+.bell-settings {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  margin-block-start: 16px;
+}
+
+.bell-settings .bell-panel {
+  justify-self: stretch;
+}
+
+.bell-settings > .bell-button {
+  background: var(--bell-surface);
+}
+
+/* The panel opens above the button: the chevron points up while closed, down while open. */
+.bell-settings > .bell-button svg:last-child {
+  transform: rotate(180deg);
+}
+
+.bell-settings > .bell-button[aria-expanded='true'] svg:last-child {
+  transform: none;
 }
 
 .bell-views {
@@ -173,7 +233,6 @@
 
 .bell-button,
 .bell-choice,
-.bell-ring-count button,
 .bell-field {
   min-width: 0;
   min-height: 44px;
@@ -184,8 +243,7 @@
 }
 
 .bell-button,
-.bell-choice,
-.bell-ring-count button {
+.bell-choice {
   font-weight: 650;
   cursor: pointer;
 }
@@ -214,14 +272,25 @@
   cursor: default;
 }
 
-.bell-button:not(:disabled):hover,
-.bell-choice:hover,
-.bell-ring-count button:hover,
-.bell-choice[aria-pressed='true'],
-.bell-ring-count button[aria-pressed='true'] {
+.bell-choice[aria-pressed='true'] {
   border-color: var(--bell-accent);
   background: var(--bell-selected);
   color: var(--bell-accent);
+}
+
+/* Hover only where a pointer really hovers, so a tap leaves no stuck hover state. */
+@media (hover: hover) {
+  .bell-button:not(:disabled):hover,
+  .bell-choice:hover {
+    border-color: var(--bell-accent);
+    background: var(--bell-selected);
+    color: var(--bell-accent);
+  }
+}
+
+.bell-button:not(:disabled):active,
+.bell-choice:active {
+  filter: brightness(0.92);
 }
 
 .bell-panel {
@@ -238,8 +307,16 @@
   gap: 6px;
 }
 
-.bell-row label {
+.bell-row label,
+.bell-row-help {
   grid-column: 1 / -1;
+}
+
+.bell-row-help {
+  margin: 0;
+  color: var(--bell-quiet);
+  font-size: 0.9375rem;
+  line-height: 1.4;
 }
 
 .bell-ring-count {
@@ -254,6 +331,15 @@
   font-size: 1.0625rem;
 }
 
+select.bell-field {
+  appearance: none;
+  padding-inline-end: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px 20px;
+}
+
 .bell-display {
   display: grid;
   justify-items: center;
@@ -263,7 +349,7 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: min(100%, 15.75rem);
+  width: min(100%, 14.5rem);
   aspect-ratio: 1;
 }
 
@@ -279,13 +365,21 @@
 .bell-ring__bar {
   fill: none;
   stroke: var(--bell-line);
-  stroke-width: 1.5;
+  stroke-width: 6;
 }
 
 .bell-ring__bar {
   stroke: var(--bell-accent);
-  stroke-width: 2.5;
+  stroke-width: 6;
   stroke-linecap: round;
+}
+
+.bell-ring__status {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 17%;
+  margin: 0;
+  text-align: center;
 }
 
 .bell-ring__readout,
@@ -299,7 +393,7 @@
 }
 
 .bell-clock {
-  min-height: 13.75rem;
+  min-height: 14.5rem;
 }
 
 .bell-clock > svg {
@@ -310,12 +404,28 @@
 
 .bell-ring__time,
 .bell-clock__time {
-  font-size: clamp(2.625rem, 11vw, 3.375rem);
+  font-size: clamp(2.125rem, 9vw, 2.75rem);
   line-height: 1.1;
   font-weight: 550;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.055em;
   white-space: nowrap;
+}
+
+/* Trim the line box to the digits' height so they centre in the ring in any font. */
+.bell-ring__time {
+  text-box: trim-both cap alphabetic;
+}
+
+/* Three-digit minutes are wider than the ring's inside. */
+.bell-ring__time[data-long] {
+  font-size: clamp(1.75rem, 7.4vw, 2.25rem);
+}
+
+@supports not (text-box: trim-both cap alphabetic) {
+  .bell-ring__time {
+    transform: translateY(0.12em);
+  }
 }
 
 .bell-clock__remaining,
@@ -350,8 +460,7 @@
   gap: 6px;
 }
 
-.bell-presets .bell-choice,
-.bell-ring-count button {
+.bell-presets .bell-choice {
   font-size: 1.25rem;
   font-variant-numeric: tabular-nums;
 }
@@ -359,304 +468,448 @@
 .bell-actions {
   grid-template-columns: minmax(0, 1fr) auto;
 }
-
 .bell-actions .bell-button {
   min-height: 49px;
   padding-inline: 14px;
 }
-
 .bell-actions .bell-button--start,
 .bell-actions .bell-button--start:hover {
   border-color: var(--bell-accent);
   background: var(--bell-accent);
   color: var(--bell-on-accent);
 }
-
 .bell-app .bell-button--ring-now {
+  border-color: var(--bell-accent);
+  background: var(--bell-selected);
   width: 100%;
   min-height: 56px;
-  margin-top: 24px;
-  border-color: var(--bell-accent);
-  border-radius: 14px;
-  background: var(--bell-selected);
   color: var(--bell-accent);
+  border-radius: 14px;
+  margin-top: 24px;
   font-size: 1.1875rem;
 }
-
 .bell-app .bell-button--ring-now:active {
   background: var(--bell-accent);
   color: var(--bell-on-accent);
 }
-
 .bell-help {
-  margin-top: 10px;
   text-align: center;
+  margin-top: 10px;
   font-size: 0.9375rem;
 }
-
 .bell-alerts:not(:empty),
 .bell-schedule-view {
   margin-top: 12px;
 }
-
 .bell-schedule-view h2 {
+  margin-bottom: 6px;
   font-size: 1.25rem;
   font-weight: 650;
-  margin-bottom: 6px;
 }
-
 .bell-notice {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 6px 8px 6px 12px;
-  border-radius: 11px;
   background: var(--bell-selected);
   color: var(--bell-accent);
+  border-radius: 11px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 12px;
+  display: flex;
 }
-
 .bell-notice button {
   min-width: 44px;
 }
-
-.bell-error {
-  font-size: 1rem;
+.bell-app .bell-error {
+  border-inline-start: 3px solid var(--danger);
   color: var(--danger);
+  margin: 0;
+  padding-inline-start: 10px;
+  font-size: 1rem;
+  font-weight: 600;
 }
-
+.bell-app .bell-field[aria-invalid='true'] {
+  border-color: var(--danger);
+  background: #fdecea;
+}
+.bell-app .bell-days[data-invalid] .bell-choice {
+  border-color: var(--danger);
+}
 .bell-schedule-screen,
 .bell-schedule-form,
 .bell-import-preview {
-  display: grid;
   gap: 12px;
+  display: grid;
   container-type: inline-size;
 }
-
 .bell-schedule-heading {
-  display: flex;
-  min-height: 44px;
   align-items: center;
   gap: 10px;
+  min-height: 44px;
+  display: flex;
 }
-
 .bell-schedule-heading h2 {
   margin: 0;
 }
-
 .bell-schedule-heading .bell-button {
   min-width: 44px;
 }
-
 .bell-schedule-heading .bell-switch {
   margin-inline-start: auto;
 }
-
 .bell-switch-track {
-  position: relative;
+  border: 1px solid var(--bell-control-line);
+  background: var(--bell-line);
+  border-radius: 12px;
   width: 30px;
   height: 17px;
-  border: 1px solid var(--bell-control-line);
-  border-radius: 12px;
-  background: var(--bell-line);
+  position: relative;
 }
-
-.bell-switch-track::before {
+.bell-switch-track:before {
+  background: var(--bell-quiet);
+  content: '';
+  border-radius: 50%;
+  width: 11px;
+  height: 11px;
   position: absolute;
   inset-block-start: 2px;
   inset-inline-start: 2px;
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background: var(--bell-quiet);
-  content: '';
 }
-
 .bell-switch[aria-checked='true'] {
   border-color: var(--bell-accent);
   background: var(--bell-selected);
   color: var(--bell-accent);
 }
-
 .bell-switch[aria-checked='true'] .bell-switch-track {
   border-color: var(--bell-accent);
   background: var(--bell-accent);
 }
-
-.bell-switch[aria-checked='true'] .bell-switch-track::before {
-  inset-inline-start: auto;
-  inset-inline-end: 2px;
+.bell-switch[aria-checked='true'] .bell-switch-track:before {
   background: var(--bell-on-accent);
+  inset-inline: auto 2px;
 }
-
 .bell-days {
-  display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 3px;
+  display: grid;
 }
-
 .bell-days button {
   padding: 0;
   font-size: 1.0625rem;
 }
-
-@container (max-width: 319px) {
+@container (width<=319px) {
   .bell-days {
     gap: 0;
     margin-inline: -12px;
   }
 }
-
 .bell-schedule-empty {
-  padding-block: 15px;
   border-block: 1px solid var(--bell-line);
+  padding-block: 15px;
   font-size: 1rem;
 }
-
 .bell-schedule-list {
+  border-top: 1px solid var(--bell-line);
   max-height: 24rem;
   overflow: auto;
-  border-top: 1px solid var(--bell-line);
 }
-
 .bell-schedule-entry {
-  display: grid;
-  width: 100%;
-  min-height: 48px;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 8px;
-  padding-inline: 4px;
   border-bottom: 1px solid var(--bell-line);
   text-align: start;
   cursor: pointer;
+  grid-template-columns: repeat(2, 5.25rem) minmax(0, 1fr);
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-height: 48px;
+  padding: 6px 2px;
+  display: grid;
 }
-
 .bell-schedule-entry:hover {
   background: var(--bell-tile);
 }
-
 .bell-schedule-entry time {
-  font-size: 1.125rem;
-  font-weight: 650;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  font-size: 1rem;
+  font-weight: 650;
 }
-
 .bell-entry-label {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
 }
-
 .bell-entry-rings,
 .bell-schedule-hint {
   color: var(--bell-quiet);
   font-size: 0.9375rem;
 }
-
 .bell-schedule-files,
 .bell-schedule-shortcuts {
-  display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
+  display: grid;
 }
-
 .bell-schedule-files button {
   padding-inline: 4px;
   font-size: 1rem;
 }
-
 .bell-schedule-shortcuts {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-
 .bell-schedule-form fieldset {
   min-width: 0;
 }
-
 .bell-schedule-form legend {
   padding-block-end: 5px;
 }
-
 .bell-wake {
-  display: flex;
-  min-height: 44px;
   align-items: center;
-  gap: 8px;
-  cursor: pointer;
+  gap: 12px;
+  min-height: 44px;
+  display: flex;
 }
-
-.bell-wake input {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--bell-accent);
+.bell-wake > span {
+  min-width: 0;
 }
-
 .bell-button--danger,
 .bell-button--danger:not(:disabled):hover {
   color: var(--danger);
 }
-
 .bell-file-input {
+  border: 1px solid var(--bell-control-line);
+  border-radius: 11px;
   width: 100%;
   min-height: 44px;
   padding: 8px;
-  border: 1px solid var(--bell-control-line);
-  border-radius: 11px;
 }
-
 .bell-file-input::file-selector-button {
+  background: var(--bell-selected);
   min-height: 36px;
-  margin-inline-end: 8px;
-  padding-inline: 10px;
+  color: var(--bell-accent);
+  cursor: pointer;
   border: 0;
   border-radius: 7px;
-  background: var(--bell-selected);
+  margin-inline-end: 8px;
+  padding-inline: 10px;
+}
+.bell-import-preview dl > div {
+  border-bottom: 1px solid var(--bell-line);
+  justify-content: space-between;
+  padding-block: 5px;
+  display: flex;
+}
+.bell-csv-errors {
+  max-height: 12rem;
+  color: var(--bell-quiet);
+  padding-inline-start: 16px;
+  font-size: 1rem;
+  overflow: auto;
+}
+.bell-import-actions {
+  gap: 8px;
+  display: grid;
+}
+.bell-sound-dialog {
+  border: 1px solid var(--bell-control-line);
+  background: var(--bell-surface);
+  width: min(100% - 32px, 22rem);
+  color: inherit;
+  border-radius: 16px;
+  margin: auto;
+  padding: 24px 20px 20px;
+  box-shadow: 0 12px 40px #0004;
+}
+.bell-sound-dialog[open] {
+  text-align: center;
+  gap: 18px;
+  display: grid;
+}
+.bell-sound-dialog::backdrop {
+  background: #12121099;
+}
+.bell-sound-dialog p {
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+.bell-sound-dialog .bell-button--start {
+  border-color: var(--bell-accent);
+  background: var(--bell-accent);
+  color: var(--bell-on-accent);
+}
+.bell-sound-dialog .bell-button {
+  min-height: 52px;
+  font-size: 1.0625rem;
+}
+@media (width<=375px) {
+  .bell-sound-dialog .bell-actions {
+    grid-template-columns: 1fr;
+  }
+}
+.bell-dot,
+.bell-day-dot {
+  background: var(--bell-accent);
+  border-radius: 50%;
+  flex: none;
+  width: 8px;
+  height: 8px;
+  display: inline-block;
+}
+.bell-views .bell-dot {
+  margin-inline-start: 2px;
+}
+.bell-day-dot {
+  width: 7px;
+  height: 7px;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+.bell-days .bell-choice {
+  position: relative;
+}
+.bell-next {
+  background: var(--bell-tile);
+  border-radius: 12px;
+  gap: 2px;
+  padding: 10px 12px;
+  display: grid;
+}
+.bell-next--off {
+  color: var(--bell-quiet);
+}
+.bell-running {
   color: var(--bell-accent);
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-weight: 650;
+  display: flex;
+}
+.bell-next-line,
+.bell-next-in {
+  margin: 0;
+}
+.bell-next-line strong {
+  font-variant-numeric: tabular-nums;
+}
+.bell-next-in {
+  color: var(--bell-quiet);
+  font-size: 0.9375rem;
+}
+.bell-entry-text {
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  display: flex;
+}
+.bell-entry-text .bell-entry-label {
+  flex: 1;
+  min-width: 0;
+}
+.bell-entry-days {
+  color: var(--bell-quiet);
+  overflow-wrap: anywhere;
+  font-size: 0.8125rem;
+  line-height: 1.3;
+}
+.bell-entry-side {
+  align-items: center;
+  gap: 8px;
+  display: flex;
+}
+.bell-next-tag {
+  color: var(--bell-accent);
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+
+/* Radio choices, as in a mobile settings form: a circle and its label, side by side in one row. */
+.bell-ring-count {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0 4px;
+}
+
+.bell-row .bell-radio {
+  grid-column: auto;
+}
+
+.bell-radio {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  padding-inline: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
 }
 
-.bell-import-preview dl > div {
-  display: flex;
-  justify-content: space-between;
-  padding-block: 5px;
-  border-bottom: 1px solid var(--bell-line);
+.bell-radio input {
+  appearance: none;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  border: 2px solid var(--bell-control-line);
+  border-radius: 50%;
+  background: var(--bell-surface);
+  cursor: pointer;
 }
 
-.bell-csv-errors {
-  max-height: 12rem;
-  overflow: auto;
-  padding-inline-start: 16px;
-  color: var(--bell-quiet);
-  font-size: 1rem;
+.bell-radio input:checked {
+  border-color: var(--bell-accent);
+  background: radial-gradient(
+    circle,
+    var(--bell-accent) 0 45%,
+    var(--bell-surface) 50%
+  );
 }
 
-.bell-import-actions {
-  display: grid;
-  gap: 8px;
+.bell-radio:has(input:checked) {
+  color: var(--bell-accent);
 }
 
-.bell-confirmation,
-.bell-audio-notice {
-  margin-block-start: 10px;
+.bell-radio input:focus-visible {
+  outline: 3px solid var(--bell-accent);
+  outline-offset: 2px;
 }
 
-.bell-confirmation {
-  display: grid;
-  gap: 10px;
-  padding: 12px;
-  border: 1px solid #8e631e;
-  border-radius: 12px;
-  background: #fff3d6;
+html[data-mini-app-input='pointer'] .bell-radio input:focus-visible {
+  outline: none;
 }
 
-.bell-audio-notice {
-  flex-wrap: wrap;
+.bell-button {
+  position: relative;
+  overflow: hidden;
 }
 
-@media (max-width: 375px) {
-  .bell-confirmation .bell-actions {
-    grid-template-columns: 1fr;
+.bell-play-progress {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 4px;
+  background: var(--bell-accent);
+  transform-origin: left;
+  animation: bell-play-fill linear forwards;
+}
+
+@keyframes bell-play-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bell-play-progress {
+    animation: none;
+    transform: none;
+    opacity: 0.5;
   }
 }

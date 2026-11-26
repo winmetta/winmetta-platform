@@ -2,13 +2,7 @@
 // end bell settings and a manual bell. Buttons and labels are English in both locales on purpose
 // (§7.1): do not "fix" that. Only alerts, notices and errors are translated.
 import { DateTime } from 'luxon';
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type KeyboardEvent,
-} from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { nextAlarm } from '../../lib/meditation-bell/alarm';
 import { track } from '../../lib/analytics';
 import * as events from '../../lib/meditation-bell/events';
@@ -16,7 +10,11 @@ import {
   format12Hour,
   formatCountdown,
 } from '../../lib/meditation-bell/format';
-import { bellCount, type Week } from '../../lib/meditation-bell/schedule';
+import {
+  bellCount,
+  maxRings,
+  type Week,
+} from '../../lib/meditation-bell/schedule';
 import {
   defaultState,
   storageKey,
@@ -34,6 +32,7 @@ import {
   PauseIcon,
   PlayIcon,
   ResetIcon,
+  StopIcon,
   VolumeIcon,
 } from './icons';
 import BellSchedule, { type ScheduleConfirmation } from './BellSchedule';
@@ -41,6 +40,7 @@ import { fill, type Labels } from './labels';
 import { useWeeklyBells } from './use-weekly-bells';
 import { checkpointChange, loadState, saveState } from './storage';
 import { audioIsUnlocked, keepScreenOn, ring, unlockAudio } from './web-player';
+import { usePreview, type Playing, type PreviewRole } from './use-preview';
 
 interface Props {
   labels: Labels;
@@ -65,7 +65,9 @@ interface PanelProps {
   labels: Labels;
   soundNames: Record<string, string>;
   bell: SoundSettings;
-  preview: (sound: string) => void;
+  preview: (role: PreviewRole, sound: string, rings?: number) => void;
+  stop: () => void;
+  playing: Playing | undefined;
   change: (
     next: Partial<SoundSettings>,
     role: 'start' | 'end',
@@ -74,11 +76,24 @@ interface PanelProps {
   ) => void;
 }
 
+/** A thin bar that fills while a preview sound plays (decorative: the button is disabled meanwhile). */
+function PlayProgress({ seconds }: { seconds: number }) {
+  return (
+    <span
+      className="bell-play-progress"
+      aria-hidden="true"
+      style={{ animationDuration: `${seconds}s` }}
+    />
+  );
+}
+
 function SettingsPanel({
   labels,
   soundNames,
   bell,
   preview,
+  stop,
+  playing,
   change,
 }: PanelProps) {
   return (
@@ -87,8 +102,12 @@ function SettingsPanel({
         <label htmlFor="bell-start-sound" className="font-semibold">
           {labels.bellStartBell}
         </label>
+        <p className="bell-row-help" id="bell-start-help">
+          {labels.bellStartBellHelp}
+        </p>
         <select
           id="bell-start-sound"
+          aria-describedby="bell-start-help"
           className="bell-field"
           value={bell.startBell.sound}
           onChange={(e) =>
@@ -110,19 +129,32 @@ function SettingsPanel({
           type="button"
           className="bell-button"
           disabled={bell.startBell.sound === 'off'}
-          aria-label={`${labels.bellPlay}: ${labels.bellStartBell}`}
-          onClick={() => preview(bell.startBell.sound)}
+          aria-label={`${playing?.role === 'start' ? labels.bellStop : labels.bellPlay}: ${labels.bellStartBell}`}
+          onClick={() =>
+            playing?.role === 'start'
+              ? stop()
+              : preview('start', bell.startBell.sound)
+          }
         >
-          <VolumeIcon />
-          <span>{labels.bellPlay}</span>
+          {playing?.role === 'start' ? <StopIcon /> : <VolumeIcon />}
+          <span>
+            {playing?.role === 'start' ? labels.bellStop : labels.bellPlay}
+          </span>
+          {playing?.role === 'start' && (
+            <PlayProgress seconds={playing.seconds} />
+          )}
         </button>
       </div>
       <div className="bell-row">
         <label htmlFor="bell-end-sound" className="font-semibold">
           {labels.bellEndBell}
         </label>
+        <p className="bell-row-help" id="bell-end-help">
+          {labels.bellEndBellHelp}
+        </p>
         <select
           id="bell-end-sound"
+          aria-describedby="bell-end-help"
           className="bell-field"
           value={bell.endBell.sound}
           onChange={(e) =>
@@ -142,27 +174,51 @@ function SettingsPanel({
             </option>
           ))}
         </select>
+        <button
+          type="button"
+          className="bell-button"
+          aria-label={`${playing?.role === 'end' ? labels.bellStop : labels.bellPlay}: ${labels.bellEndBell}`}
+          onClick={() =>
+            playing?.role === 'end'
+              ? stop()
+              : preview('end', bell.endBell.sound, bell.endBell.rings)
+          }
+        >
+          {playing?.role === 'end' ? <StopIcon /> : <VolumeIcon />}
+          <span>
+            {playing?.role === 'end' ? labels.bellStop : labels.bellPlay}
+          </span>
+          {playing?.role === 'end' && (
+            <PlayProgress seconds={playing.seconds} />
+          )}
+        </button>
+        <p className="bell-row-help" id="bell-rings-help">
+          {labels.bellRingsHelp}
+        </p>
         <div
           className="bell-ring-count"
-          role="group"
+          role="radiogroup"
           aria-label={labels.bellRings}
+          aria-describedby="bell-rings-help"
         >
-          {[1, 2, 3].map((n) => (
-            <button
-              key={n}
-              type="button"
-              aria-pressed={bell.endBell.rings === n}
-              onClick={() =>
-                change(
-                  { endBell: { ...bell.endBell, rings: n } },
-                  'end',
-                  bell.endBell.sound,
-                  n,
-                )
-              }
-            >
-              {n}x
-            </button>
+          {Array.from({ length: maxRings }, (_, i) => i + 1).map((n) => (
+            <label key={n} className="bell-radio">
+              <input
+                type="radio"
+                name="bell-end-rings"
+                value={n}
+                checked={bell.endBell.rings === n}
+                onChange={() =>
+                  change(
+                    { endBell: { ...bell.endBell, rings: n } },
+                    'end',
+                    bell.endBell.sound,
+                    n,
+                  )
+                }
+              />
+              <span>{n}x</span>
+            </label>
           ))}
         </div>
       </div>
@@ -177,6 +233,41 @@ interface DisplayProps {
   visible: boolean;
   status: string | undefined;
   alarmText: string;
+}
+
+interface SoundPromptProps {
+  labels: Labels;
+  open: boolean;
+  enable: () => void;
+}
+
+/** A modal the user has to answer: scheduled bells stay silent until a tap unlocks the sound. */
+function SoundPrompt({ labels, open, enable }: SoundPromptProps) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const element = dialog.current;
+    if (!element) return;
+    if (open && !element.open) element.showModal();
+    if (!open && element.open) element.close();
+  }, [open]);
+  return (
+    <dialog
+      ref={dialog}
+      className="bell-sound-dialog"
+      aria-labelledby="bell-sound-prompt"
+      onCancel={(event) => event.preventDefault()}
+    >
+      <p id="bell-sound-prompt">{labels.bellScheduleAudioPrompt}</p>
+      <button
+        type="button"
+        className="bell-button bell-button--start"
+        onClick={enable}
+      >
+        <VolumeIcon />
+        {labels.bellScheduleEnableSound}
+      </button>
+    </dialog>
+  );
 }
 
 function CountdownDigits({ left }: { left: number }) {
@@ -241,13 +332,20 @@ function Display({
             />
           </svg>
           <div className="bell-ring__readout">
-            <span className="bell-ring__time" data-testid="bell-time">
+            <span
+              className="bell-ring__time"
+              data-testid="bell-time"
+              data-long={Math.ceil(left / 1000) >= 6000 || undefined}
+            >
               <CountdownDigits left={left} />
             </span>
-            <p className="bell-status" data-testid="bell-status">
-              {status}
-            </p>
           </div>
+          <p
+            className="bell-status bell-ring__status"
+            data-testid="bell-status"
+          >
+            {status}
+          </p>
         </div>
       ) : (
         <div className="bell-clock">
@@ -384,7 +482,7 @@ function TimeField({
 }
 
 const timerStatusLabel = {
-  running: 'bellStatusSitting',
+  running: undefined,
   paused: 'bellStatusPaused',
   finished: 'bellStatusRang',
   missed: 'bellStatusMissed',
@@ -428,10 +526,11 @@ function BellTimerSession({
   const [notices, setNotices] = useState<Notice[]>([]);
   const [panel, setPanel] = useState(false);
   const [view, setView] = useState<'timer' | 'schedule'>('timer');
-  const [keepAwake, setKeepAwake] = useState(false);
   const [audioReady, setAudioReady] = useState(audioIsUnlocked);
+  const [soundPromptShut, setSoundPromptShut] = useState(false);
   const [confirmation, setConfirmation] = useState<ScheduleConfirmation>();
   const confirmationButton = useRef<HTMLButtonElement>(null);
+  const confirmationDialog = useRef<HTMLDialogElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
   const [minutesText, setMinutesText] = useState(String(defaultMinutes));
   const [alarmText, setAlarmText] = useState('');
@@ -463,6 +562,7 @@ function BellTimerSession({
   const mode = timer.mode;
   const running = timer.status === 'running';
   const active = running || timer.status === 'paused';
+  const keepAwake = bell.schedule.keepAwake ?? false;
   const keepScreen = running || (bell.schedule.on && keepAwake);
   const busy = active || bell.schedule.on;
 
@@ -518,13 +618,19 @@ function BellTimerSession({
     });
   };
 
-  const dismissOnEscape = (event: KeyboardEvent<HTMLButtonElement>) => {
-    if (event.key === 'Escape') dismissConfirmation(false);
-  };
-
+  // A confirmation is a modal: the page behind waits for the answer.
   useEffect(() => {
-    if (confirmation) confirmationButton.current?.focus();
+    if (!confirmation) return;
+    const dialog = confirmationDialog.current;
+    if (dialog && !dialog.open) dialog.showModal();
+    confirmationButton.current?.focus();
   }, [confirmation]);
+
+  const setKeepAwake = (keepAwake: boolean) =>
+    updateBell((current) => ({
+      ...current,
+      schedule: { ...current.schedule, keepAwake },
+    }));
 
   const updateWeek = (week: Week) => {
     updateBell((current) => ({
@@ -815,16 +921,19 @@ function BellTimerSession({
     }
   };
 
-  const ringNow = () => {
-    void unlock();
-    void ring(bell.endBell.sound, 1);
-    send(events.ringNow(view));
-  };
+  const { playing, preview, stop } = usePreview(unlock);
+  useEffect(() => {
+    if (!panel && playing?.role !== 'now') stop();
+  }, [panel, playing?.role, stop]);
 
-  const preview = (sound: string) => {
-    void unlock().then((ready) => {
-      if (ready && sound !== 'off') void ring(sound, 1);
-    });
+  /** Rings the Alarm bell's sound and count now; while it rings the button is Stop. */
+  const ringNow = () => {
+    if (playing?.role === 'now') {
+      stop();
+      return;
+    }
+    preview('now', bell.endBell.sound, bell.endBell.rings);
+    send(events.ringNow(view));
   };
 
   const change = (
@@ -834,12 +943,13 @@ function BellTimerSession({
     rings?: number,
   ) => {
     if (!updateBell((current) => ({ ...current, ...patch }))) return;
-    preview(sound);
+    stop();
     send(events.soundChange(role, sound, rings));
     notify(labels.bellNoticeSaved ?? '');
   };
 
-  const status = labels[timerStatusLabel[timer.status]];
+  const statusKey = timerStatusLabel[timer.status];
+  const status = statusKey ? labels[statusKey] : '';
   const selectedMinutes = selectedPreset(timer, countdownSource, alarmPreset);
 
   return (
@@ -865,18 +975,29 @@ function BellTimerSession({
           className="bell-button"
           aria-controls="bell-schedule-view"
           aria-pressed={view === 'schedule'}
+          aria-label={
+            bell.schedule.on
+              ? `${labels.bellScheduleHeading}, ${labels.bellRunning}`
+              : undefined
+          }
           onClick={() => setView('schedule')}
         >
           <CalendarIcon />
           {labels.bellScheduleHeading}
+          {bell.schedule.on && <span className="bell-dot" aria-hidden="true" />}
         </button>
       </div>
 
       {confirmation && (
-        <div
-          className="bell-confirmation"
+        <dialog
+          ref={confirmationDialog}
+          className="bell-sound-dialog"
           role="alertdialog"
           aria-labelledby="bell-confirmation-message"
+          onCancel={(event) => {
+            event.preventDefault();
+            dismissConfirmation(false);
+          }}
         >
           <p id="bell-confirmation-message">{confirmation.message}</p>
           <div className="bell-actions">
@@ -884,7 +1005,6 @@ function BellTimerSession({
               type="button"
               className="bell-button bell-button--start"
               onClick={() => dismissConfirmation(true)}
-              onKeyDown={dismissOnEscape}
             >
               {confirmation.action}
             </button>
@@ -893,29 +1013,17 @@ function BellTimerSession({
               type="button"
               className="bell-button"
               onClick={() => dismissConfirmation(false)}
-              onKeyDown={dismissOnEscape}
             >
               {labels.bellScheduleCancel}
             </button>
           </div>
-        </div>
+        </dialog>
       )}
-      {bell.schedule.on && !audioReady && loaded && (
-        <div
-          className="bell-notice bell-audio-notice"
-          inert={Boolean(confirmation)}
-        >
-          <p role="status">{labels.bellScheduleAudioPrompt}</p>
-          <button
-            type="button"
-            className="bell-button"
-            onClick={() => void unlock()}
-          >
-            <VolumeIcon />
-            {labels.bellScheduleEnableSound}
-          </button>
-        </div>
-      )}
+      <SoundPrompt
+        labels={labels}
+        open={bell.schedule.on && !audioReady && loaded && !soundPromptShut}
+        enable={() => void unlock().then(() => setSoundPromptShut(true))}
+      />
       <div className="bell-alerts" role="status" aria-live="polite">
         {notices.map((n) => (
           <p key={n.id} className="bell-notice">
@@ -943,17 +1051,6 @@ function BellTimerSession({
           <button
             type="button"
             className="bell-button"
-            aria-expanded={panel}
-            aria-controls={panel ? 'bell-panel' : undefined}
-            onClick={() => setPanel((p) => !p)}
-          >
-            <BellIcon />
-            <span>{labels.bellBells}</span>
-            <ChevronIcon />
-          </button>
-          <button
-            type="button"
-            className="bell-button"
             disabled={active}
             onClick={() =>
               chooseMode(mode === 'countdown' ? 'alarm' : 'countdown')
@@ -965,16 +1062,6 @@ function BellTimerSession({
               : labels.bellModeCountdown}
           </button>
         </div>
-
-        {panel && (
-          <SettingsPanel
-            labels={labels}
-            soundNames={soundNames}
-            bell={bell}
-            change={change}
-            preview={preview}
-          />
-        )}
 
         <Display
           labels={labels}
@@ -1081,10 +1168,35 @@ function BellTimerSession({
         onClick={ringNow}
         disabled={Boolean(confirmation)}
       >
-        <BellIcon />
-        {labels.bellRingNow}
+        {playing?.role === 'now' ? <StopIcon /> : <BellIcon />}
+        {playing?.role === 'now' ? labels.bellStop : labels.bellRingNow}
+        {playing?.role === 'now' && <PlayProgress seconds={playing.seconds} />}
       </button>
       <p className="bell-help">{labels.bellHelp}</p>
+      <div className="bell-settings">
+        {panel && (
+          <SettingsPanel
+            labels={labels}
+            soundNames={soundNames}
+            bell={bell}
+            change={change}
+            preview={preview}
+            stop={stop}
+            playing={playing}
+          />
+        )}
+        <button
+          type="button"
+          className="bell-button"
+          aria-expanded={panel}
+          aria-controls={panel ? 'bell-panel' : undefined}
+          onClick={() => setPanel((p) => !p)}
+        >
+          <BellIcon />
+          <span>{labels.bellBells}</span>
+          <ChevronIcon />
+        </button>
+      </div>
     </div>
   );
 }

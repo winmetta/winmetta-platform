@@ -82,18 +82,18 @@ describe('events', () => {
   });
 
   it('sends only registered sounds, and off only for the start bell', () => {
-    expect(soundChange('end', 'winmetta-long', 3)?.data).toEqual({
+    expect(soundChange('end', 'deep-chime', 3)?.data).toEqual({
       role: 'end',
-      sound: 'winmetta-long',
+      sound: 'deep-chime',
       rings: 3,
     });
     expect(soundChange('start', 'off')?.data).toEqual({
       role: 'start',
       sound: 'off',
     });
-    expect(soundChange('start', 'winmetta-short', 2)?.data).toEqual({
+    expect(soundChange('start', 'soft-chime', 2)?.data).toEqual({
       role: 'start',
-      sound: 'winmetta-short',
+      sound: 'soft-chime',
     });
     expect(soundChange('end', 'off')).toBeUndefined();
     expect(soundChange('end', 'my own label')).toBeUndefined();

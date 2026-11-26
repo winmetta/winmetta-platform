@@ -11,9 +11,9 @@ import { days } from './days';
 import { emptyWeek } from './schedule';
 
 const sample = `day,time,label,sound,rings
-Mon,06:00,Morning sitting,winmetta-long,3
-Mon,09:00,Dhamma talk,winmetta-short,1
-Sun,19:00,Evening chanting,winmetta-long,1
+Mon,06:00,Morning sitting,deep-chime,3
+Mon,09:00,Dhamma talk,soft-chime,1
+Sun,19:00,Evening chanting,deep-chime,1
 `;
 let n = 0;
 const id = () => `id${++n}`;
@@ -35,16 +35,16 @@ describe('splitRecords', () => {
 
 describe('parseCsv', () => {
   it('reads the sample file', () => {
-    const r = parseCsv(sample, 'winmetta-long');
+    const r = parseCsv(sample, 'deep-chime');
     expect(r).toMatchObject({ ok: true, skipped: [] });
     expect(r.ok && r.bells).toHaveLength(3);
   });
   it('skips bad rows with their row number and reason', () => {
     const r = parseCsv(
-      'day,time,label,sound,rings\nFunday,06:00,,,1\nMon,25:00,,,1\nMon,06:00,,,4\nMon,07:00,,,1\nMon,07:00,,,2\nTue,06:00,' +
+      'day,time,label,sound,rings\nFunday,06:00,,,1\nMon,25:00,,,1\nMon,06:00,,,7\nMon,07:00,,,1\nMon,07:00,,,2\nTue,06:00,' +
         'x'.repeat(41) +
         ',,1\n',
-      'winmetta-long',
+      'deep-chime',
     );
     expect(r.ok && r.skipped).toEqual([
       { row: 2, reason: 'unknown-day' },
@@ -55,15 +55,15 @@ describe('parseCsv', () => {
     ]);
   });
   it('falls back for an unknown or missing sound and defaults rings to 1', () => {
-    const r = parseCsv('day,time,sound\nMon,06:00,nope\n', 'winmetta-long');
+    const r = parseCsv('day,time,sound\nMon,06:00,nope\n', 'deep-chime');
     expect(r.ok && r.bells[0]).toMatchObject({
-      sound: 'winmetta-long',
+      sound: 'deep-chime',
       soundFallback: true,
       rings: 1,
     });
   });
   it('accepts a byte-order mark and any column order', () => {
-    const r = parseCsv('﻿time,day\n06:00,Mon\n', 'winmetta-long');
+    const r = parseCsv('﻿time,day\n06:00,Mon\n', 'deep-chime');
     expect(r.ok && r.bells).toHaveLength(1);
   });
   it('refuses a missing header, an empty file, a big file and too many bells', () => {
@@ -88,7 +88,7 @@ describe('parseCsv', () => {
   it('rejects an unclosed quoted field even after a valid row', () => {
     const text =
       'day,time,label\nMon,06:00,Morning\nTue,07:00,"Unclosed\nWed,08:00,Evening';
-    expect(parseCsv(text, 'winmetta-long')).toEqual({
+    expect(parseCsv(text, 'deep-chime')).toEqual({
       ok: false,
       error: 'malformed',
     });
@@ -114,7 +114,7 @@ describe('row numbers', () => {
   it('are file lines, even with blank lines and multi-line quoted labels', () => {
     const r = parseCsv(
       'day,time,label\n\nMon,06:00,"two\nlines"\nXyz,07:00,a\n\r\nMon,99:00,b\n',
-      'winmetta-long',
+      'deep-chime',
     );
     expect(r.ok && r.skipped).toEqual([
       { row: 5, reason: 'unknown-day' },
@@ -125,7 +125,7 @@ describe('row numbers', () => {
 
 describe('applyImport and round trip', () => {
   it('replace starts empty; add skips a time already set that day', () => {
-    const parsed = parseCsv(sample, 'winmetta-long');
+    const parsed = parseCsv(sample, 'deep-chime');
     if (!parsed.ok) throw new Error('parse');
     const first = applyImport(emptyWeek(), parsed.bells, 'replace', id);
     expect(first.added).toBe(3);
@@ -146,13 +146,13 @@ describe('applyImport and round trip', () => {
         id: 'a',
         time: '06:00',
         label: '+ Morning',
-        sound: 'winmetta-short',
+        sound: 'soft-chime',
         rings: 1,
       },
     ];
     const exported = serializeCsv(week);
     expect(splitRecords(exported)[1]?.[2]).toBe('\t+ Morning');
-    const imported = parseCsv(exported, 'winmetta-long');
+    const imported = parseCsv(exported, 'deep-chime');
     expect(imported.ok && imported.bells[0]?.label).toBe('+ Morning');
   });
 
@@ -163,16 +163,16 @@ describe('applyImport and round trip', () => {
         id: `${day}-${index}`,
         time: `${String(Math.floor(index / 60)).padStart(2, '0')}:${String(index % 60).padStart(2, '0')}`,
         label: 'က'.repeat(40),
-        sound: 'winmetta-short',
+        sound: 'soft-chime',
         rings: 1,
       }));
     }
-    const imported = parseCsv(serializeCsv(week), 'winmetta-long');
+    const imported = parseCsv(serializeCsv(week), 'deep-chime');
     expect(imported.ok && imported.bells).toHaveLength(700);
   });
 
   it('exporting then importing gives the same schedule', () => {
-    const parsed = parseCsv(sample, 'winmetta-long');
+    const parsed = parseCsv(sample, 'deep-chime');
     if (!parsed.ok) throw new Error('parse');
     const week = applyImport(emptyWeek(), parsed.bells, 'replace', id).week;
     week.Tue = [
@@ -180,13 +180,13 @@ describe('applyImport and round trip', () => {
         id: 'z',
         time: '05:30',
         label: 'A, "quoted" label',
-        sound: 'winmetta-short',
+        sound: 'soft-chime',
         rings: 2,
       },
     ];
     const text = serializeCsv(week);
     expect(text.startsWith('﻿' + csvHeader.join(','))).toBe(true);
-    const back = parseCsv(text, 'winmetta-long');
+    const back = parseCsv(text, 'deep-chime');
     if (!back.ok) throw new Error('reparse');
     const again = applyImport(emptyWeek(), back.bells, 'replace', id).week;
     const strip = (w: typeof week) =>

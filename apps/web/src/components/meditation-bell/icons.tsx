@@ -22,6 +22,9 @@ export const BellIcon = icon(
   </>,
 );
 export const PlayIcon = icon(<path d="M6 4l14 8-14 8z" />);
+export const StopIcon = icon(
+  <rect x="5" y="5" width="14" height="14" rx="2" />,
+);
 export const PauseIcon = icon(
   <>
     <path d="M6 4h4v16H6z" />

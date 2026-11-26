@@ -13,15 +13,15 @@ This adds two things:
 
 ## 1. Decisions (proposed 2026-11-25)
 
-| Decision | Choice | Notes |
-| --- | --- | --- |
+| Decision             | Choice                                                                 | Notes                                                                                                                                                                                                                        |
+| -------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Where the code lives | **A workspace package in this repository**, `packages/myanmar-convert` | Two users here already (the mini app, book search); one PR can change the package and the page. A separate repository adds releases and a second CI for no gain yet. It can be split out with its history later (section 9). |
-| Libraries | **One library per direction**, not several mixed | Mixing libraries makes the same text convert differently depending on the path. Section 4. |
-| Conversion path | **Always through Unicode:** source → Unicode → target | Win Innwa ↔ Zawgyi needs no table of its own, and only four converters need testing. |
-| Fixes | **In the wrapper, never inside a library** | Pre- and post-processing steps in the package, each with a test that shows the input it fixes. No edits under `node_modules`, no patch files. Real library bugs go upstream. |
-| Detection | **Zawgyi is detected; Win Innwa is chosen by the user** | Win Innwa text is plain ASCII (`jrefrm` shows as မြန်မာ only in the font), so no detector can tell it from English. Section 5.3. |
-| Where it runs | **In the browser only** | No server, no upload, no storage of the text. The converters load only on the converter page. |
-| npm | **Later**, after the mini app has been used and the tests have settled | Section 9. |
+| Libraries            | **One library per direction**, not several mixed                       | Mixing libraries makes the same text convert differently depending on the path. Section 4.                                                                                                                                   |
+| Conversion path      | **Always through Unicode:** source → Unicode → target                  | Win Innwa ↔ Zawgyi needs no table of its own, and only four converters need testing.                                                                                                                                         |
+| Fixes                | **In the wrapper, never inside a library**                             | Pre- and post-processing steps in the package, each with a test that shows the input it fixes. No edits under `node_modules`, no patch files. Real library bugs go upstream.                                                 |
+| Detection            | **Zawgyi is detected; Win Innwa is chosen by the user**                | Win Innwa text is plain ASCII (`jrefrm` shows as မြန်မာ only in the font), so no detector can tell it from English. Section 5.3.                                                                                             |
+| Where it runs        | **In the browser only**                                                | No server, no upload, no storage of the text. The converters load only on the converter page.                                                                                                                                |
+| npm                  | **Later**, after the mini app has been used and the tests have settled | Section 9.                                                                                                                                                                                                                   |
 
 Out of scope: converting whole files (Word, PDF, Excel), other legacy fonts (Ayar, CE, Matrix, Myanmar1) unless the libraries already cover them, Shan, Mon and Karen text, transliteration (Burmese ↔ Latin), spelling correction, and changing what the site itself accepts: site content stays Unicode-only ([tech-architecture.md](tech-architecture.md) §5).
 
@@ -29,11 +29,11 @@ Out of scope: converting whole files (Word, PDF, Excel), other legacy fonts (Aya
 
 ## 2. The three encodings
 
-| Encoding | What it is | Where it is found | Can it be detected? |
-| --- | --- | --- | --- |
-| **Unicode** | The standard Myanmar block U+1000–U+109F, in the order the syllable is spoken. Fonts: Noto Sans Myanmar, Pyidaungsu, Myanmar Text. | Everything modern, this site | Yes (it is the default) |
-| **Zawgyi** | Uses Myanmar code points but in visual order and with its own glyph code points (U+1060–U+1097 reused). Needs the Zawgyi-One font. | Phones, Facebook and web text from about 2007 to 2019; filenames and text layers in the library | Yes, mostly: Google's detector plus the impossible-in-Unicode markers in `zawgyi.ts`. Pāḷi with stacked consonants can look like Zawgyi. |
-| **Win Innwa** family | ASCII and Latin-1 bytes drawn as Burmese glyphs by the font. The family (WinMyanmar Systems, 1992–2005) includes Win Innwa, Win Researcher, Win Kalaw and others, which share one keyboard mapping. | Word documents, PDFs and print layouts from government offices, publishers and monasteries; the "legacy font" pages found by book search | **No.** Without the font name the text is just Latin letters. |
+| Encoding             | What it is                                                                                                                                                                                          | Where it is found                                                                                                                        | Can it be detected?                                                                                                                      |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **Unicode**          | The standard Myanmar block U+1000–U+109F, in the order the syllable is spoken. Fonts: Noto Sans Myanmar, Pyidaungsu, Myanmar Text.                                                                  | Everything modern, this site                                                                                                             | Yes (it is the default)                                                                                                                  |
+| **Zawgyi**           | Uses Myanmar code points but in visual order and with its own glyph code points (U+1060–U+1097 reused). Needs the Zawgyi-One font.                                                                  | Phones, Facebook and web text from about 2007 to 2019; filenames and text layers in the library                                          | Yes, mostly: Google's detector plus the impossible-in-Unicode markers in `zawgyi.ts`. Pāḷi with stacked consonants can look like Zawgyi. |
+| **Win Innwa** family | ASCII and Latin-1 bytes drawn as Burmese glyphs by the font. The family (WinMyanmar Systems, 1992–2005) includes Win Innwa, Win Researcher, Win Kalaw and others, which share one keyboard mapping. | Word documents, PDFs and print layouts from government offices, publishers and monasteries; the "legacy font" pages found by book search | **No.** Without the font name the text is just Latin letters.                                                                            |
 
 Unicode → Zawgyi and Unicode → Win Innwa cannot be exact for every text: both are glyph encodings and some Unicode sequences have no single correct glyph form. The app says so (section 6).
 
@@ -43,14 +43,14 @@ Unicode → Zawgyi and Unicode → Win Innwa cannot be exact for every text: bot
 
 **Libraries:**
 
-| Library | Language | Directions | License | Activity on 2026-11-25 |
-| --- | --- | --- | --- | --- |
-| [google/myanmar-tools](https://github.com/google/myanmar-tools) | JS, Java, C++, PHP, Ruby, Python | Zawgyi ↔ Unicode (CLDR rules), Zawgyi detector | Apache-2.0 | 269 stars; last push 2025-03. Already used here at **1.1.3**: 1.2.0 on npm ships unbuilt sources ([tech-architecture.md](tech-architecture.md) §5). |
-| [greenlikeorange/knayi-myscript](https://github.com/greenlikeorange/knayi-myscript) | JS with TypeScript types | Zawgyi ↔ Unicode, **Win Innwa family → Unicode** (since 2.10.0, PR #68 merged 2026-10-03), detection, syllable breaking, normalization | MIT | 82 stars; last push 2026-11-07; npm 2.10.0. Peer dependency `myanmar-tools >=1.1.2 <1.2.0`, which matches our pin. |
-| [trhura/python-myanmar](https://github.com/trhura/python-myanmar) | Python | Every direction between Unicode, Zawgyi and Win Innwa | MIT | 75 stars; last push 2025-08 |
-| [kanaung/converter](https://github.com/kanaung/converter) | PHP | Rule files for Win Innwa, Ayar, Zawgyi, Myanmar3 | MIT | 18 stars; last push 2019 |
-| [Rabbit-Converter/Rabbit](https://github.com/Rabbit-Converter/Rabbit) | JS (also Node, PHP, Java, Python) | Zawgyi ↔ Unicode | WTFPL | 188 stars; simple regular-expression rules |
-| [aungkkmo/mm-converter](https://github.com/aungkkmo/mm-converter) | Python | Win Innwa and Zawgyi → Unicode | MIT | A small wrapper around myanmar-tools and python-myanmar |
+| Library                                                                             | Language                          | Directions                                                                                                                             | License    | Activity on 2026-11-25                                                                                                                              |
+| ----------------------------------------------------------------------------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [google/myanmar-tools](https://github.com/google/myanmar-tools)                     | JS, Java, C++, PHP, Ruby, Python  | Zawgyi ↔ Unicode (CLDR rules), Zawgyi detector                                                                                         | Apache-2.0 | 269 stars; last push 2025-03. Already used here at **1.1.3**: 1.2.0 on npm ships unbuilt sources ([tech-architecture.md](tech-architecture.md) §5). |
+| [greenlikeorange/knayi-myscript](https://github.com/greenlikeorange/knayi-myscript) | JS with TypeScript types          | Zawgyi ↔ Unicode, **Win Innwa family → Unicode** (since 2.10.0, PR #68 merged 2026-10-03), detection, syllable breaking, normalization | MIT        | 82 stars; last push 2026-11-07; npm 2.10.0. Peer dependency `myanmar-tools >=1.1.2 <1.2.0`, which matches our pin.                                  |
+| [trhura/python-myanmar](https://github.com/trhura/python-myanmar)                   | Python                            | Every direction between Unicode, Zawgyi and Win Innwa                                                                                  | MIT        | 75 stars; last push 2025-08                                                                                                                         |
+| [kanaung/converter](https://github.com/kanaung/converter)                           | PHP                               | Rule files for Win Innwa, Ayar, Zawgyi, Myanmar3                                                                                       | MIT        | 18 stars; last push 2019                                                                                                                            |
+| [Rabbit-Converter/Rabbit](https://github.com/Rabbit-Converter/Rabbit)               | JS (also Node, PHP, Java, Python) | Zawgyi ↔ Unicode                                                                                                                       | WTFPL      | 188 stars; simple regular-expression rules                                                                                                          |
+| [aungkkmo/mm-converter](https://github.com/aungkkmo/mm-converter)                   | Python                            | Win Innwa and Zawgyi → Unicode                                                                                                         | MIT        | A small wrapper around myanmar-tools and python-myanmar                                                                                             |
 
 Older or unmaintained, for reference only: [mapmeld/my-winresearcher](https://github.com/mapmeld/my-winresearcher) (Win Researcher → Unicode, 2017), [scriptive/burglish](https://github.com/scriptive/burglish) (MIT, 2018), [Zwenexsys/parabaik](https://github.com/Zwenexsys/parabaik) (LGPL, 2014), [thanlwinsoft/firefoxmyext](https://github.com/thanlwinsoft/firefoxmyext) (2011). Outside JavaScript, ICU's `Zawgyi-my` transform (CLDR) converts Zawgyi to Unicode; browsers do not include it.
 
@@ -62,13 +62,13 @@ Older or unmaintained, for reference only: [mapmeld/my-winresearcher](https://gi
 
 ## 4. How each direction is done
 
-| Direction | Done by | Notes |
-| --- | --- | --- |
-| Zawgyi → Unicode | `myanmar-tools` 1.1.3 `zawgyiToUnicode` | Already a dependency; the same converter the library manifest uses |
-| Unicode → Zawgyi | `myanmar-tools` 1.1.3 `unicodeToZawgyi` | Same library, so the two directions agree |
-| Win Innwa → Unicode | `knayi-myscript` 2.10.0 `fontConvert(text, 'unicode', 'win')` | The only maintained JavaScript option |
-| Unicode → Win Innwa | **Our own table**, ported from `trhura/python-myanmar` (MIT), checked against kanaung's rule files | Credited in the package's `NOTICE` (section 8) |
-| Win Innwa ↔ Zawgyi | Through Unicode | No separate table |
+| Direction           | Done by                                                                                            | Notes                                                              |
+| ------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Zawgyi → Unicode    | `myanmar-tools` 1.1.3 `zawgyiToUnicode`                                                            | Already a dependency; the same converter the library manifest uses |
+| Unicode → Zawgyi    | `myanmar-tools` 1.1.3 `unicodeToZawgyi`                                                            | Same library, so the two directions agree                          |
+| Win Innwa → Unicode | `knayi-myscript` 2.10.0 `fontConvert(text, 'unicode', 'win')`                                      | The only maintained JavaScript option                              |
+| Unicode → Win Innwa | **Our own table**, ported from `trhura/python-myanmar` (MIT), checked against kanaung's rule files | Credited in the package's `NOTICE` (section 8)                     |
+| Win Innwa ↔ Zawgyi  | Through Unicode                                                                                    | No separate table                                                  |
 
 **knayi-myscript was compared with python-myanmar** for Win Innwa → Unicode on 2026-11-25. The 1,860 Burmese library titles without Latin letters were converted to Win Innwa with this package, then read back by each. knayi gave back 1,848 unchanged, python-myanmar 1,143: python-myanmar reads Win Innwa's `0` as the digit, not wa, misreads tall aa (`g`) and leaves some marks as Latin letters, and its table has gaps (empty entries, a zero-width space in one stacked letter). knayi stays for this direction. For Unicode → Win Innwa, knayi's table (which covers every Win Innwa 4 code point) is read in reverse, and python-myanmar's rules choose the glyph variants.
 

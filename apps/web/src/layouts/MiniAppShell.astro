@@ -136,6 +136,20 @@ const customHeader = Astro.slots.has('app-header');
       // A mini app that holds running state (a timer, an active schedule) sets
       // document.body.dataset.miniAppBusy = 'true'. Leaving through the top bar then asks first
       // (the message is in data-leave-message), and closing the tab shows the browser's own warning.
+      // A click or tap should not leave a keyboard focus ring on a button or link; a key press
+      // brings it back (global.css, `data-mini-app-input`).
+      const root = document.documentElement;
+      root.dataset.miniAppInput = 'keyboard';
+      document.addEventListener(
+        'pointerdown',
+        () => (root.dataset.miniAppInput = 'pointer'),
+        true,
+      );
+      document.addEventListener(
+        'keydown',
+        () => (root.dataset.miniAppInput = 'keyboard'),
+        true,
+      );
       const message = document.body.dataset.leaveMessage ?? '';
       const busy = () => document.body.dataset.miniAppBusy === 'true';
       document.addEventListener(

@@ -51,6 +51,8 @@ export const stateSchema = z.object({
     on: z.boolean(),
     week: weekSchema,
     checkedAt: z.number().int().nonnegative().optional(),
+    /** Keep the screen on while the schedule is on; chosen after the battery notice. */
+    keepAwake: z.boolean().optional(),
   }),
   timer: timerSchema.nullable(),
 });

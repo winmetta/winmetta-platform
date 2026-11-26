@@ -55,7 +55,7 @@ test('the bell page has its own layout, back link, language switch and canonical
   await expect(page.locator('.site-header, .site-footer')).toHaveCount(0);
   const back = page.locator('[data-mini-bar] a[href="/en/mini-apps/"]');
   await expect(back).toBeVisible();
-  await expect(back).toHaveAccessibleName('Back to Mini Apps');
+  await expect(back).toHaveAccessibleName('Mini Apps');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'Meditation bell',
   );
