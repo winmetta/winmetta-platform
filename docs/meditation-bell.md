@@ -6,7 +6,7 @@
 
 This adds two things:
 
-1. **Mini apps:** small, self-contained tools inside this site, listed on one page with app-style icons. The meditation bell is the first; a Burmese text converter (Unicode, Zawgyi, Win Innwa) is a likely second.
+1. **Mini apps:** small, self-contained tools inside this site, listed on one page with app-style icons. The meditation bell is the first; a Burmese font converter (Unicode, Zawgyi, Win Innwa) is a likely second ([myanmar-converter.md](myanmar-converter.md)).
 2. **The meditation bell:** a countdown timer, an alarm at a clock time, a manual "Ring bell now" button, and a weekly schedule with CSV import and export. Everything is stored in the browser.
 
 ---
