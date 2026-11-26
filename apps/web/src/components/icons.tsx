@@ -61,3 +61,12 @@ export const MoreIcon = () => (
     <path d="m6 9 6 6 6-6" />
   </Svg>
 );
+/** Two opposite arrows: swap two choices. */
+export const SwapIcon = () => (
+  <Svg>
+    <path d="M7 4 3 8l4 4" />
+    <path d="M3 8h14" />
+    <path d="m17 20 4-4-4-4" />
+    <path d="M21 16H7" />
+  </Svg>
+);

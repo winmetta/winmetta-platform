@@ -1,0 +1,98 @@
+---
+// The Burmese text converter (docs/myanmar-converter.md §6): Unicode, Zawgyi and Win Innwa in every
+// direction, in the browser. Unlinked from the listing and noindex until go-live (docs/implementation-plan.md
+// §5F stage 4: the registry status changes from `coming`), whatever PUBLIC_MINI_APPS says.
+import MiniAppShell from '../../../../layouts/MiniAppShell.astro';
+import MiniAppIcon from '../../../../components/MiniAppIcon.astro';
+import TextConverterIsland, {
+  type Labels,
+} from '../../../../components/TextConverterIsland';
+import { localeCodes, type Locale } from '../../../../i18n/locales';
+import { t, type MessageKey } from '../../../../i18n/messages';
+import { miniAppBySlug } from '../../../../lib/mini-apps';
+export function getStaticPaths() {
+  return localeCodes.map((locale) => ({
+    params: { locale },
+    props: { locale },
+  }));
+}
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const app = miniAppBySlug('burmese-text-converter')!;
+const name = t(locale, app.name);
+const text = (key: MessageKey) => t(locale, key);
+const labels: Labels = {
+  from: text('converterFrom'),
+  to: text('converterTo'),
+  auto: text('converterAuto'),
+  unicode: text('converterUnicode'),
+  zawgyi: text('converterZawgyi'),
+  winInnwa: text('converterWinInnwa'),
+  swap: text('converterSwap'),
+  swapLabel: text('converterSwapLabel'),
+  input: text('converterInput'),
+  inputPlaceholder: text('converterInputPlaceholder'),
+  output: text('converterOutput'),
+  copy: text('converterCopy'),
+  copyLabel: text('converterCopyLabel'),
+  copied: text('converterCopied'),
+  clear: text('converterClear'),
+  loading: text('converterLoading'),
+  loadError: text('converterLoadError'),
+  retry: text('converterRetry'),
+  foundUnicode: text('converterFoundUnicode'),
+  foundZawgyi: text('converterFoundZawgyi'),
+  noBurmese: text('converterNoBurmese'),
+  choose: text('converterChoose'),
+  tooLong: text('converterTooLong'),
+  same: text('converterSame'),
+  fontZawgyi: text('converterFontZawgyi'),
+  fontWinInnwa: text('converterFontWinInnwa'),
+  lossy: text('converterLossy'),
+  noteUnmapped: text('converterNoteUnmapped'),
+  noteLatin: text('converterNoteLatin'),
+  noteLooksUnicode: text('converterNoteLooksUnicode'),
+  noteLooksZawgyi: text('converterNoteLooksZawgyi'),
+};
+const libraries = [
+  ['myanmar-tools', 'https://github.com/google/myanmar-tools'],
+  ['knayi-myscript', 'https://github.com/greenlikeorange/knayi-myscript'],
+  ['python-myanmar', 'https://github.com/trhura/python-myanmar'],
+] as const;
+---
+
+<MiniAppShell
+  locale={locale}
+  title={name}
+  path="mini-apps/burmese-text-converter/"
+  noindex={app.status === 'coming'}
+>
+  <header class="space-y-4">
+    <div class="flex items-center gap-4">
+      <MiniAppIcon icon={app.icon} size={48} />
+      <h1 class="text-3xl font-bold">{name}</h1>
+    </div>
+    <p class="lead">{text('converterIntro')}</p>
+  </header>
+  <noscript>
+    <p class="card">{text('converterNeedsJs')}</p>
+  </noscript>
+  {/* An island renders as `display: contents`: a wrapper gives it the page's vertical spacing. */}
+  <div>
+    <TextConverterIsland client:load labels={labels} />
+  </div>
+  <p class="muted pb-6 text-sm">
+    {text('converterBuiltWith')}
+    {libraries.map(([library, href], index) => (
+      <>
+        {index > 0 && ', '}
+        <a class="link" href={href} rel="noopener">
+          {library}
+        </a>
+      </>
+    ))}
+    . {text('converterFontsNote')}
+  </p>
+</MiniAppShell>

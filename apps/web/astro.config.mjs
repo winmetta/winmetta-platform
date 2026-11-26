@@ -111,7 +111,10 @@ export default defineConfig({
         (process.env.PUBLIC_DONATE === 'true' || !/\/donate\/$/.test(page)) &&
         // The mini apps are noindex until reviewed (PUBLIC_MINI_APPS, docs/meditation-bell.md §2).
         (process.env.PUBLIC_MINI_APPS === 'true' ||
-          !/\/mini-apps\//.test(page)),
+          !/\/mini-apps\//.test(page)) &&
+        // The converter stays out until its go-live (docs/implementation-plan.md §5F stage 4):
+        // remove this line when its registry status changes from `coming`.
+        !/\/mini-apps\/burmese-text-converter\//.test(page),
     }),
   ],
   vite: {
