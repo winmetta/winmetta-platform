@@ -75,7 +75,10 @@ const [contactBefore, contactAfter] = text('privacyContact').split('{email}');
           ),
         )}
         {title === 'privacyAnalyticsTitle' && (
-          <p>{text('privacyBellAnalytics')}</p>
+          <>
+            <p>{text('privacyBellAnalytics')}</p>
+            <p>{text('privacyConverterAnalytics')}</p>
+          </>
         )}
       </section>
     ))}

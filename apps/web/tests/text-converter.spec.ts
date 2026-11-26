@@ -73,6 +73,32 @@ test('the input has its own Copy, and Clear looks destructive', async ({
   await expect(clear).toBeEnabled();
 });
 
+test('counts what is used without sending the text', async ({ page }) => {
+  await page.addInitScript(() => {
+    const sent: { name: string; data: unknown }[] = [];
+    (window as unknown as Record<string, unknown>).sentEvents = sent;
+    (window as unknown as Record<string, unknown>).umami = {
+      track: (name: string, data: unknown) => sent.push({ name, data }),
+    };
+  });
+  await open(page);
+  await page.getByLabel('Text to convert').fill('ျမန္မာစာ ေလ့လာျခင္း');
+  await expect(
+    page.getByRole('textbox', { name: 'Result', exact: true }),
+  ).not.toHaveValue('');
+  await page.getByRole('button', { name: 'Swap' }).click();
+  await page.getByRole('button', { name: 'Clear' }).click();
+  const sent = await page.evaluate(
+    () => (window as unknown as { sentEvents: unknown[] }).sentEvents,
+  );
+  const names = sent.map((e) => (e as { name: string }).name);
+  expect(names).toContain('converter_convert');
+  expect(names).toContain('converter_swap');
+  expect(names).toContain('converter_clear');
+  const all = JSON.stringify(sent);
+  expect(all).not.toMatch(/[က-႟]/u);
+});
+
 test('refuses text over the size limit', async ({ page }) => {
   await open(page);
   // Setting the value directly: typing 200,001 characters one by one would take minutes.

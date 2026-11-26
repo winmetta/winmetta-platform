@@ -10,6 +10,8 @@ import {
   type Converter,
   type FromChoice,
 } from '../lib/text-converter';
+import { send, useConverterEvents } from './use-converter-events';
+import * as events from '../lib/text-converter-events';
 import {
   CheckIcon,
   CloseIcon,
@@ -196,7 +198,11 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
         converter.current = { convert, detect };
         setStatus('ready');
       },
-      () => live && setStatus('error'),
+      () => {
+        if (!live) return;
+        setStatus('error');
+        send(events.loadError());
+      },
     );
     return () => {
       live = false;
@@ -218,6 +224,8 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
         : null,
     [status, text, from, to],
   );
+
+  useConverterEvents(view, from, to, text.length);
 
   const lines: { text: string; tone: Tone }[] = [];
   const say = (text: string, tone: Tone) => lines.push({ text, tone });
@@ -245,6 +253,7 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
       : labels.inputPlaceholder;
 
   const doSwap = () => {
+    send(events.swap());
     const next = swap(from, to, view?.source ?? null);
     setFrom(next.from);
     setTo(next.to);
@@ -256,6 +265,7 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
   };
   const copy = () => {
     if (!view?.output) return;
+    send(events.copy('result', from, to, text.length));
     void copyText(view.output).then((ok) => {
       setCopied(ok);
       if (ok) window.setTimeout(() => setCopied(false), 2000);
@@ -264,6 +274,7 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
 
   const copyInput = () => {
     if (!input) return;
+    send(events.copy('input', from, to, input.length));
     void copyText(input).then((ok) => {
       setCopiedInput(ok);
       if (ok) window.setTimeout(() => setCopiedInput(false), 2000);
@@ -316,6 +327,7 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
           labels.from,
           from,
           (v) => {
+            send(events.encodingChange('from', v as FromChoice));
             setFrom(v as FromChoice);
             setPreviewFont(null);
           },
@@ -345,7 +357,10 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
           'converter-to',
           labels.to,
           to,
-          (v) => setTo(v as Encoding),
+          (v) => {
+            send(events.encodingChange('to', v as FromChoice));
+            setTo(v as Encoding);
+          },
           false,
         )}
       </div>
@@ -359,7 +374,10 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
             id="converter-preview-font"
             label={labels.previewAs}
             value={inputFont}
-            onChange={setPreviewFont}
+            onChange={(font) => {
+              send(events.fontChange(font));
+              setPreviewFont(font);
+            }}
             labels={labels}
           />
           <textarea
@@ -388,6 +406,7 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
               danger
               icon={<CloseIcon />}
               onClick={() => {
+                send(events.clear());
                 setInput('');
                 setText('');
               }}

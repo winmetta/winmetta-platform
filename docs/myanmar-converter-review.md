@@ -30,6 +30,7 @@ Known limits that are not errors: Win Innwa types wa (ဝ) and zero (၀) with t
 | `converterCopy` | Copy | ကူးယူရန် |
 | `converterCopyLabel` | Copy the result | ရလဒ်ကို ကူးယူရန် |
 | `converterCopyInputLabel` | Copy what you typed | ရိုက်ထည့်ထားသော စာသားကို ကူးယူရန် |
+| `privacyConverterAnalytics` (Privacy page) | When analytics is enabled, we count Burmese Text Converter feature use … (see `en.json`) | (see `my.json`) |
 | `converterCopied` | Copied | ကူးယူပြီး |
 | `converterClear` | Clear | ဖျက်ရန် |
 | `converterLoading` | Loading the converter… | ပြောင်းလဲကိရိယာကို ဖွင့်နေပါသည်… |
