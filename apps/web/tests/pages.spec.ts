@@ -89,7 +89,7 @@ test('Privacy states what the site does and shows a Latin-digit date', async ({
   const ipLogging = process.env.PUBLIC_ANALYTICS_IP_LOGGING === 'true';
   const bookSearch = process.env.PUBLIC_BOOK_SEARCH === 'true';
   await expect(page.getByRole('heading', { level: 2 })).toHaveCount(
-    7 + Number(feedback) + Number(ipLogging) + Number(bookSearch),
+    8 + Number(feedback) + Number(ipLogging) + Number(bookSearch),
   );
   await expect(page.locator('main')).toContainText('November 25, 2026');
   await expect(page.locator('main')).toContainText('Website analytics');
@@ -97,6 +97,18 @@ test('Privacy states what the site does and shows a Latin-digit date', async ({
     Number(ipLogging),
   );
   await expect(page.locator('main')).toContainText('stats.app.winmetta.org');
+});
+
+test('the main site uses the light palette with a dark system preference', async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.goto('/en/about/');
+  await expect(page.locator('html')).toHaveCSS('color-scheme', 'light');
+  await expect(page.locator('body')).toHaveCSS(
+    'background-color',
+    'rgb(255, 255, 255)',
+  );
 });
 
 test('language switch keeps the page and canonical URLs are per page', async ({

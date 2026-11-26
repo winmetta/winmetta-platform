@@ -16,9 +16,14 @@ describe('sound registry', () => {
       expect(messages.en[s.name]).toBeTruthy();
       expect(messages.my[s.name]).toBeTruthy();
     }
-    expect(isSoundId(defaultStartSound)).toBe(true);
+    expect(defaultStartSound).toBe('off');
     expect(isSoundId(defaultEndSound)).toBe(true);
     expect(soundById('nope')).toBeUndefined();
+  });
+  it('gives every sound a generated tone, and the two chimes never have a file', () => {
+    for (const s of sounds) expect(s.synth.decay).toBeGreaterThan(0);
+    expect(soundById('soft-chime')?.file).toBeNull();
+    expect(soundById('deep-chime')?.file).toBeNull();
   });
   it('spaces repeated strikes five seconds apart', () => {
     expect(ringOffsets(3)).toEqual([0, 5, 10]);

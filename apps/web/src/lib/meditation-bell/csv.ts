@@ -10,9 +10,9 @@ import {
   type Bell,
   type Week,
 } from './schedule';
-import { isSoundId } from './sounds';
+import { defaultEndSound, isSoundId } from './sounds';
 
-export const maxCsvBytes = 100 * 1024;
+export const maxCsvBytes = 128 * 1024;
 export const maxCsvBells = 700;
 export const maxCsvBellsPerDay = 100;
 export const csvHeader = ['day', 'time', 'label', 'sound', 'rings'] as const;
@@ -43,7 +43,10 @@ export type CsvResult =
       /** The line of the file the row starts on, so it matches a spreadsheet (the header is line 1). */
       skipped: { row: number; reason: SkipReason }[];
     }
-  | { ok: false; error: 'too-big' | 'too-many' | 'no-header' | 'empty' };
+  | {
+      ok: false;
+      error: 'too-big' | 'too-many' | 'no-header' | 'empty' | 'malformed';
+    };
 
 /** One CSV record and the line of the file it starts on (the first line is 1). */
 export interface CsvRecord {
@@ -52,11 +55,11 @@ export interface CsvRecord {
 }
 
 /** RFC 4180 records: quoted fields may hold commas, doubled quotes and line breaks. */
-export function splitRecordsWithLines(text: string): CsvRecord[] {
+export function splitRecordsWithLines(text: string): CsvRecord[] | undefined {
   const records: CsvRecord[] = [];
   let field = '';
   let record: string[] = [];
-  let quoted = false;
+  let state: 'plain' | 'quoted' | 'closed' = 'plain';
   let line = 1;
   let startLine = 1;
   const endRecord = () => {
@@ -72,29 +75,38 @@ export function splitRecordsWithLines(text: string): CsvRecord[] {
     const pair = c === '\r' && text[i + 1] === '\n';
     if (isBreak) line++;
     if (pair) i++;
-    if (quoted && isBreak) field += pair ? '\r\n' : c;
-    else if (quoted) {
+    if (state === 'quoted') {
+      if (isBreak) {
+        field += pair ? '\r\n' : c;
+        continue;
+      }
       if (c === '"' && text[i + 1] === '"') {
         field += '"';
         i++;
-      } else if (c === '"') quoted = false;
+      } else if (c === '"') state = 'closed';
       else field += c;
-    } else if (c === '"') quoted = true;
-    else if (c === ',') {
+    } else if (c === ',') {
       record.push(field);
       field = '';
+      state = 'plain';
     } else if (isBreak) {
       endRecord();
       startLine = line;
+      state = 'plain';
+    } else if (state === 'closed') return undefined;
+    else if (c === '"') {
+      if (field !== '') return undefined;
+      state = 'quoted';
     } else field += c;
   }
+  if (state === 'quoted') return undefined;
   endRecord();
   return records;
 }
 
 /** The records without their line numbers. */
 export const splitRecords = (text: string): string[][] =>
-  splitRecordsWithLines(text).map((record) => record.cells);
+  (splitRecordsWithLines(text) ?? []).map((record) => record.cells);
 
 function parseRow(
   cells: Record<string, string>,
@@ -133,6 +145,7 @@ export function parseCsv(text: string, fallbackSound: string): CsvResult {
   const records = splitRecordsWithLines(
     text.startsWith(BOM) ? text.slice(1) : text,
   );
+  if (!records) return { ok: false, error: 'malformed' };
   const header = records
     .shift()
     ?.cells.map((name) => name.trim().toLowerCase());
@@ -203,7 +216,12 @@ export function applyImport(
 }
 
 const quote = (value: string): string =>
-  /[",\r\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+  /[",;\r\n\t]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+
+// Protect formula-like labels when opened in Excel. On import trim() removes the guard.
+const formulaPrefix = /^[\p{White_Space}\p{Cc}\p{Cf}]*[=+@＝＋－＠-]/u;
+const quoteLabel = (label: string): string =>
+  quote(formulaPrefix.test(label) ? `\t${label.trimStart()}` : label);
 
 /** The schedule as CSV, UTF-8 with a byte-order mark so Excel shows Burmese labels correctly. */
 export function serializeCsv(week: Week): string {
@@ -214,8 +232,8 @@ export function serializeCsv(week: Week): string {
         [
           day,
           bell.time,
-          quote(bell.label),
-          bell.sound,
+          quoteLabel(bell.label),
+          isSoundId(bell.sound) ? bell.sound : defaultEndSound,
           String(bell.rings),
         ].join(','),
       );

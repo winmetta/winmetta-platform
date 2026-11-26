@@ -1,33 +1,33 @@
 # Mini apps and the meditation bell
 
-**Status:** planned 2026-11-25; stage 2 (mini apps foundation), stage 3 (bell logic) and stage 4 (the Timer: countdown, alarm, presets, bell settings, Ring bell now) built 2026-11-25; the Schedule is not built yet. The staged plan is in [implementation-plan.md](implementation-plan.md) §5E. An interactive design mockup was reviewed with the maintainer on 2026-11-25; this document records what it settled.
+**Status:** the mini-app foundation, bell logic, mobile-first Timer, weekly scheduling and local CSV import/export are built. The WinMetta sound recordings and go-live checks are pending. See [implementation-plan.md](implementation-plan.md) §5E for the stages.
 
 **Why:** Win Metta's retreats and online sittings use a bell to end a session. Today that is the retreat bell page at `retreat.winmetta.org`, built from the archived `winmetta-retreat-web` repository, with each retreat's bell times written into the code. Meditators also want a simple bell for their own sittings: ring once after 20 minutes, or at 6:00 AM tomorrow, or on a weekly practice schedule. A bell for anyone, with no login and nothing sent to a server, fits the mission and costs almost nothing to host.
 
 This adds two things:
 
 1. **Mini apps:** small, self-contained tools inside this site, listed on one page with app-style icons. The meditation bell is the first; a Burmese font converter (Unicode, Zawgyi, Win Innwa) is a likely second ([myanmar-converter.md](myanmar-converter.md)).
-2. **The meditation bell:** a countdown timer, an alarm at a clock time, a manual "Ring bell now" button, and a weekly schedule with CSV import and export. Everything is stored in the browser.
+2. **The meditation bell:** a countdown timer, an alarm at a clock time, a manual "Ring now" button, and a weekly schedule with CSV import and export. Everything is stored in the browser.
 
 ---
 
 ## 1. Decisions (2026-11-25)
 
-| Decision              | Choice                                                                                                                       | Notes                                                                                                                                                                   |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Where mini apps live  | **`/<locale>/mini-apps/`** (listing) and **`/<locale>/mini-apps/<slug>/`** (each app), first `meditation-bell`               | Inside `apps/web`, built as static pages like the rest of the site.                                                                                                     |
-| Listing page          | **A normal site page** (header and footer) with a grid of app-style icons                                                   | Rounded-square icon, name below, a Beta or "Coming later" note. Driven by one registry file (section 2).                                                                |
-| Mini app pages        | **Their own minimal layout:** no site header, footer or logo                                                                  | A slim top bar with **"← Mini Apps"** (back to the listing) and the language switch. Section 2.                                                                         |
-| Bell modes            | **Two: Timer and Schedule**, switched by a segmented control at the top of the app                                           | Timer covers a countdown and an alarm at a clock time. Daily is not a separate mode: the weekly schedule with "Every day" covers it.                                   |
-| One or the other      | **A timer and the weekly schedule never run at the same time**                                                               | Starting a timer while the schedule is on asks first and turns the schedule off; turning the schedule on while a timer runs asks first and stops the timer. Section 4. |
-| Turning off           | **Off never deletes.** A schedule that is turned off keeps its bells                                                         | The user turns it back on by hand; it does not come back by itself after a timer.                                                                                     |
-| Storage               | **The browser only** (`localStorage`), versioned                                                                             | No account, no server, no sync. CSV export is the backup. Section 6.                                                                                                   |
-| Interface language    | **English buttons and labels in both locales; Burmese only for alerts, notices and error messages**                          | Western digits (0–9) for every time, date and number, in both locales. A deliberate exception to the site's fully translated pages; section 7.                         |
-| Bell sounds           | **WinMetta bell (short)** and **WinMetta bell (long)**, cut from Win Metta's own recording, plus **public-domain (CC0) bells** as each is cleared | A short bell to start a sitting, a long bell (by default rung 3 times) to end it. Each schedule bell has its own sound and ring count. Section 8.                       |
-| Native apps           | **Later, not in this plan.** Bell logic is written so a desktop or mobile app can reuse it                                   | A browser cannot ring reliably with the tab closed or the phone locked. Section 9.                                                                                     |
-| Analytics             | **Cookieless usage events for the timer and the schedule**, through the site's existing Umami setup                         | To learn which features are used. Bucketed counts only, never labels, times or schedule contents. Section 11 and [analytics.md](analytics.md) §3.                      |
-| Feedback              | **A feedback button in the footer of every mini app**                                                                        | Opens the site's existing feedback dialog. Section 2.                                                                                                                  |
-| Icons                 | **Designed in Canva** (through the Canva connector), exported as SVG and committed                                           | One set for every mini app. Section 2.1.                                                                                                                               |
+| Decision             | Choice                                                                                                                                                                                   | Notes                                                                                                                                                                                               |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Where mini apps live | **`/<locale>/mini-apps/`** (listing) and **`/<locale>/mini-apps/<slug>/`** (each app), first `meditation-bell`                                                                           | Inside `apps/web`, built as static pages like the rest of the site.                                                                                                                                 |
+| Listing page         | **A normal site page** (header and footer) with a grid of app-style icons                                                                                                                | Rounded-square icon, name below, a Beta or "Coming later" note. Driven by one registry file (section 2).                                                                                            |
+| Mini app pages       | **Their own minimal layout:** no site header, footer or logo                                                                                                                             | Mobile-first app UI with its own components and a compact top bar. Section 2.                                                                                                                       |
+| Bell modes           | **Two: Timer and Schedule**, switched by a segmented control at the top of the app                                                                                                       | Timer offers one mode switch action: Set alarm in Countdown, Countdown in Alarm. The weekly schedule covers daily recurrence.                                                                       |
+| One or the other     | **A timer and the weekly schedule never run at the same time**                                                                                                                           | Starting a timer while the schedule is on asks first and turns the schedule off; turning the schedule on while a timer runs asks first and stops the timer. Section 4.                              |
+| Turning off          | **Off never deletes.** A schedule that is turned off keeps its bells                                                                                                                     | The user turns it back on by hand; it does not come back by itself after a timer.                                                                                                                   |
+| Storage              | **The browser only** (`localStorage`), versioned                                                                                                                                         | No account, no server, no sync. CSV export is the backup. Section 6.                                                                                                                                |
+| Interface language   | **English buttons and labels in both locales; Burmese only for alerts, notices and error messages**                                                                                      | Western digits (0–9) for every time, date and number, in both locales. A deliberate exception to the site's fully translated pages; section 7.                                                      |
+| Bell sounds          | **Soft chime (synth)**, **Deep chime (synth)** and **Long chime (synth)**, made in the browser; Win Metta's own recording and **public-domain (CC0) bells** are added as each is cleared | The Alarm bell defaults to Long chime, rung 3 times (1x to 6x); the Start button bell is Off by default and can ring once on Start. Each schedule bell has its own sound and ring count. Section 8. |
+| Native apps          | **Later, not in this plan.** Bell logic is written so a desktop or mobile app can reuse it                                                                                               | A browser cannot ring reliably with the tab closed or the phone locked. Section 9.                                                                                                                  |
+| Analytics            | **Cookieless usage events for the timer and the schedule**, through the site's existing Umami setup                                                                                      | To learn which features are used. Bucketed counts only, never labels, times or schedule contents. Section 11 and [analytics.md](analytics.md) §3.                                                   |
+| Feedback             | **A feedback button in the footer of every mini app**                                                                                                                                    | Opens the site's existing feedback dialog. Section 2.                                                                                                                                               |
+| Icons                | **Designed in Canva** (through the Canva connector), exported as SVG and committed                                                                                                       | One set for every mini app. Section 2.1.                                                                                                                                                            |
 
 Out of scope: accounts or sync between devices, uploading your own bell sounds, sharing a schedule by link, interval bells during a countdown, statistics shown to the user of any kind (minutes meditated, streaks), and the Burmese text converter itself (only its tile on the listing page).
 
@@ -41,15 +41,16 @@ Out of scope: accounts or sync between devices, uploading your own bell sounds, 
 
 **Mini app layout** (a new `layouts/MiniAppShell.astro`):
 
-- **Keeps** what the main layout provides that every page needs: global styles and fonts (Noto Sans Myanmar), `<html lang>`, the title, canonical and `hreflang` alternates, the analytics component (it sends only page views unless an event is added), and the Beta label.
+- **Keeps** what the main layout provides that every page needs: global styles and fonts (Noto Sans Myanmar), `<html lang>`, the title, canonical and `hreflang` alternates, the analytics component (it sends only page views unless an event is added), and the locale preference behavior.
 - **Drops** the site header, navigation, footer and logo, so the app gets the whole screen.
-- **Top bar:** "← Mini Apps" on the start side, a real link to `/<locale>/mini-apps/` (not `history.back()`, which goes nowhere when the app is opened from a shared link or a home-screen shortcut), and the language switch **EN | ကခဂ** on the end side. The ကခဂ button has `lang="my"` and the accessible name "Myanmar", and its text is vertically centred: Burmese glyphs are taller than Latin ones, so the button sets its own line height and is checked in a screenshot (the 2026-11-25 mockup clipped it). Switching language follows the site rule: only the locale segment of the address changes (AGENTS.md §6).
-- **Leaving while a bell is set:** if a timer is running or paused, or the schedule is on, following "← Mini Apps" or switching language asks first, and closing the tab triggers the browser's own leave warning. Timer and schedule state are saved anyway, so coming back resumes them (section 4).
+- **Mobile-first UI:** Meditation Bell owns the visual styles and controls for its header and task flow. The shared shell provides page metadata, navigation behavior and service integration.
+- **Top bar:** a back arrow links to the localized Mini Apps listing. The bell icon and app name form the only page heading. A globe button opens a language menu with English and မြန်မာ. The menu preserves the path, query and fragment when changing the locale.
+- **Leaving while a bell is set:** if a timer is running or paused, or the schedule is on, following "← Mini Apps" or switching language asks first. The question says what stops ("Your timer or weekly schedule is still running. Bells ring only while this page is open, so leaving stops them."), not that something is unsaved, because there are no unsaved changes; and closing the tab triggers the browser's own leave warning. Timer and schedule state are saved anyway, so coming back resumes them (section 4).
 - **Footer with a feedback button:** every mini app ends with a slim footer holding a **Feedback** button (an outline speech-bubble icon and the word, an icon-only button on narrow phones with the accessible name "Send feedback"). It opens the site's existing feedback dialog ([feedback.md](feedback.md)) with the `general` context, the mini app's name filled in as the item, and the "suggestion", "website" and "other" problem types, so reports reach the team without a new endpoint or context. It follows the site's other feedback links: shown only when `PUBLIC_FEEDBACK` is on (it is in production), and a `mailto:` message without JavaScript (`feedbackMailto` in `lib/feedback.ts`). The footer stays below the app's content and never covers it; it is the only footer content (no site links or logo).
 
 **Navigation.** The listing page needs a menu link with an icon in `NavIcon.astro`. Where it goes, and its Burmese name, are open questions (section 12): the Dhamma Library menu already has "Dhamma Apps" (`studyApps`), a list of outside study apps, and the two names must not be confused.
 
-**Design rules** for the listing page and every mini app are summarized in [design-guide.md](design-guide.md) §9, so later mini apps look and behave the same.
+**Design rules** for the listing page and every mini app are summarized in [design-guide.md](design-guide.md) §9, so later mini apps can apply the same mobile-first principles with their own interfaces.
 
 ### 2.1 Icons (designed in Canva)
 
@@ -57,7 +58,7 @@ Out of scope: accounts or sync between devices, uploading your own bell sounds, 
 - **Made in Canva** through the Canva connector, from basic shapes and lines drawn for this icon, not from Canva's stock elements, photos or illustrations, whose licence limits their use in logos and app icons (check Canva's current content licence when the icons are made). Win Metta's own artwork may be used.
 - **Sizes:** designed on a 1024 × 1024 canvas so the same art can later be an installable-app, desktop or mobile app icon; exported as SVG for the site (and PNG at 1024 px for later app stores).
 - **In the repo:** the cleaned SVG in `apps/web/src/assets/mini-apps/<id>.svg` (no embedded fonts or raster images, small enough to inline), named in the registry, and a line in `apps/web/src/assets/SOURCES.md` saying it was designed for Win Metta in Canva. The link to the Canva design is kept in the private repository, not here.
-- **Checked** at 64 px and 32 px, in light and dark, next to the other tiles; a Burmese speaker checks any Burmese letters in an icon.
+- **Checked** at 64 px and 32 px, on the light palette next to the other tiles; a Burmese speaker checks any Burmese letters in an icon.
 
 **Feature flag.** Like the Dāna page ([donations.md](donations.md)), the listing page and the bell are always built but stay unlinked, `noindex` and out of the sitemap until `PUBLIC_MINI_APPS=true`; the flag adds the menu link.
 
@@ -65,38 +66,38 @@ Out of scope: accounts or sync between devices, uploading your own bell sounds, 
 
 ## 3. Timer mode
 
-The Timer page has, from top to bottom: the bell settings button and the Countdown/Set alarm switch, the display, the minute presets, the custom-minutes field (countdown) or the "Ring at" time field (alarm), Start/Pause and Reset/Clear, and **Ring bell now**.
+The app starts with a **Timer / Schedule** switch. In Timer, the toolbar below it has one button on the right: **Set alarm** in Countdown, **Countdown** in Alarm. Schedule omits it. Below the toolbar are the time display, presets and time field, and the timer actions. **Ring now** is a shared manual action below the active view, and under its help line, on the start side, sits the **Bells Settings** button that opens the Start button bell and Alarm bell settings (in both views, since the Alarm bell is also the default for new schedule bells).
 
 ### 3.1 Countdown
 
-- **Display:** a progress ring with the time left as `mm:ss`, or `mmm:ss` once the timer is 100 minutes or longer (for example `09:00`, `120:00`), and a status line (Ready, Sitting, Paused, Bell rang).
+- **Display:** a progress ring with the time left as `mm:ss.SSS`, or `mmm:ss.SSS` at 100 minutes or longer (for example `09:00.000` or `120:00.000`), and a status line (Ready, Paused, Bell rang; nothing while the timer runs, since the ring itself shows it).
 - **Presets:** 3, 5, 10, 15 (first row) and 30, 60, 90, 120 minutes (second row).
 - **Custom minutes:** whole minutes from 1 to **960** (16 hours). Anything else shows an error under the field and changes nothing.
 - **Start / Pause / Resume** and **Reset** (back to the chosen length). Choosing a preset stops a running timer and sets the new length.
 
 ### 3.2 Alarm
 
-"Set alarm" replaces the ring with a **large clock**.
+Alarm uses an alarm-clock icon and a large wall-clock time. An unset alarm shows dashes and “Pick a time or a preset”. After Start, the target stays on screen and a separate minutes, seconds and milliseconds readout shows the time remaining. The remaining time refreshes while the timer view is visible and freezes while paused. While an alarm is paused its clock shows dashes, because Resume works out a new ring time from the time left; the remaining readout stays.
 
 - **Presets** become "+N minutes from now" (the same eight values) and set the clock to now plus N, rounded to the minute.
-- **Ring at:** a time field. The alarm is the next time that clock time occurs: a time that has already passed today means tomorrow, and the line under the clock says **"Rings tomorrow"** (or "Rings today") and how long until then.
+- **Ring at:** a time field. The alarm is the next time that clock time occurs: a time that has already passed today means tomorrow. The remaining time appears beneath the target.
 - **Limit:** at most **16 hours** ahead. A time further away (for example 2:00 PM when it is now 7:00 PM) shows "Pick a time within the next 16 hours" and sets nothing.
-- **Start / Pause / Resume** and **Clear** (removes the alarm). "Countdown" switches back.
+- **Start / Pause / Resume** and **Reset** (removes the alarm). "Countdown" switches back.
 
 ### 3.3 Sound and the manual bell
 
-- **Bell settings button** (top left, "🔔 Bells ▾"): opens a small panel with two rows, each sound with a play button to preview it:
-  - **Start bell:** Off, or a sound (default: WinMetta bell (short), rung once). It rings when Start is pressed (not on Resume), so a sitting opens with one short ring.
-  - **End bell:** a sound and 1x, 2x or 3x (default: WinMetta bell (long), 3x). It rings when the countdown or alarm ends.
-  Choosing plays the choice once, shows a notice, and saves it. The end bell is also the default for new schedule bells.
-- **Ring bell now:** plays the end bell's sound once, immediately, in both modes, whether or not a timer or schedule is active.
+- **Bell settings button** (bottom left, "🔔 Bells Settings ▾"): opens a small panel with two rows, each sound with a play button to preview it:
+  - **Start button bell:** Off, or a sound (default: Off, so nothing rings on Start until the person chooses a sound; rung once). It rings when Start is pressed (not on Resume).
+  - **Alarm bell:** a sound and 1x to 6x (default: Long chime (synth), 3x). It rings when the countdown or alarm ends.
+    Choosing a sound or a ring count only saves it and shows a notice; nothing plays except from a **Play** button (the Alarm bell's Play rings the chosen count). While a preview plays, that button becomes **Stop** (same place, still enabled) with a thin progress bar along its bottom edge; Stop ends the sound at once with a very short fade, and the preview also ends when the sound finishes, when the choice changes or when the panel closes. Each row has a short help line (linked with `aria-describedby`). The alarm bell is also the default for new schedule bells and for Ring now.
+- **Ring now:** rings the Alarm bell's sound and ring count (1x to 6x) immediately, in either view. While it rings the button becomes **Stop** (same place, still enabled, with the same thin progress bar), and Stop ends the sound at once. Give this frequent manual action a full-width button at least 56 px high and a 24 px gap above it.
 
 ### 3.4 How the timer keeps time
 
 - A running timer stores its **end as an absolute moment** (milliseconds since the epoch), never a count of ticks, so a slowed-down background tab, a reload or a closed and reopened tab cannot make it drift. Pausing stores the time left; resuming computes a new end.
 - The page checks "has the end passed?" (about once a second when visible; on `visibilitychange` and `focus`). Browsers slow timers in hidden tabs, so a bell can be up to about a minute late in a background tab; that is accepted and stated in the help text.
 - **Asleep or closed when the bell was due:** on return, a bell missed by **two minutes or less** still rings; an older one does not ring and shows a notice ("Your 6:00 AM bell was missed while this page was closed").
-- **Audio needs a first tap:** browsers only allow sound after the user has interacted with the page. Start, a preset and "Ring bell now" all count; the audio is unlocked on the first of them. If the schedule is on and the page was just opened, a notice asks for one tap to enable sound.
+- **Audio needs a first tap:** browsers only allow sound after the user has interacted with the page. Start, a preset and "Ring now" all count; the audio is unlocked on the first of them. If the schedule is on and the page was just opened, a modal dialog asks for one tap to enable sound (it has no Esc or outside-click dismissal, so it cannot be missed).
 - **Screen:** while a timer runs and the page is visible, the app asks the browser to keep the screen on (Screen Wake Lock API, where supported) and releases it when the timer stops.
 
 ---
@@ -106,8 +107,10 @@ The Timer page has, from top to bottom: the bell settings button and the Countdo
 ### 4.1 Weekly schedule
 
 - **Header:** "Weekly schedule" and an **On/Off** switch.
+- **Running and next bell:** under the heading, a card shows "Running" with a dot when the schedule is on (the Schedule tab carries the same dot) and "Next bell: Today 4:44 PM · label" with "in 2 h 22 min", the soonest bell across the whole week; when off it says "Schedule is off. Bells will not ring." The next bell's row is tagged "Next" and its day button has a dot.
+- **Which days:** every bell row names the days it runs on ("Every day", "Weekdays", "Thu", "Mon–Wed, Sat"). Bells with the same time, label, sound and rings on several days read as one bell.
 - **Days:** a row of seven day buttons that always fits the screen (section 7.2); the selected day's bells are listed below, sorted by time, with the time, the label and "3x" when a bell rings more than once. Tapping a bell opens it for editing.
-- **Buttons:** Add, Import, Export, and **Ring bell now**.
+- **Buttons:** Add, Import, Export, and **Ring now**.
 - **Help line:** "Bells ring only while this page is open", because that is true of every browser (section 9).
 - There is no "Back to timer" button: the Timer/Schedule switch at the top is always visible.
 
@@ -115,7 +118,7 @@ The Timer page has, from top to bottom: the bell settings button and the Countdo
 
 A full screen inside the app, with a back arrow.
 
-- **Time** (required), **Label** (optional, up to 40 characters, for example "Walking meditation"), **Days** (one or more, with "Every day" and "Weekdays" shortcuts; the day being viewed is preselected), **Sound** (default: the Timer page's end bell sound), **Rings** (1x, 2x or 3x; default: the end bell's count), and **Test sound**.
+- **Time** (required), **Label** (optional, up to 40 characters, for example "Walking meditation"), **Days** (one or more, with "Every day" and "Weekdays" shortcuts; the day being viewed is preselected), **Sound** (default: the Timer page's Alarm bell sound), **Rings** (1x to 6x; default: the Alarm bell's count), and **Test sound**.
 - **Save / Cancel**, and **Delete** when editing.
 - **Errors:** no time, no day, or a time that already has a bell on one of the chosen days ("A bell at 6:00 AM is already set on Tuesday").
 - Editing a bell may move it to other days; it is saved on every chosen day.
@@ -129,17 +132,17 @@ A full screen inside the app, with a back arrow.
 ### 4.4 How the schedule keeps time
 
 - Bell times are **local wall-clock times** in the device's time zone, so 6:00 AM stays 6:00 AM across daylight-saving changes and when the device moves zones. The next bell is computed with Luxon, already a dependency. A time skipped by a daylight-saving change rings at the next valid minute; a time that occurs twice rings once.
-- The same checks as the timer apply (section 3.4): absolute next-bell moment, checks on visibility, the two-minute rule for missed bells, and the first-tap audio unlock.
-- **Keep screen on:** the schedule page offers a "Keep screen on" switch (off by default) for a retreat-room display, using the same Wake Lock API.
+- The scheduler checks absolute occurrences once per second while enabled and rechecks on focus and visibility changes. It saves a checkpoint to resume after reload and rebases it when the device clock is set backward. Open tabs pick up schedule changes from the same browser, and a Web Lock coordinates scheduled playback when available. After sound is enabled, bells due within the past two minutes ring and the app reports the most recent older missed bell from the last seven days.
+- **Keep screen on:** the schedule page offers a "Keep screen on so bells can ring" switch (off by default) for a retreat-room display, using the same Wake Lock API. The label is English in both locales. Turning it on first opens a modal that says the screen will not dim or lock and will use more battery, which bells need to ring on schedule; the user confirms ("Keep screen on") or cancels, and turning it off is immediate. That explanation is translated in Burmese like other messages and needs the reviewer's check. The switch is disabled, with "Turn the schedule on to use this.", while the schedule is off, and the choice is saved in the stored state (`schedule.keepAwake`, optional, so older saved data still loads), so a reload keeps it.
 
 ---
 
 ## 5. Alerts and notices
 
-All alerts and notices appear **at the top of the app, just under the Timer/Schedule switch**, never at the bottom, so they are seen without scrolling.
+Notices appear **at the top of the app, just under the Timer/Schedule switch**, never at the bottom, so they are seen without scrolling. Confirmations are modals in the middle of the screen, so they cannot be missed.
 
-- **Confirmations** (amber, with buttons, `role="alertdialog"`): the two "one or the other" questions (section 4.3) and "This replaces your whole weekly schedule. Export it first if you may want it back." before an import that replaces it.
-- **Notices** (green, `role="status"`, close after 4 seconds or with ✕): bell saved or deleted, imported, exported, bell settings changed, schedule turned on or off, a missed bell.
+- **Confirmations** (a centred modal over a dimmed page, with buttons, `role="alertdialog"`; Esc cancels, and Cancel has the focus): the two "one or the other" questions (section 4.3) and "This replaces your whole weekly schedule. Export it first if you may want it back." before an import that replaces it.
+- **Notices** (highlighted, `role="status"`, close after 4 seconds or with ✕): bell saved or deleted, imported, exported, bell settings changed, schedule turned on or off, a missed bell.
 - **Errors** appear next to the field they are about (custom minutes, the alarm time, the add-bell form, the import screen) as well as in the screen reader's live region.
 - Messages name days in full ("Monday", never "Mo" or "Mon") and use Western digits, in both locales.
 
@@ -149,26 +152,26 @@ All alerts and notices appear **at the top of the app, just under the Timer/Sche
 
 ### 6.1 Browser storage
 
-One `localStorage` key, `winmetta.meditationBell`, holds a JSON object with a `version` field, validated with a Zod schema on read. An unknown or broken value is not deleted: the app starts empty, keeps the old value under a backup key and shows a notice. Contents: the start and end bell settings, the weekly schedule (bells per day) and whether it is on, and the running or paused timer or alarm (mode, end moment or time left, length).
+One `localStorage` key, `winmetta.meditationBell`, holds a JSON object with a `version` field, validated with a Zod schema on read. An unknown or broken value is not deleted: the app starts empty, keeps the old value under a backup key and shows a notice. Contents: the Start button bell and Alarm bell settings, the weekly schedule (bells per day) and whether it is on, and the running or paused timer or alarm (mode, end moment or time left, length).
 
 - **No IndexedDB:** the data is a few kilobytes. IndexedDB becomes worth it only if users can store their own sounds, which is out of scope.
 - **Storage can be wiped:** Safari may delete a site's storage after about seven days without a visit, and private windows forget it. Export is the backup, and the help on the schedule page says so. The app also calls `navigator.storage.persist()` when the schedule is first saved, where supported.
 - **Blocked storage:** the bell still works for the visit (timer and manual bell) and says that the schedule can't be saved.
-- **Settings and Privacy:** the Settings page Reset does **not** clear the bell's data, because it is the user's own content, not a preference. A separate Settings row, "Meditation bell data", with a red Clear button and a confirmation, removes it. The bilingual Privacy page gets a paragraph: the schedule, sound choice and timer stay on the device and are never sent anywhere.
+- **Settings and Privacy:** the Settings page Reset does **not** clear the bell's data, because it is the user's own content, not a preference. A separate Settings row, "Meditation bell data", with a red Clear button and a confirmation, removes it. The bilingual Privacy page explains what the browser stores, how CSV files stay on the device, and the limited analytics events, including built-in sound selections and ring counts. Clearing the bell data also stops an active timer or schedule in an open tab of the same browser.
 
 ### 6.2 CSV format
 
 ```text
 day,time,label,sound,rings
-Mon,06:00,Morning sitting,winmetta-long,3
-Mon,09:00,Dhamma talk,winmetta-short,1
-Sun,19:00,Evening chanting,winmetta-long,1
+Mon,06:00,Morning sitting,deep-chime,3
+Mon,09:00,Dhamma talk,soft-chime,1
+Sun,19:00,Evening chanting,deep-chime,1
 ```
 
-- **Columns:** `day` (`Mon` to `Sun`), `time` (24-hour `HH:MM`, `00:00` to `23:59`), `label` (optional, up to 40 characters), `sound` (a sound id from section 8, for example `winmetta-long`; an unknown or missing id falls back to the end bell's sound, and the preview says so), `rings` (1 to 3, default 1). The header row is required. Quoted fields follow RFC 4180, so a label may contain a comma.
-- **Export** downloads `winmetta-bell-schedule.csv`, UTF-8 **with a byte-order mark**, so Excel shows Burmese labels correctly; Google Sheets and Numbers ignore the mark. Export never includes the timer.
-- **Import** opens a screen with "Choose CSV file", reads the file in the browser (it is never uploaded), and shows a **preview**: how many bells are ready per day, and every row that will be skipped with its row number and reason (unknown day, invalid time, rings out of range). The user picks **Replace the whole schedule** (asks first, section 5) or **Add to the current schedule** (a time that already has a bell on that day is skipped). A file with no valid rows imports nothing.
-- **Size limit:** files over 100 KB or with more than 700 bells (100 a day) are refused with a message, to keep a mistaken file from freezing the page.
+- **Columns:** `day` (`Mon` to `Sun`), `time` (24-hour `HH:MM`, `00:00` to `23:59`), `label` (optional, up to 40 characters), `sound` (a sound id from section 8, for example `deep-chime`; an unknown or missing id falls back to the Alarm bell's sound, and the preview says so), `rings` (1 to 6, default 1). The header row is required. Quoted fields follow RFC 4180, so a label may contain a comma.
+- **Export** downloads `winmetta-bell-schedule.csv`, UTF-8 **with a byte-order mark**, so Excel shows Burmese labels correctly; Google Sheets and Numbers ignore the mark. Export never includes the timer. A tab inside a quoted field protects formula-like labels when opened in Excel, and importing trims that tab from the label.
+- **Import** opens a screen with "Choose CSV file", reads the file in the browser (it is never uploaded), and shows a **preview**: how many bells are ready per day, and every row that will be skipped with its row number and reason (unknown day, invalid time, rings out of range). The user picks **Replace the whole schedule** (asks first, section 5) or **Add to the current schedule** (a time that already has a bell on that day is skipped). A file with no valid rows or an incorrectly quoted field imports nothing.
+- **Size limit:** files over 128 KiB or with more than 700 bells (100 a day) are refused with a message, to keep a mistaken file from freezing the page.
 - This lets organizers publish a retreat's bell schedule as a CSV that participants import, instead of times written into code as in the old retreat page.
 
 ---
@@ -181,37 +184,44 @@ The mini app's buttons and labels are **English in both locales**; only alerts, 
 
 - **Why:** the maintainer's choice for this app. Short English control words (Start, Reset, Schedule) are widely understood by the bell's users, and Burmese digits and day names make dense controls harder to read. The messages that explain a consequence ("this turns off your schedule") are the ones where a misunderstanding costs something, so they are translated.
 - **How:** every string is still a message key in `en.json` and `my.json`, as the site requires (AGENTS.md §6). For the button and label keys, the `my` value is the English text, so a later change of mind is a content change only. A comment in the bell's code and this section explain why, so nobody "fixes" it.
-- **Every button has an icon** next to its word, to help readers who read little English.
+- **Action buttons pair icons with words** to help readers who read little English. Numeric presets and day buttons use concise text labels.
 - Burmese messages keep common technical words in English (Timer, Schedule, import, export), as other pages do. All Burmese text needs a Burmese speaker's review before go-live.
 - This exception covers the mini app pages only. The mini-apps listing page is fully translated, like every other site page.
 
 ### 7.2 Day names and narrow screens
 
-- **Day buttons** use the longest form that fits: **"Monday"** on desktop and wide screens, **"Mon"** on tablets and wide phones, **"Mo"** only on narrow phones. The choice is made by the width available to the row (a container query), not by the device.
+- **Day buttons** show three-letter labels such as **"Mon"** at every width, with the full day name available to assistive technology.
 - The seven buttons share the row equally and may shrink (`minmax(0, 1fr)` grid columns), so Sunday is never cut off; this was a bug in the 2026-11-25 mockup at narrow widths. The same applies to the preset grid, the Add/Import/Export row and long bell labels, which are cut with an ellipsis.
 - **Messages, alerts, notices and the CSV import preview always use full day names** ("Monday"), whatever the width. The CSV file itself uses `Mon` to `Sun`.
-- Checked at 320 px, 375 px and desktop, in both locales, light and dark (AGENTS.md §6 asks for desktop and 375 px; the bell adds 320 px because of the seven-button row).
+- Checked at 320 px, 375 px and desktop, in both locales with the light palette (AGENTS.md §6 asks for desktop and 375 px; the bell adds 320 px because of the seven-button row).
 
 ### 7.3 Design guide
 
-The mockup is not the final styling. In stages 4 and 5 (implementation-plan §5E) the controls are mapped onto [design-guide.md](design-guide.md): the Timer/Schedule switch, the countdown/alarm switch and the rings choice are segmented choices; Start is the page's single primary button; Reset, Clear and Ring bell now are outline buttons; the guide reserves `.chip` for post topics, so the presets and day buttons need their own pattern (a toggle-button group). The shared mini app rules (layout, alerts at the top, day names, narrow screens) are already in [design-guide.md](design-guide.md) §9; component patterns it does not have yet (the preset grid, the day row, the countdown ring) are added there in the same PR.
+Meditation Bell uses a compact, mobile-first control layout and its own styles. Timer and Schedule share a top-level switch. The Timer toolbar has one action for changing modes. Countdown uses a thin progress ring, while Alarm shows the clock time and a numeric countdown underneath. Start fills its action row alongside Reset. Ring now sits on a separate full-width row. Presets and day buttons use pressed states, and the ring count is a group of radio buttons, to communicate selection.
 
 ---
 
 ## 8. Sounds
 
-Decided 2026-11-25: the sounds come from **Win Metta's own bell recording** (section 8.1) and from **public-domain (CC0) recordings** (section 8.3), all prepared the same way (section 8.2). Canva is not used for sounds: its connector makes designs, not audio, and its audio library is licensed for use inside Canva designs, not as files given away on their own.
+Decided 2026-11-25: the sounds come from **Win Metta's own bell recording** (section 8.1a) and from **public-domain (CC0) recordings** (section 8.3), all prepared the same way (section 8.2). Canva is not used for sounds: its connector makes designs, not audio, and its audio library is licensed for use inside Canva designs, not as files given away on their own.
 
-### 8.1 WinMetta bell, short and long
+### 8.1 Built-in sounds: Soft, Deep and Long chimes (synth)
 
-The source is `WinMetta_Meditation_Timer.mp3` from the archived `winmetta-retreat-web` repository (818 KB). **Confirm that Win Metta owns the recording before committing it or anything cut from it.** Two sounds are cut from it:
+These need no recording: the app makes them in the browser with Web Audio (`synthesize()` in `web-player.ts`), so they are the same on every ring. They are the only sounds offered for now: two for the defaults and a longer one to choose.
 
-| Id               | Name                  | What it is                                                         | Default use                    |
-| ---------------- | --------------------- | ------------------------------------------------------------------ | ------------------------------ |
-| `winmetta-short` | WinMetta bell (short) | One strike, faded out after about 3–5 seconds                      | Start bell, rung once          |
-| `winmetta-long`  | WinMetta bell (long)  | One strike with its whole natural decay, leading silence trimmed   | End bell, rung 3 times         |
+| Id           | Name               | What it is                                                        | Default use              |
+| ------------ | ------------------ | ----------------------------------------------------------------- | ------------------------ |
+| `soft-chime` | Soft chime (synth) | A higher struck-bell tone, about 2 s                              | none                     |
+| `deep-chime` | Deep chime (synth) | A lower struck-bell tone, about 4.5 s                             | none                     |
+| `long-chime` | Long chime (synth) | A low, large-bell tone that rings about 10 s, with a slow shimmer | Alarm bell, rung 3 times |
 
-Three rings are **not** a separate file: a bell set to 2x or 3x plays one strike that many times, each strike starting about 5 seconds after the one before (long enough to hear each, short enough to feel like one bell), so every sound works with every ring count.
+Each registry entry carries its pitch and decay (`synth`); the long chime also has a `shimmer`, a twin of each partial a little off pitch, which gives the slow beating of a large bell. Licence: none needed. They stay in the list after recorded sounds are added, so people can choose a plain tone.
+
+Several rings are **not** a separate file: a bell set to 2x to 6x plays one strike that many times, each strike starting about 5 seconds after the one before (long enough to hear each, short enough to feel like one bell), so every sound works with every ring count.
+
+### 8.1a WinMetta bell recording (planned, not offered yet)
+
+The source is `WinMetta_Meditation_Timer.mp3` from the archived `winmetta-retreat-web` repository (818 KB). **Confirm that Win Metta owns the recording before committing it or anything cut from it.** Two sounds may be cut from it and added to the list (a short strike, faded out after about 3–5 seconds, and a long one with its whole natural decay), named after how they sound (earlier drafts used Ding and Dong). Until then they are not in the app.
 
 ### 8.2 Preparing a sound
 
@@ -232,8 +242,8 @@ To give more choice (a singing bowl, a deeper temple bell, a lighter chime), rec
 
 ### 8.4 Loading and playing
 
-- Sounds load when the user first opens the bell settings, presses Start or "Ring bell now", or turns the schedule on, not on page load, so opening the app downloads no audio. Only the sounds in use are loaded.
-- The app ships with the two WinMetta sounds; CC0 sounds join the list as each one is cleared, with no change to the app beyond the registry.
+- The built-in chimes are generated in the browser and download nothing. A recorded sound (when one is added) loads when the user first presses Start, Ring now or Play, or turns the schedule on, not on page load, so opening the app downloads no audio. Only the sounds in use are loaded.
+- The app ships with the three built-in chimes; the WinMetta recording (section 8.1a) and CC0 sounds join the list as each one is cleared, with no change to the app beyond the registry.
 
 ---
 
@@ -265,18 +275,18 @@ The web version says this plainly in its help text and does not try to work arou
 - `apps/web/src/lib/meditation-bell/`: pure TypeScript, no DOM.
   - `schema.ts`: the Zod schema and version migration for the stored state.
   - `timer.ts`: the countdown and alarm state machine (start, pause, resume, reset, clear, finished, missed), driven by a clock passed in, so tests control time.
-  - `alarm.ts`: "next occurrence of a clock time within 16 hours", including "Rings tomorrow" and the 16-hour limit.
+  - `alarm.ts`: "next occurrence of a clock time within 16 hours", including next-day alarms and the 16-hour limit.
   - `schedule.ts`: next bell across the week, duplicates, add, edit and delete, daylight-saving cases.
   - `csv.ts`: parse (with per-row errors) and serialize (with the byte-order mark).
   - `sounds.ts`: the sound registry (id, name key, file, length, licence; section 8.2).
-  - `format.ts`: `mm:ss` / `mmm:ss`, 12-hour times, day names in their three lengths.
+  - `format.ts`: `mm:ss.SSS` / `mmm:ss.SSS`, 12-hour times, day names in their three lengths.
   - `days.ts`: the seven day ids (`Mon` to `Sun`) and their Luxon weekday numbers.
   - `player.ts`: the `BellPlayer` interface (`ring`, `schedule`, `cancel`) that a platform implements (section 9).
 - `apps/web/src/components/meditation-bell/`: the React island (Timer, Schedule, edit and import screens, the alert area) and the web bell player (Web Audio API, Wake Lock).
 - `apps/web/src/pages/[locale]/mini-apps/index.astro` and `[locale]/mini-apps/meditation-bell/index.astro`.
 - **Unit tests (Vitest):** every module in `lib/meditation-bell/`, with fixed clocks and time zones (including a spring-forward and a fall-back day in `America/Los_Angeles`).
 - **Analytics:** a unit test that every bell event's properties come from the fixed lists and buckets in section 11 (no free text can reach the tracker), as the site's existing analytics tests do.
-- **Browser tests (Playwright):** the listing page; the back link; the footer Feedback button opening the dialog with the mini app filled in; the language switch keeping the page; a countdown finishing (with a fake clock); the alarm "Rings tomorrow" and 16-hour cases; both "one or the other" confirmations; add, edit and delete a bell; import with the sample file (preview, skipped rows, replace and add); export; the seven day buttons fitting at 320 px; screenshots in both locales.
+- **Browser tests (Playwright):** the listing page; the back link; the footer Feedback button opening the dialog with the mini app filled in; the language switch keeping the page; a countdown finishing (with a fake clock); the next-day alarm, remaining-time readout and 16-hour limit; both "one or the other" confirmations; add, edit and delete a bell; import with the sample file (preview, skipped rows, replace and add); export; the seven day buttons fitting at 320 px; screenshots in both locales.
 - **Manual checks before go-live:** desktop Chrome, Firefox and Safari, and iPhone Safari and Android Chrome: sound after the first tap, a background tab, sleep and wake, the screen staying on.
 
 ---
@@ -287,17 +297,17 @@ The web version says this plainly in its help text and does not try to work arou
 
 **Events** (names and properties; buckets for lengths are 1–5, 6–15, 16–30, 31–60, 61–120 and more than 120 minutes, and for bell counts 0, 1–5, 6–20 and more):
 
-| Event                  | Properties                                                                                                        | Sent when                                                        |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `bell_timer_start`     | `mode` (`countdown`, `alarm`), `length` (bucket; for an alarm, the time until it rings), `from` (`preset`, `custom`, `time`), `start_bell` (true or false) | Start, not Resume                                                 |
-| `bell_timer_end`       | `mode`, `how` (`rang`, `reset`, `cleared`, `missed`)                                                              | A started timer ends                                             |
-| `bell_ring_now`        | `view` (`timer`, `schedule`)                                                                                      | Ring bell now                                                    |
-| `bell_sound_change`    | `role` (`start`, `end`), `sound` (the sound's id from the fixed list, or `off` for the start bell), `rings` (1–3, end bell only) | The start or end bell setting is changed                         |
-| `bell_schedule_switch` | `on` (true or false), `bells` (bucket of all bells in the week)                                                    | The schedule is turned on or off                                 |
-| `bell_schedule_edit`   | `action` (`add`, `edit`, `delete`), `days` (`1`, `2-6`, `7`)                                                       | A bell is saved or deleted                                       |
-| `bell_schedule_ring`   | none                                                                                                              | A scheduled bell rings                                           |
-| `bell_conflict`        | `kind` (`start_timer`, `schedule_on`), `choice` (`confirm`, `cancel`)                                              | The "one or the other" confirmation is answered                  |
-| `bell_csv`             | `action` (`import`, `export`), `ok` (true or false), `bells` (bucket), `skipped` (true or false), `how` (`replace`, `add`; import only) | An import or export finishes or fails                            |
+| Event                  | Properties                                                                                                                                                 | Sent when                                              |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `bell_timer_start`     | `mode` (`countdown`, `alarm`), `length` (bucket; for an alarm, the time until it rings), `from` (`preset`, `custom`, `time`), `start_bell` (true or false) | Start, not Resume                                      |
+| `bell_timer_end`       | `mode`, `how` (`rang`, `reset`, `cleared`, `missed`)                                                                                                       | A started timer ends                                   |
+| `bell_ring_now`        | `view` (`timer`, `schedule`)                                                                                                                               | Ring now                                               |
+| `bell_sound_change`    | `role` (`start`, `end`), `sound` (the sound's id from the fixed list, or `off` for the Start button bell), `rings` (1–6, Alarm bell only)                  | The Start button bell or Alarm bell setting is changed |
+| `bell_schedule_switch` | `on` (true or false), `bells` (bucket of all bells in the week)                                                                                            | The schedule is turned on or off                       |
+| `bell_schedule_edit`   | `action` (`add`, `edit`, `delete`), `days` (`1`, `2-6`, `7`)                                                                                               | A bell is saved or deleted                             |
+| `bell_schedule_ring`   | none                                                                                                                                                       | A scheduled bell rings                                 |
+| `bell_conflict`        | `kind` (`start_timer`, `schedule_on`), `choice` (`confirm`, `cancel`)                                                                                      | The "one or the other" confirmation is answered        |
+| `bell_csv`             | `action` (`import`, `export`), `ok` (true or false), `bells` (bucket), `skipped` (true or false), `how` (`replace`, `add`; import only)                    | An import or export finishes or fails                  |
 
 Opening the listing page or a mini app is already counted as a page view, so there is no "open" event. The footer Feedback button uses the existing `feedback_open` and `feedback_submit` events (`ctx=general`; the page path tells the mini apps apart).
 
@@ -305,7 +315,7 @@ Opening the listing page or a mini app is already counted as a page view, so the
 
 **Privacy page:** its analytics paragraph lists what is counted; at go-live it adds "which mini app features, such as the timer and the schedule, are used (never your schedule or labels)" in both languages.
 
-**Questions** these answer (added to [analytics.md](analytics.md) §3.1): Is the bell used, and which mode? Which timer lengths, and presets or custom? Do timers run to the bell? Do people keep a weekly schedule, and does it actually ring (is the page left open)? Does the "one or the other" rule get in the way (cancel rate)? Are CSV import and export used, and do imports fail? Is "Ring bell now" used, and which sound do people choose?
+**Questions** these answer (added to [analytics.md](analytics.md) §3.1): Is the bell used, and which mode? Which timer lengths, and presets or custom? Do timers run to the bell? Do people keep a weekly schedule, and does it actually ring (is the page left open)? Does the "one or the other" rule get in the way (cancel rate)? Are CSV import and export used, and do imports fail? Is "Ring now" used, and which sound do people choose?
 
 ---
 

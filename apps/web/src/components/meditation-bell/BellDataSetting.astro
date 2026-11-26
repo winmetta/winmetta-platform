@@ -1,0 +1,96 @@
+---
+import { t } from '../../i18n/messages';
+import type { Locale } from '../../i18n/locales';
+import { miniAppsEnabled } from '../../lib/mini-apps';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+---
+
+<div
+  class="settings-row"
+  data-bell-data-setting
+  data-cleared-message={t(locale, 'settingsBellDataCleared')}
+  data-blocked-message={t(locale, 'settingsNoStorage')}
+  hidden={!miniAppsEnabled}
+>
+  <div class="settings-text">
+    <h2 id="settings-bell-data-title">{t(locale, 'settingsBellDataTitle')}</h2>
+    <p>{t(locale, 'settingsBellDataHelp')}</p>
+  </div>
+  <div class="settings-action">
+    <button type="button" class="btn btn-danger" data-bell-data-open disabled>
+      {t(locale, 'settingsBellDataClear')}
+    </button>
+    <span role="status" class="settings-done" data-bell-data-status></span>
+  </div>
+  <dialog
+    class="settings-confirm space-y-4"
+    aria-labelledby="settings-bell-confirm-title"
+    aria-describedby="settings-bell-confirm-description"
+    data-bell-data-dialog
+  >
+    <h2 id="settings-bell-confirm-title" class="text-xl font-bold">
+      {t(locale, 'settingsBellDataConfirmTitle')}
+    </h2>
+    <p id="settings-bell-confirm-description">
+      {t(locale, 'settingsBellDataConfirmDescription')}
+    </p>
+    <form method="dialog" class="flex flex-wrap justify-end gap-2">
+      <button type="submit" value="cancel" class="btn btn-outline" autofocus>
+        {t(locale, 'settingsBellDataCancel')}
+      </button>
+      <button type="submit" value="clear" class="btn btn-danger">
+        {t(locale, 'settingsBellDataClear')}
+      </button>
+    </form>
+  </dialog>
+</div>
+
+<script>
+  import { backupKey, storageKey } from '../../lib/meditation-bell/schema';
+  import { clearBellData, storedBellData } from './storage';
+
+  const row = document.querySelector<HTMLElement>('[data-bell-data-setting]');
+  const open = row?.querySelector<HTMLButtonElement>('[data-bell-data-open]');
+  const dialog = row?.querySelector<HTMLDialogElement>(
+    '[data-bell-data-dialog]',
+  );
+  const status = row?.querySelector<HTMLElement>('[data-bell-data-status]');
+  if (row && open && dialog && status) {
+    const sync = () => {
+      const data = storedBellData();
+      if (data === 'present') row.hidden = false;
+      open.disabled = data !== 'present';
+      if (data === 'blocked' && !row.hidden)
+        status.textContent = row.dataset.blockedMessage ?? '';
+    };
+    sync();
+    window.addEventListener('storage', (event) => {
+      if (
+        event.key === storageKey ||
+        event.key === backupKey ||
+        event.key === null
+      )
+        sync();
+    });
+    open.addEventListener('click', () => {
+      dialog.returnValue = 'cancel';
+      dialog.showModal();
+    });
+    dialog.addEventListener('close', () => {
+      if (dialog.returnValue !== 'clear') return;
+      const cleared = clearBellData();
+      status.textContent =
+        (cleared ? row.dataset.clearedMessage : row.dataset.blockedMessage) ??
+        '';
+      sync();
+      if (cleared) {
+        status.tabIndex = -1;
+        status.focus();
+      }
+    });
+  }
+</script>

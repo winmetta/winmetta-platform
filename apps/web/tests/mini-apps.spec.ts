@@ -55,13 +55,18 @@ test('the bell page has its own layout, back link, language switch and canonical
   await expect(page.locator('.site-header, .site-footer')).toHaveCount(0);
   const back = page.locator('[data-mini-bar] a[href="/en/mini-apps/"]');
   await expect(back).toBeVisible();
-  await expect(back).toContainText('Mini Apps');
+  await expect(back).toHaveAccessibleName('Mini Apps');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'Meditation bell',
+  );
+  await expect(page.locator('[data-mini-bar] h1 img')).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
     /\/en\/mini-apps\/meditation-bell\/$/,
   );
+  await page.locator('.bell-language summary').click();
   const myanmar = page.locator('[data-mini-bar] a[data-locale="my"]');
-  await expect(myanmar).toHaveText('ကခဂ');
+  await expect(myanmar).toHaveText('မြန်မာ');
   await expect(myanmar).toHaveAttribute('lang', 'my');
   await expect(myanmar).toHaveAccessibleName('Myanmar');
   await myanmar.click();
@@ -71,6 +76,7 @@ test('the bell page has its own layout, back link, language switch and canonical
 
 test('the language switch keeps the query and fragment', async ({ page }) => {
   await page.goto('/en/mini-apps/meditation-bell/?x=1#top');
+  await page.locator('.bell-language summary').click();
   await page.locator('[data-mini-bar] a[data-locale="my"]').click();
   await expect(page).toHaveURL(/\/my\/mini-apps\/meditation-bell\/\?x=1#top$/);
 });

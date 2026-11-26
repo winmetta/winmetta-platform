@@ -15,7 +15,7 @@ export interface Timer {
   status: TimerStatus;
   /** The chosen length (a countdown) or the time from the start to the alarm. */
   lengthMs: number;
-  /** When it rings; only while running. */
+  /** Target moment while running, retained for the alarm readout. */
   endAt: number | null;
   /** Time left; only while paused. */
   remainingMs: number | null;
@@ -60,7 +60,7 @@ export function pause(timer: Timer, now: number): Timer {
   return {
     ...timer,
     status: 'paused',
-    endAt: null,
+    endAt: timer.mode === 'alarm' ? timer.endAt : null,
     remainingMs: Math.max(0, timer.endAt - now),
   };
 }
@@ -107,7 +107,7 @@ export function tick(
     timer: {
       ...timer,
       status: event === 'rang' ? 'finished' : 'missed',
-      endAt: null,
+      endAt: timer.mode === 'alarm' ? timer.endAt : null,
       remainingMs: null,
     },
     event,

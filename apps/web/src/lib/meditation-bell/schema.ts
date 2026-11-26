@@ -47,7 +47,13 @@ export const stateSchema = z.object({
   version: z.literal(stateVersion),
   startBell: z.object({ sound: z.string().min(1).max(64) }),
   endBell: z.object({ sound: z.string().min(1).max(64), rings }),
-  schedule: z.object({ on: z.boolean(), week: weekSchema }),
+  schedule: z.object({
+    on: z.boolean(),
+    week: weekSchema,
+    checkedAt: z.number().int().nonnegative().optional(),
+    /** Keep the screen on while the schedule is on; chosen after the battery notice. */
+    keepAwake: z.boolean().optional(),
+  }),
   timer: timerSchema.nullable(),
 });
 export type BellState = z.infer<typeof stateSchema>;

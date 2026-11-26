@@ -2,6 +2,13 @@
 // events all use these ids, so an id is never reused or renamed.
 import type { MessageKey } from '../../i18n/messages';
 
+/** A generated tone: pitch in Hz, decay in seconds, and an optional beating twin (Hz) for a larger bell. */
+export interface Synth {
+  base: number;
+  decay: number;
+  shimmer?: number;
+}
+
 export interface BellSound {
   /** Stable id: stored state, CSV `sound` column, analytics. */
   id: string;
@@ -16,22 +23,37 @@ export interface BellSound {
   /** Length of one strike in seconds, from the prepared file. */
   seconds: number | null;
   licence: string;
+  /**
+   * The generated tone (pitch in Hz, decay in seconds). Played when `file` is null: always for the
+   * built-in chimes (§8.1), and for a recorded sound until its file exists.
+   */
+  synth: Synth;
 }
 
 export const sounds: readonly BellSound[] = [
   {
-    id: 'winmetta-short',
-    name: 'bellSoundWinmettaShort',
+    id: 'soft-chime',
+    name: 'bellSoundSoftChime',
     file: null,
     seconds: null,
-    licence: 'Win Metta',
+    licence: 'Generated in the app',
+    synth: { base: 294, decay: 2.2 },
   },
   {
-    id: 'winmetta-long',
-    name: 'bellSoundWinmettaLong',
+    id: 'deep-chime',
+    name: 'bellSoundDeepChime',
     file: null,
     seconds: null,
-    licence: 'Win Metta',
+    licence: 'Generated in the app',
+    synth: { base: 196, decay: 4.5 },
+  },
+  {
+    id: 'long-chime',
+    name: 'bellSoundLongChime',
+    file: null,
+    seconds: null,
+    licence: 'Generated in the app',
+    synth: { base: 174, decay: 10, shimmer: 1.2 },
   },
 ];
 
@@ -41,8 +63,8 @@ export const soundById = (id: string): BellSound | undefined =>
   sounds.find((sound) => sound.id === id);
 
 /** Defaults (§3.3): a short start bell once; a long end bell, three times. */
-export const defaultStartSound = 'winmetta-short';
-export const defaultEndSound = 'winmetta-long';
+export const defaultStartSound = 'off';
+export const defaultEndSound = 'long-chime';
 export const defaultEndRings = 3;
 
 /** Each strike starts this long after the one before it (§8.1). */

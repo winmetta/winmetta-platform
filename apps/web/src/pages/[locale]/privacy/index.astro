@@ -34,6 +34,7 @@ const sections = [
     ? [['privacyBookSearchTitle', 'privacyBookSearch'] as const]
     : []),
   ['privacyStoredTitle', 'privacyStored'],
+  ['privacyBellTitle', 'privacyBell'],
   ['privacySearchUrlTitle', 'privacySearchUrl'],
   ['privacyHostingTitle', 'privacyHosting'],
   ['privacyLinksTitle', 'privacyLinks'],
@@ -72,6 +73,9 @@ const [contactBefore, contactAfter] = text('privacyContact').split('{email}');
           ) : (
             <p>{block}</p>
           ),
+        )}
+        {title === 'privacyAnalyticsTitle' && (
+          <p>{text('privacyBellAnalytics')}</p>
         )}
       </section>
     ))}
