@@ -1,6 +1,6 @@
 # Mini apps and the meditation bell
 
-**Status:** planned 2026-11-25; stage 2 (mini apps foundation, with a placeholder bell page) built 2026-11-25; the bell itself is not built yet. The staged plan is in [implementation-plan.md](implementation-plan.md) §5E. An interactive design mockup was reviewed with the maintainer on 2026-11-25; this document records what it settled.
+**Status:** planned 2026-11-25; stage 2 (mini apps foundation), stage 3 (bell logic) and stage 4 (the Timer: countdown, alarm, presets, bell settings, Ring bell now) built 2026-11-25; the Schedule is not built yet. The staged plan is in [implementation-plan.md](implementation-plan.md) §5E. An interactive design mockup was reviewed with the maintainer on 2026-11-25; this document records what it settled.
 
 **Why:** Win Metta's retreats and online sittings use a bell to end a session. Today that is the retreat bell page at `retreat.winmetta.org`, built from the archived `winmetta-retreat-web` repository, with each retreat's bell times written into the code. Meditators also want a simple bell for their own sittings: ring once after 20 minutes, or at 6:00 AM tomorrow, or on a weekly practice schedule. A bell for anyone, with no login and nothing sent to a server, fits the mission and costs almost nothing to host.
 

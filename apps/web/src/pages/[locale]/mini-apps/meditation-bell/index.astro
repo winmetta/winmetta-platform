@@ -1,11 +1,13 @@
 ---
-// The meditation bell (docs/meditation-bell.md). A placeholder until stages 3 to 5 of
-// docs/implementation-plan.md §5E. Unlinked and noindex until PUBLIC_MINI_APPS is on.
+// The meditation bell (docs/meditation-bell.md). Stage 4 of docs/implementation-plan.md §5E: the
+// Timer. The weekly schedule comes in stage 5. Unlinked and noindex until PUBLIC_MINI_APPS is on.
 import MiniAppShell from '../../../../layouts/MiniAppShell.astro';
 import MiniAppIcon from '../../../../components/MiniAppIcon.astro';
+import BellTimer from '../../../../components/meditation-bell/BellTimer';
 import { localeCodes, type Locale } from '../../../../i18n/locales';
-import { t } from '../../../../i18n/messages';
+import { messages, t, type MessageKey } from '../../../../i18n/messages';
 import { miniAppBySlug } from '../../../../lib/mini-apps';
+import { sounds } from '../../../../lib/meditation-bell/sounds';
 export function getStaticPaths() {
   return localeCodes.map((locale) => ({
     params: { locale },
@@ -18,6 +20,16 @@ interface Props {
 const { locale } = Astro.props;
 const app = miniAppBySlug('meditation-bell')!;
 const name = t(locale, app.name);
+// Every message the island shows. The buttons and labels are English in both locales on purpose
+// (meditation-bell.md §7.1); only alerts, notices and errors differ.
+const labels = Object.fromEntries(
+  (Object.keys(messages.en) as MessageKey[])
+    .filter((key) => key.startsWith('bell'))
+    .map((key) => [key, t(locale, key)]),
+);
+const soundNames = Object.fromEntries(
+  sounds.map((sound) => [sound.id, t(locale, sound.name)]),
+);
 ---
 
 <MiniAppShell locale={locale} title={name} path="mini-apps/meditation-bell/">
@@ -25,5 +37,5 @@ const name = t(locale, app.name);
     <MiniAppIcon icon={app.icon} size={48} />
     <h1 class="text-3xl font-bold">{name}</h1>
   </div>
-  <p class="lead">{t(locale, 'miniAppBellSoon')}</p>
+  <BellTimer client:load labels={labels} soundNames={soundNames} />
 </MiniAppShell>
