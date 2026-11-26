@@ -5,7 +5,7 @@
   font-family: 'Zawgyi-One';
   src:
     local('Zawgyi-One'),
-    url('/fonts/zawgyi-one.woff2') format('woff2');
+    url('/fonts/zawgyi-one.woff2?v=4') format('woff2');
   font-display: swap;
 }
 

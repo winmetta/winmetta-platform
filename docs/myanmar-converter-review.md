@@ -29,6 +29,7 @@ Known limits that are not errors: Win Innwa types wa (ဝ) and zero (၀) with t
 | `converterOutput` | Result | ရလဒ် |
 | `converterCopy` | Copy | ကူးယူရန် |
 | `converterCopyLabel` | Copy the result | ရလဒ်ကို ကူးယူရန် |
+| `converterCopyInputLabel` | Copy what you typed | ရိုက်ထည့်ထားသော စာသားကို ကူးယူရန် |
 | `converterCopied` | Copied | ကူးယူပြီး |
 | `converterClear` | Clear | ဖျက်ရန် |
 | `converterLoading` | Loading the converter… | ပြောင်းလဲကိရိယာကို ဖွင့်နေပါသည်… |
@@ -42,6 +43,9 @@ Known limits that are not errors: Win Innwa types wa (ဝ) and zero (၀) with t
 | `converterTooLong` | This text is too long. Convert up to 200,000 characters at a time. | ဤစာသားသည် ရှည်လွန်းပါသည်။ တစ်ကြိမ်လျှင် စာလုံး ၂၀၀,၀၀၀ အထိ ပြောင်းလဲနိုင်ပါသည်။ |
 | `converterSame` | From and To are the same, so the text was not changed. | "မှ" နှင့် "သို့" တူနေသောကြောင့် စာသားကို မပြောင်းလဲပါ။ |
 | `converterPreviewAs` | Show the text in the font | စာသားကို ပြသမည့် ဖောင့် |
+| `converterFontLabel` | Font | ဖောင့် |
+| `converterShownIn` | Shown in {font} (the font is Zawgyi-One or Win Innwa) | {font} ဖောင့်ဖြင့် ပြထားပါသည် |
+| `converterShownInUnicode` | Shown in Unicode font: {font} (the font is Noto Sans Myanmar) | ယူနီကုဒ်ဖောင့်ဖြင့် ပြထားပါသည် - {font} |
 | `converterLossy` | Zawgyi and Win Innwa cannot show every Unicode text exactly. Check the result before you use it. | ဇော်ဂျီနှင့် ဝင်းအင်းဝသည် ယူနီကုဒ်စာသားတိုင်းကို တိကျစွာ မဖော်ပြနိုင်ပါ။ အသုံးမပြုမီ ရလဒ်ကို စစ်ဆေးပါ။ |
 | `converterNoteUnmapped` | These letters have no Win Innwa glyph and were kept as Unicode: {chars} | ဤစာလုံးများအတွက် ဝင်းအင်းဝ ဂလစ်ဖ် မရှိသဖြင့် ယူနီကုဒ်အတိုင်း ထားခဲ့ပါသည်- {chars} |
 | `converterNoteLatin` | A Win Innwa font draws Latin letters and symbols as Burmese, so they will look wrong in the result. | ဝင်းအင်းဝဖောင့်သည် အင်္ဂလိပ်အက္ခရာနှင့် သင်္ကေတများကို မြန်မာစာလုံးအဖြစ် ပြသောကြောင့် ရလဒ်တွင် မှားယွင်း၍ ပေါ်ပါမည်။ |

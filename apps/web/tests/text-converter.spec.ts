@@ -58,6 +58,21 @@ test('converts Win Innwa, swaps and clears', async ({ page }) => {
   ).toHaveValue('');
 });
 
+test('the input has its own Copy, and Clear looks destructive', async ({
+  page,
+}) => {
+  await open(page);
+  const copy = page.getByRole('button', { name: 'Copy what you typed' });
+  const clear = page.getByRole('button', { name: 'Clear' });
+  await expect(copy).toBeDisabled();
+  await expect(clear).toBeDisabled();
+  await expect(clear).toHaveClass(/mini-button--danger/);
+  await expect(copy).not.toHaveClass(/mini-button--danger/);
+  await page.getByLabel('Text to convert').fill('abc');
+  await expect(copy).toBeEnabled();
+  await expect(clear).toBeEnabled();
+});
+
 test('refuses text over the size limit', async ({ page }) => {
   await open(page);
   // Setting the value directly: typing 200,001 characters one by one would take minutes.
@@ -107,28 +122,32 @@ test('the Converter shows the input in a font the reader picks and the result in
   await input.fill('ျမန္မာစာ ေလ့လာျခင္း');
   // Auto detects Zawgyi, so the input is shown in the Zawgyi font until the reader picks another.
   await expect(input).toHaveClass(/font-zawgyi/);
-  const group = page.getByRole('group', {
-    name: 'Show the text in the font',
-  });
-  await expect(group.getByRole('button', { name: 'Zawgyi' })).toHaveAttribute(
+  await expect(
+    page.getByText('Shown in Unicode font: Noto Sans Myanmar'),
+  ).toHaveCount(1);
+  const font = page.getByRole('group', { name: 'Show the text in the font' });
+  await expect(page.getByText('Shown in Zawgyi-One')).toHaveCount(1);
+  await expect(font.getByRole('button', { name: 'Zawgyi' })).toHaveAttribute(
     'aria-pressed',
     'true',
   );
-  await group.getByRole('button', { name: 'Unicode' }).click();
+  await font.getByRole('button', { name: 'Unicode' }).click();
   await expect(input).not.toHaveClass(/font-/);
-  await group.getByRole('button', { name: 'Win Innwa' }).click();
+  await font.getByRole('button', { name: 'Win Innwa' }).click();
   await expect(input).toHaveClass(/font-win-innwa/);
+  await expect(page.getByText('Shown in Win Innwa')).toBeVisible();
   // Converting does not change the preview, only the result's font follows To.
   await expect(result).not.toHaveClass(/font-/);
   await page.locator('#converter-to').selectOption('win-innwa');
   await expect(result).toHaveClass(/font-win-innwa/);
+  await expect(page.getByText('Shown in Win Innwa')).toHaveCount(2);
   await expect(input).toHaveClass(/font-win-innwa/);
   // Changing From goes back to following the encoding.
   await page.locator('#converter-from').selectOption('zawgyi');
   await expect(input).toHaveClass(/font-zawgyi/);
   // Both bundled fonts really load and are the ones in use.
   const loaded = await page.evaluate(async () => {
-    const checks = [
+    const checks: [string, string][] = [
       ["16px 'Zawgyi-One'", 'ျမန္မာ'],
       ["16px 'Win Innwa'", 'jrefrm'],
     ];
@@ -140,4 +159,20 @@ test('the Converter shows the input in a font the reader picks and the result in
     return results;
   });
   expect(loaded).toEqual([true, true]);
+});
+
+test('the input placeholder is written in the encoding of the shown font', async ({
+  page,
+}) => {
+  await open(page, '/my/mini-apps/burmese-text-converter/');
+  const input = page.locator('#converter-input');
+  // Unicode: ေ comes after its consonant. Zawgyi: ေ is written before it.
+  await expect(input).toHaveAttribute('placeholder', /နေရာ/);
+  await page
+    .getByRole('group', { name: /ဖောင့်/ })
+    .getByRole('button')
+    .nth(1)
+    .click();
+  await expect(input).toHaveAttribute('placeholder', /ေနရာ/);
+  await expect(input).toHaveAttribute('placeholder', /\u106B/);
 });

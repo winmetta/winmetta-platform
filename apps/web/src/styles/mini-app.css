@@ -161,7 +161,6 @@
 }
 
 .mini-button,
-.mini-choice,
 .mini-field {
   min-width: 0;
   min-height: 44px;
@@ -171,8 +170,7 @@
   color: var(--mini-ink);
 }
 
-.mini-button,
-.mini-choice {
+.mini-button {
   font-weight: 650;
   cursor: pointer;
 }
@@ -191,35 +189,49 @@
   height: 18px;
 }
 
+/* A destructive action (Clear, Reset, Delete): red, docs/design-guide.md §9. */
+.mini-button--danger {
+  border-color: var(--danger);
+  background: #fff;
+  color: var(--danger);
+}
+
+@media (hover: hover) {
+  .mini-button--danger:not(:disabled):hover {
+    border-color: var(--danger);
+    background: #fdecea;
+    color: var(--danger);
+  }
+}
+
+/* A compact secondary action (Swap): only as wide as its words, smaller text. */
+.mini-button--small {
+  min-height: 36px;
+  padding-inline: 12px;
+  font-size: 0.875rem;
+}
+
+.mini-button--small svg {
+  width: 16px;
+  height: 16px;
+}
+
 .mini-button:disabled,
 .mini-field:disabled {
   opacity: 0.68;
   cursor: default;
 }
 
-.mini-choice--small {
-  min-height: 40px;
-  font-size: 0.9375rem;
-}
-
-.mini-choice[aria-pressed='true'] {
-  border-color: var(--mini-accent);
-  background: var(--mini-selected);
-  color: var(--mini-accent);
-}
-
 /* Hover only where a pointer really hovers, so a tap leaves no stuck hover state. */
 @media (hover: hover) {
-  .mini-button:not(:disabled):hover,
-  .mini-choice:hover {
+  .mini-button:not(:disabled):hover {
     border-color: var(--mini-accent);
     background: var(--mini-selected);
     color: var(--mini-accent);
   }
 }
 
-.mini-button:not(:disabled):active,
-.mini-choice:active {
+.mini-button:not(:disabled):active {
   filter: brightness(0.92);
 }
 
@@ -321,4 +333,61 @@ textarea.mini-field {
 .mini-field[aria-invalid='true'] {
   border-color: var(--danger);
   background: #fdecea;
+}
+
+/* A choice of two or three short options: the buttons stick together as one control, and the
+   selected one looks pressed in (design guide: Choices). Markup:
+   <div class="mini-choices" role="group" aria-label="…"><button class="mini-choice" aria-pressed>…</button>…</div> */
+.mini-choices {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--mini-control-line);
+  border-radius: 11px;
+  background: var(--mini-tile);
+}
+
+.mini-choice {
+  min-width: 0;
+  min-height: 36px;
+  padding-inline: 10px;
+  border: 0;
+  border-inline-start: 1px solid var(--mini-control-line);
+  border-radius: 0;
+  background: var(--mini-tile);
+  /* Raised: a light top edge and a darker bottom edge. */
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.75),
+    inset 0 -2px 0 rgb(0 0 0 / 0.08);
+  color: var(--mini-ink);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.mini-choice:first-child {
+  border-inline-start: 0;
+}
+
+.mini-choice[aria-pressed='true'] {
+  /* Pressed in: sunk into the control, darker, with the shadow on the inside top. */
+  background: var(--mini-selected);
+  box-shadow:
+    inset 0 3px 6px rgb(0 0 0 / 0.28),
+    inset 0 0 0 1px rgb(38 79 99 / 0.25);
+  color: var(--mini-accent);
+}
+
+.mini-choice:focus-visible {
+  outline: 3px solid var(--mini-accent);
+  outline-offset: -3px;
+}
+
+@media (hover: hover) {
+  .mini-choice[aria-pressed='false']:hover {
+    background: color-mix(in srgb, var(--mini-selected) 45%, var(--mini-tile));
+  }
 }
