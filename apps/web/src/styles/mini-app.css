@@ -1,0 +1,312 @@
+/* Shared look of the mini apps (docs/design-guide.md §9). It follows the meditation bell: a warm surface,
+   a compact title bar, a narrow column, 44px controls with an outline, one accent. New mini apps use these
+   `mini-*` classes and MiniAppHeader.astro; the bell still has its own `bell-*` copies of the same rules
+   (meditation-bell.css) and moves onto these the next time it is changed. */
+
+.mini-app--custom:has(.mini-header) {
+  --mini-surface: color-mix(in srgb, var(--paper) 68%, var(--sand));
+  --mini-ink: var(--ink);
+  --mini-quiet: var(--text-muted);
+  --mini-line: var(--stone);
+  --mini-control-line: var(--border-strong);
+  --mini-tile: var(--sand);
+  --mini-selected: var(--sky);
+  --mini-accent: var(--brand-strong);
+  --mini-on-accent: var(--paper);
+  background: var(--mini-surface);
+  color: var(--mini-ink);
+}
+
+.mini-header,
+.mini-app--custom:has(.mini-header) :is(.mini-app-content, .mini-footer) {
+  width: 100%;
+  max-width: 27rem;
+  margin-inline: auto;
+}
+
+@media (min-width: 640px) {
+  .mini-header,
+  .mini-app--custom:has(.mini-header) :is(.mini-app-content, .mini-footer) {
+    max-width: 33.5rem;
+  }
+}
+
+.mini-header {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
+  align-items: center;
+  min-height: 54px;
+  padding-inline: 10px;
+  border-bottom: 1px solid var(--mini-line);
+}
+
+.mini-header h1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 1.1875rem;
+  font-weight: 650;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.mini-header h1 img {
+  flex: none;
+}
+
+.mini-header-action,
+.mini-app-feedback {
+  display: grid;
+  min-width: 44px;
+  min-height: 44px;
+  place-items: center;
+  border-radius: 10px;
+  color: var(--mini-accent);
+}
+
+.mini-header-action svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+
+.mini-back {
+  display: flex;
+  justify-self: start;
+  gap: 6px;
+  padding-inline: 8px 12px;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+/* Narrow phones keep the arrow only; the words stay as the accessible name. */
+@media (max-width: 22.5rem) {
+  .mini-back-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* The Burmese title is wider, so its header gives up the words sooner. */
+@media (max-width: 27rem) {
+  :lang(my) .mini-back-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+.mini-language {
+  position: relative;
+  justify-self: end;
+}
+
+.mini-language summary::-webkit-details-marker {
+  display: none;
+}
+
+.mini-language-menu {
+  position: absolute;
+  inset-block-start: calc(100% + 4px);
+  inset-inline-end: 0;
+  display: grid;
+  min-width: 9rem;
+  padding: 4px;
+  background: var(--mini-surface);
+  border: 1px solid var(--mini-control-line);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px #0002;
+}
+
+.mini-language-menu a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 12px;
+  border-radius: 8px;
+  line-height: 1.7;
+}
+
+.mini-language-menu a[aria-current],
+.mini-language-menu a:hover,
+.mini-header-action:hover {
+  background: var(--mini-selected);
+}
+
+.mini-app--custom:has(.mini-header) .mini-app-content {
+  flex: 1;
+  padding: 8px 18px 12px;
+  font-size: 1.0625rem;
+}
+
+.mini-app--custom:has(.mini-header) .mini-footer {
+  padding-inline: 18px;
+}
+
+.mini-app-feedback {
+  display: inline-flex;
+  justify-content: center;
+  gap: 6px;
+  padding-inline: 10px;
+}
+
+.mini-button,
+.mini-choice,
+.mini-field {
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--mini-control-line);
+  border-radius: 11px;
+  background: var(--mini-tile);
+  color: var(--mini-ink);
+}
+
+.mini-button,
+.mini-choice {
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.mini-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding-inline: 10px;
+  font-size: 1.0625rem;
+}
+
+.mini-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.mini-button:disabled,
+.mini-field:disabled {
+  opacity: 0.68;
+  cursor: default;
+}
+
+.mini-choice[aria-pressed='true'] {
+  border-color: var(--mini-accent);
+  background: var(--mini-selected);
+  color: var(--mini-accent);
+}
+
+/* Hover only where a pointer really hovers, so a tap leaves no stuck hover state. */
+@media (hover: hover) {
+  .mini-button:not(:disabled):hover,
+  .mini-choice:hover {
+    border-color: var(--mini-accent);
+    background: var(--mini-selected);
+    color: var(--mini-accent);
+  }
+}
+
+.mini-button:not(:disabled):active,
+.mini-choice:active {
+  filter: brightness(0.92);
+}
+
+.mini-panel {
+  padding: 12px;
+  border: 1px solid var(--mini-line);
+  border-radius: 13px;
+  background: var(--mini-tile);
+}
+
+.mini-field {
+  width: 100%;
+  padding-inline: 10px;
+  background: var(--mini-surface);
+  font-size: 1.0625rem;
+}
+
+select.mini-field {
+  appearance: none;
+  padding-inline-end: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px 20px;
+}
+
+/* An app with two boxes side by side (the converter) uses a wider column on a desktop screen; on a
+   phone it is the same narrow column as every mini app. */
+@media (min-width: 900px) {
+  .mini-app--wide.mini-app--custom:has(.mini-header)
+    :is(.mini-header, .mini-app-content, .mini-footer) {
+    max-width: 60rem;
+  }
+}
+
+textarea.mini-field {
+  min-height: 14rem;
+  padding-block: 10px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.mini-label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 650;
+}
+
+/* The one main action of an app: filled with the accent. */
+.mini-button--primary,
+.mini-button--primary:hover {
+  border-color: var(--mini-accent);
+  background: var(--mini-accent);
+  color: var(--mini-on-accent);
+}
+
+.mini-help {
+  margin: 0;
+  color: var(--mini-quiet);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.mini-help a {
+  color: var(--mini-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* A message about the whole app: a calm highlight, not a pill or a button. */
+.mini-notice {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 11px;
+  background: var(--mini-selected);
+  color: var(--mini-accent);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* A problem the reader must fix: red text with a bar on the start side, so colour is not the only cue. */
+.mini-error {
+  margin: 0;
+  padding-inline-start: 10px;
+  border-inline-start: 3px solid var(--danger);
+  color: var(--danger);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.mini-field[aria-invalid='true'] {
+  border-color: var(--danger);
+  background: #fdecea;
+}

@@ -21,8 +21,10 @@ interface Props {
   path: string;
   /** Keeps the page out of search results even when mini apps are on (an app not yet approved). */
   noindex?: boolean;
+  /** A wider column on desktop, for an app with two boxes side by side (see styles/mini-app.css). */
+  wide?: boolean;
 }
-const { locale, title, path, noindex = false } = Astro.props;
+const { locale, title, path, noindex = false, wide = false } = Astro.props;
 const href = (code: Locale) => `/${code}/${path}`;
 const canonical = new URL(href(locale), Astro.site);
 const page = Astro.url.pathname;
@@ -58,7 +60,7 @@ const customHeader = Astro.slots.has('app-header');
   <body
     class:list={[
       'flex min-h-screen flex-col',
-      { 'mini-app--custom': customHeader },
+      { 'mini-app--custom': customHeader, 'mini-app--wide': wide },
     ]}
     data-mini-app
     data-leave-message={t(locale, 'miniAppLeaveConfirm')}
