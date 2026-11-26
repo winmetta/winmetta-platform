@@ -174,4 +174,5 @@ See prd.md §4.7 for full reasoning. Summary: learner-level analytics and cross-
 | Analytics (Phase 4): tool choice, events, privacy rules, hosting | [docs/analytics.md](docs/analytics.md) |
 | Feedback form and Sādhu button (disabled pending deployment): contexts, endpoint, routing, privacy | [docs/feedback.md](docs/feedback.md) |
 | Dāna page, donation data rules and the receipt plan | [docs/donations.md](docs/donations.md) |
+| Mini apps and the meditation bell (planned): listing page, mini app layout, timer, schedule, CSV, language rule | [docs/meditation-bell.md](docs/meditation-bell.md) |
 | Internal org information and the operations runbook: people and roles, access, dashboard logins, alert routing, org decisions, deploy and rollback steps (private repo; access on request) | `winmetta-platform-private` repo, start at its `AGENTS.md`; [docs/runbook.md](docs/runbook.md) here is a pointer |
