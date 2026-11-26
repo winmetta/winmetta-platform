@@ -309,7 +309,8 @@ function Display({
   const mode = timer.mode;
   const running = timer.status === 'running';
   const paused = timer.status === 'paused';
-  const alarmEnd = timer.endAt ?? undefined;
+  // A paused alarm has no ring time: Resume works it out again from the time left.
+  const alarmEnd = paused ? undefined : (timer.endAt ?? undefined);
   const progress = timer.lengthMs > 0 ? Math.min(1, left / timer.lengthMs) : 0;
   const circumference = 2 * Math.PI * 52;
   return (
@@ -353,7 +354,7 @@ function Display({
           <span className="bell-clock__time" data-testid="bell-time">
             {alarmEnd
               ? format12Hour(clockOf(alarmEnd))
-              : alarmText
+              : alarmText && !paused
                 ? format12Hour(alarmText)
                 : '––:––'}
           </span>

@@ -77,7 +77,7 @@ The app starts with a **Timer / Schedule** switch. In Timer, the toolbar below i
 
 ### 3.2 Alarm
 
-Alarm uses an alarm-clock icon and a large wall-clock time. An unset alarm shows dashes and “Pick a time or a preset”. After Start, the target stays on screen and a separate minutes, seconds and milliseconds readout shows the time remaining. The remaining time refreshes while the timer view is visible and freezes while paused.
+Alarm uses an alarm-clock icon and a large wall-clock time. An unset alarm shows dashes and “Pick a time or a preset”. After Start, the target stays on screen and a separate minutes, seconds and milliseconds readout shows the time remaining. The remaining time refreshes while the timer view is visible and freezes while paused. While an alarm is paused its clock shows dashes, because Resume works out a new ring time from the time left; the remaining readout stays.
 
 - **Presets** become "+N minutes from now" (the same eight values) and set the clock to now plus N, rounded to the minute.
 - **Ring at:** a time field. The alarm is the next time that clock time occurs: a time that has already passed today means tomorrow. The remaining time appears beneath the target.

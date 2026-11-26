@@ -184,8 +184,10 @@ test('the alarm rings tomorrow for a time that has passed and refuses one over 1
   await expect(time(page)).toHaveText('6:00 AM');
   await expect(remaining).toHaveText(/^657:49\.7\d{2}$/);
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
+  // A paused alarm has no ring time (Resume works it out again), so the clock shows dashes.
+  await expect(time(page)).toHaveText('––:––');
   await page.reload();
-  await expect(time(page)).toHaveText('6:00 AM');
+  await expect(time(page)).toHaveText('––:––');
   await expect(status(page)).toHaveText('Paused');
   await page.clock.fastForward('01:00');
   await expect(remaining).toHaveText('657:49.750');
