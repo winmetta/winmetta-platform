@@ -321,7 +321,7 @@ Opening the listing page or a mini app is already counted as a page view, so the
 
 ## 12. Open questions
 
-- **Menu and name:** where the "Mini Apps" link goes, and the Burmese name of the listing page. Stage 2 built it as its own first-level menu item after Dhamma Posts (shown only with `PUBLIC_MINI_APPS`), with the drafted Burmese name "အက်ပ်ငယ်များ" for a Burmese speaker to review; the alternative is a link under Dhamma Library next to "Dhamma Apps".
+- **Menu and name:** where the "Mini Apps" link goes, and the Burmese name of the listing page. Stage 2 built it as its own first-level menu item (second since 2026-11-26, between Dhamma Library and Classes; shown only with `PUBLIC_MINI_APPS`), with the drafted Burmese name "အက်ပ်ငယ်များ" for a Burmese speaker to review; the alternative is a link under Dhamma Library next to "Dhamma Apps".
 - **Confirmation that Win Metta owns the WinMetta bell recording** (section 8), before any file cut from it is committed.
 - **Which CC0 bells to add** (section 8.3): a short list of candidates for the maintainer and a teacher to listen to.
 - **The old retreat bell page:** whether `retreat.winmetta.org` should later point to the new bell, and how retreat organizers share their schedule CSV. Changing that host is a production change and needs its own approval.

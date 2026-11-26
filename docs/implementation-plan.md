@@ -118,7 +118,7 @@ Routes are relative to the locale prefix (`/en/` or `/my/`).
 | Zoom help | `/zoom-help/` | Short cards and numbered steps with emoji: install Zoom, set your name before joining, join, microphone and camera, raise your hand, breakout rooms; linked from the footer and the Classes pages. |
 | Dhamma Library | `/dhamma-library/` | Unified discovery for Burmese and Dhamma resources: books and PDF files from S3 plus curated app URLs, blog posts and other links, with every PDF in the S3 bucket indexed: folder-style tag browsing and fuzzy search tuned for Burmese (see "Dhamma Library: S3 file index, tags and search"). Other resource types (apps, blog links) stay curated. |
 
-Use shared mobile/desktop navigation for Classes (with Sayadaws and Retreats in a submenu), Dhamma Study Groups and Dhamma Library; keep About, Privacy and Zoom help easy to reach in the footer. The language switcher is visible and keyboard accessible on both layouts.
+Use shared mobile/desktop navigation in this order (changed 2026-11-26): Dhamma Library (with Dhamma Apps, Digital Texts and Dhamma Posts in a submenu), Mini Apps, Classes (with Sayadaws, Retreats and Dhamma Study Groups in a submenu) and Donate; keep About, Privacy and Zoom help easy to reach in the footer. The language switcher is visible and keyboard accessible on both layouts.
 
 ### Dhamma Library: S3 file index, tags and search
 
@@ -541,7 +541,7 @@ Candidate directions, in no fixed order:
 * **Library content pipeline and class archive:** the repeatable upload-and-reindex workflow (outline below), a unified class archive, and full-text, OCR and transcript search. Search inside PDFs starts with book search stage 1 (§5C); its possible next stages are noted in [book-search.md](book-search.md) §12.
 * **Optional accounts and progress sync, and the first backend:** also the point to add a staging environment with integration tests (tech-architecture.md §10).
 * **Native apps, monastic content tools and more curricula.**
-* **Classes and Study Groups as mini apps:** turn the Classes and Dhamma Study Groups pages into mini apps (see [meditation-bell.md](meditation-bell.md) §2 and [design-guide.md](design-guide.md) §9), so the header menu shrinks to Dhamma Library, Dhamma Posts, Mini Apps and Donate, and Donate returns to the header (it was taken out while Mini Apps would wrap the desktop bar onto a second line). Needs its own plan: the Classes pages have detail pages, a weekly schedule and retreat archive that must keep their addresses.
+* **Classes and Study Groups as mini apps:** turn the Classes and Dhamma Study Groups pages into mini apps (see [meditation-bell.md](meditation-bell.md) §2 and [design-guide.md](design-guide.md) §9), so the header menu shrinks further. Donate is back in the header since 2026-11-26, now that Dhamma Posts and Dhamma Study Groups sit in submenus and the bar has four first-level items. Needs its own plan: the Classes pages have detail pages, a weekly schedule and retreat archive that must keep their addresses.
 
 #### Library content pipeline (outline)
 
