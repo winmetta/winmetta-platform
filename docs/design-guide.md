@@ -1,8 +1,23 @@
 # Design guide
 
-Rules for the look and behaviour of the site, so that every page, and every feature added later by a person or an AI agent, feels like the same product. The visual tokens (palette, fonts) are in [AGENTS.md](../AGENTS.md) §6 and `apps/web/src/styles/global.css`; this guide says how to use them. When a rule here and the code disagree, fix whichever is wrong in the same change.
+Use the Canva **Win Metta Brand Kit** as the visual source for the main site and every mini app. The shared palette and fonts are in [AGENTS.md](../AGENTS.md) §6 and `apps/web/src/styles/global.css`. When a rule here and the code disagree, fix whichever is wrong in the same change.
 
 Principles behind every rule: calm and legible, nothing that pulls attention for its own sake, the same thing always looks and is worded the same way, and a reader with a slow phone, a small screen or a Burmese interface is never an afterthought.
+
+## Brand colors
+
+Use the shared CSS tokens for the Canva kit swatches. Consult the kit before adding a new brand color and update the reference tokens when the palette changes.
+
+| Swatches | Recommended roles |
+| --- | --- |
+| Ink `#121210` and paper `#ffffff` | Main text and surfaces. Reverse their roles for dark mini-app surfaces. |
+| Sand `#ede7df` and sand-2 `#e9dfd7` | Warm backgrounds, secondary surfaces and neutral controls. |
+| Sky `#d9e8f1` and mist `#bdd2dc` | Selected or highlighted controls and light accents on dark backgrounds. |
+| Stone `#cdcecc` and grey `#959897` | Dividers and supporting UI. Verify their contrast for each use. |
+
+Use `--brand`, `--brand-strong`, `--text-muted` and `--border-strong` for accessible roles that need more contrast than the original swatches provide. Derive additional light and dark surfaces from the shared swatches, and check the resulting foreground and background pairs. Aim for at least 4.5:1 for normal text and 3:1 for control boundaries where those boundaries identify the control. Use semantic colors for errors and confirmations.
+
+The main site uses the shared site components. Mini apps use the same brand tokens and can map them onto their own mobile-first controls. Meditation Bell uses sand for its light controls, sky for selected controls, deep blue for primary actions, and ink and mist for its dark palette.
 
 ## 1. Clickable or not, and button or not
 
@@ -31,7 +46,6 @@ If a control seems to need a frame to be noticed, the layout is the problem, not
 | Quiet link         | `.link-quiet` in a `.card-aside` or `.card-actions` row                                                                    | Something wrong?                                                                                                                                                         | Content, or anything the reader came to do        |
 | Folder name        | `.folder-name` (symbol and name), as a text action, a tree link or a label                                                 | Dhamma Library folders in result cards, "Try these folders", the folder tree, the active filter                                                                          | A filled pill or chip                             |
 | Chip               | `.chip`                                                                                                                    | A clickable Dhamma post topic                                                                                                                                            | Folders, anything that is not clickable           |
-| Toggle button group| `.toggle` (a button with `aria-pressed`; a ✓ shows when on), in a `.bell-presets` grid or `.segmented` group               | One choice from a few: timer presets, the end bell's rings, countdown or alarm                                                                                           | A navigation link, or a chip                      |
 | Progress ring and big clock| `.bell-ring` (SVG ring, time in the centre) and `.bell-clock` (large clock plus a line saying when it rings)               | The meditation bell's display: a countdown, or an alarm time                                                                                                             | Anywhere a plain number is enough                 |
 | Menu control       | `.menu-button` (the three-line symbol, which becomes a cross when open, then the word "Menu"; a text action in the header) | The phone navigation toggle                                                                                                                                              | Anything but the header                           |
 | Badge              | `.badge` (plain muted text and symbol)                                                                                     | PDF page 60, Read by OCR, a count; a file size has a document symbol before it (`FileIcon`, or `LinkIcon name="file"` in Astro) and sits right after its Download button | Anything clickable                                |
@@ -114,14 +128,15 @@ No streaks, badges for achievement, counters that invite comparison, autoplay, p
 
 ## 9. Mini apps
 
-Mini apps are small tools under `/<locale>/mini-apps/`, the meditation bell first. The full design is in [meditation-bell.md](meditation-bell.md) §2 and §7; these are the rules every mini app follows so they feel like one family (planned 2026-11-25; the listing page and layout are built, the bell's own controls are not yet).
+Mini apps are small tools under `/<locale>/mini-apps/`. Design each as a standalone, mobile-first experience. Prefer app-specific layouts, components and interaction patterns that fit its primary task. Shared services such as localization, analytics and feedback can support each app's own interface.
 
 - **Listing page:** a normal site page (header, footer, language switcher). Each mini app is a tile: its icon as a rounded square, 64 px, and its name below in the body font; a "Beta" or "Coming later" note as a `.badge`-style muted line, never a pill. A tile is one link (the whole tile), except a "Coming later" tile, which is not a link and does not look like one. Every tile comes from the registry (`lib/mini-apps.ts`), never hand-written markup.
 - **Icons:** one set, designed in Canva from basic shapes (no stock elements): a rounded square with one flat background colour from the palette and one simple symbol, no text, gradients or shadows, legible at 32 px, light and dark. Source, export and licence rules: [meditation-bell.md](meditation-bell.md) §2.1.
-- **Mini app layout (`MiniAppShell.astro`), not the site layout:** no site header, navigation, logo or site footer. A slim top bar with **"← Mini Apps"** (a real link to the listing, start side) and the compact language switch **EN | ကခဂ** (end side; `lang="my"`, accessible name "Myanmar", text vertically centred, checked in a screenshot because Burmese glyphs are taller). A slim footer with only the **Feedback** button (outline speech-bubble icon and the word; icon only on narrow phones, with an accessible name), which opens the site's feedback dialog.
-- **Leaving with something running:** a mini app that holds running state (a timer, an active schedule) asks before "← Mini Apps" or a language switch leaves the page, and saves its state so coming back resumes it.
-- **Alerts at the top:** confirmations, notices and errors that concern the whole app appear in one area at the top of the app, under its main mode switch, never at the bottom. Confirmations (amber, with buttons, `role="alertdialog"`) for anything that turns something off or replaces data; notices (green, `role="status"`) close after 4 seconds or with ✕. Field errors stay next to their field.
-- **Language exception:** a mini app may keep its buttons and labels in English in both locales and translate only alerts, notices and errors, as the meditation bell does ([meditation-bell.md](meditation-bell.md) §7.1). It is still all message keys (the `my` value is the English text), every button has an icon next to its word, and it is a decision written in the mini app's own doc, not a default. The listing page is always fully translated.
+- **Mini app layout:** give each app a compact title bar with a back arrow linking to the localized Mini Apps listing, its icon and name, and an accessible language picker. The title bar serves as the page heading. Keep the language picker visually distinct from the main site's switcher. Meditation Bell uses a globe menu with English and မြန်မာ.
+- **Touch layout:** use controls with at least 44 px touch targets. Give frequent actions room and prominence. Meditation Bell uses a full-width Ring now button with a 56 px minimum height and a 24 px gap above it.
+- **Feedback and navigation:** keep any Feedback control below the app content. If a timer or schedule is active, ask before the back link or a language switch leaves the page and save the state so the user can resume.
+- **Alerts at the top:** confirmations, notices and errors that concern the whole app appear in one area at the top of the app, under its main mode switch, never at the bottom. Confirmations (amber, with buttons, `role="alertdialog"`) for anything that turns something off or replaces data; highlighted notices (`role="status"`) close after 4 seconds or with ✕. Field errors stay next to their field.
+- **Language exception:** a mini app may keep its buttons and labels in English in both locales and translate only alerts, notices and errors, as the meditation bell does ([meditation-bell.md](meditation-bell.md) §7.1). It is still all message keys (the `my` value is the English text), action buttons pair words with icons, and it is a decision written in the mini app's own doc, not a default. The listing page is always fully translated.
 - **Digits and day names:** Western digits for times, dates and numbers in both locales. Day labels use the longest form that fits the available width ("Monday", then "Mon", then "Mo"); messages and alerts always use the full name.
 - **Narrow screens:** rows of equal buttons (days, presets) use `minmax(0, 1fr)` grid columns so nothing is pushed off screen; long labels end with an ellipsis. Check every mini app at 320 px as well as 375 px and desktop, in both locales, light and dark.
 - **Calm (§7) applies in full:** no streaks, totals of time spent, badges or celebration animations. A bell may move a little when it rings; nothing else animates.

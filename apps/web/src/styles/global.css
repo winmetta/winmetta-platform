@@ -49,7 +49,8 @@
   --font-sans: system-ui, 'Noto Sans Myanmar', sans-serif;
 }
 
-.feedback-dialog {
+.feedback-dialog,
+.settings-confirm {
   margin: auto;
   width: min(36rem, calc(100% - 2rem));
   max-height: calc(100dvh - 2rem);
@@ -61,7 +62,8 @@
   background: var(--paper);
   box-shadow: var(--shadow);
 }
-.feedback-dialog::backdrop {
+.feedback-dialog::backdrop,
+.settings-confirm::backdrop {
   background: rgb(18 18 16 / 0.45);
 }
 .feedback-honeypot {
@@ -285,6 +287,9 @@
   .settings-row {
     @apply flex flex-wrap items-center justify-between gap-x-8 gap-y-4 py-8;
   }
+  .settings-row[hidden] {
+    display: none;
+  }
   /* The first row has no line above it, so no extra space either. */
   .settings-row:first-child {
     @apply pt-0;
@@ -366,79 +371,6 @@
   }
   .mini-tile--coming {
     @apply opacity-70;
-  }
-
-  /* The meditation bell (docs/meditation-bell.md §3). */
-  .bell-alerts {
-    @apply space-y-2;
-  }
-  .bell-alerts:empty {
-    @apply hidden;
-  }
-  .bell-notice {
-    @apply flex items-center justify-between gap-3 rounded-xl px-4 py-2 text-sm font-medium;
-    background: #e3f1e6;
-    color: #14361d;
-  }
-  .bell-top {
-    @apply flex flex-wrap items-center justify-between gap-3;
-  }
-  .bell-panel {
-    @apply rounded-2xl bg-sand p-4;
-  }
-  .bell-row {
-    @apply grid items-center gap-3 sm:grid-cols-[8rem_1fr_auto];
-  }
-  .bell-display {
-    @apply flex flex-col items-center gap-3;
-  }
-  .bell-ring {
-    @apply relative grid size-56 place-items-center;
-  }
-  .bell-ring svg {
-    @apply absolute inset-0 size-full -rotate-90;
-  }
-  .bell-ring__track {
-    fill: none;
-    stroke: var(--sand);
-    stroke-width: 8;
-  }
-  .bell-ring__bar {
-    fill: none;
-    stroke: var(--brand);
-    stroke-width: 8;
-    stroke-linecap: round;
-    transition: stroke-dashoffset 1s linear;
-  }
-  .bell-ring__time,
-  .bell-clock__time {
-    @apply text-5xl font-bold tabular-nums;
-  }
-  .bell-clock {
-    @apply flex min-h-56 flex-col items-center justify-center gap-2 text-center;
-  }
-  .bell-clock__line,
-  .bell-status {
-    color: var(--text-muted);
-  }
-  .bell-presets {
-    @apply grid grid-cols-4 gap-2;
-  }
-  /* A toggle button: a choice that stays selected (presets, later the day buttons). Not .chip, which is a post topic. */
-  .toggle {
-    @apply min-h-11 min-w-0 cursor-pointer truncate rounded-xl border px-2 text-sm font-semibold transition-colors hover:bg-sky/60;
-    border-color: var(--border-strong);
-  }
-  .toggle[aria-pressed='true'] {
-    @apply bg-sky;
-    outline: 2px solid var(--brand);
-  }
-  .bell-actions {
-    @apply flex flex-wrap gap-3;
-  }
-  .bell-error {
-    @apply text-sm font-medium;
-    color: #9b1c1c;
   }
 
   /* Layout */

@@ -2,7 +2,8 @@
 // The meditation bell (docs/meditation-bell.md). Stage 4 of docs/implementation-plan.md §5E: the
 // Timer. The weekly schedule comes in stage 5. Unlinked and noindex until PUBLIC_MINI_APPS is on.
 import MiniAppShell from '../../../../layouts/MiniAppShell.astro';
-import MiniAppIcon from '../../../../components/MiniAppIcon.astro';
+import BellHeader from '../../../../components/meditation-bell/BellHeader.astro';
+import '../../../../styles/meditation-bell.css';
 import BellTimer from '../../../../components/meditation-bell/BellTimer';
 import { localeCodes, type Locale } from '../../../../i18n/locales';
 import { messages, t, type MessageKey } from '../../../../i18n/messages';
@@ -33,9 +34,6 @@ const soundNames = Object.fromEntries(
 ---
 
 <MiniAppShell locale={locale} title={name} path="mini-apps/meditation-bell/">
-  <div class="flex items-center gap-4">
-    <MiniAppIcon icon={app.icon} size={48} />
-    <h1 class="text-3xl font-bold">{name}</h1>
-  </div>
+  <BellHeader slot="app-header" {locale} title={name} icon={app.icon} />
   <BellTimer client:load labels={labels} soundNames={soundNames} />
 </MiniAppShell>

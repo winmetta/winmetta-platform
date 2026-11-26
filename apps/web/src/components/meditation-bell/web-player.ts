@@ -17,11 +17,14 @@ function audioContext(): Ctx | undefined {
   return context;
 }
 
+export const audioIsUnlocked = (): boolean => context?.state === 'running';
+
 /** Browsers only allow sound after a tap: call this from Start, a preset or Ring bell now. */
-export async function unlockAudio(): Promise<void> {
+export async function unlockAudio(): Promise<boolean> {
   const ctx = audioContext();
   if (ctx && ctx.state === 'suspended')
     await ctx.resume().catch(() => undefined);
+  return ctx?.state === 'running';
 }
 
 /** Sounds load when first needed, never on page load, and only the ones in use. */
@@ -96,9 +99,11 @@ type WakeLockSentinelLike = {
 };
 let lock: WakeLockSentinelLike | undefined;
 let requesting = false;
+let wantsScreenOn = false;
 
 /** Keep the screen on while a timer runs and the page is visible (where supported). */
 export async function keepScreenOn(on: boolean): Promise<void> {
+  wantsScreenOn = on;
   const wakeLock = (
     navigator as unknown as {
       wakeLock?: { request: (type: 'screen') => Promise<WakeLockSentinelLike> };
@@ -117,6 +122,10 @@ export async function keepScreenOn(on: boolean): Promise<void> {
   try {
     const sentinel = await wakeLock.request('screen').catch(() => undefined);
     if (!sentinel) return;
+    if (!wantsScreenOn) {
+      await sentinel.release().catch(() => undefined);
+      return;
+    }
     // The browser releases it by itself when the page is hidden: forget it, so coming back asks again.
     sentinel.addEventListener('release', () => {
       if (lock === sentinel) lock = undefined;

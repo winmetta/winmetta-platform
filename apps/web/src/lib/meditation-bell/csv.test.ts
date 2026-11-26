@@ -7,6 +7,7 @@ import {
   serializeCsv,
   splitRecords,
 } from './csv';
+import { days } from './days';
 import { emptyWeek } from './schedule';
 
 const sample = `day,time,label,sound,rings
@@ -84,6 +85,15 @@ describe('parseCsv', () => {
       parseCsv(`day,time\n${rows.slice(0, 101).join('\n')}\n`, 'x'),
     ).toEqual({ ok: false, error: 'too-many' });
   });
+  it('rejects an unclosed quoted field even after a valid row', () => {
+    const text =
+      'day,time,label\nMon,06:00,Morning\nTue,07:00,"Unclosed\nWed,08:00,Evening';
+    expect(parseCsv(text, 'winmetta-long')).toEqual({
+      ok: false,
+      error: 'malformed',
+    });
+  });
+
   it('imports nothing from a file with no valid rows', () => {
     const r = parseCsv('day,time\nxx,yy\n', 'x');
     expect(r.ok && r.bells).toEqual([]);
@@ -129,6 +139,38 @@ describe('applyImport and round trip', () => {
     );
     expect(replaced.week.Sun).toEqual([]);
   });
+  it('exports formula-like labels as text and restores them on import', () => {
+    const week = emptyWeek();
+    week.Mon = [
+      {
+        id: 'a',
+        time: '06:00',
+        label: '+ Morning',
+        sound: 'winmetta-short',
+        rings: 1,
+      },
+    ];
+    const exported = serializeCsv(week);
+    expect(splitRecords(exported)[1]?.[2]).toBe('\t+ Morning');
+    const imported = parseCsv(exported, 'winmetta-long');
+    expect(imported.ok && imported.bells[0]?.label).toBe('+ Morning');
+  });
+
+  it('imports an exported full week of 40-character Burmese labels', () => {
+    const week = emptyWeek();
+    for (const day of days) {
+      week[day] = Array.from({ length: 100 }, (_, index) => ({
+        id: `${day}-${index}`,
+        time: `${String(Math.floor(index / 60)).padStart(2, '0')}:${String(index % 60).padStart(2, '0')}`,
+        label: 'က'.repeat(40),
+        sound: 'winmetta-short',
+        rings: 1,
+      }));
+    }
+    const imported = parseCsv(serializeCsv(week), 'winmetta-long');
+    expect(imported.ok && imported.bells).toHaveLength(700);
+  });
+
   it('exporting then importing gives the same schedule', () => {
     const parsed = parseCsv(sample, 'winmetta-long');
     if (!parsed.ok) throw new Error('parse');

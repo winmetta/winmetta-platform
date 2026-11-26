@@ -26,6 +26,7 @@ const { locale, title, path, noindex = false } = Astro.props;
 const href = (code: Locale) => `/${code}/${path}`;
 const canonical = new URL(href(locale), Astro.site);
 const page = Astro.url.pathname;
+const customHeader = Astro.slots.has('app-header');
 ---
 
 <!doctype html>
@@ -55,40 +56,58 @@ const page = Astro.url.pathname;
     <Analytics />
   </head>
   <body
-    class="flex min-h-screen flex-col"
+    class:list={[
+      'flex min-h-screen flex-col',
+      { 'mini-app--custom': customHeader },
+    ]}
     data-mini-app
     data-leave-message={t(locale, 'miniAppLeaveConfirm')}
   >
     <a href="#main" class="skip-link">
       {t(locale, 'skip')}
     </a>
-    <header class="mini-bar" data-mini-bar>
-      <div class="mini-bar__inner">
-        <a
-          href={route(locale, 'miniApps')}
-          class="footer-link"
-          aria-label={t(locale, 'miniAppBackLabel')}
-        >
-          <span aria-hidden="true" class="me-1 rtl:rotate-180">
-            ←
-          </span>
-          {t(locale, 'miniAppBack')}
-        </a>
-        {isBeta && (
-          <span class="badge" aria-hidden="true">
-            {t(locale, 'betaLabel')}
-          </span>
-        )}
-        <LanguageSwitcher locale={locale} compact />
-      </div>
-    </header>
-    <main id="main" class="mx-auto w-full max-w-3xl flex-1 space-y-6 px-4 pt-6">
+    {customHeader ? (
+      <slot name="app-header" />
+    ) : (
+      <header class="mini-bar" data-mini-bar>
+        <div class="mini-bar__inner">
+          <a
+            href={route(locale, 'miniApps')}
+            class="footer-link"
+            aria-label={t(locale, 'miniAppBackLabel')}
+          >
+            <span aria-hidden="true" class="me-1 rtl:rotate-180">
+              ←
+            </span>
+            {t(locale, 'miniAppBack')}
+          </a>
+          {isBeta && (
+            <span class="badge" aria-hidden="true">
+              {t(locale, 'betaLabel')}
+            </span>
+          )}
+          <LanguageSwitcher locale={locale} compact />
+        </div>
+      </header>
+    )}
+    <main
+      id="main"
+      class={
+        customHeader
+          ? 'mini-app-content'
+          : 'mx-auto w-full max-w-3xl flex-1 space-y-6 px-4 pt-6'
+      }
+    >
       <slot />
     </main>
     <footer class="mini-footer">
       {feedbackEnabled && (
         <a
-          class="btn btn-outline no-print"
+          class={
+            customHeader
+              ? 'mini-app-feedback no-print'
+              : 'btn btn-outline no-print'
+          }
           href={feedbackMailto(page, title)}
           data-feedback="general"
           data-feedback-page={page}

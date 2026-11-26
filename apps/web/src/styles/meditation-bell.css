@@ -1,0 +1,677 @@
+.mini-app--custom:has(.bell-header) {
+  color-scheme: light dark;
+  --bell-surface: light-dark(
+    color-mix(in srgb, var(--paper) 68%, var(--sand)),
+    var(--ink)
+  );
+  --bell-ink: light-dark(var(--ink), var(--paper));
+  --bell-quiet: light-dark(var(--text-muted), var(--stone));
+  --bell-line: light-dark(
+    var(--stone),
+    color-mix(in srgb, var(--stone) 25%, var(--ink))
+  );
+  --bell-control-line: light-dark(var(--border-strong), var(--grey));
+  --bell-tile: light-dark(
+    var(--sand),
+    color-mix(in srgb, var(--sand) 12%, var(--ink))
+  );
+  --bell-selected: light-dark(
+    var(--sky),
+    color-mix(in srgb, var(--mist) 24%, var(--ink))
+  );
+  --bell-accent: light-dark(var(--brand-strong), var(--mist));
+  --bell-on-accent: light-dark(var(--paper), var(--ink));
+  background: var(--bell-surface);
+  color: var(--bell-ink);
+}
+
+.bell-header,
+.mini-app--custom:has(.bell-header) :is(.mini-app-content, .mini-footer) {
+  width: 100%;
+  max-width: 27rem;
+  margin-inline: auto;
+}
+
+@media (min-width: 640px) {
+  .bell-header,
+  .mini-app--custom:has(.bell-header) :is(.mini-app-content, .mini-footer) {
+    max-width: 33.5rem;
+  }
+}
+
+.bell-header {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  min-height: 54px;
+  padding-inline: 10px;
+  border-bottom: 1px solid var(--bell-line);
+}
+
+.bell-header h1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.bell-header h1 img {
+  flex: none;
+}
+
+.bell-header-action,
+.mini-app-feedback {
+  display: grid;
+  min-width: 44px;
+  min-height: 44px;
+  place-items: center;
+  border-radius: 10px;
+  color: var(--bell-accent);
+}
+
+.bell-header-action svg {
+  width: 20px;
+  height: 20px;
+}
+
+.bell-language {
+  position: relative;
+}
+
+.bell-language summary::-webkit-details-marker {
+  display: none;
+}
+
+.bell-language-menu {
+  position: absolute;
+  inset-block-start: calc(100% + 4px);
+  inset-inline-end: 0;
+  display: grid;
+  min-width: 9rem;
+  padding: 4px;
+  background: var(--bell-surface);
+  border: 1px solid var(--bell-control-line);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px #0002;
+}
+
+.bell-language-menu a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 12px;
+  border-radius: 8px;
+  line-height: 1.7;
+}
+
+.bell-language-menu a[aria-current],
+.bell-language-menu a:hover,
+.bell-header-action:hover {
+  background: var(--bell-selected);
+}
+
+.mini-app--custom:has(.bell-header) .mini-app-content {
+  flex: 1;
+  padding: 8px 18px 12px;
+}
+
+.mini-app--custom:has(.bell-header) .mini-footer {
+  padding-inline: 18px;
+}
+
+.mini-app-feedback {
+  display: inline-flex;
+  justify-content: center;
+  gap: 6px;
+  padding-inline: 10px;
+}
+
+.bell-app [hidden] {
+  display: none;
+}
+
+.bell-timer-view,
+.bell-panel,
+.bell-input-row,
+.bell-preset-group,
+.bell-alerts {
+  display: grid;
+  gap: 8px;
+}
+
+.bell-timer-view {
+  margin-top: 8px;
+  gap: 12px;
+}
+
+.bell-top,
+.bell-views,
+.bell-actions,
+.bell-ring-count {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.bell-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bell-views {
+  gap: 0;
+  border-bottom: 1px solid var(--bell-line);
+}
+
+.bell-app .bell-views .bell-button {
+  border: 0;
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--bell-quiet);
+}
+
+.bell-app .bell-views [aria-pressed='true'] {
+  border-color: var(--bell-accent);
+  color: var(--bell-accent);
+}
+
+.bell-button,
+.bell-choice,
+.bell-ring-count button,
+.bell-field {
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--bell-control-line);
+  border-radius: 11px;
+  background: var(--bell-tile);
+  color: var(--bell-ink);
+}
+
+.bell-button,
+.bell-choice,
+.bell-ring-count button {
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.bell-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding-inline: 10px;
+  font-size: 0.9375rem;
+}
+
+.bell-top .bell-button {
+  background: var(--bell-surface);
+}
+
+.bell-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.bell-button:disabled,
+.bell-field:disabled {
+  opacity: 0.68;
+  cursor: default;
+}
+
+.bell-button:not(:disabled):hover,
+.bell-choice:hover,
+.bell-ring-count button:hover,
+.bell-choice[aria-pressed='true'],
+.bell-ring-count button[aria-pressed='true'] {
+  border-color: var(--bell-accent);
+  background: var(--bell-selected);
+  color: var(--bell-accent);
+}
+
+.bell-panel {
+  padding: 12px;
+  border: 1px solid var(--bell-line);
+  border-radius: 13px;
+  background: var(--bell-tile);
+}
+
+.bell-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+}
+
+.bell-row label {
+  grid-column: 1 / -1;
+}
+
+.bell-ring-count {
+  grid-template-columns: repeat(3, minmax(44px, 1fr));
+  grid-column: 1 / -1;
+}
+
+.bell-field {
+  width: 100%;
+  padding-inline: 10px;
+  background: var(--bell-surface);
+  font-size: 1rem;
+}
+
+.bell-display {
+  display: grid;
+  justify-items: center;
+}
+
+.bell-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, 13.75rem);
+  aspect-ratio: 1;
+}
+
+.bell-ring svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.bell-ring__track,
+.bell-ring__bar {
+  fill: none;
+  stroke: var(--bell-line);
+  stroke-width: 1.5;
+}
+
+.bell-ring__bar {
+  stroke: var(--bell-accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.bell-ring__readout,
+.bell-clock {
+  z-index: 0;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 7px;
+  text-align: center;
+}
+
+.bell-clock {
+  min-height: 13.75rem;
+}
+
+.bell-clock > svg {
+  width: 26px;
+  height: 26px;
+  color: var(--bell-accent);
+}
+
+.bell-ring__time,
+.bell-clock__time {
+  font-size: clamp(2.2rem, 10vw, 3.05rem);
+  line-height: 1.1;
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.055em;
+}
+
+.bell-clock__line,
+.bell-status,
+.bell-help,
+.bell-schedule-view p {
+  color: var(--bell-quiet);
+}
+
+.bell-status,
+.bell-clock__line {
+  font-size: 0.875rem;
+}
+
+.bell-presets {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.bell-actions {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.bell-actions .bell-button {
+  min-height: 49px;
+  padding-inline: 14px;
+}
+
+.bell-actions .bell-button--start,
+.bell-actions .bell-button--start:hover {
+  border-color: var(--bell-accent);
+  background: var(--bell-accent);
+  color: var(--bell-on-accent);
+}
+
+.bell-app .bell-button--ring-now {
+  width: 100%;
+  min-height: 56px;
+  margin-top: 24px;
+  border-color: var(--bell-accent);
+  border-radius: 14px;
+  background: var(--bell-selected);
+  color: var(--bell-accent);
+  font-size: 1.0625rem;
+}
+
+.bell-app .bell-button--ring-now:active {
+  background: var(--bell-accent);
+  color: var(--bell-on-accent);
+}
+
+.bell-help {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 0.8125rem;
+}
+
+.bell-alerts:not(:empty),
+.bell-schedule-view {
+  margin-top: 12px;
+}
+
+.bell-schedule-view h2 {
+  font-size: 1.125rem;
+  font-weight: 650;
+  margin-bottom: 6px;
+}
+
+.bell-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px 6px 12px;
+  border-radius: 11px;
+  background: var(--bell-selected);
+  color: var(--bell-accent);
+}
+
+.bell-notice button {
+  min-width: 44px;
+}
+
+.bell-error {
+  font-size: 0.875rem;
+  color: light-dark(#9b1c1c, #ffb2ac);
+}
+
+.bell-schedule-screen,
+.bell-schedule-form,
+.bell-import-preview {
+  display: grid;
+  gap: 12px;
+  container-type: inline-size;
+}
+
+.bell-schedule-heading {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+}
+
+.bell-schedule-heading h2 {
+  margin: 0;
+}
+
+.bell-schedule-heading .bell-button {
+  min-width: 44px;
+}
+
+.bell-schedule-heading .bell-switch {
+  margin-inline-start: auto;
+}
+
+.bell-switch-track {
+  position: relative;
+  width: 30px;
+  height: 17px;
+  border: 1px solid var(--bell-control-line);
+  border-radius: 12px;
+  background: var(--bell-line);
+}
+
+.bell-switch-track::before {
+  position: absolute;
+  inset-block-start: 2px;
+  inset-inline-start: 2px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--bell-quiet);
+  content: '';
+}
+
+.bell-switch[aria-checked='true'] {
+  border-color: var(--bell-accent);
+  background: var(--bell-selected);
+  color: var(--bell-accent);
+}
+
+.bell-switch[aria-checked='true'] .bell-switch-track {
+  border-color: var(--bell-accent);
+  background: var(--bell-accent);
+}
+
+.bell-switch[aria-checked='true'] .bell-switch-track::before {
+  inset-inline-start: auto;
+  inset-inline-end: 2px;
+  background: var(--bell-on-accent);
+}
+
+.bell-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 3px;
+}
+
+.bell-days button {
+  padding: 0;
+  font-size: 0.75rem;
+}
+
+.bell-day-full,
+.bell-day-short {
+  display: none;
+}
+
+@container (max-width: 319px) {
+  .bell-days {
+    gap: 0;
+    margin-inline: -12px;
+  }
+}
+
+@container (min-width: 320px) {
+  .bell-day-narrow {
+    display: none;
+  }
+
+  .bell-day-short {
+    display: inline;
+  }
+}
+
+@container (min-width: 485px) {
+  .bell-day-short {
+    display: none;
+  }
+
+  .bell-day-full {
+    display: inline;
+  }
+}
+
+.bell-schedule-empty {
+  padding-block: 15px;
+  border-block: 1px solid var(--bell-line);
+  font-size: 0.875rem;
+}
+
+.bell-schedule-list {
+  max-height: 24rem;
+  overflow: auto;
+  border-top: 1px solid var(--bell-line);
+}
+
+.bell-schedule-entry {
+  display: grid;
+  width: 100%;
+  min-height: 48px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding-inline: 4px;
+  border-bottom: 1px solid var(--bell-line);
+  text-align: start;
+  cursor: pointer;
+}
+
+.bell-schedule-entry:hover {
+  background: var(--bell-tile);
+}
+
+.bell-schedule-entry time {
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.bell-entry-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bell-entry-rings,
+.bell-schedule-hint {
+  color: var(--bell-quiet);
+  font-size: 0.8125rem;
+}
+
+.bell-schedule-files,
+.bell-schedule-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.bell-schedule-files button {
+  padding-inline: 4px;
+  font-size: 0.875rem;
+}
+
+.bell-schedule-shortcuts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.bell-schedule-form fieldset {
+  min-width: 0;
+}
+
+.bell-schedule-form legend {
+  padding-block-end: 5px;
+}
+
+.bell-wake {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.bell-wake input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--bell-accent);
+}
+
+.bell-button--danger,
+.bell-button--danger:not(:disabled):hover {
+  color: light-dark(#9b1c1c, #ffb2ac);
+}
+
+.bell-file-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid var(--bell-control-line);
+  border-radius: 11px;
+}
+
+.bell-file-input::file-selector-button {
+  min-height: 36px;
+  margin-inline-end: 8px;
+  padding-inline: 10px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--bell-selected);
+  color: var(--bell-accent);
+  cursor: pointer;
+}
+
+.bell-import-preview dl > div {
+  display: flex;
+  justify-content: space-between;
+  padding-block: 5px;
+  border-bottom: 1px solid var(--bell-line);
+}
+
+.bell-csv-errors {
+  max-height: 12rem;
+  overflow: auto;
+  padding-inline-start: 16px;
+  color: var(--bell-quiet);
+  font-size: 0.875rem;
+}
+
+.bell-import-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.bell-confirmation,
+.bell-audio-notice {
+  margin-block-start: 10px;
+}
+
+.bell-confirmation {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid light-dark(#8e631e, #c79d59);
+  border-radius: 12px;
+  background: light-dark(#fff3d6, #372d1c);
+}
+
+.bell-audio-notice {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 375px) {
+  .bell-confirmation .bell-actions {
+    grid-template-columns: 1fr;
+  }
+}

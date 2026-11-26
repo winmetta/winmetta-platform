@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
 
 // The meditation bell's Timer (docs/meditation-bell.md §3). The clock is faked, so a 20-minute
@@ -28,13 +29,16 @@ test('shows the countdown with English buttons in both locales', async ({
     for (const name of [
       'Start',
       'Reset',
-      'Ring bell now',
-      'Countdown',
+      'Ring now',
+      'Timer',
+      'Schedule',
       'Set alarm',
     ])
       await expect(page.getByRole('button', { name })).toBeVisible();
-    // Every action button has an icon next to its word.
-    await expect(page.locator('.bell-actions .btn svg')).toHaveCount(3);
+    await expect(
+      page.getByRole('button', { name: 'Countdown', exact: true }),
+    ).toHaveCount(0);
+    await expect(page.locator('.bell-actions button svg')).toHaveCount(2);
   }
 });
 
@@ -127,7 +131,8 @@ test('a bell missed while the page was closed is not rung and says so', async ({
   await page.getByRole('button', { name: '5 min', exact: true }).click();
   await page.getByRole('button', { name: 'Start', exact: true }).click();
   // Back 20 minutes later: well past the two-minute allowance.
-  await page.clock.install({ time: new Date(start.getTime() + 25 * 60_000) });
+  await page.clock.pauseAt(new Date(start.getTime() + 10_000));
+  await page.clock.setSystemTime(new Date(start.getTime() + 25 * 60_000));
   await page.reload();
   await expect(status(page)).toHaveText('Bell missed');
   await expect(page.locator('.bell-notice')).toContainText(
@@ -141,7 +146,8 @@ test('a bell due two minutes ago or less still rings on return', async ({
   await open(page);
   await page.getByRole('button', { name: '5 min', exact: true }).click();
   await page.getByRole('button', { name: 'Start', exact: true }).click();
-  await page.clock.install({ time: new Date(start.getTime() + 6 * 60_000) });
+  await page.clock.pauseAt(new Date(start.getTime() + 10_000));
+  await page.clock.setSystemTime(new Date(start.getTime() + 6 * 60_000));
   await page.reload();
   await expect(status(page)).toHaveText('Bell rang');
   await expect(page.locator('.bell-notice')).toHaveCount(0);
@@ -152,6 +158,14 @@ test('the alarm rings tomorrow for a time that has passed and refuses one over 1
 }) => {
   await open(page);
   await page.getByRole('button', { name: 'Set alarm', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Countdown', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Set alarm', exact: true }),
+  ).toHaveCount(0);
+  await expect(page.getByRole('timer')).toHaveCount(0);
+  await expect(status(page)).toHaveText('Pick a time or a preset');
   await page.getByLabel('Ring at').fill('14:00');
   await page.getByRole('button', { name: 'Start', exact: true }).click();
   await expect(page.locator('#bell-error')).toHaveText(
@@ -160,11 +174,10 @@ test('the alarm rings tomorrow for a time that has passed and refuses one over 1
   await expect(status(page)).toHaveText('Ready');
   await page.getByLabel('Ring at').fill('06:00');
   await page.getByRole('button', { name: 'Start', exact: true }).click();
-  await expect(status(page)).toHaveText('Sitting');
+  await expect(status(page)).toHaveText('Alarm set');
+  await expect(page.locator('.bell-clock__line')).toHaveText('Rings tomorrow');
+  await page.clock.runFor('02:00');
   await expect(time(page)).toHaveText('6:00 AM');
-  await expect(page.locator('.bell-clock__line')).toContainText(
-    /Rings tomorrow, in (659|660):/,
-  );
 });
 
 test('an alarm preset sets the clock to now plus the minutes', async ({
@@ -175,6 +188,11 @@ test('an alarm preset sets the clock to now plus the minutes', async ({
   await page.getByRole('button', { name: '+30 min', exact: true }).click();
   await expect(page.getByLabel('Ring at')).toHaveValue('19:30');
   await expect(time(page)).toHaveText('7:30 PM');
+  await page.getByRole('button', { name: 'Countdown', exact: true }).click();
+  await expect(page.getByRole('timer')).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Set alarm', exact: true }),
+  ).toBeVisible();
 });
 
 test('the bell settings panel saves a choice, plays it and shows a notice', async ({
@@ -200,15 +218,23 @@ test('the bell settings panel saves a choice, plays it and shows a notice', asyn
   await expect(page.locator('#bell-start-sound')).toHaveValue('off');
 });
 
-test('Ring bell now works with nothing running and breaks nothing', async ({
+test('Ring now works with nothing running and breaks nothing', async ({
   page,
 }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await open(page);
-  await page
-    .getByRole('button', { name: 'Ring bell now', exact: true })
-    .click();
+  await page.getByRole('button', { name: 'Ring now', exact: true }).click();
+  await expect(status(page)).toHaveText('Ready');
+  await page.getByRole('button', { name: 'Schedule', exact: true }).click();
+  await expect(
+    page.getByRole('heading', { name: 'Weekly schedule' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Set alarm', exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole('button', { name: 'Ring now', exact: true }).click();
+  await page.getByRole('button', { name: 'Timer', exact: true }).click();
   await expect(status(page)).toHaveText('Ready');
   expect(errors).toEqual([]);
 });
@@ -271,21 +297,228 @@ test('no request leaves the browser except the page itself', async ({
   await open(page);
   await page.getByRole('button', { name: '5 min', exact: true }).click();
   await page.getByRole('button', { name: 'Start', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'Ring bell now', exact: true })
-    .click();
+  await page.getByRole('button', { name: 'Ring now', exact: true }).click();
   expect(outside.filter((u) => !u.includes('analytics.example.test'))).toEqual(
     [],
   );
 });
 
-test('there is no horizontal scroll at 320 px', async ({ page }) => {
+test('the bell controls fit at 320 px and leave space above Ring now', async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await open(page);
-  await page.getByRole('button', { name: 'Bells', exact: true }).click();
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= window.innerWidth,
-    ),
-  ).toBe(true);
+  const ring = page.getByRole('button', { name: 'Ring now', exact: true });
+  await expect(ring).toHaveCSS('min-height', '56px');
+  await expect(ring).toHaveCSS('margin-top', '24px');
+  for (const colorScheme of ['light', 'dark'] as const) {
+    await page.emulateMedia({ colorScheme });
+    await page.getByRole('button', { name: 'Bells', exact: true }).click();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(320);
+    await page.getByRole('button', { name: 'Bells', exact: true }).click();
+    await page.getByRole('button', { name: 'Set alarm', exact: true }).click();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(320);
+    await page.getByRole('button', { name: 'Countdown', exact: true }).click();
+    await page.getByRole('button', { name: 'Schedule', exact: true }).click();
+    const days = page.getByRole('group', { name: 'Days' }).getByRole('button');
+    await expect(days).toHaveCount(7);
+    const sunday = await days.last().boundingBox();
+    expect(sunday).not.toBeNull();
+    expect(sunday!.x + sunday!.width).toBeLessThanOrEqual(320);
+    expect(sunday!.width).toBeGreaterThanOrEqual(44);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(320);
+    await expect(ring).toHaveCSS(
+      'color',
+      colorScheme === 'light' ? 'rgb(38, 79, 99)' : 'rgb(189, 210, 220)',
+    );
+    await page.getByRole('button', { name: 'Timer', exact: true }).click();
+  }
+});
+
+test('weekly bells can be added on multiple days, moved, and deleted', async ({
+  page,
+}) => {
+  await open(page);
+  await page.getByRole('button', { name: 'Schedule', exact: true }).click();
+  await page.getByRole('button', { name: 'Add', exact: true }).click();
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(page.getByRole('alert')).toHaveText('Choose a time.');
+  await page.getByLabel('Time', { exact: true }).fill('06:00');
+  await page.getByLabel('Label (optional)').fill('Morning sitting');
+  await page.getByRole('button', { name: 'Weekdays', exact: true }).click();
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: /6:00 AM Morning sitting/ }),
+  ).toBeVisible();
+
+  await page.getByRole('button', { name: 'Add', exact: true }).click();
+  await page.getByLabel('Time', { exact: true }).fill('06:00');
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(page.getByRole('alert')).toHaveText(
+    'A bell at 6:00 AM is already set on Monday.',
+  );
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+
+  await page.getByRole('button', { name: 'Friday', exact: true }).click();
+  await page.getByRole('button', { name: /6:00 AM Morning sitting/ }).click();
+  await page.getByLabel('Time', { exact: true }).fill('07:30');
+  await page.getByRole('button', { name: 'Sunday', exact: true }).click();
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await page.reload();
+  await page.getByRole('button', { name: 'Schedule', exact: true }).click();
+  await page.getByRole('button', { name: 'Sunday', exact: true }).click();
+  await page.getByRole('button', { name: /7:30 AM Morning sitting/ }).click();
+  await page.getByRole('button', { name: 'Delete', exact: true }).click();
+  await page
+    .getByRole('alertdialog')
+    .getByRole('button', { name: 'Delete', exact: true })
+    .click();
+  await expect(page.getByText('No bells on Sunday.')).toBeVisible();
+  await page.getByRole('button', { name: 'Monday', exact: true }).click();
+  await expect(page.getByText('No bells on Monday.')).toBeVisible();
+});
+
+test('the Timer and Schedule only stop each other after confirmation', async ({
+  page,
+}) => {
+  await open(page);
+  const timer = page.getByRole('button', { name: 'Timer', exact: true });
+  const schedule = page.getByRole('button', { name: 'Schedule', exact: true });
+  const toggle = page.getByRole('switch', { name: 'Weekly schedule' });
+  const dialog = page.getByRole('alertdialog');
+  await schedule.click();
+  await toggle.click();
+  await expect(toggle).toBeChecked();
+  await timer.click();
+  await page.getByRole('button', { name: 'Start', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Cancel' }).click();
+  await expect(status(page)).toHaveText('Ready');
+  await page.getByRole('button', { name: 'Start', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Turn off and start' }).click();
+  await expect(status(page)).toHaveText('Sitting');
+  await schedule.click();
+  await expect(toggle).not.toBeChecked();
+  await toggle.click();
+  await dialog.getByRole('button', { name: 'Cancel' }).click();
+  await expect(toggle).not.toBeChecked();
+  await toggle.click();
+  await dialog.getByRole('button', { name: 'Stop timer and turn on' }).click();
+  await expect(toggle).toBeChecked();
+  await timer.click();
+  await expect(status(page)).toHaveText('Ready');
+});
+
+test('CSV previews skipped rows and fallback sounds, adds or replaces, and downloads UTF-8 with a BOM', async ({
+  page,
+}) => {
+  await open(page);
+  await page.getByRole('button', { name: 'Schedule', exact: true }).click();
+  const choose = async (contents: string) => {
+    await page.getByRole('button', { name: 'Import', exact: true }).click();
+    await page.getByLabel('Choose CSV file').setInputFiles({
+      name: 'sittings.csv',
+      mimeType: 'text/csv',
+      buffer: Buffer.from(contents),
+    });
+  };
+  const header = 'day,time,label,sound,rings\n';
+  await choose(
+    header + 'Mon,06:00,"နံနက်, sitting",bad,2\nTue,99:00,Invalid,,1\n',
+  );
+  await expect(
+    page.getByRole('heading', { name: 'Import preview' }),
+  ).toBeVisible();
+  await expect(page.getByText('1 will use your end bell sound.')).toBeVisible();
+  await expect(page.getByText(/Row 3: Invalid time/)).toBeVisible();
+  await page
+    .getByRole('button', { name: 'Add to the current schedule' })
+    .click();
+  await expect(
+    page.getByRole('button', { name: /6:00 AM နံနက်, sitting/ }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Close', exact: true }).click();
+  await choose(
+    header +
+      'Mon,06:00,Duplicate,winmetta-short,1\nMon,07:15,Second,winmetta-short,1\n',
+  );
+  await page
+    .getByRole('button', { name: 'Add to the current schedule' })
+    .click();
+  await expect(page.getByText('Imported 1. Skipped 1.')).toBeVisible();
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export', exact: true }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe('winmetta-bell-schedule.csv');
+  const contents = await readFile(await download.path(), 'utf8');
+  expect(contents.charCodeAt(0)).toBe(0xfeff);
+  expect(contents).toContain('Mon,06:00,"နံနက်, sitting",winmetta-long,2');
+  expect(contents).toContain('Mon,07:15,Second,winmetta-short,1');
+  await choose(header + 'Mon,08:00,Replacement,winmetta-long,1\n');
+  await page
+    .getByRole('button', { name: 'Replace the whole schedule' })
+    .click();
+  await page
+    .getByRole('alertdialog')
+    .getByRole('button', { name: 'Cancel' })
+    .click();
+  await page
+    .getByRole('button', { name: 'Replace the whole schedule' })
+    .click();
+  await page
+    .getByRole('alertdialog')
+    .getByRole('button', { name: 'Replace the whole schedule' })
+    .click();
+  await expect(
+    page.getByRole('button', { name: /8:00 AM Replacement/ }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: /Morning|Second|နံနက်/ }),
+  ).toHaveCount(0);
+});
+
+test('a scheduled bell rings at its wall-clock time and an older missed bell is reported after reload', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const original = OscillatorNode.prototype.start;
+    OscillatorNode.prototype.start = function (...args) {
+      const root = document.documentElement;
+      root.dataset.oscillators = String(
+        Number(root.dataset.oscillators ?? '0') + 1,
+      );
+      return original.apply(this, args);
+    };
+  });
+  await open(page);
+  await page.getByRole('button', { name: 'Schedule', exact: true }).click();
+  await page.getByRole('button', { name: 'Wednesday', exact: true }).click();
+  for (const time of ['19:01', '19:02']) {
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
+    await page.getByLabel('Time', { exact: true }).fill(time);
+    await page.getByLabel('Rings', { exact: true }).selectOption('1');
+    await page.getByRole('button', { name: 'Save', exact: true }).click();
+  }
+  await page.getByRole('switch', { name: 'Weekly schedule' }).click();
+  await expect(page.getByRole('button', { name: 'Enable sound' })).toHaveCount(
+    0,
+  );
+  await page.clock.runFor('01:03');
+  await expect(page.locator('html')).toHaveAttribute('data-oscillators', '5');
+  await page.clock.pauseAt(new Date(start.getTime() + 70_000));
+  await page.clock.setSystemTime(new Date(start.getTime() + 5 * 60_000 + 1000));
+  await page.reload();
+  await page.getByRole('button', { name: 'Enable sound' }).click();
+  await expect(
+    page.getByText('Your Wednesday 7:02 PM bell was missed.'),
+  ).toBeVisible();
+  await expect(page.locator('html')).not.toHaveAttribute(
+    'data-oscillators',
+    /.+/,
+  );
 });

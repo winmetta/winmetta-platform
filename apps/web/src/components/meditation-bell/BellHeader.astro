@@ -1,0 +1,89 @@
+---
+import MiniAppIcon from '../MiniAppIcon.astro';
+import { localeCodes, locales, type Locale } from '../../i18n/locales';
+import { t } from '../../i18n/messages';
+import { route, switchLocale } from '../../i18n/routes';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  icon: string;
+}
+const { locale, title, icon } = Astro.props;
+const languageNames = {
+  en: 'miniAppLanguageEnglish',
+  my: 'miniAppLanguageMyanmar',
+} as const;
+---
+
+<header class="bell-header" data-mini-bar>
+  <a
+    href={route(locale, 'miniApps')}
+    class="bell-header-action"
+    aria-label={t(locale, 'miniAppBackLabel')}
+  >
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="m12 19-7-7 7-7M5 12h14"></path>
+    </svg>
+  </a>
+  <h1>
+    <MiniAppIcon {icon} size={26} />
+    {title}
+  </h1>
+  <details class="bell-language">
+    <summary class="bell-header-action" aria-label={t(locale, 'language')}>
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
+        <circle cx="12" cy="12" r="9"></circle>
+        <ellipse cx="12" cy="12" rx="4" ry="9"></ellipse>
+        <path d="M3 12h18"></path>
+      </svg>
+    </summary>
+    <nav class="bell-language-menu" aria-label={t(locale, 'language')}>
+      {localeCodes.map((code) => (
+        <a
+          href={switchLocale(Astro.url, code)}
+          lang={code}
+          hreflang={code}
+          aria-current={code === locale ? 'page' : undefined}
+          aria-label={t(locale, languageNames[code])}
+          data-locale={code}
+        >
+          {locales[code].name}
+        </a>
+      ))}
+    </nav>
+  </details>
+</header>
+<script>
+  import '../../i18n/language-switch-links';
+
+  const language = document.querySelector<HTMLDetailsElement>('.bell-language');
+  if (language) {
+    document.addEventListener('click', (event) => {
+      if (event.target instanceof Node && !language.contains(event.target)) {
+        language.open = false;
+      }
+    });
+    language.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && language.open) {
+        language.open = false;
+        language.querySelector('summary')?.focus();
+      }
+    });
+  }
+</script>

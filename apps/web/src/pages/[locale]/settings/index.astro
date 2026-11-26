@@ -1,4 +1,5 @@
 ---
+import BellDataSetting from '../../../components/meditation-bell/BellDataSetting.astro';
 import GearIcon from '../../../components/GearIcon.astro';
 import Shell from '../../../layouts/Shell.astro';
 import { locales, localeCodes, type Locale } from '../../../i18n/locales';
@@ -63,6 +64,7 @@ const text = (key: Parameters<typeof t>[1]) => t(locale, key);
           <span role="status" class="settings-done" data-reset-status></span>
         </div>
       </div>
+      <BellDataSetting {locale} />
     </div>
     <p role="status" class="settings-done" data-status></p>
     <template data-saved>{text('settingsSaved')}</template>
