@@ -4,7 +4,7 @@ import {
   hasZawgyiMarker,
   type ZawgyiConverter,
   type ZawgyiDetector,
-} from './zawgyi';
+} from './zawgyi.ts';
 const detector = (probability: number): ZawgyiDetector => ({
   getZawgyiProbability: () => probability,
 });

@@ -1,6 +1,6 @@
 // The rules every Dhamma post file must follow. The content loader (so `astro build` fails), the
 // validate-posts script (pre-commit and CI) and the golden test all run checkPost.
-import { hasZawgyiMarker } from '../zawgyi.ts';
+import { hasZawgyiMarker } from '@winmetta/myanmar-convert/zawgyi';
 import { postLanguages } from './languages.ts';
 import {
   parsePost,

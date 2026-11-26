@@ -1,0 +1,24 @@
+{
+  "name": "@winmetta/myanmar-convert",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Convert Burmese text between Unicode, Zawgyi and Win Innwa",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./zawgyi": "./src/zawgyi.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "knayi-myscript": "2.10.0",
+    "myanmar-tools": "1.1.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "vitest": "^5.1.0"
+  }
+}

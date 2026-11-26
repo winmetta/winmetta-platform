@@ -16,6 +16,7 @@
     "@astrojs/react": "^7.1.4",
     "@astrojs/sitemap": "^3.7.4",
     "@fontsource/noto-sans-myanmar": "^5.2.8",
+    "@winmetta/myanmar-convert": "*",
     "@winmetta/search-text": "*",
     "@radix-ui/react-slot": "^1.5.0",
     "@tailwindcss/vite": "^4.3.4",

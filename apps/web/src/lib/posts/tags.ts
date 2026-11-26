@@ -7,7 +7,7 @@
 // (compared with the search normalization, so `Pali terms` equals `Pāḷi terms` and ဥ equals ဉ).
 import { normalizeSearch } from '@winmetta/search-text';
 import { postTagSchema } from '../schemas.ts';
-import { hasZawgyiMarker } from '../zawgyi.ts';
+import { hasZawgyiMarker } from '@winmetta/myanmar-convert/zawgyi';
 import { postLanguages, type PostLanguage } from './languages.ts';
 import { slugifyTitle } from './slug.ts';
 

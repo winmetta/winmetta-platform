@@ -1,4 +1,4 @@
-import { countZawgyiMarkers } from '../../web/src/lib/zawgyi.ts';
+import { countZawgyiMarkers } from '@winmetta/myanmar-convert/zawgyi';
 
 // Whether one page's text layer can be indexed as it is, or the page must be read by OCR.
 export type TextLayerReason = 'too_little_text' | 'zawgyi' | 'legacy_font';
