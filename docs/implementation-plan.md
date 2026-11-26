@@ -455,7 +455,7 @@ One reviewed PR each, in this order.
 * One library per direction, always converting through Unicode: `myanmar-tools` 1.1.3 for Zawgyi, `knayi-myscript` for Win Innwa → Unicode, our own table (ported from `trhura/python-myanmar`, MIT) for Unicode → Win Innwa.
 * Fixes live in the package's own steps with tests, never inside a library.
 * Zawgyi is detected with the existing two-gate rule; Win Innwa is always chosen by the user.
-* The Zawgyi rules move from `apps/web/src/lib/zawgyi.ts` into the package; book search and the manifest generator import them from there.
+* The Zawgyi rules move from `apps/web/src/lib/zawgyi.ts` into the package; every importer (book search, the manifest generator, the teacher import script, the library search island and the Dhamma Post checks) uses the package, and the `apps/web` copy is deleted.
 * Publishing to npm comes later, after the mini app has been used.
 
 ### Stages

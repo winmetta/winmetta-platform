@@ -94,7 +94,7 @@ detect(text: string): DetectResult; // 'unicode' | 'zawgyi' | 'unsure' | 'no-mya
 ### 5.2 Layout
 
 - `src/convert.ts`: routing through Unicode and the pre- and post-processing steps.
-- `src/zawgyi.ts`: the Zawgyi markers, detector thresholds and `fixZawgyiTitle`, **moved from `apps/web/src/lib/zawgyi.ts`**. Book search (`apps/book-search/src/quality.ts`) and the library manifest generator import it from the package, not from inside `apps/web` as they do today. Behaviour does not change; the existing tests move with it.
+- `src/zawgyi.ts`: the Zawgyi markers, detector thresholds and `fixZawgyiTitle`, **moved from `apps/web/src/lib/zawgyi.ts`**. Every current importer switches to the package and `apps/web/src/lib/zawgyi.ts` is deleted, so there is one copy of the rules: on 2026-11-25 these are `apps/book-search/src/quality.ts`, `scripts/generate-library-manifest.mjs` and `scripts/import-teachers.mjs` (which today reach inside `apps/web`), and `apps/web/src/components/LibrarySearchIsland.tsx`, `apps/web/src/lib/posts/validate.ts` and `apps/web/src/lib/posts/tags.ts`. Search for importers again when the move is made. Behaviour does not change; `zawgyi.test.ts` moves with it.
 - `src/win-innwa/`: the Unicode → Win Innwa table and code, and any Win Innwa fixes.
 - `src/normalize.ts`: Unicode output is put in NFC and in the standard storage order (medials, vowels and marks), so converted text matches text typed in Unicode. It reuses `@winmetta/search-text`'s normalization where that fits rather than copying it.
 - No imports from `apps/*`, no DOM, no Node-only APIs, so it runs in the browser, in Node scripts and on Lambda, and can be moved to its own repository or published unchanged.
