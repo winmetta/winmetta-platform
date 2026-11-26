@@ -331,6 +331,10 @@
   .footer-link[aria-current] {
     @apply bg-white font-semibold;
   }
+  /* YouTube and Facebook: the official mark before the service name. */
+  .footer-link--brand {
+    @apply gap-2;
+  }
 
   /* Layout */
   .page {

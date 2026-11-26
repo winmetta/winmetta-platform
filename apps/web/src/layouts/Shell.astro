@@ -8,6 +8,8 @@ import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 import NavIcon from '../components/NavIcon.astro';
 import GearIcon from '../components/GearIcon.astro';
 import Analytics from '../components/Analytics.astro';
+import BrandIcon from '../components/BrandIcon.astro';
+import { channelLinks } from '../lib/classes';
 import { locales, localeCodes, type Locale } from '../i18n/locales';
 import { pagePaths, route, type PageId } from '../i18n/routes';
 import { t } from '../i18n/messages';
@@ -273,6 +275,22 @@ const postLanguageScript = postLanguagesHeadScript(defaultPostLanguage(locale));
             </a>
           )}
           <FeedbackLink locale={locale} class="footer-link" />
+          <a
+            href={channelLinks.youtube}
+            class="footer-link footer-link--brand"
+            rel="noopener"
+          >
+            <BrandIcon name="youtube" />
+            YouTube
+          </a>
+          <a
+            href={channelLinks.facebook}
+            class="footer-link footer-link--brand"
+            rel="noopener"
+          >
+            <BrandIcon name="facebook" />
+            Facebook
+          </a>
           <a href="https://winmetta.org/" class="footer-link" rel="noopener">
             winmetta.org
           </a>
