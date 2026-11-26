@@ -58,7 +58,7 @@ Out of scope: accounts or sync between devices, uploading your own bell sounds, 
 - **Made in Canva** through the Canva connector, from basic shapes and lines drawn for this icon, not from Canva's stock elements, photos or illustrations, whose licence limits their use in logos and app icons (check Canva's current content licence when the icons are made). Win Metta's own artwork may be used.
 - **Sizes:** designed on a 1024 × 1024 canvas so the same art can later be an installable-app, desktop or mobile app icon; exported as SVG for the site (and PNG at 1024 px for later app stores).
 - **In the repo:** the cleaned SVG in `apps/web/src/assets/mini-apps/<id>.svg` (no embedded fonts or raster images, small enough to inline), named in the registry, and a line in `apps/web/src/assets/SOURCES.md` saying it was designed for Win Metta in Canva. The link to the Canva design is kept in the private repository, not here.
-- **Checked** at 64 px and 32 px, in light and dark, next to the other tiles; a Burmese speaker checks any Burmese letters in an icon.
+- **Checked** at 64 px and 32 px, on the light palette next to the other tiles; a Burmese speaker checks any Burmese letters in an icon.
 
 **Feature flag.** Like the Dāna page ([donations.md](donations.md)), the listing page and the bell are always built but stay unlinked, `noindex` and out of the sitemap until `PUBLIC_MINI_APPS=true`; the flag adds the menu link.
 
@@ -77,10 +77,10 @@ The app starts with a **Timer / Schedule** switch. In Timer, the toolbar below i
 
 ### 3.2 Alarm
 
-Alarm uses an alarm-clock icon and a large wall-clock time. An unset alarm shows dashes and “Pick a time or a preset”. The display continues to show the selected time after Start.
+Alarm uses an alarm-clock icon and a large wall-clock time. An unset alarm shows dashes and “Pick a time or a preset”. After Start, the target stays on screen and a separate minutes-and-seconds readout shows the time remaining. The remaining time freezes while paused.
 
 - **Presets** become "+N minutes from now" (the same eight values) and set the clock to now plus N, rounded to the minute.
-- **Ring at:** a time field. The alarm is the next time that clock time occurs: a time that has already passed today means tomorrow, and the line under the clock says **"Rings tomorrow"** (or "Rings today").
+- **Ring at:** a time field. The alarm is the next time that clock time occurs: a time that has already passed today means tomorrow. The remaining time appears beneath the target.
 - **Limit:** at most **16 hours** ahead. A time further away (for example 2:00 PM when it is now 7:00 PM) shows "Pick a time within the next 16 hours" and sets nothing.
 - **Start / Pause / Resume** and **Clear** (removes the alarm). "Countdown" switches back.
 
@@ -191,11 +191,11 @@ The mini app's buttons and labels are **English in both locales**; only alerts, 
 - **Day buttons** use the longest form that fits: **"Monday"** on desktop and wide screens, **"Mon"** on tablets and wide phones, **"Mo"** only on narrow phones. The choice is made by the width available to the row (a container query), not by the device.
 - The seven buttons share the row equally and may shrink (`minmax(0, 1fr)` grid columns), so Sunday is never cut off; this was a bug in the 2026-11-25 mockup at narrow widths. The same applies to the preset grid, the Add/Import/Export row and long bell labels, which are cut with an ellipsis.
 - **Messages, alerts, notices and the CSV import preview always use full day names** ("Monday"), whatever the width. The CSV file itself uses `Mon` to `Sun`.
-- Checked at 320 px, 375 px and desktop, in both locales, light and dark (AGENTS.md §6 asks for desktop and 375 px; the bell adds 320 px because of the seven-button row).
+- Checked at 320 px, 375 px and desktop, in both locales with the light palette (AGENTS.md §6 asks for desktop and 375 px; the bell adds 320 px because of the seven-button row).
 
 ### 7.3 Design guide
 
-Meditation Bell uses a compact, mobile-first control layout and its own styles. Timer and Schedule share a top-level switch. The Timer toolbar has one action for changing modes. Countdown uses a thin progress ring, while Alarm shows a clock time with no progress indicator. Start fills its action row alongside Reset or Clear. Ring now sits on a separate full-width row. Presets, the rings choice and day buttons use pressed states to communicate selection.
+Meditation Bell uses a compact, mobile-first control layout and its own styles. Timer and Schedule share a top-level switch. The Timer toolbar has one action for changing modes. Countdown uses a thin progress ring, while Alarm shows the clock time and a numeric countdown underneath. Start fills its action row alongside Reset or Clear. Ring now sits on a separate full-width row. Presets, the rings choice and day buttons use pressed states to communicate selection.
 
 ---
 
@@ -266,7 +266,7 @@ The web version says this plainly in its help text and does not try to work arou
 - `apps/web/src/lib/meditation-bell/`: pure TypeScript, no DOM.
   - `schema.ts`: the Zod schema and version migration for the stored state.
   - `timer.ts`: the countdown and alarm state machine (start, pause, resume, reset, clear, finished, missed), driven by a clock passed in, so tests control time.
-  - `alarm.ts`: "next occurrence of a clock time within 16 hours", including "Rings tomorrow" and the 16-hour limit.
+  - `alarm.ts`: "next occurrence of a clock time within 16 hours", including next-day alarms and the 16-hour limit.
   - `schedule.ts`: next bell across the week, duplicates, add, edit and delete, daylight-saving cases.
   - `csv.ts`: parse (with per-row errors) and serialize (with the byte-order mark).
   - `sounds.ts`: the sound registry (id, name key, file, length, licence; section 8.2).
@@ -277,7 +277,7 @@ The web version says this plainly in its help text and does not try to work arou
 - `apps/web/src/pages/[locale]/mini-apps/index.astro` and `[locale]/mini-apps/meditation-bell/index.astro`.
 - **Unit tests (Vitest):** every module in `lib/meditation-bell/`, with fixed clocks and time zones (including a spring-forward and a fall-back day in `America/Los_Angeles`).
 - **Analytics:** a unit test that every bell event's properties come from the fixed lists and buckets in section 11 (no free text can reach the tracker), as the site's existing analytics tests do.
-- **Browser tests (Playwright):** the listing page; the back link; the footer Feedback button opening the dialog with the mini app filled in; the language switch keeping the page; a countdown finishing (with a fake clock); the alarm "Rings tomorrow" and 16-hour cases; both "one or the other" confirmations; add, edit and delete a bell; import with the sample file (preview, skipped rows, replace and add); export; the seven day buttons fitting at 320 px; screenshots in both locales.
+- **Browser tests (Playwright):** the listing page; the back link; the footer Feedback button opening the dialog with the mini app filled in; the language switch keeping the page; a countdown finishing (with a fake clock); the next-day alarm, remaining-time readout and 16-hour limit; both "one or the other" confirmations; add, edit and delete a bell; import with the sample file (preview, skipped rows, replace and add); export; the seven day buttons fitting at 320 px; screenshots in both locales.
 - **Manual checks before go-live:** desktop Chrome, Firefox and Safari, and iPhone Safari and Android Chrome: sound after the first tap, a background tab, sleep and wake, the screen staying on.
 
 ---

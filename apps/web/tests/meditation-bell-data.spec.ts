@@ -142,3 +142,50 @@ test('an open bell page follows schedule changes from another tab', async ({
     page.getByRole('switch', { name: 'Weekly schedule' }),
   ).not.toBeChecked();
 });
+
+test('the sound preview unlocks a restored schedule and sound edits retain checkpoints from another tab', async ({
+  page,
+  context,
+}) => {
+  await page.goto('/en/mini-apps/meditation-bell/');
+  await expect(
+    page.locator('[data-bell-timer][data-ready="true"]'),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Schedule', exact: true }).click();
+  await page.getByRole('switch', { name: 'Weekly schedule' }).click();
+  await page.reload();
+  const enable = page.getByRole('button', { name: 'Enable sound' });
+  await expect(enable).toBeVisible();
+  await page.getByRole('button', { name: 'Bells', exact: true }).click();
+  await page.getByRole('button', { name: 'Play: Start bell' }).click();
+  await expect(enable).toHaveCount(0);
+
+  const other = await context.newPage();
+  await other.goto('/en/about/');
+  await page.evaluate((key) => {
+    window.addEventListener('storage', (event) => {
+      if (event.key === key)
+        document.documentElement.dataset.bellStorageReceived = 'true';
+    });
+  }, storageKey);
+  const checkedAt = await other.evaluate((key) => {
+    const data = JSON.parse(localStorage.getItem(key)!);
+    data.schedule.checkedAt = Date.now() + 5000;
+    localStorage.setItem(key, JSON.stringify(data));
+    return data.schedule.checkedAt;
+  }, storageKey);
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-bell-storage-received',
+    'true',
+  );
+  await page
+    .getByRole('group', { name: 'Rings' })
+    .getByRole('button', { name: '2x' })
+    .click();
+  const saved = await page.evaluate(
+    (key) => JSON.parse(localStorage.getItem(key)!),
+    storageKey,
+  );
+  expect(saved.schedule.checkedAt).toBe(checkedAt);
+  expect(saved.endBell.rings).toBe(2);
+});

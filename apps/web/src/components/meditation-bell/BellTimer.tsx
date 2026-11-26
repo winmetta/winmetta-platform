@@ -59,19 +59,28 @@ interface Notice {
 /** The local clock time `HH:MM` of a moment, for the "Ring at" field. */
 const clockOf = (ms: number) => DateTime.fromMillis(ms).toFormat('HH:mm');
 
+type SoundSettings = Pick<BellState, 'startBell' | 'endBell'>;
+
 interface PanelProps {
   labels: Labels;
   soundNames: Record<string, string>;
-  bell: BellState;
+  bell: SoundSettings;
+  preview: (sound: string) => void;
   change: (
-    next: BellState,
+    next: Partial<SoundSettings>,
     role: 'start' | 'end',
     sound: string,
     rings?: number,
   ) => void;
 }
 
-function SettingsPanel({ labels, soundNames, bell, change }: PanelProps) {
+function SettingsPanel({
+  labels,
+  soundNames,
+  bell,
+  preview,
+  change,
+}: PanelProps) {
   return (
     <div id="bell-panel" className="bell-panel">
       <div className="bell-row">
@@ -84,7 +93,7 @@ function SettingsPanel({ labels, soundNames, bell, change }: PanelProps) {
           value={bell.startBell.sound}
           onChange={(e) =>
             change(
-              { ...bell, startBell: { sound: e.target.value } },
+              { startBell: { sound: e.target.value } },
               'start',
               e.target.value,
             )
@@ -102,9 +111,7 @@ function SettingsPanel({ labels, soundNames, bell, change }: PanelProps) {
           className="bell-button"
           disabled={bell.startBell.sound === 'off'}
           aria-label={`${labels.bellPlay}: ${labels.bellStartBell}`}
-          onClick={() => {
-            void ring(bell.startBell.sound, 1);
-          }}
+          onClick={() => preview(bell.startBell.sound)}
         >
           <VolumeIcon />
           <span>{labels.bellPlay}</span>
@@ -121,7 +128,6 @@ function SettingsPanel({ labels, soundNames, bell, change }: PanelProps) {
           onChange={(e) =>
             change(
               {
-                ...bell,
                 endBell: { ...bell.endBell, sound: e.target.value },
               },
               'end',
@@ -148,7 +154,7 @@ function SettingsPanel({ labels, soundNames, bell, change }: PanelProps) {
               aria-pressed={bell.endBell.rings === n}
               onClick={() =>
                 change(
-                  { ...bell, endBell: { ...bell.endBell, rings: n } },
+                  { endBell: { ...bell.endBell, rings: n } },
                   'end',
                   bell.endBell.sound,
                   n,
@@ -167,23 +173,16 @@ function SettingsPanel({ labels, soundNames, bell, change }: PanelProps) {
 interface DisplayProps {
   labels: Labels;
   timer: timers.Timer;
-  now: number;
   left: number;
   status: string | undefined;
   alarmText: string;
 }
 
 /** The progress ring (countdown) or the large clock (alarm), with the status line. */
-function Display({
-  labels,
-  timer,
-  now,
-  left,
-  status,
-  alarmText,
-}: DisplayProps) {
+function Display({ labels, timer, left, status, alarmText }: DisplayProps) {
   const mode = timer.mode;
   const running = timer.status === 'running';
+  const paused = timer.status === 'paused';
   const alarmEnd = timer.endAt ?? undefined;
   const progress = timer.lengthMs > 0 ? Math.min(1, left / timer.lengthMs) : 0;
   const circumference = 2 * Math.PI * 52;
@@ -225,23 +224,22 @@ function Display({
                 ? format12Hour(alarmText)
                 : '––:––'}
           </span>
-          {alarmEnd !== undefined && running && (
-            <span className="bell-clock__line">
-              {DateTime.fromMillis(alarmEnd).hasSame(
-                DateTime.fromMillis(now),
-                'day',
-              )
-                ? labels.bellRingsToday
-                : labels.bellRingsTomorrow}
+          {(running || paused) && (
+            <span
+              className="bell-clock__remaining"
+              role="timer"
+              aria-label={labels.bellRingAria}
+            >
+              {formatCountdown(left)}
             </span>
           )}
-          <p className="bell-status" data-testid="bell-status">
-            {timer.status === 'idle' && !alarmText
-              ? labels.bellAlarmPrompt
-              : running
-                ? labels.bellAlarmSet
+          {!running && (
+            <p className="bell-status" data-testid="bell-status">
+              {timer.status === 'idle' && !alarmText
+                ? labels.bellAlarmPrompt
                 : status}
-          </p>
+            </p>
+          )}
         </div>
       )}
     </div>
@@ -697,6 +695,7 @@ function BellTimerSession({
           : current.schedule,
       }));
       if (!started) return;
+      setNow(currentTime);
       void unlock();
       const startSound = bell.startBell.sound;
       if (startSound !== 'off') void ring(startSound, 1);
@@ -778,18 +777,20 @@ function BellTimerSession({
     send(events.ringNow(view));
   };
 
+  const preview = (sound: string) => {
+    void unlock().then((ready) => {
+      if (ready && sound !== 'off') void ring(sound, 1);
+    });
+  };
+
   const change = (
-    next: BellState,
+    patch: Partial<SoundSettings>,
     role: 'start' | 'end',
     sound: string,
     rings?: number,
   ) => {
-    updateBell(() => next);
-    void unlock();
-    void ring(sound === 'off' ? 'winmetta-short' : sound, 1).then(
-      () => undefined,
-    );
-    if (sound === 'off') return;
+    if (!updateBell((current) => ({ ...current, ...patch }))) return;
+    preview(sound);
     send(events.soundChange(role, sound, rings));
     notify(labels.bellNoticeSaved ?? '');
   };
@@ -928,13 +929,13 @@ function BellTimerSession({
             soundNames={soundNames}
             bell={bell}
             change={change}
+            preview={preview}
           />
         )}
 
         <Display
           labels={labels}
           timer={timer}
-          now={now}
           left={left}
           status={status}
           alarmText={alarmText}
@@ -982,7 +983,9 @@ function BellTimerSession({
               className="bell-button bell-button--start"
               onClick={() => {
                 void unlock();
-                setTimer(timers.resume(timer, Date.now()));
+                const at = Date.now();
+                setNow(at);
+                setTimer(timers.resume(timer, at));
               }}
             >
               <PlayIcon />

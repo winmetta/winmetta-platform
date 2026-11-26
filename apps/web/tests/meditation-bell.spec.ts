@@ -173,11 +173,20 @@ test('the alarm rings tomorrow for a time that has passed and refuses one over 1
   );
   await expect(status(page)).toHaveText('Ready');
   await page.getByLabel('Ring at').fill('06:00');
+  await page.clock.pauseAt(new Date(start.getTime() + 10_000));
   await page.getByRole('button', { name: 'Start', exact: true }).click();
-  await expect(status(page)).toHaveText('Alarm set');
-  await expect(page.locator('.bell-clock__line')).toHaveText('Rings tomorrow');
+  const remaining = page.getByRole('timer', { name: 'Time left' });
+  await expect(remaining).toHaveText('659:50');
+  await expect(status(page)).toHaveCount(0);
   await page.clock.runFor('02:00');
   await expect(time(page)).toHaveText('6:00 AM');
+  await expect(remaining).toHaveText('657:50');
+  await page.getByRole('button', { name: 'Pause', exact: true }).click();
+  await page.reload();
+  await expect(time(page)).toHaveText('6:00 AM');
+  await expect(status(page)).toHaveText('Paused');
+  await page.clock.runFor('01:00');
+  await expect(remaining).toHaveText('657:50');
 });
 
 test('an alarm preset sets the clock to now plus the minutes', async ({
@@ -333,10 +342,8 @@ test('the bell controls fit at 320 px and leave space above Ring now', async ({
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth),
     ).toBeLessThanOrEqual(320);
-    await expect(ring).toHaveCSS(
-      'color',
-      colorScheme === 'light' ? 'rgb(38, 79, 99)' : 'rgb(189, 210, 220)',
-    );
+    await expect(page.locator('html')).toHaveCSS('color-scheme', 'light');
+    await expect(ring).toHaveCSS('color', 'rgb(38, 79, 99)');
     await page.getByRole('button', { name: 'Timer', exact: true }).click();
   }
 });

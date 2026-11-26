@@ -12,6 +12,7 @@
  *   --border-strong darkened --grey for input borders (3.8:1 on white, the 3:1 minimum for controls)
  */
 :root {
+  color-scheme: light;
   --ink: #121210;
   --paper: #ffffff;
   --sand: #ede7df;

@@ -1,26 +1,13 @@
 .mini-app--custom:has(.bell-header) {
-  color-scheme: light dark;
-  --bell-surface: light-dark(
-    color-mix(in srgb, var(--paper) 68%, var(--sand)),
-    var(--ink)
-  );
-  --bell-ink: light-dark(var(--ink), var(--paper));
-  --bell-quiet: light-dark(var(--text-muted), var(--stone));
-  --bell-line: light-dark(
-    var(--stone),
-    color-mix(in srgb, var(--stone) 25%, var(--ink))
-  );
-  --bell-control-line: light-dark(var(--border-strong), var(--grey));
-  --bell-tile: light-dark(
-    var(--sand),
-    color-mix(in srgb, var(--sand) 12%, var(--ink))
-  );
-  --bell-selected: light-dark(
-    var(--sky),
-    color-mix(in srgb, var(--mist) 24%, var(--ink))
-  );
-  --bell-accent: light-dark(var(--brand-strong), var(--mist));
-  --bell-on-accent: light-dark(var(--paper), var(--ink));
+  --bell-surface: color-mix(in srgb, var(--paper) 68%, var(--sand));
+  --bell-ink: var(--ink);
+  --bell-quiet: var(--text-muted);
+  --bell-line: var(--stone);
+  --bell-control-line: var(--border-strong);
+  --bell-tile: var(--sand);
+  --bell-selected: var(--sky);
+  --bell-accent: var(--brand-strong);
+  --bell-on-accent: var(--paper);
   background: var(--bell-surface);
   color: var(--bell-ink);
 }
@@ -329,16 +316,20 @@
   letter-spacing: -0.055em;
 }
 
-.bell-clock__line,
+.bell-clock__remaining,
 .bell-status,
 .bell-help,
 .bell-schedule-view p {
   color: var(--bell-quiet);
 }
 
-.bell-status,
-.bell-clock__line {
+.bell-status {
   font-size: 0.875rem;
+}
+
+.bell-clock__remaining {
+  font-size: 1.125rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .bell-presets {
@@ -413,7 +404,7 @@
 
 .bell-error {
   font-size: 0.875rem;
-  color: light-dark(#9b1c1c, #ffb2ac);
+  color: var(--danger);
 }
 
 .bell-schedule-screen,
@@ -610,7 +601,7 @@
 
 .bell-button--danger,
 .bell-button--danger:not(:disabled):hover {
-  color: light-dark(#9b1c1c, #ffb2ac);
+  color: var(--danger);
 }
 
 .bell-file-input {
@@ -661,9 +652,9 @@
   display: grid;
   gap: 10px;
   padding: 12px;
-  border: 1px solid light-dark(#8e631e, #c79d59);
+  border: 1px solid #8e631e;
   border-radius: 12px;
-  background: light-dark(#fff3d6, #372d1c);
+  background: #fff3d6;
 }
 
 .bell-audio-notice {
