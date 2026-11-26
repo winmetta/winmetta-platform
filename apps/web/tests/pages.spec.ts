@@ -18,11 +18,11 @@ const locales = [
 
 for (const l of locales) {
   test.describe(`${l.code} pages`, () => {
-    test('Home links to the library, About and Privacy', async ({ page }) => {
+    test('Home links to the library and About', async ({ page }) => {
       await page.goto(`/${l.code}/`);
       await expect(page.locator('h1')).toHaveText(l.home);
       const start = page.locator('section[aria-labelledby="start"]');
-      await expect(start.getByRole('link')).toHaveCount(7);
+      await expect(start.getByRole('link')).toHaveCount(6);
       await start.locator(`a[href="/${l.code}/dhamma-library/"]`).click();
       await expect(page).toHaveURL(new RegExp(`/${l.code}/dhamma-library/$`));
     });
