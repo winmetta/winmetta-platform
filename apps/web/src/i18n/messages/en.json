@@ -411,7 +411,7 @@
   "miniAppFeedback": "Feedback",
   "miniAppLanguageEnglish": "English",
   "miniAppLanguageMyanmar": "Myanmar",
-  "miniAppLeaveConfirm": "Something is still set in this mini app. Your settings are saved on this device, but a bell rings only while this page is open. Leave this page?",
+  "miniAppLeaveConfirm": "Your timer or weekly schedule is still running. Bells ring only while this page is open, so leaving stops them. Your settings stay saved on this device. Leave this page?",
   "bellSoundSoftChime": "Soft chime (synth)",
   "bellSoundDeepChime": "Deep chime (synth)",
   "bellSoundLongChime": "Long chime (synth)",
