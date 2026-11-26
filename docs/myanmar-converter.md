@@ -141,7 +141,7 @@ Built on the mini apps foundation ([meditation-bell.md](meditation-bell.md) §2)
 - **Round trips:** Unicode → Zawgyi → Unicode and Unicode → Win Innwa → Unicode return the original for the whole set, with any known exception listed by name.
 - **Golden file:** the expected output of every sample is committed, so a library update that changes any result fails CI and is reviewed.
 - **Browser tests (Playwright):** the page in both locales, Auto with Zawgyi and with Pāḷi Unicode, swap, copy, the size limit, and a check that no request carries the text.
-- **Reader review:** a Burmese speaker who knows Pāḷi checks a sample of every direction before go-live.
+- **Reader review:** a Burmese speaker who knows Pāḷi checks a sample of every direction before go-live. The sheet for it, with the draft interface text and 63 generated samples, is [myanmar-converter-review.md](myanmar-converter-review.md).
 
 ---
 
