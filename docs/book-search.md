@@ -88,9 +88,7 @@ The indexer appends one JSON line per page to `state/<bookId>.jsonl` as each pag
   "engine": "tesseract 5.5.4, tessdata_best e12c65a, mya+eng",
   "status": "ok",
   "confidence": 0.87,
-  "passages": [
-    { "ordinal": 1, "script": "my", "text": "<the passage as read>" }
-  ],
+  "passages": [{ "ordinal": 1, "script": "my", "text": "<the passage as read>" }],
   "extractedAt": "2026-11-20T21:00:00Z"
 }
 ```
@@ -108,12 +106,12 @@ The indexer appends one JSON line per page to `state/<bookId>.jsonl` as each pag
 
 `npm run book-search:build` creates a new file from the approved manifest revision and the state store in one transaction:
 
-| Table          | Columns                                                                                                                                                                        |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `meta`         | `key`, `value`: index version, manifest revision, extractor and model versions, build time                                                                                     |
-| `books`        | `id` (primary key), `key`, `title`, `author` (empty until the manifest has the field), `language`, `pages`, `sha256`                                                           |
-| `pages`        | `book_id`, `page`, `method`, `status`, `confidence`; primary key (`book_id`, `page`)                                                                                           |
-| `passages`     | `id` (integer primary key), `book_id`, `page`, `ordinal`, `language`, `script`, `display_text`                                                                                 |
+| Table | Columns |
+| --- | --- |
+| `meta` | `key`, `value`: index version, manifest revision, extractor and model versions, build time |
+| `books` | `id` (primary key), `key`, `title`, `author` (empty until the manifest has the field), `language`, `pages`, `sha256` |
+| `pages` | `book_id`, `page`, `method`, `status`, `confidence`; primary key (`book_id`, `page`) |
+| `passages` | `id` (integer primary key), `book_id`, `page`, `ordinal`, `language`, `script`, `display_text` |
 | `passages_fts` | FTS5, contentless (`content=''`), columns `my_tokens` and `latin_tokens`, row id = `passages.id`. Language filters join `passages`; snippets come from `passages.display_text` |
 
 A passage is stored twice: exactly as read in `passages.display_text` (snippets and citations), and as space-separated search tokens in `passages_fts`. For example, `ဓမ္မ ဒေသနာ` is indexed in `my_tokens` as `ဓမ္မ ဒေ သ နာ`.
@@ -142,12 +140,12 @@ The local server and the future AWS backend implement the same contract, so the 
 
 **`GET /api/search`**
 
-| Parameter | Rule                                                                                                                                                                                                |
-| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `q`       | Required, 1–200 characters after normalization, at most 8 terms. A Burmese term needs at least two syllables or three characters (so `ဓမ္မ` works and a single letter does not). `"…"` is a phrase. |
-| `lang`    | `any` (default), `my`, `en`, `pi` or `und`; filters on the passage language                                                                                                                         |
-| `limit`   | 1–20, default 10                                                                                                                                                                                    |
-| `page`    | 1–10, default 1                                                                                                                                                                                     |
+| Parameter | Rule |
+| --- | --- |
+| `q` | Required, 1–200 characters after normalization, at most 8 terms. A Burmese term needs at least two syllables or three characters (so `ဓမ္မ` works and a single letter does not). `"…"` is a phrase. |
+| `lang` | `any` (default), `my`, `en`, `pi` or `und`; filters on the passage language |
+| `limit` | 1–20, default 10 |
+| `page` | 1–10, default 1 |
 
 Unknown parameters are rejected. The query parser accepts only terms and quoted phrases and quotes every token itself, so FTS5 syntax typed by a user (`OR`, `NEAR`, `*`, `^`, `"`) is searched as text, never run as an operator. Values are bound parameters. Results are ranked with `bm25()`, one result per PDF page (its best passage), so a page is cited once.
 
@@ -198,16 +196,16 @@ Unknown parameters are rejected. The query parser accepts only terms and quoted 
 
 Vitest, like the rest of the repo. Fixtures are synthetic text only, never text copied from library books, so the tests run in CI without PDFs, Tesseract or AWS.
 
-| Area            | What is checked                                                                                                                                                                                                                                                                                         |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ftsTokens`     | Burmese syllables with stacked consonants, spaced and unspaced Burmese, Pāḷi diacritics folded, digits, ဥ/ဉ                                                                                                                                                                                             |
-| Query parser    | terms and phrases, limits, FTS5 operators and stray quotes searched as text                                                                                                                                                                                                                             |
-| Quality check   | Zawgyi, glyph-only code points, ေ before its consonant, legacy-font Latin, empty pages                                                                                                                                                                                                                  |
-| Builder         | fixture JSONL → SQLite: tables, counts, `integrity_check`, the `unicode61` check in §6, golden queries                                                                                                                                                                                                  |
-| Server + client | the server starts on a free port with a fixture index; the client calls it through `baseUrl`: results, `lang` filter, paging, every error code, `Sec-Fetch-Site: cross-site` refused                                                                                                                    |
-| CLI             | spawned with `--base-url` against the same server: text and `--json` output, exit code on errors                                                                                                                                                                                                        |
-| Contract        | the client suite reads its own variable, `BOOK_SEARCH_TEST_BASE_URL` (never the CLI's `BOOK_SEARCH_BASE_URL`, so a shell set up for the CLI cannot point `npm test` at a deployed backend); unset, it starts the fixture server, and later the same suite can run against a deployed backend on purpose |
-| OCR smoke test  | one tiny generated PDF with synthetic Burmese and English text, OCR'd with the pinned models; **skipped when `tesseract` is not installed** (CI does not install it in stage 1)                                                                                                                         |
+| Area | What is checked |
+| --- | --- |
+| `ftsTokens` | Burmese syllables with stacked consonants, spaced and unspaced Burmese, Pāḷi diacritics folded, digits, ဥ/ဉ |
+| Query parser | terms and phrases, limits, FTS5 operators and stray quotes searched as text |
+| Quality check | Zawgyi, glyph-only code points, ေ before its consonant, legacy-font Latin, empty pages |
+| Builder | fixture JSONL → SQLite: tables, counts, `integrity_check`, the `unicode61` check in §6, golden queries |
+| Server + client | the server starts on a free port with a fixture index; the client calls it through `baseUrl`: results, `lang` filter, paging, every error code, `Sec-Fetch-Site: cross-site` refused |
+| CLI | spawned with `--base-url` against the same server: text and `--json` output, exit code on errors |
+| Contract | the client suite reads its own variable, `BOOK_SEARCH_TEST_BASE_URL` (never the CLI's `BOOK_SEARCH_BASE_URL`, so a shell set up for the CLI cannot point `npm test` at a deployed backend); unset, it starts the fixture server, and later the same suite can run against a deployed backend on purpose |
+| OCR smoke test | one tiny generated PDF with synthetic Burmese and English text, OCR'd with the pinned models; **skipped when `tesseract` is not installed** (CI does not install it in stage 1) |
 
 **Golden queries for the pilot** live in `apps/book-search/pilot/golden-queries.json`: at least 30, supplied by Burmese and English readers, each with the expected book and page. They run against a locally built pilot index, not in CI, because the index is not committed.
 

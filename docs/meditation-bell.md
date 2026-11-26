@@ -251,12 +251,12 @@ To give more choice (a singing bowl, a deeper temple bell, a lighter chime), rec
 
 What a browser can and cannot do decides what the web version promises.
 
-| Where                        | Timer and alarm                                  | Weekly schedule                                    |
-| ---------------------------- | ------------------------------------------------ | -------------------------------------------------- |
-| Desktop browser, tab open    | Works; up to about a minute late in a hidden tab | Works while the tab is open and the computer awake |
-| Desktop, computer asleep     | Does not ring; the two-minute rule on wake       | Same                                               |
-| Phone browser, screen on     | Works while the page is visible                  | Works while the page is visible                    |
-| Phone browser, screen locked | **Does not ring** (the page is suspended)        | **Does not ring**                                  |
+| Where                         | Timer and alarm                                    | Weekly schedule                                    |
+| ----------------------------- | -------------------------------------------------- | -------------------------------------------------- |
+| Desktop browser, tab open     | Works; up to about a minute late in a hidden tab   | Works while the tab is open and the computer awake |
+| Desktop, computer asleep      | Does not ring; the two-minute rule on wake         | Same                                               |
+| Phone browser, screen on      | Works while the page is visible                    | Works while the page is visible                    |
+| Phone browser, screen locked  | **Does not ring** (the page is suspended)          | **Does not ring**                                  |
 
 The web version says this plainly in its help text and does not try to work around it (no silent audio loops, no push notifications).
 

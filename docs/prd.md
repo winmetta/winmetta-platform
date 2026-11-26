@@ -24,12 +24,12 @@ The platform has **two primary user groups**: students attending online Zoom cla
 
 ## 3. Core Product Principles
 
-- **Calm by Default:** No pushy notifications, streaks, leaderboards, badges, or infinite scroll.
-- **Dāna & Open Access:** Core teachings, the Dhamma Library, and the literacy curriculum remain free and unpaywalled.
-- **Mindful Engagement:** Replace likes/follower counts with mindful gestures (_Sādhu / Anumodanā_) and quiet progress tracking, not competitive metrics.
-- **Works on Weak Connections:** Pages are lightweight and load fast on slow networks and lower-powered devices within the supported modern-browser baseline (tech-architecture.md §2). Full offline use (downloaded lessons, audio, library files) is a future goal, not a v1 requirement.
-- **Mobile and Desktop:** Design and validate responsive layouts for both mobile and desktop, with touch-friendly controls, keyboard navigation, and readable content at each size. Mobile is the expected majority of usage; desktop remains a first-class experience.
-- **Two Primary User Groups:** Support online class students and independent learners worldwide. Location, language, and technical comfort are separate preferences, not proxies for a learner's goals.
+* **Calm by Default:** No pushy notifications, streaks, leaderboards, badges, or infinite scroll.
+* **Dāna & Open Access:** Core teachings, the Dhamma Library, and the literacy curriculum remain free and unpaywalled.
+* **Mindful Engagement:** Replace likes/follower counts with mindful gestures (*Sādhu / Anumodanā*) and quiet progress tracking, not competitive metrics.
+* **Works on Weak Connections:** Pages are lightweight and load fast on slow networks and lower-powered devices within the supported modern-browser baseline (tech-architecture.md §2). Full offline use (downloaded lessons, audio, library files) is a future goal, not a v1 requirement.
+* **Mobile and Desktop:** Design and validate responsive layouts for both mobile and desktop, with touch-friendly controls, keyboard navigation, and readable content at each size. Mobile is the expected majority of usage; desktop remains a first-class experience.
+* **Two Primary User Groups:** Support online class students and independent learners worldwide. Location, language, and technical comfort are separate preferences, not proxies for a learner's goals.
 
 ---
 
@@ -39,88 +39,88 @@ The platform has **two primary user groups**: students attending online Zoom cla
 
 Phases 0–2 use public navigation and a language switcher without onboarding. From the LLB learning experience (a future phase) onward, the app may ask a short, skippable set of questions rather than assuming one default experience:
 
-- **Learning intent:** Attend online classes, explore resources independently, or both (optional; changeable).
-- **Tech comfort:** Tech-fluent or prefers a simpler mode.
-- **Interface language:** Mostly Burmese or mostly English (changeable anytime in settings).
+* **Learning intent:** Attend online classes, explore resources independently, or both (optional; changeable).
+* **Tech comfort:** Tech-fluent or prefers a simpler mode.
+* **Interface language:** Mostly Burmese or mostly English (changeable anytime in settings).
 
 These answers adjust, but never lock:
 
-- **Content emphasis on the home screen** — optional learning intent can emphasize classes or independent study without hiding either. Do not infer intent from geography or interface language.
-- **Interface density** — a simplified mode (larger text, fewer options, linear navigation) for non-tech-fluent users vs. a standard mode for tech-fluent users.
-- **UI copy language** — Burmese-first or English-first labels and navigation.
+* **Content emphasis on the home screen** — optional learning intent can emphasize classes or independent study without hiding either. Do not infer intent from geography or interface language.
+* **Interface density** — a simplified mode (larger text, fewer options, linear navigation) for non-tech-fluent users vs. a standard mode for tech-fluent users.
+* **UI copy language** — Burmese-first or English-first labels and navigation.
 
 No account is required to set or use these preferences — they are stored locally by default (see §4.6 on access considerations).
 
 ### 4.2. Burmese & Pāḷi Literacy Pipeline (Future)
 
-- Digitize the existing curriculum — **"Let's Learn Burmese" (LLB)**, currently taught by Ven. U Garudhamma: Grade 1 & Grade 2 books plus the 96-part "Learning Grammar by Reading" series — into interactive, self-paced **LLB lessons**: script recognition/tracing drills, audio-linked reading practice (using existing class recordings), and spaced-repetition review — without streaks or competitive pressure.
-- Designed with **heritage learners** in mind: LLB should work for someone with partial/passive Burmese knowledge, not only for a true zero-knowledge beginner, which is where mainstream language apps fall short for this audience.
-- Progression path extends from Burmese script literacy (LLB) toward Pāḷi, following the same "organize by actual class name" pattern as LLB rather than one generic "Pāḷi track":
-  - **PGTP — "Pāḷi Saddā & Tipiṭaka Pāḷi"** (ပါဠိသဒ္ဒါ နှင့် တိပိဋကပါဠိ သင်တန်း): Pāḷi grammar and Tipiṭaka Pāḷi, currently taught by Ven. U Garudhamma — the natural next step after LLB, and the first candidate for digitization once LLB is validated.
-  - **Sutta Piṭaka Study** (မူရင်းသုတ္တန်ပိဋကတ်ပါဠိတော်ကို လေ့လာခြင်း သင်တန်း): studying the original Sutta Piṭaka Pāḷi text, currently taught by Ven. Kelāsa — a distinct, more advanced curriculum from PGTP; gets its own short name (not yet assigned) if/when it's digitized, rather than being merged with PGTP just because both involve Pāḷi.
-  - As with LLB, each of these is a course identity independent of its current teacher — see the naming note in tech-architecture.md §3.
-- Learner progress and review state are kept on the learner's own device (browser storage); no account needed.
-- Each LLB lesson can note when a learner may be ready to join the live Zoom class — for v1 this is a simple in-app suggestion, not a data pipeline back to teachers (see §4.7 on deferred monastic tooling).
+* Digitize the existing curriculum — **"Let's Learn Burmese" (LLB)**, currently taught by Ven. U Garudhamma: Grade 1 & Grade 2 books plus the 96-part "Learning Grammar by Reading" series — into interactive, self-paced **LLB lessons**: script recognition/tracing drills, audio-linked reading practice (using existing class recordings), and spaced-repetition review — without streaks or competitive pressure.
+* Designed with **heritage learners** in mind: LLB should work for someone with partial/passive Burmese knowledge, not only for a true zero-knowledge beginner, which is where mainstream language apps fall short for this audience.
+* Progression path extends from Burmese script literacy (LLB) toward Pāḷi, following the same "organize by actual class name" pattern as LLB rather than one generic "Pāḷi track":
+  * **PGTP — "Pāḷi Saddā & Tipiṭaka Pāḷi"** (ပါဠိသဒ္ဒါ နှင့် တိပိဋကပါဠိ သင်တန်း): Pāḷi grammar and Tipiṭaka Pāḷi, currently taught by Ven. U Garudhamma — the natural next step after LLB, and the first candidate for digitization once LLB is validated.
+  * **Sutta Piṭaka Study** (မူရင်းသုတ္တန်ပိဋကတ်ပါဠိတော်ကို လေ့လာခြင်း သင်တန်း): studying the original Sutta Piṭaka Pāḷi text, currently taught by Ven. Kelāsa — a distinct, more advanced curriculum from PGTP; gets its own short name (not yet assigned) if/when it's digitized, rather than being merged with PGTP just because both involve Pāḷi.
+  * As with LLB, each of these is a course identity independent of its current teacher — see the naming note in tech-architecture.md §3.
+* Learner progress and review state are kept on the learner's own device (browser storage); no account needed.
+* Each LLB lesson can note when a learner may be ready to join the live Zoom class — for v1 this is a simple in-app suggestion, not a data pipeline back to teachers (see §4.7 on deferred monastic tooling).
 
 **Naming note:** "LLB" identifies the **course**, not a teacher — LLB lessons are attributed to whichever teacher currently teaches them (Ven. U Garudhamma today; possibly additional or different teachers later), so the data model should keep "curriculum" (`llb`) and "teacher" as separate fields rather than binding the course name to one person. Avoid the bare generic term "lesson" when referring to this content — as more curricula are added (e.g., the Pāḷi track above, or a distinct course from another teacher), each should get its own short name/prefix the same way, so content from different curricula stays unambiguous.
 
 ### 4.3. Dhamma Library & Class Archive
 
-- **Classes and Dhamma Library are the two main page groups**, primarily serving online students and independent learners respectively, with access open to both. Class pages link to relevant library resources.
-- **Dhamma Resources is part of Dhamma Library**, not a separate top-level page. The unified library supports books, PDF files, mobile/desktop app URLs, audio, video, images, slides, blog posts and other curated links.
-- Phase 1 **indexes every PDF in the existing S3 bucket** (about 3,000 files, mostly Burmese books; already public via winmetta.org). Most visitors type Burmese words and do not know a title or author, so search is **fuzzy** and surfaces similar books, built on MiniSearch with Burmese-aware normalization (ဥ/ဉ and Burmese/ASCII digits treated as equal). Folders become **tags** (number prefix removed; each path segment is a tag) used for folder-style browsing and filtering, with clear filters, empty states and shareable query/tag URLs. Apps, blog links and other non-S3 items stay curated. Details: tech-architecture.md §3.
-- **Dhamma Posts** (Phase 3): short teachings and explanations of Pāḷi terms, suttas and Abhidhamma ideas, each in Burmese, English and Simplified Chinese, curated in the repo by volunteers on the teachers' behalf. Readers browse all posts in chronological order (newest first) and by topic (tags, each with related topics drawn from its posts), search every post's text in Burmese, English or Chinese, choose any of the three languages to read independently of the interface language, share a short permanent link to a post or a topic that opens in the languages they chose, and print a post in those languages. Long lists are split into pages. No author field, feed, comments or engagement features. Format and workflow: AGENTS.md §7.
-- Keep subject categories, resource types, file formats and app platforms distinct. A book can have a PDF download, and an app can have mobile/desktop links within one entry. Preserve source language and attribution. Full-text indexing inside PDFs, OCR and transcripts are future work.
-- A unified class archive: recordings and descriptions per teacher/series pulled together from YouTube and Facebook into one browsable, searchable timeline (e.g., "Paṭṭhāna course episode 115") so students aren't hunting across three platforms.
-- **Link out to, rather than rebuild, existing best-in-class Tipiṭaka reader apps** (e.g., Tipitaka.app, tipitakapali.org) for full canonical-text search — that problem is already well solved.
-- **Rights check required before republishing:** confirm copyright/attribution status of JPTS (Journal of the Pali Text Society) material and other rare-book scans; only host what Win Metta has the right to redistribute.
+* **Classes and Dhamma Library are the two main page groups**, primarily serving online students and independent learners respectively, with access open to both. Class pages link to relevant library resources.
+* **Dhamma Resources is part of Dhamma Library**, not a separate top-level page. The unified library supports books, PDF files, mobile/desktop app URLs, audio, video, images, slides, blog posts and other curated links.
+* Phase 1 **indexes every PDF in the existing S3 bucket** (about 3,000 files, mostly Burmese books; already public via winmetta.org). Most visitors type Burmese words and do not know a title or author, so search is **fuzzy** and surfaces similar books, built on MiniSearch with Burmese-aware normalization (ဥ/ဉ and Burmese/ASCII digits treated as equal). Folders become **tags** (number prefix removed; each path segment is a tag) used for folder-style browsing and filtering, with clear filters, empty states and shareable query/tag URLs. Apps, blog links and other non-S3 items stay curated. Details: tech-architecture.md §3.
+* **Dhamma Posts** (Phase 3): short teachings and explanations of Pāḷi terms, suttas and Abhidhamma ideas, each in Burmese, English and Simplified Chinese, curated in the repo by volunteers on the teachers' behalf. Readers browse all posts in chronological order (newest first) and by topic (tags, each with related topics drawn from its posts), search every post's text in Burmese, English or Chinese, choose any of the three languages to read independently of the interface language, share a short permanent link to a post or a topic that opens in the languages they chose, and print a post in those languages. Long lists are split into pages. No author field, feed, comments or engagement features. Format and workflow: AGENTS.md §7.
+* Keep subject categories, resource types, file formats and app platforms distinct. A book can have a PDF download, and an app can have mobile/desktop links within one entry. Preserve source language and attribution. Full-text indexing inside PDFs, OCR and transcripts are future work.
+* A unified class archive: recordings and descriptions per teacher/series pulled together from YouTube and Facebook into one browsable, searchable timeline (e.g., "Paṭṭhāna course episode 115") so students aren't hunting across three platforms.
+* **Link out to, rather than rebuild, existing best-in-class Tipiṭaka reader apps** (e.g., Tipitaka.app, tipitakapali.org) for full canonical-text search — that problem is already well solved.
+* **Rights check required before republishing:** confirm copyright/attribution status of JPTS (Journal of the Pali Text Society) material and other rare-book scans; only host what Win Metta has the right to redistribute.
 
 ### 4.4. Live Class Directory
 
-- A clean, structured schedule view of current weekly Zoom classes (day/time, teacher bio, Zoom link/passcode) — digitizing what's already on the homepage today. Class Zoom links and passcodes are already public on winmetta.org, so they may appear in this repo's class-schedule content.
-- Show each upcoming class in both Pacific time (`America/Los_Angeles`) and Myanmar time (`Asia/Yangon`) by default, including the date/day in each zone. Store the recurring class’s source IANA timezone and local day/time; derive each dated occurrence so Pacific daylight-saving changes and Myanmar day rollovers remain correct. Do not hardcode PST or a fixed offset year-round.
-- A profile preference for the displayed timezone is future work; v1 always shows Pacific and Myanmar.
-- Plain chronological/day-of-week listing. No feed, no algorithmic ordering.
+* A clean, structured schedule view of current weekly Zoom classes (day/time, teacher bio, Zoom link/passcode) — digitizing what's already on the homepage today. Class Zoom links and passcodes are already public on winmetta.org, so they may appear in this repo's class-schedule content.
+* Show each upcoming class in both Pacific time (`America/Los_Angeles`) and Myanmar time (`Asia/Yangon`) by default, including the date/day in each zone. Store the recurring class’s source IANA timezone and local day/time; derive each dated occurrence so Pacific daylight-saving changes and Myanmar day rollovers remain correct. Do not hardcode PST or a fixed offset year-round.
+* A profile preference for the displayed timezone is future work; v1 always shows Pacific and Myanmar.
+* Plain chronological/day-of-week listing. No feed, no algorithmic ordering.
 
 ### 4.5. Internationalization & Content Language
 
-- English (`en`) and Burmese (`my`) are the launch interface languages. Phase 0 builds the localization foundation; Phase 1 delivers translated versions of all five starter pages and shared navigation, with locale-prefixed routes and a same-page language switcher.
-- Design for additional languages/locales through a central locale registry, keyed UI messages, localized content records and locale-aware formatting. Interface language, source material language and timezone are separate fields; linked teachings need not exist in every UI language. See implementation-plan.md §2 and tech-architecture.md §5 for fallback and validation rules.
+* English (`en`) and Burmese (`my`) are the launch interface languages. Phase 0 builds the localization foundation; Phase 1 delivers translated versions of all five starter pages and shared navigation, with locale-prefixed routes and a same-page language switcher.
+* Design for additional languages/locales through a central locale registry, keyed UI messages, localized content records and locale-aware formatting. Interface language, source material language and timezone are separate fields; linked teachings need not exist in every UI language. See implementation-plan.md §2 and tech-architecture.md §5 for fallback and validation rules.
 
-- All Burmese-script content in v1 is **Unicode-only**. Legacy Zawgyi encoding is out of scope for UI text and curated content, except that the library manifest generator converts Zawgyi filenames in the S3 bucket to Unicode for review (see [tech-architecture.md](tech-architecture.md) §5).
+* All Burmese-script content in v1 is **Unicode-only**. Legacy Zawgyi encoding is out of scope for UI text and curated content, except that the library manifest generator converts Zawgyi filenames in the S3 bucket to Unicode for review (see [tech-architecture.md](tech-architecture.md) §5).
 
 ### 4.6. Geographic & Access Considerations
 
-- **Worldwide access:** Class students and independent learners can browse the same resources. Let learners choose their path without requiring location or enrollment information.
-- **Low-bandwidth support:** required for both elderly diaspora users and Myanmar's variable connectivity. Target modern browsers on mobile and desktop; legacy browsers below the documented baseline are not a v1 requirement. Offline use is a future enhancement (see tech-architecture.md §10).
-- **No login required for core content.** Browsing the library, class directory, and LLB lessons never requires an account. Optional accounts (for saving progress across devices, a future phase) should collect only the minimum data needed and clearly state its purpose. Sign-in through a familiar provider (Google first) is acceptable.
+* **Worldwide access:** Class students and independent learners can browse the same resources. Let learners choose their path without requiring location or enrollment information.
+* **Low-bandwidth support:** required for both elderly diaspora users and Myanmar's variable connectivity. Target modern browsers on mobile and desktop; legacy browsers below the documented baseline are not a v1 requirement. Offline use is a future enhancement (see tech-architecture.md §10).
+* **No login required for core content.** Browsing the library, class directory, and LLB lessons never requires an account. Optional accounts (for saving progress across devices, a future phase) should collect only the minimum data needed and clearly state its purpose. Sign-in through a familiar provider (Google first) is acceptable.
 
 ### 4.7. Non-Goals for v1 (Future Plan)
 
 Explicitly deferred, not abandoned:
 
-- **Monastic-facing content management tooling** (self-serve upload/tagging for teachers). v1 content is loaded by a small admin/volunteer team on teachers' behalf. A teacher-facing tool is a future phase once the learner-facing product is validated.
-- **Cross-device account sync of LLB lesson progress and library bookmarks** (not "playlists" — that was a feature of an earlier, pre-pivot version of this product). A tentative auth approach is sketched in tech-architecture.md §10 for when accounts arrive.
-- **Community submissions & moderated reflections queue.**
-- **Native mobile apps** (Electron/Capacitor builds). v1 targets a single responsive web app designed for mobile and desktop; native wrappers are evaluated only after the web app validates real usage.
-- **Zawgyi legacy encoding support** — see §4.5 and tech-architecture.md. This includes searching the library with Zawgyi-typed queries: v1 search assumes Unicode input, and supporting Zawgyi input is a future improvement with no scheduled phase or date (tech-architecture.md §10). The proposed font converter mini app ([myanmar-converter.md](myanmar-converter.md)) converts text that users paste; it does not change this rule for site content.
-- **Learner-level analytics and cross-visit tracking** — not planned. Phases 0–3 collect no analytics. Phase 4 (live once its go-live change is deployed) adds cookieless activity counts with daily session IDs, plus short-lived session IP logging after its separate rollout. IPs cannot establish learner identity. See [analytics.md](analytics.md). Local progress remains on the learner's device.
-- **A/B testing / experimentation tooling** — deferred until there's a concrete, mission-aligned question worth testing (not for engagement optimization, which conflicts with Calm by Default). Tentative notes in tech-architecture.md §9 for when it's needed.
+* **Monastic-facing content management tooling** (self-serve upload/tagging for teachers). v1 content is loaded by a small admin/volunteer team on teachers' behalf. A teacher-facing tool is a future phase once the learner-facing product is validated.
+* **Cross-device account sync of LLB lesson progress and library bookmarks** (not "playlists" — that was a feature of an earlier, pre-pivot version of this product). A tentative auth approach is sketched in tech-architecture.md §10 for when accounts arrive.
+* **Community submissions & moderated reflections queue.**
+* **Native mobile apps** (Electron/Capacitor builds). v1 targets a single responsive web app designed for mobile and desktop; native wrappers are evaluated only after the web app validates real usage.
+* **Zawgyi legacy encoding support** — see §4.5 and tech-architecture.md. This includes searching the library with Zawgyi-typed queries: v1 search assumes Unicode input, and supporting Zawgyi input is a future improvement with no scheduled phase or date (tech-architecture.md §10). The proposed font converter mini app ([myanmar-converter.md](myanmar-converter.md)) converts text that users paste; it does not change this rule for site content.
+* **Learner-level analytics and cross-visit tracking** — not planned. Phases 0–3 collect no analytics. Phase 4 (live once its go-live change is deployed) adds cookieless activity counts with daily session IDs, plus short-lived session IP logging after its separate rollout. IPs cannot establish learner identity. See [analytics.md](analytics.md). Local progress remains on the learner's device.
+* **A/B testing / experimentation tooling** — deferred until there's a concrete, mission-aligned question worth testing (not for engagement optimization, which conflicts with Calm by Default). Tentative notes in tech-architecture.md §9 for when it's needed.
 
 ---
 
 ## 5. Funding & Sustainability Plan
 
-- **Dāna / donations:** Win Metta is a 501(c)(3); tax-deductible donations continue as the base funding model. The site's Dāna page and the receipt plan are in [donations.md](donations.md). Core learning content and the Dhamma Library remain free and unpaywalled, consistent with the Dāna & Open Access principle.
-- **Grant opportunities specific to this angle** (distinct from — and more viable than — a generic dana-only meditation-app model):
-  - Immigrant/refugee community integration and heritage-language preservation grants. Burmese refugees were the largest single refugee-origin group admitted to the US from 2011–2023, which makes Win Metta's literacy mission a plausible fit for state library, refugee-resettlement-agency, and ethnic-community-foundation grant programs.
-  - Buddhist and Asian-American cultural preservation foundation grants.
-  - International precedent exists for this kind of funding outside the US (e.g., EU Erasmus+-funded minority/heritage-language projects like IndyLan) — worth researching comparable programs in the UK, Australia, and Singapore rather than assuming grants are US-only.
-- **Volunteer-driven delivery model:** curriculum digitization, translation/transcription, and much of the initial build will likely rely on volunteer labor from the congregation and diaspora rather than paid staff. Project scope (see Phased Roadmap) should be sized to realistic volunteer capacity, not to a full commercial engineering team's output.
-- **Low fixed-cost infrastructure by design:** v1 is a static web app with no server or database to run, so hosting stays cheap and maintenance stays light without earned revenue.
-- **Free nonprofit programs first, paid tools when worthwhile:** prefer free services and nonprofit grants (for example any AWS nonprofit credits; permanent hosting never depends on a grant that can lapse). Paying for tooling is fine when it saves volunteer time or reduces risk; donations may fund tech development and maintenance.
-- **Popular, well-supported tools:** choose widely used stacks with large communities and good documentation so volunteers can learn them easily and the project stays maintainable for years.
-- **Explicitly not pursued:** ads, data-selling, or paywalls on core Dhamma or language content. A possible future option (not part of v1) is earned revenue from physical book publishing/compilations or in-person retreat logistics, noted here only as a future possibility.
+* **Dāna / donations:** Win Metta is a 501(c)(3); tax-deductible donations continue as the base funding model. The site's Dāna page and the receipt plan are in [donations.md](donations.md). Core learning content and the Dhamma Library remain free and unpaywalled, consistent with the Dāna & Open Access principle.
+* **Grant opportunities specific to this angle** (distinct from — and more viable than — a generic dana-only meditation-app model):
+  * Immigrant/refugee community integration and heritage-language preservation grants. Burmese refugees were the largest single refugee-origin group admitted to the US from 2011–2023, which makes Win Metta's literacy mission a plausible fit for state library, refugee-resettlement-agency, and ethnic-community-foundation grant programs.
+  * Buddhist and Asian-American cultural preservation foundation grants.
+  * International precedent exists for this kind of funding outside the US (e.g., EU Erasmus+-funded minority/heritage-language projects like IndyLan) — worth researching comparable programs in the UK, Australia, and Singapore rather than assuming grants are US-only.
+* **Volunteer-driven delivery model:** curriculum digitization, translation/transcription, and much of the initial build will likely rely on volunteer labor from the congregation and diaspora rather than paid staff. Project scope (see Phased Roadmap) should be sized to realistic volunteer capacity, not to a full commercial engineering team's output.
+* **Low fixed-cost infrastructure by design:** v1 is a static web app with no server or database to run, so hosting stays cheap and maintenance stays light without earned revenue.
+* **Free nonprofit programs first, paid tools when worthwhile:** prefer free services and nonprofit grants (for example any AWS nonprofit credits; permanent hosting never depends on a grant that can lapse). Paying for tooling is fine when it saves volunteer time or reduces risk; donations may fund tech development and maintenance.
+* **Popular, well-supported tools:** choose widely used stacks with large communities and good documentation so volunteers can learn them easily and the project stays maintainable for years.
+* **Explicitly not pursued:** ads, data-selling, or paywalls on core Dhamma or language content. A possible future option (not part of v1) is earned revenue from physical book publishing/compilations or in-person retreat logistics, noted here only as a future possibility.
 
 ---
 
@@ -128,11 +128,11 @@ Explicitly deferred, not abandoned:
 
 No metrics are collected in Phases 0–3. Phase 4 (live once its go-live change is deployed, [analytics.md](analytics.md)) uses cookieless analytics to measure activity such as page, class, library and post use by day; it does not instrument the learner outcomes below. The following are candidate future measures, not release requirements, and those that need the same person recognized across days (return-to-learn, bridge-to-community) cannot be measured by Phase 4 and would need local-only counters or an opt-in design. Before introducing collection, define feasible measurements, privacy constraints, and denominators; cross-session outcomes cannot be inferred from unrelated aggregate event counts. DAU, session counts, and streaks are not product goals. See tech-architecture.md §4.4. Candidate measures:
 
-- **Literacy progress:** % of learners completing Grade 1 / Grade 2 equivalent LLB lessons; number of learners who reach "can read a short Pāḷi passage in Burmese script unaided."
-- **Bridge-to-community rate:** number of self-paced learners who go on to join a live Zoom class (opt-in, self-reported or signup-linked).
-- **Return-to-learn rate:** % of learners who return to complete their _next_ LLB lesson within a set window (e.g., two weeks) — a gentler signal than daily-streak mechanics.
-- **Library reach:** number of distinct rare/archival texts accessed at least once per quarter — measures whether the preservation mission is actually reaching readers, not just hosting files.
-- **Teacher-reported signal (qualitative):** occasional check-ins with Sayadaws on whether they observe improved reading ability among app users in live class — collected by conversation, not instrumentation.
+* **Literacy progress:** % of learners completing Grade 1 / Grade 2 equivalent LLB lessons; number of learners who reach "can read a short Pāḷi passage in Burmese script unaided."
+* **Bridge-to-community rate:** number of self-paced learners who go on to join a live Zoom class (opt-in, self-reported or signup-linked).
+* **Return-to-learn rate:** % of learners who return to complete their *next* LLB lesson within a set window (e.g., two weeks) — a gentler signal than daily-streak mechanics.
+* **Library reach:** number of distinct rare/archival texts accessed at least once per quarter — measures whether the preservation mission is actually reaching readers, not just hosting files.
+* **Teacher-reported signal (qualitative):** occasional check-ins with Sayadaws on whether they observe improved reading ability among app users in live class — collected by conversation, not instrumentation.
 
 ---
 
@@ -195,24 +195,24 @@ Phases 0, 1 and 2 are done, and Phase 3 (Dhamma Posts) was merged on 2026-10-25.
 +---------------------------------------------------------------------------------------+
 ```
 
-- **Phase 0 — Foundation Code (done):** Public MIT-licensed repo, tooling, basic CI, and an Astro app with all needed libraries and English/Burmese localization support. No real pages or content and no deployment. See implementation-plan.md §2.
-- **Phase 1 — Bilingual Pages (done):** Home, About, Privacy, the Classes group (classes with a weekly schedule, Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library (the whole S3 PDF library with tag browsing and fuzzy Burmese search) in English and Burmese, with an original mobile/desktop design, serving online class students and independent learners worldwide. No hosting or deployment yet. See implementation-plan.md §3.
-- **Phase 2 — Infrastructure & Deployment (done 2026-10-23):** Pulumi (TypeScript), domains (`app.winmetta.org`), AWS hosting (S3 + CloudFront), the existing S3 + bunny.net setup for the Dhamma Library PDFs (new media infrastructure waits until something needs it), Route 53 DNS for `app.winmetta.org`, and a single production environment labelled Beta in the UI (staging comes with the first API or backend). The site becomes public here. See implementation-plan.md §4. No backend or database.
-- **Phase 3 — Dhamma Posts (merged 2026-10-25):** short teachings and explanations of Pāḷi terms, suttas and Abhidhamma ideas, each in Burmese, English and Simplified Chinese (§4.3), kept as markdown files in the repo and published as static pages: post, topic and paginated list pages, a "Read in" choice of languages that shared links carry, and print. Still no backend or database. See implementation-plan.md §5.
-- **Phase 4 — Analytics (planned 2026-10-26; server running since stage 2, tracker switched on by the go-live change):** privacy-first activity measurement so volunteers can see which classes, retreats, library folders, books and posts are used and in which languages. Self-hosted Umami at `stats.app.winmetta.org` uses cookieless daily session IDs. Short-lived IP logging has its own rollout and Privacy disclosure. See [analytics.md](analytics.md) and implementation-plan.md §5A.
-- **Future — LLB Pilot:** The flagship learning deliverable. Digitizes the LLB curriculum, proven and already-tested; piloted directly with the existing "Let's Learn Burmese" class roster (currently taught by Ven. U Garudhamma) before wider release.
-- **Future — Library & Class Archive Expansion:** Defines the repeatable pipeline for adding PDFs to S3 and refreshing the index and pages (generator, review PR, CI checks, deploy; see tech-architecture.md §3), plus a unified class timeline and deeper content indexing (full-text, OCR, transcripts) when needed.
-- **Future — Optional Accounts & Progress Sync:** Cross-device sync for learners who want it, opt-in only. This is likely where a backend and database are first introduced (tentative; see tech-architecture.md §10).
-- **Future — Native apps, monastic tools and more curricula:** Monastic-facing content tools, community submissions/moderation, native mobile apps, and further curricula beyond LLB (e.g. PGTP, the natural next step, may be pulled forward once LLB is validated — plans can change).
+* **Phase 0 — Foundation Code (done):** Public MIT-licensed repo, tooling, basic CI, and an Astro app with all needed libraries and English/Burmese localization support. No real pages or content and no deployment. See implementation-plan.md §2.
+* **Phase 1 — Bilingual Pages (done):** Home, About, Privacy, the Classes group (classes with a weekly schedule, Sayadaws, Dhamma Study Groups, Retreats and Zoom help) and Dhamma Library (the whole S3 PDF library with tag browsing and fuzzy Burmese search) in English and Burmese, with an original mobile/desktop design, serving online class students and independent learners worldwide. No hosting or deployment yet. See implementation-plan.md §3.
+* **Phase 2 — Infrastructure & Deployment (done 2026-10-23):** Pulumi (TypeScript), domains (`app.winmetta.org`), AWS hosting (S3 + CloudFront), the existing S3 + bunny.net setup for the Dhamma Library PDFs (new media infrastructure waits until something needs it), Route 53 DNS for `app.winmetta.org`, and a single production environment labelled Beta in the UI (staging comes with the first API or backend). The site becomes public here. See implementation-plan.md §4. No backend or database.
+* **Phase 3 — Dhamma Posts (merged 2026-10-25):** short teachings and explanations of Pāḷi terms, suttas and Abhidhamma ideas, each in Burmese, English and Simplified Chinese (§4.3), kept as markdown files in the repo and published as static pages: post, topic and paginated list pages, a "Read in" choice of languages that shared links carry, and print. Still no backend or database. See implementation-plan.md §5.
+* **Phase 4 — Analytics (planned 2026-10-26; server running since stage 2, tracker switched on by the go-live change):** privacy-first activity measurement so volunteers can see which classes, retreats, library folders, books and posts are used and in which languages. Self-hosted Umami at `stats.app.winmetta.org` uses cookieless daily session IDs. Short-lived IP logging has its own rollout and Privacy disclosure. See [analytics.md](analytics.md) and implementation-plan.md §5A.
+* **Future — LLB Pilot:** The flagship learning deliverable. Digitizes the LLB curriculum, proven and already-tested; piloted directly with the existing "Let's Learn Burmese" class roster (currently taught by Ven. U Garudhamma) before wider release.
+* **Future — Library & Class Archive Expansion:** Defines the repeatable pipeline for adding PDFs to S3 and refreshing the index and pages (generator, review PR, CI checks, deploy; see tech-architecture.md §3), plus a unified class timeline and deeper content indexing (full-text, OCR, transcripts) when needed.
+* **Future — Optional Accounts & Progress Sync:** Cross-device sync for learners who want it, opt-in only. This is likely where a backend and database are first introduced (tentative; see tech-architecture.md §10).
+* **Future — Native apps, monastic tools and more curricula:** Monastic-facing content tools, community submissions/moderation, native mobile apps, and further curricula beyond LLB (e.g. PGTP, the natural next step, may be pulled forward once LLB is validated — plans can change).
 
 ---
 
 ## 8. Future Plan: Personas & Adaptive Experience
 
-_Deferred; revisit when the adaptive experience (§4.1) is designed. Not a Phase 0–3 requirement._
+*Deferred; revisit when the adaptive experience (§4.1) is designed. Not a Phase 0–3 requirement.*
 
-- **Principle — Meet Learners Where They Are:** The same platform must serve a tech-fluent diaspora teenager and a non-tech-fluent elder in Myanmar equally well — via adaptive onboarding, not a one-size-fits-all interface.
-- **Personas** illustrating needs within the two primary user groups (they don't restrict who the platform is for):
+* **Principle — Meet Learners Where They Are:** The same platform must serve a tech-fluent diaspora teenager and a non-tech-fluent elder in Myanmar equally well — via adaptive onboarding, not a one-size-fits-all interface.
+* **Personas** illustrating needs within the two primary user groups (they don't restrict who the platform is for):
   1. **The Heritage Reconnector:** Burmese-heritage, English (or another local language) dominant, wants to learn to read and write Burmese and understand the Buddhist teachings their family practices. May have passive/spoken Burmese already — not a zero-knowledge beginner.
   2. **The Committed Dhamma Student:** Already literate in Burmese (Myanmar-based or diaspora), wants structured, self-paced progress through Pāḷi grammar, Abhidhamma, and Tipiṭaka study between weekly live classes.
   3. **The Practicing Elder:** An existing Zoom class attendee (first-generation immigrant or Myanmar-based) who wants easier access to the recordings and materials from classes they already attend, instead of hunting across YouTube, Facebook, and PDF folders.

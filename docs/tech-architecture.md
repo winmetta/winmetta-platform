@@ -1,6 +1,6 @@
 # Technical Architecture
 
-**Status:** Phases 0–3 (foundation code, bilingual pages, infrastructure & deployment, Dhamma Posts; Phase 3 merged on 2026-10-25) are specified in detail in [implementation-plan.md](implementation-plan.md), and Phase 4 (analytics) in §4.4 and [analytics.md](analytics.md); the Dhamma Posts content format and checks are in [AGENTS.md](../AGENTS.md) §7. Everything under "Future" is a _tentative direction_ recorded so ideas aren't lost — it is **not** a source of truth and will be redesigned when that phase is actually planned.
+**Status:** Phases 0–3 (foundation code, bilingual pages, infrastructure & deployment, Dhamma Posts; Phase 3 merged on 2026-10-25) are specified in detail in [implementation-plan.md](implementation-plan.md), and Phase 4 (analytics) in §4.4 and [analytics.md](analytics.md); the Dhamma Posts content format and checks are in [AGENTS.md](../AGENTS.md) §7. Everything under "Future" is a *tentative direction* recorded so ideas aren't lost — it is **not** a source of truth and will be redesigned when that phase is actually planned.
 
 **Guiding principle:** pick popular, well-documented tools with large communities, easy learning curves for volunteers, and good long-term support. Prefer free programs offered to nonprofits, but paying for tooling is fine when it saves volunteer time or reduces risk — donations may fund tech development and maintenance (see [prd.md](prd.md) §5).
 
@@ -51,21 +51,21 @@ Versions were checked against the npm registry, the Node.js release schedule and
 
 Phase 2 tooling, checked against npm and GitHub releases on 2026-10-07 (re-check at step 3 of the plan, and never copy these from memory): Pulumi CLI and `@pulumi/pulumi` 3.267.0, `@pulumi/aws` 7.48.0, `pulumi/actions` v7.0.0, `aws-actions/configure-aws-credentials` v6.3.0, `actions/upload-artifact` v7.0.1 (already used in `ci.yml`). The Pulumi CLI is not part of the repo's npm dependencies and is installed separately by each maintainer who runs `pulumi up`.
 
-| Layer             | Selection                                                                                   | Version baseline                                                                             | Why                                                                                                                                                                                                                                                                                                                                                                    |
-| ----------------- | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Runtime           | **Node.js**                                                                                 | 24.x (Active LTS)                                                                            | Longest support runway. Node 22 is Maintenance LTS (EOL April 2027).                                                                                                                                                                                                                                                                                                   |
-| Package manager   | **npm**                                                                                     | 11.x (bundled)                                                                               | No extra tool for contributors to learn.                                                                                                                                                                                                                                                                                                                               |
-| Monorepo          | **Turborepo + npm workspaces**                                                              | ^2.11                                                                                        | Lightweight, standard Node tooling.                                                                                                                                                                                                                                                                                                                                    |
-| Language          | **TypeScript** (strict)                                                                     | ^6.0                                                                                         | TypeScript 7.0 is stable (7.0.2 on npm as of 2026-10-06), but `typescript-eslint` 8.71 supports only TypeScript below 6.1, so stay on 6.x until it supports 7.                                                                                                                                                                                                         |
-| Web app           | **Astro** + **React** islands                                                               | Astro ^7.3, React ^19.3                                                                      | Ships almost no JS by default; pre-renders content for SEO and low-bandwidth connections and supported devices; React only where interactivity is needed.                                                                                                                                                                                                              |
-| Content & schemas | **Astro content collections** with **Zod**                                                  | —                                                                                            | Zod is Astro's built-in schema layer and the most popular TypeScript validator. Content lives in the repo as Markdown/JSON.                                                                                                                                                                                                                                            |
-| Styling / UI      | **Tailwind CSS + shadcn/ui**                                                                | Tailwind ^4.3                                                                                | Widely used; components are copied into the repo, so no dependency abandonment risk.                                                                                                                                                                                                                                                                                   |
-| Static hosting    | **AWS S3 + CloudFront**                                                                     | Private S3 bucket with origin access control behind CloudFront; ACM certificates             | Cheap and low-maintenance: the site is small, CloudFront on pay-as-you-go pricing should cost well under a dollar a month at this size (chosen 2026-10-10 over the flat-rate plans, which can stop serving at their limit; see implementation-plan.md §4), and it sits in the AWS account that already holds the media. Everything can be defined in code with Pulumi. |
-| Media             | **AWS S3** + **bunny.net CDN**                                                              | Existing library bucket and pull zone in Phase 2; new media infrastructure in a future phase | S3 is the most widely used, best-documented object store, with an S3-compatible API that keeps media portable; bunny.net serves and caches media cheaply so most reads never hit S3 egress (§6).                                                                                                                                                                       |
-| DNS               | **AWS Route 53**                                                                            | One hosted zone for `app.winmetta.org` (about $0.50/month)                                   | Delegated from DreamHost, which keeps `winmetta.org` itself. Holds the app and ACM validation records (more names, such as a CDN or staging host, are added when needed), all managed by Pulumi.                                                                                                                                                                       |
-| Analytics         | **Umami, self-hosted** (Phase 4: server running, tracker switched on by the go-live change) | —                                                                                            | Cookieless, daily session IDs, MIT license, light to run. Nothing is collected in Phases 0–3; see §4.4 and [analytics.md](analytics.md).                                                                                                                                                                                                                               |
-| Infra as code     | **Pulumi (TypeScript)**                                                                     | —                                                                                            | The same language as the app, so one toolchain, editor setup and test runner for the volunteer team; covers AWS natively and other providers through bridged providers; see §8.                                                                                                                                                                                        |
-| CI/CD             | **GitHub Actions**                                                                          | —                                                                                            | Free for public repos.                                                                                                                                                                                                                                                                                                                                                 |
+| Layer | Selection | Version baseline | Why |
+| --- | --- | --- | --- |
+| Runtime | **Node.js** | 24.x (Active LTS) | Longest support runway. Node 22 is Maintenance LTS (EOL April 2027). |
+| Package manager | **npm** | 11.x (bundled) | No extra tool for contributors to learn. |
+| Monorepo | **Turborepo + npm workspaces** | ^2.11 | Lightweight, standard Node tooling. |
+| Language | **TypeScript** (strict) | ^6.0 | TypeScript 7.0 is stable (7.0.2 on npm as of 2026-10-06), but `typescript-eslint` 8.71 supports only TypeScript below 6.1, so stay on 6.x until it supports 7. |
+| Web app | **Astro** + **React** islands | Astro ^7.3, React ^19.3 | Ships almost no JS by default; pre-renders content for SEO and low-bandwidth connections and supported devices; React only where interactivity is needed. |
+| Content & schemas | **Astro content collections** with **Zod** | — | Zod is Astro's built-in schema layer and the most popular TypeScript validator. Content lives in the repo as Markdown/JSON. |
+| Styling / UI | **Tailwind CSS + shadcn/ui** | Tailwind ^4.3 | Widely used; components are copied into the repo, so no dependency abandonment risk. |
+| Static hosting | **AWS S3 + CloudFront** | Private S3 bucket with origin access control behind CloudFront; ACM certificates | Cheap and low-maintenance: the site is small, CloudFront on pay-as-you-go pricing should cost well under a dollar a month at this size (chosen 2026-10-10 over the flat-rate plans, which can stop serving at their limit; see implementation-plan.md §4), and it sits in the AWS account that already holds the media. Everything can be defined in code with Pulumi. |
+| Media | **AWS S3** + **bunny.net CDN** | Existing library bucket and pull zone in Phase 2; new media infrastructure in a future phase | S3 is the most widely used, best-documented object store, with an S3-compatible API that keeps media portable; bunny.net serves and caches media cheaply so most reads never hit S3 egress (§6). |
+| DNS | **AWS Route 53** | One hosted zone for `app.winmetta.org` (about $0.50/month) | Delegated from DreamHost, which keeps `winmetta.org` itself. Holds the app and ACM validation records (more names, such as a CDN or staging host, are added when needed), all managed by Pulumi. |
+| Analytics | **Umami, self-hosted** (Phase 4: server running, tracker switched on by the go-live change) | — | Cookieless, daily session IDs, MIT license, light to run. Nothing is collected in Phases 0–3; see §4.4 and [analytics.md](analytics.md). |
+| Infra as code | **Pulumi (TypeScript)** | — | The same language as the app, so one toolchain, editor setup and test runner for the volunteer team; covers AWS natively and other providers through bridged providers; see §8. |
+| CI/CD | **GitHub Actions** | — | Free for public repos. |
 
 ### Browser and layout baseline
 
@@ -134,8 +134,8 @@ Deployment workflows use the GitHub `production` environment (a `staging` enviro
 
 Classes and Dhamma Library are the two main navigation groups; discovery lives under `/[locale]/dhamma-library/`. The library has two sources that feed one search index:
 
-- **S3 files (the bulk):** every PDF in the bucket `dhamma-library`, represented by generated records in a committed manifest (`apps/web/src/library/manifest.json`). Each record has a stable id, the exact S3 `key` (used only to build the CDN URL, URL-encoded), a display `title`, an optional `titleNote` (trailing parenthetical text), `tags` and `tagPath`, an inferred `language`, `sizeBytes`, `format` and `lastModified`. A lean `libraryFileSchema` in `lib/schemas.ts` validates it, separate from the curated `resourceSchema`. Human corrections (title, author, language, extra tags, hide, "same work as") live in `overrides.json`, keyed by S3 key. Never rename S3 objects to fix a title: it breaks public URLs.
-- **Curated resources:** apps, blog-post links and other non-S3 items stay in the curated `resources` collection with source URLs and verification dates.
+* **S3 files (the bulk):** every PDF in the bucket `dhamma-library`, represented by generated records in a committed manifest (`apps/web/src/library/manifest.json`). Each record has a stable id, the exact S3 `key` (used only to build the CDN URL, URL-encoded), a display `title`, an optional `titleNote` (trailing parenthetical text), `tags` and `tagPath`, an inferred `language`, `sizeBytes`, `format` and `lastModified`. A lean `libraryFileSchema` in `lib/schemas.ts` validates it, separate from the curated `resourceSchema`. Human corrections (title, author, language, extra tags, hide, "same work as") live in `overrides.json`, keyed by S3 key. Never rename S3 objects to fix a title: it breaks public URLs.
+* **Curated resources:** apps, blog-post links and other non-S3 items stay in the curated `resources` collection with source URLs and verification dates.
 
 **Tags, not categories.** Every segment of an S3 key's folder path is a tag, with the leading number removed (`^[0-9၀-၉]+[။.]\s*`) and zero-width characters dropped, so `၁၀။ မြန်မာရှား (၁)/၁။ ဝိနိစ္ဆယများ/x.pdf` carries `မြန်မာရှား (၁)` and `ဝိနိစ္ဆယများ`. Display text keeps the original spelling; identity and matching use the normalized form. Folder-style navigation is built from the S3 key prefixes: one pre-rendered static page per folder at `/[locale]/dhamma-library/folders/<id>/` (page 1) and `.../<id>/<n>/` for later pages of 50 books, with breadcrumbs, subfolder links and counts, working without JavaScript. The library landing page shows the whole tree nested. Each folder has a stable ASCII id (`f001`, `f002`, …) in the committed `apps/web/src/library/folders.json`, keyed by its exact key prefix: the generator keeps existing ids, gives new folders the next number, never reuses an id, and reports entries whose folder no longer exists. If a folder is renamed in S3, edit that entry's `path` by hand to keep its URL; the build fails when a folder has no id. Display names are the folder segment with its number prefix removed; there are no English folder names yet, so English pages show the Burmese names (with `lang`), and any translation would be added as a field on the `folders.json` entry.
 
@@ -167,11 +167,11 @@ Organize content by the **actual class name Win Metta already uses**, never by g
 
 The word "lesson" is fine as a generic content-unit term in code (e.g. `lesson.ts`), but always qualify it with its curriculum code in data, URLs and UI (e.g. `llb/grade-1/…`) so content from different classes stays unambiguous.
 
-| `curriculum` code | Class name (as taught today)                                           | Current teacher   |
-| ----------------- | ---------------------------------------------------------------------- | ----------------- |
-| `llb`             | Let's Learn Burmese                                                    | Ven. U Garudhamma |
-| `pgtp`            | Pāḷi Saddā & Tipiṭaka Pāḷi (ပါဠိသဒ္ဒါ နှင့် တိပိဋကပါဠိ သင်တန်း)        | Ven. U Garudhamma |
-| _(unassigned)_    | Sutta Piṭaka Study (မူရင်းသုတ္တန်ပိဋကတ်ပါဠိတော်ကို လေ့လာခြင်း သင်တန်း) | Ven. Kelāsa       |
+| `curriculum` code | Class name (as taught today) | Current teacher |
+| --- | --- | --- |
+| `llb` | Let's Learn Burmese | Ven. U Garudhamma |
+| `pgtp` | Pāḷi Saddā & Tipiṭaka Pāḷi (ပါဠိသဒ္ဒါ နှင့် တိပိဋကပါဠိ သင်တန်း) | Ven. U Garudhamma |
+| *(unassigned)* | Sutta Piṭaka Study (မူရင်းသုတ္တန်ပိဋကတ်ပါဠိတော်ကို လေ့လာခြင်း သင်တန်း) | Ven. Kelāsa |
 
 `llb` and `pgtp` share a teacher today but remain separate curricula. Add any new class to this table with its own code before digitizing its content.
 
@@ -207,10 +207,10 @@ LLB practice progress, spaced-repetition state, and library bookmarks are stored
 
 Phases 0–3 collect no analytics: no SDK, no learner events, no collection service. Phase 4 (planned 2026-10-26; the server has run since stage 2, and the go-live change (stage 4) turns the tracker on in the production build; checklist in implementation-plan.md §5A) adds **cookieless, aggregate** activity counts with self-hosted **Umami**. The full design, tool comparison, event list and privacy rules are in [analytics.md](analytics.md); the summary:
 
-- The tracker writes no cookie and no localStorage or sessionStorage key, sends no free text (search words never leave the page), reports URLs without query strings, does not load the tracker when Do Not Track is on, and uses a daily-rotating salt. After the separate IP rollout, the server retains IP addresses in Caddy access logs and as a short-lived Umami session property. An opt-in returning-visitor ID is a separate, undecided, later option.
-- Umami runs on one AWS EC2 instance in the AWS account (Pulumi, Caddy with Let's Encrypt, PostgreSQL on the same instance) at `stats.app.winmetta.org` (§6). It adds the app's first server, but it is analytics-only: the site stays static and learner progress stays on the device.
-- IndexedDB progress and review state remain local features for learners, not telemetry. The measures in [prd.md](prd.md) §6 that need the same learner recognized across days are not measurable by this design.
-- Hosting/CDN operational logs are separate from product analytics and are not a promise of zero provider-side logging.
+* The tracker writes no cookie and no localStorage or sessionStorage key, sends no free text (search words never leave the page), reports URLs without query strings, does not load the tracker when Do Not Track is on, and uses a daily-rotating salt. After the separate IP rollout, the server retains IP addresses in Caddy access logs and as a short-lived Umami session property. An opt-in returning-visitor ID is a separate, undecided, later option.
+* Umami runs on one AWS EC2 instance in the AWS account (Pulumi, Caddy with Let's Encrypt, PostgreSQL on the same instance) at `stats.app.winmetta.org` (§6). It adds the app's first server, but it is analytics-only: the site stays static and learner progress stays on the device.
+* IndexedDB progress and review state remain local features for learners, not telemetry. The measures in [prd.md](prd.md) §6 that need the same learner recognized across days are not measurable by this design.
+* Hosting/CDN operational logs are separate from product analytics and are not a promise of zero provider-side logging.
 
 ---
 
@@ -218,21 +218,21 @@ Phases 0–3 collect no analytics: no SDK, no learner events, no collection serv
 
 Visitors can report a typo, wrong content, a wrong class schedule or a broken book link, and readers can show appreciation for a post. The design, request format, routing and privacy rules are in [feedback.md](feedback.md); the staged plan is in implementation-plan.md §5B. The summary:
 
-- **One stateless endpoint:** an AWS Lambda function behind an IAM-authenticated Function URL, reached through the existing CloudFront distribution at `/api/feedback` (same origin, no CORS). CloudFront origin access control signs requests, and permissions restrict access to the distribution. Defined in Pulumi behind a flag, like the analytics server (§8).
-- **Delivery without storage:** the function validates the report and publishes it to an SNS topic, which emails group mailboxes by route (`content`, `schedule`, `site`). There is no database, and the function does not read or log the IP address or the message.
-- **The form** is an in-place `<dialog>` opened from a link on the page that has the problem; without JavaScript the link is a `mailto:`.
-- **The Sādhu button** sends only an analytics event; there is no count on the site and no server state.
-- This is the first request path other than the static site and the analytics host, so the staging and integration-test advice in §7 and §10 stays in force for the first real API.
+* **One stateless endpoint:** an AWS Lambda function behind an IAM-authenticated Function URL, reached through the existing CloudFront distribution at `/api/feedback` (same origin, no CORS). CloudFront origin access control signs requests, and permissions restrict access to the distribution. Defined in Pulumi behind a flag, like the analytics server (§8).
+* **Delivery without storage:** the function validates the report and publishes it to an SNS topic, which emails group mailboxes by route (`content`, `schedule`, `site`). There is no database, and the function does not read or log the IP address or the message.
+* **The form** is an in-place `<dialog>` opened from a link on the page that has the problem; without JavaScript the link is a `mailto:`.
+* **The Sādhu button** sends only an analytics event; there is no count on the site and no server state.
+* This is the first request path other than the static site and the analytics host, so the staging and integration-test advice in §7 and §10 stays in force for the first real API.
 
 ### 4.6. Book search inside PDFs (stage 1 local; AWS backend added 2026-11-21)
 
 Readers will be able to search the text inside library PDFs and cite the exact physical page. Stage 1 proves it on a developer's machine; the design, data model, API contract and tests are in [book-search.md](book-search.md), and the checklist in implementation-plan.md §5C. The summary:
 
-- **Indexing:** Poppler reads each page's text layer; pages without a usable one (missing, Zawgyi, legacy font or broken order) are rendered and read by Tesseract with pinned `tessdata_best` Burmese and English models. Page results go to a JSONL state store, which a build step turns into one versioned SQLite FTS5 file. Nothing is committed but the code, the schema and the golden queries.
-- **Shared text code:** the website's normalization and Burmese syllable tokenizer move to `packages/search-text`, so catalog search, Dhamma Posts search and book search normalize text the same way.
-- **API:** `GET /api/search` and `GET /api/search/health`, served in stage 1 by a local `node:http` server on `127.0.0.1` with Node's built-in `node:sqlite`. The API client takes a base URL, so the same client, CLI and tests can later call a deployed backend.
-- **AWS backend (2026-11-21):** the same handler runs in a Lambda behind an IAM-authenticated Function URL, reached through the existing distribution at `/api/search` (same origin, no CORS, no public API, no WAF), with the released SQLite index in a new private S3 bucket. Defined in Pulumi behind `bookSearchEnabled`, like the feedback endpoint (§4.5); see [book-search.md](book-search.md) §12. This is a third small, deliberate exception to "no backend" (§0): it holds no accounts, stores nothing and logs no query.
-- **Not in stage 1:** AWS resources, the website UI and other OCR engines. Possible later stages (Google Cloud Vision, an engine comparison, a same-origin Lambda at `app.winmetta.org/api/search`, a Dhamma Library "Search inside PDFs" mode) are notes in [book-search.md](book-search.md) §12, not designs. A deployed search endpoint would be a third exception to "no backend" (§0) and needs its own decision.
+* **Indexing:** Poppler reads each page's text layer; pages without a usable one (missing, Zawgyi, legacy font or broken order) are rendered and read by Tesseract with pinned `tessdata_best` Burmese and English models. Page results go to a JSONL state store, which a build step turns into one versioned SQLite FTS5 file. Nothing is committed but the code, the schema and the golden queries.
+* **Shared text code:** the website's normalization and Burmese syllable tokenizer move to `packages/search-text`, so catalog search, Dhamma Posts search and book search normalize text the same way.
+* **API:** `GET /api/search` and `GET /api/search/health`, served in stage 1 by a local `node:http` server on `127.0.0.1` with Node's built-in `node:sqlite`. The API client takes a base URL, so the same client, CLI and tests can later call a deployed backend.
+* **AWS backend (2026-11-21):** the same handler runs in a Lambda behind an IAM-authenticated Function URL, reached through the existing distribution at `/api/search` (same origin, no CORS, no public API, no WAF), with the released SQLite index in a new private S3 bucket. Defined in Pulumi behind `bookSearchEnabled`, like the feedback endpoint (§4.5); see [book-search.md](book-search.md) §12. This is a third small, deliberate exception to "no backend" (§0): it holds no accounts, stores nothing and logs no query.
+* **Not in stage 1:** AWS resources, the website UI and other OCR engines. Possible later stages (Google Cloud Vision, an engine comparison, a same-origin Lambda at `app.winmetta.org/api/search`, a Dhamma Library "Search inside PDFs" mode) are notes in [book-search.md](book-search.md) §12, not designs. A deployed search endpoint would be a third exception to "no backend" (§0) and needs its own decision.
 
 ---
 
@@ -262,39 +262,39 @@ Permanent hosting and media both live in **AWS**, where Win Metta already has an
 
 `winmetta.org` (WordPress) is unchanged by this repo. The platform lives on a subdomain:
 
-| Host                                                                    | Points to                                                                            | Purpose                                                                                                    |
-| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
-| `winmetta.org` (+ `www`)                                                | Existing WordPress hosting                                                           | Blog/news, About, existing pages — untouched.                                                              |
-| `app.winmetta.org`                                                      | AWS CloudFront (production)                                                          | This platform's frontend. `app.` chosen as the most understandable label for less tech-fluent users.       |
-| `dhamma-library.b-cdn.net`                                              | Existing bunny.net pull zone                                                         | Library PDFs, backed by the existing `dhamma-library` S3 bucket. Unchanged in Phase 2.                     |
-| `stats.app.winmetta.org` (Phase 4, running)                             | AWS EC2 instance running Umami behind Caddy; a record in the `app.winmetta.org` zone | First-party analytics collection and dashboard ([analytics.md](analytics.md)).                             |
-| `staging.app.winmetta.org`, `cdn.app.winmetta.org` (later, not Phase 2) | CloudFront staging; bunny.net pull zone (CNAME)                                      | Staging arrives with the first API or backend; the CDN hostname with new platform media in a future phase. |
+| Host | Points to | Purpose |
+| --- | --- | --- |
+| `winmetta.org` (+ `www`) | Existing WordPress hosting | Blog/news, About, existing pages — untouched. |
+| `app.winmetta.org` | AWS CloudFront (production) | This platform's frontend. `app.` chosen as the most understandable label for less tech-fluent users. |
+| `dhamma-library.b-cdn.net` | Existing bunny.net pull zone | Library PDFs, backed by the existing `dhamma-library` S3 bucket. Unchanged in Phase 2. |
+| `stats.app.winmetta.org` (Phase 4, running) | AWS EC2 instance running Umami behind Caddy; a record in the `app.winmetta.org` zone | First-party analytics collection and dashboard ([analytics.md](analytics.md)). |
+| `staging.app.winmetta.org`, `cdn.app.winmetta.org` (later, not Phase 2) | CloudFront staging; bunny.net pull zone (CNAME) | Staging arrives with the first API or backend; the CDN hostname with new platform media in a future phase. |
 
 `winmetta.org` stays on DreamHost's name servers, because DreamHost's free nonprofit shared hosting requires it, so its DNS is managed in the DreamHost panel. The platform's names live in a separate **Route 53** hosted zone for `app.winmetta.org`, delegated once by adding four NS records for `app` in DreamHost's panel (confirm the panel accepts NS records for a subdomain before building on it). The zone, the production alias records and the ACM validation CNAMEs are then created in Route 53 by Pulumi; later hosts are added to the same zone. Delegation must be live before ACM can validate the certificate, so the first apply is staged (zone, then NS records in DreamHost, then certificate and distribution; see implementation-plan.md §4). Check delegation by resolving a record that exists only in the new zone, because DreamHost notes that subdomain NS records may not show up in public `dig` NS lookups. Existing WordPress records stay intact. WordPress navigation can link to `app.winmetta.org`, and the app can link back for blog/news.
 
-| Component                         | Where                                                           | Why                                                                                                                                                                                                                                                                                                                                            |
-| --------------------------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Astro build output                | **AWS S3 + CloudFront**                                         | SSL (ACM), CDN, custom domain through a Route 53 alias record.                                                                                                                                                                                                                                                                                 |
-| Library PDFs                      | Existing **AWS S3** bucket `dhamma-library` + **bunny.net** CDN | S3 charges internet egress (about $0.09/GB beyond a small free allowance), so all public traffic goes through bunny.net, which caches and pulls from S3 only on cache misses. bunny.net is already used this way for the Dhamma Library PDFs and as a cache in front of the WordPress site. Check whether AWS nonprofit credit programs apply. |
-| New audio, video, images (future) | **AWS S3** origin + **bunny.net** CDN                           | Same pattern, set up when a phase needs it (see "Media delivery").                                                                                                                                                                                                                                                                             |
+| Component | Where | Why |
+| --- | --- | --- |
+| Astro build output | **AWS S3 + CloudFront** | SSL (ACM), CDN, custom domain through a Route 53 alias record. |
+| Library PDFs | Existing **AWS S3** bucket `dhamma-library` + **bunny.net** CDN | S3 charges internet egress (about $0.09/GB beyond a small free allowance), so all public traffic goes through bunny.net, which caches and pulls from S3 only on cache misses. bunny.net is already used this way for the Dhamma Library PDFs and as a cache in front of the WordPress site. Check whether AWS nonprofit credit programs apply. |
+| New audio, video, images (future) | **AWS S3** origin + **bunny.net** CDN | Same pattern, set up when a phase needs it (see "Media delivery"). |
 
 ### Static site delivery
 
-- **Origin:** a private S3 bucket reachable only through CloudFront (origin access control). Public access on the bucket stays blocked.
-- **Certificate and region:** the CloudFront certificate must be in `us-east-1` (use an aliased provider in Pulumi). Pick one region for the bucket and the Pulumi state and record it.
-- **Directory URLs:** the site uses `trailingSlash: 'always'`, and S3 behind origin access control does not serve directory indexes. A CloudFront viewer-request Function maps `/en/about/` to its `index.html` and redirects a missing trailing slash.
-- **404:** a missing key returns 403 from S3 with origin access control, so CloudFront answers 403 and 404 with the site's real 404 page (`apps/web` needs a `404.astro`).
-- **Caching:** `aws s3 sync` sets no `Cache-Control`, so the deploy sets it per path: content-hashed `_astro/*` and `library-data/*.<hash>.json` are `immutable` for a year, HTML and icons are short or no-cache, and the deploy invalidates `/*`. Old hashed files are kept about a week after a deploy so an already-open page can still load its lazy search index.
-- **Headers:** a response headers policy adds security headers. Indexing is controlled only by the build variable `PUBLIC_ALLOW_INDEXING` (meta tag and `robots.txt`), never by a CloudFront header, so the two cannot disagree.
-- **Compression:** enable CloudFront automatic compression for text, including the JSON search index.
+* **Origin:** a private S3 bucket reachable only through CloudFront (origin access control). Public access on the bucket stays blocked.
+* **Certificate and region:** the CloudFront certificate must be in `us-east-1` (use an aliased provider in Pulumi). Pick one region for the bucket and the Pulumi state and record it.
+* **Directory URLs:** the site uses `trailingSlash: 'always'`, and S3 behind origin access control does not serve directory indexes. A CloudFront viewer-request Function maps `/en/about/` to its `index.html` and redirects a missing trailing slash.
+* **404:** a missing key returns 403 from S3 with origin access control, so CloudFront answers 403 and 404 with the site's real 404 page (`apps/web` needs a `404.astro`).
+* **Caching:** `aws s3 sync` sets no `Cache-Control`, so the deploy sets it per path: content-hashed `_astro/*` and `library-data/*.<hash>.json` are `immutable` for a year, HTML and icons are short or no-cache, and the deploy invalidates `/*`. Old hashed files are kept about a week after a deploy so an already-open page can still load its lazy search index.
+* **Headers:** a response headers policy adds security headers. Indexing is controlled only by the build variable `PUBLIC_ALLOW_INDEXING` (meta tag and `robots.txt`), never by a CloudFront header, so the two cannot disagree.
+* **Compression:** enable CloudFront automatic compression for text, including the JSON search index.
 
 ### Media delivery (existing library now, new media in a future phase)
 
-- **Current state (Phase 1 source, unchanged in Phase 2):** the existing bucket `dhamma-library` (us-east-2) and the Bunny pull zone `dhamma-library.b-cdn.net` already serve the library. They are not imported into Pulumi and not migrated; builds use the default `PUBLIC_LIBRARY_CDN_BASE`. Moving to `cdn.app.winmetta.org` later is a change to that one variable plus a Bunny hostname, and needs its own decision (about 115 GiB). Do not record the AWS account number in this public repo.
-- **New media (future design):** a separate S3 bucket for platform media (and a staging one once staging exists), with all public access blocked, served by a bunny.net pull zone on the custom hostname `cdn.app.winmetta.org` with a certificate for that exact hostname.
-- **Origin access:** keep the bucket private and use Bunny's S3 origin authentication with a dedicated IAM user whose policy is read-only (`s3:GetObject`) on that bucket only. Set the pull zone's origin region to match the bucket. This means the raw S3 URL cannot bypass the CDN. **Verify Bunny's S3 authentication against your bucket's region before relying on it.**
-- **Credentials:** AWS access keys and Bunny API keys live in secret configuration only, never in client code or committed files. Use separate IAM credentials for the read-only Bunny origin user and for maintainer uploads (write access, e.g. via the AWS CLI `aws s3 sync`).
-- Use versioned object paths for replaced media. Public access requires no learner account or token.
+* **Current state (Phase 1 source, unchanged in Phase 2):** the existing bucket `dhamma-library` (us-east-2) and the Bunny pull zone `dhamma-library.b-cdn.net` already serve the library. They are not imported into Pulumi and not migrated; builds use the default `PUBLIC_LIBRARY_CDN_BASE`. Moving to `cdn.app.winmetta.org` later is a change to that one variable plus a Bunny hostname, and needs its own decision (about 115 GiB). Do not record the AWS account number in this public repo.
+* **New media (future design):** a separate S3 bucket for platform media (and a staging one once staging exists), with all public access blocked, served by a bunny.net pull zone on the custom hostname `cdn.app.winmetta.org` with a certificate for that exact hostname.
+* **Origin access:** keep the bucket private and use Bunny's S3 origin authentication with a dedicated IAM user whose policy is read-only (`s3:GetObject`) on that bucket only. Set the pull zone's origin region to match the bucket. This means the raw S3 URL cannot bypass the CDN. **Verify Bunny's S3 authentication against your bucket's region before relying on it.**
+* **Credentials:** AWS access keys and Bunny API keys live in secret configuration only, never in client code or committed files. Use separate IAM credentials for the read-only Bunny origin user and for maintainer uploads (write access, e.g. via the AWS CLI `aws s3 sync`).
+* Use versioned object paths for replaced media. Public access requires no learner account or token.
 
 Release checks for new media: anonymous fetches succeed on cache misses and hits; audio/video seeking (range requests) works; MIME types, cache headers and CORS for browser fetches are correct.
 
@@ -306,16 +306,16 @@ Release checks for new media: anonymous fetches succeed on cache misses and hits
 
 Deliberately small, for a volunteer team. Rollout by phase:
 
-- **Phase 0:** local development plus `ci.yml` (lint, typecheck, tests, build). No deploy.
-- **Phase 1:** no deployment. Pages are built and reviewed locally, and `ci.yml` keeps checking every PR.
-- **Phase 2:** add the deploy workflow (`deploy-web.yml`), static hosting on S3 + CloudFront, Pulumi, the custom domain and one production environment, labelled Beta.
-- **With the first API or backend (§10):** add a staging environment with its own stack, database and integration tests, and consider a PR preview host.
+* **Phase 0:** local development plus `ci.yml` (lint, typecheck, tests, build). No deploy.
+* **Phase 1:** no deployment. Pages are built and reviewed locally, and `ci.yml` keeps checking every PR.
+* **Phase 2:** add the deploy workflow (`deploy-web.yml`), static hosting on S3 + CloudFront, Pulumi, the custom domain and one production environment, labelled Beta.
+* **With the first API or backend (§10):** add a staging environment with its own stack, database and integration tests, and consider a PR preview host.
 
-| Environment    | Where                                              | Purpose                                                                         |
-| -------------- | -------------------------------------------------- | ------------------------------------------------------------------------------- |
-| **Local**      | `npm run dev`                                      | Development. No Docker, no database.                                            |
-| **PR builds**  | Workflow artifact from `ci.yml` (added in Phase 2) | Per-pull-request check of the built site; no hosted preview in Phase 2.         |
-| **Production** | `app.winmetta.org` (Phase 2)                       | Live site, open to search engines since 2026-10-23 (implementation-plan.md §4). |
+| Environment | Where | Purpose |
+| --- | --- | --- |
+| **Local** | `npm run dev` | Development. No Docker, no database. |
+| **PR builds** | Workflow artifact from `ci.yml` (added in Phase 2) | Per-pull-request check of the built site; no hosted preview in Phase 2. |
+| **Production** | `app.winmetta.org` (Phase 2) | Live site, open to search engines since 2026-10-23 (implementation-plan.md §4). |
 
 **Why no staging yet:** the site is static with no backend or database, so a second environment would add a bucket, certificate, role and stack without testing much, and the staging bytes could not be promoted anyway because `SITE_URL` and `PUBLIC_ALLOW_INDEXING` are baked in at build time. The safety nets are the PR review and CI before a merge, a post-deploy smoke test against the live site, and rollback by redeploying an earlier ref. Merges deploy without a manual approval (since 2026-11-25); the `production` GitHub environment only limits deploys to `main`. Stack parameters are per stack, so adding `staging` later is a new config file and `pulumi up`.
 
@@ -342,11 +342,11 @@ infra/pulumi/
 └── Pulumi.production.yaml    # non-secret config for the production stack
 ```
 
-- **Bootstrap (one time, outside Pulumi):** the state bucket, the KMS key and the GitHub OIDC identity provider must exist before `pulumi login s3://…`, so a maintainer creates them once by hand or with a short script, and the runbook records their names (never the account ID).
-- **State and secrets:** a private, versioned S3 bucket as the Pulumi backend and an AWS KMS key as the secrets provider, so state, locking and encryption stay inside the one AWS account and need no extra service or subscription. Pulumi Cloud's free individual tier is an alternative if the team prefers its UI. Nothing is stored in git.
-- **Public repo rule:** commit only non-secret `Pulumi.<stack>.yaml`; secrets are set with `pulumi config set --secret` or come from the environment, and access keys and connection strings stay out of the repo. Phase 2 needs no secrets, so keep the stack config secret-free. The KMS secrets provider still stores an encrypted data key (`encryptedkey`, ciphertext that is safe to commit; see [infra/pulumi/README.md](../infra/pulumi/README.md#why-encryptedkey-is-committed)) with the stack, so the read-only preview role most likely needs `kms:Decrypt` on that one key (Pulumi's documentation implies this for stack operations but does not spell it out for previews; confirm with a dry run in step 3). With secret-free config that decrypts nothing sensitive. Revisit this before the first real secret, for example by making previews maintainer-triggered only.
-- `pulumi preview` runs on PRs touching `infra/` with a read-only role; `pulumi up` is a manual maintainer action, never automatic.
-- **CI auth:** GitHub OIDC trust to AWS IAM roles, so no long-lived AWS keys are stored in GitHub. The production deploy role trusts only this repository's `production` environment (matched on GitHub's immutable OIDC subject, which includes the numeric organization and repository IDs, so a recreated repository with the same name cannot assume it; a rename changes the subject and needs the config refreshed, see `infra/pulumi/README.md`) and may touch only the site bucket and its distribution (sync and invalidation). The Pulumi preview role is separate and read-only. Workflows use `pull_request`, never `pull_request_target`, and fork pull requests get no OIDC token.
+* **Bootstrap (one time, outside Pulumi):** the state bucket, the KMS key and the GitHub OIDC identity provider must exist before `pulumi login s3://…`, so a maintainer creates them once by hand or with a short script, and the runbook records their names (never the account ID).
+* **State and secrets:** a private, versioned S3 bucket as the Pulumi backend and an AWS KMS key as the secrets provider, so state, locking and encryption stay inside the one AWS account and need no extra service or subscription. Pulumi Cloud's free individual tier is an alternative if the team prefers its UI. Nothing is stored in git.
+* **Public repo rule:** commit only non-secret `Pulumi.<stack>.yaml`; secrets are set with `pulumi config set --secret` or come from the environment, and access keys and connection strings stay out of the repo. Phase 2 needs no secrets, so keep the stack config secret-free. The KMS secrets provider still stores an encrypted data key (`encryptedkey`, ciphertext that is safe to commit; see [infra/pulumi/README.md](../infra/pulumi/README.md#why-encryptedkey-is-committed)) with the stack, so the read-only preview role most likely needs `kms:Decrypt` on that one key (Pulumi's documentation implies this for stack operations but does not spell it out for previews; confirm with a dry run in step 3). With secret-free config that decrypts nothing sensitive. Revisit this before the first real secret, for example by making previews maintainer-triggered only.
+* `pulumi preview` runs on PRs touching `infra/` with a read-only role; `pulumi up` is a manual maintainer action, never automatic.
+* **CI auth:** GitHub OIDC trust to AWS IAM roles, so no long-lived AWS keys are stored in GitHub. The production deploy role trusts only this repository's `production` environment (matched on GitHub's immutable OIDC subject, which includes the numeric organization and repository IDs, so a recreated repository with the same name cannot assume it; a rename changes the subject and needs the config refreshed, see `infra/pulumi/README.md`) and may touch only the site bucket and its distribution (sync and invalidation). The Pulumi preview role is separate and read-only. Workflows use `pull_request`, never `pull_request_target`, and fork pull requests get no OIDC token.
 
 ---
 
@@ -358,23 +358,23 @@ Not needed for v1. If a concrete learning-outcome question arises (e.g. does one
 
 ## 10. Future Directions (Tentative)
 
-_Everything here is a starting idea, not a design. Revisit and rewrite when the relevant phase begins._
+*Everything here is a starting idea, not a design. Revisit and rewrite when the relevant phase begins.*
 
 ### Backend & database (likely a future phase)
 
 When a feature needs server state (accounts, progress sync, dynamic content), add:
 
-- **Fastify + TypeScript** API in `apps/api`, run as a plain Docker container on AWS (**App Runner** or ECS Fargate; choose when the backend is real).
-- **PostgreSQL 18** on Amazon RDS (or Aurora Serverless). Vanilla Postgres only, so it stays portable. Note this is a real fixed cost.
-- `api.winmetta.org` as a sibling subdomain; a staging environment with its own separate database and integration tests at that point (Phase 2 has production only, §7).
-- Local dev against a native Postgres at `localhost:5432/winmetta_dev`.
+* **Fastify + TypeScript** API in `apps/api`, run as a plain Docker container on AWS (**App Runner** or ECS Fargate; choose when the backend is real).
+* **PostgreSQL 18** on Amazon RDS (or Aurora Serverless). Vanilla Postgres only, so it stays portable. Note this is a real fixed cost.
+* `api.winmetta.org` as a sibling subdomain; a staging environment with its own separate database and integration tests at that point (Phase 2 has production only, §7).
+* Local dev against a native Postgres at `localhost:5432/winmetta_dev`.
 
 ### Accounts & progress sync (likely a future phase)
 
-- Core content stays fully usable with no login; accounts are optional and only for syncing progress/bookmarks across devices. Existing IndexedDB data migrates into the account on first sign-in.
-- Passwordless. Candidate implementation: **Better Auth** inside the Fastify app, storing users in the same Postgres.
-- Sign-in methods: **Google** first, plus **email magic link sent via SendGrid**. Facebook and Apple can be added later if learners ask. Avoid SMS OTP.
-- Collect the minimum data needed and state its purpose clearly.
+* Core content stays fully usable with no login; accounts are optional and only for syncing progress/bookmarks across devices. Existing IndexedDB data migrates into the account on first sign-in.
+* Passwordless. Candidate implementation: **Better Auth** inside the Fastify app, storing users in the same Postgres.
+* Sign-in methods: **Google** first, plus **email magic link sent via SendGrid**. Facebook and Apple can be added later if learners ask. Avoid SMS OTP.
+* Collect the minimum data needed and state its purpose clearly.
 
 ### Zawgyi-typed search queries (no scheduled phase)
 
