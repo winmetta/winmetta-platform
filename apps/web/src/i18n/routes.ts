@@ -15,6 +15,7 @@ export const pagePaths = {
   digitalTexts: 'dhamma-library/digital-texts/',
   posts: 'dhamma-posts/',
   donate: 'donate/',
+  miniApps: 'mini-apps/',
 } as const;
 export type PageId = keyof typeof pagePaths;
 export function route(locale: Locale, page: PageId = 'home'): string {
@@ -23,6 +24,10 @@ export function route(locale: Locale, page: PageId = 'home'): string {
 /** Static folder page; page 1 has no page segment, later pages are .../2/, .../3/. */
 export function folderRoute(locale: Locale, id: string, page = 1): string {
   return `/${locale}/dhamma-library/folders/${id}/${page > 1 ? `${page}/` : ''}`;
+}
+/** A mini app's page (lib/mini-apps.ts). */
+export function miniAppRoute(locale: Locale, slug: string): string {
+  return `/${locale}/mini-apps/${slug}/`;
 }
 /** Retreat detail page. */
 export function retreatRoute(locale: Locale, id: string): string {

@@ -1,0 +1,29 @@
+---
+// The meditation bell (docs/meditation-bell.md). A placeholder until stages 3 to 5 of
+// docs/implementation-plan.md §5E. Unlinked and noindex until PUBLIC_MINI_APPS is on.
+import MiniAppShell from '../../../../layouts/MiniAppShell.astro';
+import MiniAppIcon from '../../../../components/MiniAppIcon.astro';
+import { localeCodes, type Locale } from '../../../../i18n/locales';
+import { t } from '../../../../i18n/messages';
+import { miniAppBySlug } from '../../../../lib/mini-apps';
+export function getStaticPaths() {
+  return localeCodes.map((locale) => ({
+    params: { locale },
+    props: { locale },
+  }));
+}
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const app = miniAppBySlug('meditation-bell')!;
+const name = t(locale, app.name);
+---
+
+<MiniAppShell locale={locale} title={name} path="mini-apps/meditation-bell/">
+  <div class="flex items-center gap-4">
+    <MiniAppIcon icon={app.icon} size={48} />
+    <h1 class="text-3xl font-bold">{name}</h1>
+  </div>
+  <p class="lead">{t(locale, 'miniAppBellSoon')}</p>
+</MiniAppShell>

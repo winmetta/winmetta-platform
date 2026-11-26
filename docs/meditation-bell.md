@@ -1,6 +1,6 @@
 # Mini apps and the meditation bell
 
-**Status:** planned 2026-11-25; nothing built yet. The staged plan is in [implementation-plan.md](implementation-plan.md) §5E. An interactive design mockup was reviewed with the maintainer on 2026-11-25; this document records what it settled.
+**Status:** planned 2026-11-25; stage 2 (mini apps foundation, with a placeholder bell page) built 2026-11-25; the bell itself is not built yet. The staged plan is in [implementation-plan.md](implementation-plan.md) §5E. An interactive design mockup was reviewed with the maintainer on 2026-11-25; this document records what it settled.
 
 **Why:** Win Metta's retreats and online sittings use a bell to end a session. Today that is the retreat bell page at `retreat.winmetta.org`, built from the archived `winmetta-retreat-web` repository, with each retreat's bell times written into the code. Meditators also want a simple bell for their own sittings: ring once after 20 minutes, or at 6:00 AM tomorrow, or on a weekly practice schedule. A bell for anyone, with no login and nothing sent to a server, fits the mission and costs almost nothing to host.
 
@@ -309,7 +309,7 @@ Opening the listing page or a mini app is already counted as a page view, so the
 
 ## 12. Open questions
 
-- **Menu and name:** where the "Mini apps" link goes (its own menu item, or next to "Dhamma Apps" under Dhamma Library), and the Burmese name of the listing page.
+- **Menu and name:** where the "Mini apps" link goes, and the Burmese name of the listing page. Stage 2 built it as its own first-level menu item after Dhamma Posts (shown only with `PUBLIC_MINI_APPS`), with the drafted Burmese name "အက်ပ်ငယ်များ" for a Burmese speaker to review; the alternative is a link under Dhamma Library next to "Dhamma Apps".
 - **Confirmation that Win Metta owns the WinMetta bell recording** (section 8), before any file cut from it is committed.
 - **Which CC0 bells to add** (section 8.3): a short list of candidates for the maintainer and a teacher to listen to.
 - **The old retreat bell page:** whether `retreat.winmetta.org` should later point to the new bell, and how retreat organizers share their schedule CSV. Changing that host is a production change and needs its own approval.

@@ -1,0 +1,67 @@
+---
+// Listing of mini apps (docs/meditation-bell.md §2): a normal site page with a grid of tiles from
+// the registry. Unlinked and noindex until PUBLIC_MINI_APPS is on.
+import Shell from '../../../layouts/Shell.astro';
+import MiniAppIcon from '../../../components/MiniAppIcon.astro';
+import { localeCodes, type Locale } from '../../../i18n/locales';
+import { t } from '../../../i18n/messages';
+import { miniAppRoute } from '../../../i18n/routes';
+import { hasPage, miniApps, miniAppsEnabled } from '../../../lib/mini-apps';
+export function getStaticPaths() {
+  return localeCodes.map((locale) => ({
+    params: { locale },
+    props: { locale },
+  }));
+}
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+---
+
+<Shell
+  locale={locale}
+  title={t(locale, 'miniAppsTitle')}
+  page="miniApps"
+  noindex={!miniAppsEnabled}
+>
+  <header class="space-y-4">
+    <h1 class="text-3xl font-bold sm:text-4xl">{t(locale, 'miniAppsTitle')}</h1>
+    <p class="lead">{t(locale, 'miniAppsIntro')}</p>
+  </header>
+  <ul class="mini-grid" aria-label={t(locale, 'miniAppsList')}>
+    {miniApps.map((app) => {
+      const inner = (
+        <>
+          <MiniAppIcon icon={app.icon} size={64} />
+          <span class="font-semibold">{t(locale, app.name)}</span>
+          <span class="badge">
+            {app.status === 'coming'
+              ? t(locale, 'miniAppComing')
+              : app.status === 'beta'
+                ? t(locale, 'betaLabel')
+                : ''}
+          </span>
+        </>
+      );
+      return (
+        <li>
+          {hasPage(app) ? (
+            <a
+              href={miniAppRoute(locale, app.slug)}
+              class="mini-tile"
+              aria-describedby={`desc-${app.id}`}
+            >
+              {inner}
+            </a>
+          ) : (
+            <div class="mini-tile mini-tile--coming">{inner}</div>
+          )}
+          <p id={`desc-${app.id}`} class="sr-only">
+            {t(locale, app.description)}
+          </p>
+        </li>
+      );
+    })}
+  </ul>
+</Shell>

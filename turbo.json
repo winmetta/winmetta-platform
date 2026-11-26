@@ -12,7 +12,8 @@
         "PUBLIC_FEEDBACK",
         "PUBLIC_FEEDBACK_POSTS_REVIEWED",
         "PUBLIC_BOOK_SEARCH",
-        "PUBLIC_DONATE"
+        "PUBLIC_DONATE",
+        "PUBLIC_MINI_APPS"
       ]
     },
     "dev": {

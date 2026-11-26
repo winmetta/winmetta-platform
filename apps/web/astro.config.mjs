@@ -108,7 +108,10 @@ export default defineConfig({
         new URL(page).pathname !== '/' &&
         !/\/dhamma-posts\/(?:tags\/[^/]+\/)?oldest\//.test(page) &&
         // The Dāna page is noindex until its wording is approved (PUBLIC_DONATE, docs/donations.md).
-        (process.env.PUBLIC_DONATE === 'true' || !/\/donate\/$/.test(page)),
+        (process.env.PUBLIC_DONATE === 'true' || !/\/donate\/$/.test(page)) &&
+        // The mini apps are noindex until reviewed (PUBLIC_MINI_APPS, docs/meditation-bell.md §2).
+        (process.env.PUBLIC_MINI_APPS === 'true' ||
+          !/\/mini-apps\//.test(page)),
     }),
   ],
   vite: {

@@ -10,7 +10,8 @@ type Name =
   | 'studyApps'
   | 'digitalTexts'
   | 'posts'
-  | 'donate';
+  | 'donate'
+  | 'miniApps';
 interface Props {
   name: Name;
 }
@@ -49,6 +50,7 @@ const paths: Record<Name, string[]> = {
     'M16 17H8',
     'M10 9H8',
   ],
+  miniApps: ['M3 3h7v7H3z', 'M14 3h7v7h-7z', 'M14 14h7v7h-7z', 'M3 14h7v7H3z'],
   donate: [
     'M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z',
   ],

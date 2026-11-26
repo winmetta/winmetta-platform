@@ -45,6 +45,7 @@ test('the default environment turns both features on and points at the stubs', (
       PUBLIC_BOOK_SEARCH: 'true',
       BOOK_SEARCH_STUB_URL: 'http://127.0.0.1:4323',
       PUBLIC_DONATE: 'true',
+      PUBLIC_MINI_APPS: 'true',
     },
   );
 });
@@ -63,6 +64,7 @@ test('a switched-off feature is explicitly off, with no stub address', () => {
   assert.equal(env.BOOK_SEARCH_STUB_URL, '');
   // The Dāna page has no stub and no switch: always linked in local dev.
   assert.equal(env.PUBLIC_DONATE, 'true');
+  assert.equal(env.PUBLIC_MINI_APPS, 'true');
 });
 
 test('book search stays off when no index is built, whatever was asked', () => {

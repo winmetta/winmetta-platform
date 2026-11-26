@@ -4,8 +4,15 @@ import { switchLocale } from '../i18n/routes';
 import { t } from '../i18n/messages';
 interface Props {
   locale: Locale;
+  /** Mini apps: "EN | ကခဂ" with the language's English name as the accessible name. */
+  compact?: boolean;
 }
-const { locale } = Astro.props;
+const { locale, compact = false } = Astro.props;
+const short = { en: 'EN', my: 'ကခဂ' } as const;
+const longName = {
+  en: 'miniAppLanguageEnglish',
+  my: 'miniAppLanguageMyanmar',
+} as const;
 ---
 
 <nav aria-label={t(locale, 'language')} class="segmented">
@@ -16,8 +23,10 @@ const { locale } = Astro.props;
       hreflang={code}
       aria-current={code === locale ? 'page' : undefined}
       data-locale={code}
+      aria-label={compact ? t(locale, longName[code]) : undefined}
+      class={compact ? 'lang-compact' : undefined}
     >
-      {locales[code].name}
+      {compact ? short[code] : locales[code].name}
     </a>
   ))}
 </nav>

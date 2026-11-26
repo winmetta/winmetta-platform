@@ -336,6 +336,38 @@
     @apply gap-2;
   }
 
+  /* Mini apps (docs/meditation-bell.md §2): their own slim top bar and footer, no site chrome. */
+  .mini-bar {
+    @apply sticky top-0 z-20 border-b border-stone/70 bg-white;
+  }
+  .mini-bar__inner {
+    @apply mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-2;
+  }
+  /* Burmese glyphs are taller than Latin ones: give the label its own line height so it is not clipped. */
+  .segmented a.lang-compact {
+    @apply min-h-10 px-3 text-sm leading-normal;
+  }
+  :lang(my).lang-compact,
+  .lang-compact:lang(my) {
+    line-height: 1.7;
+  }
+  .mini-footer {
+    @apply mx-auto flex w-full max-w-3xl justify-end px-4 pb-6 pt-2;
+  }
+  /* Tiles on the listing page: icon above the name, wrapping on phones. */
+  .mini-grid {
+    @apply grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4;
+  }
+  .mini-tile {
+    @apply relative flex flex-col items-center gap-2 rounded-2xl p-3 text-center;
+  }
+  a.mini-tile {
+    @apply transition-colors hover:bg-sky;
+  }
+  .mini-tile--coming {
+    @apply opacity-70;
+  }
+
   /* Layout */
   .page {
     @apply mx-auto w-full max-w-5xl flex-1 space-y-10 px-5 pb-4 pt-8 sm:pt-12;

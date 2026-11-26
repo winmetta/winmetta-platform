@@ -23,7 +23,8 @@ export function parseDevArgs(args) {
  * The environment the dev server runs with. Each feature is switched explicitly in both
  * directions, so a stale `.env.local` cannot turn on one that was asked to be off.
  * `hasIndex` says whether a built book-search index exists to serve. The Dāna page needs no
- * stand-in, so it is always linked locally, to show how it looks once PUBLIC_DONATE is on.
+ * stand-in, so it is always linked locally, to show how it looks once PUBLIC_DONATE is on. The same goes for
+ * the mini apps (PUBLIC_MINI_APPS).
  */
 export function devEnv({ feedback, bookSearch, hasIndex, ports }) {
   const searchOn = bookSearch && hasIndex;
@@ -36,5 +37,6 @@ export function devEnv({ feedback, bookSearch, hasIndex, ports }) {
       ? `http://127.0.0.1:${ports.bookSearch}`
       : '',
     PUBLIC_DONATE: 'true',
+    PUBLIC_MINI_APPS: 'true',
   };
 }

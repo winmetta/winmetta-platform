@@ -4,6 +4,7 @@ import FeedbackLink from '../components/FeedbackLink.astro';
 import '../styles/global.css';
 import { feedbackEnabled } from '../lib/feedback';
 import { donateEnabled } from '../lib/donation';
+import { miniAppsEnabled } from '../lib/mini-apps';
 import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 import NavIcon from '../components/NavIcon.astro';
 import GearIcon from '../components/GearIcon.astro';
@@ -55,6 +56,10 @@ const navItems = [
   // The Dāna page is linked only once its wording is approved (docs/donations.md).
   ...(donateEnabled
     ? ([{ page: 'donate', icon: 'donate', label: 'navDonate' }] as const)
+    : []),
+  // The mini apps are linked only once they are approved (PUBLIC_MINI_APPS, meditation-bell.md §2).
+  ...(miniAppsEnabled
+    ? ([{ page: 'miniApps', icon: 'miniApps', label: 'navMiniApps' }] as const)
     : []),
 ] as const;
 const inLibrary =
@@ -159,7 +164,8 @@ const postLanguageScript = postLanguagesHeadScript(defaultPostLanguage(locale));
                 : (target === 'library' && inLibrary) ||
                     (target === 'posts' && inPosts)
                   ? 'true'
-                  : target === 'classes' && path?.startsWith('classes/')
+                  : (target === 'miniApps' && path?.startsWith('mini-apps/')) ||
+                      (target === 'classes' && path?.startsWith('classes/'))
                     ? 'true'
                     : undefined;
             const link = (

@@ -17,6 +17,7 @@ name: Deploy web
 #   PUBLIC_FEEDBACK_POSTS_REVIEWED optional; enables post links/Sādhu only after wording review
 #   PUBLIC_BOOK_SEARCH          optional; shows Search inside PDFs once the /api/search service is verified
 #   PUBLIC_DONATE               optional; links and indexes the Dāna page once its wording is approved
+#   PUBLIC_MINI_APPS            optional; links and indexes the Mini apps pages once reviewed (docs/meditation-bell.md)
 #   PUBLIC_ANALYTICS            true turns on the cookieless Umami tracker (optional; off when unset)
 #   PUBLIC_ANALYTICS_WEBSITE_ID the website id from the Umami settings (public, not a secret)
 #   SITE_BUCKET                 the `siteBucket` stack output
@@ -66,6 +67,7 @@ jobs:
       PUBLIC_FEEDBACK_POSTS_REVIEWED: ${{ vars.PUBLIC_FEEDBACK_POSTS_REVIEWED }}
       PUBLIC_BOOK_SEARCH: ${{ vars.PUBLIC_BOOK_SEARCH }}
       PUBLIC_DONATE: ${{ vars.PUBLIC_DONATE }}
+      PUBLIC_MINI_APPS: ${{ vars.PUBLIC_MINI_APPS }}
       PUBLIC_ANALYTICS: ${{ vars.PUBLIC_ANALYTICS }}
       PUBLIC_ANALYTICS_WEBSITE_ID: ${{ vars.PUBLIC_ANALYTICS_WEBSITE_ID }}
       PUBLIC_ANALYTICS_IP_LOGGING: ${{ vars.PUBLIC_ANALYTICS_IP_LOGGING }}
