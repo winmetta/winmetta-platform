@@ -70,10 +70,11 @@ const source = records[0]?.sourceUrl ?? 'https://winmetta.org/';
     <p class="lead">{text(intro)}</p>
   </header>
   {kind === 'class' && (
-    <div class="grid gap-4 sm:grid-cols-2">
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {[
         ['teachers', '🙏', 'meetSayadawsTitle', 'meetSayadawsText'],
         ['retreats', '🧘', 'meetRetreatsTitle', 'meetRetreatsText'],
+        ['studyGroups', '📖', 'meetStudyGroupsTitle', 'meetStudyGroupsText'],
       ].map(([target, icon, title, body]) => (
         <a
           class="card card-link flex items-center gap-4"
@@ -138,6 +139,19 @@ const source = records[0]?.sourceUrl ?? 'https://winmetta.org/';
           <ClassCard record={record} locale={locale} builtAt={builtAt} />
         ))}
       </ul>
+    </section>
+  )}
+  {kind === 'class' && (
+    <section class="card space-y-2" aria-labelledby="study-groups">
+      <h2 id="study-groups" class="text-xl font-bold">
+        {text('navStudyGroups')}
+      </h2>
+      <p>{text('studyGroupsIntro')}</p>
+      <p>
+        <a class="link" href={route(locale, 'studyGroups')}>
+          {text('studyGroupsLink')}
+        </a>
+      </p>
     </section>
   )}
   {kind === 'class' && (

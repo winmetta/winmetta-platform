@@ -155,3 +155,53 @@ test('Retreats sit under Classes in the menu and are linked from the Classes pag
     'true',
   );
 });
+
+test('Study Groups sit under Classes in the menu and are linked from the Classes page', async ({
+  page,
+  isMobile,
+}) => {
+  await page.goto('/en/classes/');
+  await expect(
+    page.getByRole('link', { name: /^Dhamma Study Groups Small Zoom groups/ }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Dhamma Study Groups', level: 2 }),
+  ).toBeVisible();
+  if (isMobile) await page.getByRole('button', { name: 'Menu' }).click();
+  else
+    await page.locator('.nav-group > .nav-link[href="/en/classes/"]').hover();
+  await page.locator('.nav-sublink', { hasText: 'Study Groups' }).click();
+  await expect(page).toHaveURL(/\/en\/study-groups\/$/);
+  await expect(page.locator('.nav-link[href="/en/classes/"]')).toHaveAttribute(
+    'aria-current',
+    'true',
+  );
+});
+
+test('the menu order is Library, Mini Apps, Classes, Donate; Posts sit under the Library', async ({
+  page,
+}) => {
+  await page.goto('/en/');
+  const tops = await page
+    .locator(
+      '#site-nav > a.nav-link:not(.nav-settings), #site-nav > .nav-group > a.nav-link',
+    )
+    .evaluateAll((links) => links.map((a) => a.getAttribute('href')));
+  const order = [
+    '/en/dhamma-library/',
+    '/en/mini-apps/',
+    '/en/classes/',
+    '/en/donate/',
+  ];
+  expect(tops).toEqual(order.filter((href) => tops.includes(href)));
+  expect(tops.slice(0, 1)).toEqual(['/en/dhamma-library/']);
+  await expect(
+    page.locator(
+      '.nav-group:has(> .nav-link[href="/en/dhamma-library/"]) .nav-sublink[href="/en/dhamma-posts/"]',
+    ),
+  ).toHaveCount(1);
+  await page.goto('/en/dhamma-posts/');
+  await expect(
+    page.locator('.nav-link[href="/en/dhamma-library/"]'),
+  ).toHaveAttribute('aria-current', 'true');
+});

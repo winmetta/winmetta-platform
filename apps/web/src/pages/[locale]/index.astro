@@ -1,7 +1,10 @@
 ---
 import Shell from '../../layouts/Shell.astro';
+import MiniAppIcon from '../../components/MiniAppIcon.astro';
 import { localeCodes, type Locale } from '../../i18n/locales';
-import { postRoute, route } from '../../i18n/routes';
+import { miniAppRoute, postRoute, route } from '../../i18n/routes';
+import { donateEnabled } from '../../lib/donation';
+import { hasPage, miniApps, miniAppsEnabled } from '../../lib/mini-apps';
 import { t } from '../../i18n/messages';
 import { loadPosts } from '../../lib/posts/catalog';
 import { defaultPostLanguage } from '../../lib/posts/languages';
@@ -17,13 +20,25 @@ interface Props {
 }
 const { locale } = Astro.props;
 const text = (key: Parameters<typeof t>[1]) => t(locale, key);
-// Add Classes here when its page is built; never link to an unbuilt page.
+// Same order as the header menu. Never link to an unbuilt or unapproved page: Mini Apps and Donate
+// appear only while they are on (PUBLIC_MINI_APPS, PUBLIC_DONATE).
 const paths = [
-  { page: 'classes', title: 'classesTitle', text: 'classesIntro' },
-  { page: 'retreats', title: 'retreatsTitle', text: 'retreatsIntro' },
   { page: 'library', title: 'libraryTitle', text: 'homeLibraryText' },
   { page: 'studyApps', title: 'studyAppsTitle', text: 'studyAppsIntro' },
   { page: 'posts', title: 'postsTitle', text: 'homePostsText' },
+  ...(miniAppsEnabled
+    ? ([
+        { page: 'miniApps', title: 'miniAppsTitle', text: 'homeMiniAppsText' },
+      ] as const)
+    : []),
+  { page: 'classes', title: 'classesTitle', text: 'classesIntro' },
+  { page: 'retreats', title: 'retreatsTitle', text: 'retreatsIntro' },
+  { page: 'studyGroups', title: 'navStudyGroups', text: 'studyGroupsIntro' },
+  ...(donateEnabled
+    ? ([
+        { page: 'donate', title: 'navDonate', text: 'homeDonateText' },
+      ] as const)
+    : []),
   { page: 'about', title: 'aboutTitle', text: 'homeAboutText' },
 ] as const;
 // The home page names recent posts in the interface language only.
@@ -72,6 +87,54 @@ const latest = recentPosts(await loadPosts(), 3).flatMap((post) => {
       ))}
     </ul>
   </section>
+  {miniAppsEnabled && (
+    <section class="space-y-4" aria-labelledby="home-mini-apps">
+      <h2 id="home-mini-apps" class="text-2xl font-bold">
+        {text('miniAppsTitle')}
+      </h2>
+      <p class="muted">{text('homeMiniAppsIntro')}</p>
+      <ul class="mini-grid" aria-label={text('miniAppsList')}>
+        {miniApps.map((app) => {
+          const inner = (
+            <>
+              <MiniAppIcon icon={app.icon} size={64} />
+              <span class="font-semibold">{text(app.name)}</span>
+              <span class="badge">
+                {app.status === 'coming'
+                  ? text('miniAppComing')
+                  : app.status === 'beta'
+                    ? text('betaLabel')
+                    : ''}
+              </span>
+            </>
+          );
+          return (
+            <li>
+              {hasPage(app) ? (
+                <a
+                  href={miniAppRoute(locale, app.slug)}
+                  class="mini-tile"
+                  aria-describedby={`home-desc-${app.id}`}
+                >
+                  {inner}
+                </a>
+              ) : (
+                <div class="mini-tile mini-tile--coming">{inner}</div>
+              )}
+              <p id={`home-desc-${app.id}`} class="sr-only">
+                {text(app.description)}
+              </p>
+            </li>
+          );
+        })}
+      </ul>
+      <p>
+        <a class="link" href={route(locale, 'miniApps')}>
+          {text('miniAppsTitle')}
+        </a>
+      </p>
+    </section>
+  )}
   <section class="space-y-4" aria-labelledby="recent-posts">
     <h2 id="recent-posts" class="text-2xl font-bold">
       {text('postsRecent')}

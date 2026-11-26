@@ -129,3 +129,19 @@ test('the footer has no Feedback button when feedback is off', async ({
   await page.goto('/en/mini-apps/meditation-bell/');
   await expect(page.locator('.mini-footer a')).toHaveCount(0);
 });
+
+test('the home page presents the mini apps only when they are on', async ({
+  page,
+}) => {
+  for (const code of ['en', 'my']) {
+    await page.goto(`/${code}/`);
+    const section = page.locator('section[aria-labelledby="home-mini-apps"]');
+    if (!enabled) {
+      await expect(section).toHaveCount(0);
+      continue;
+    }
+    await expect(
+      section.locator(`a[href="/${code}/mini-apps/meditation-bell/"]`),
+    ).toBeVisible();
+  }
+});

@@ -22,7 +22,13 @@ for (const l of locales) {
       await page.goto(`/${l.code}/`);
       await expect(page.locator('h1')).toHaveText(l.home);
       const start = page.locator('section[aria-labelledby="start"]');
-      await expect(start.getByRole('link')).toHaveCount(6);
+      // Library, Study Apps, Posts, Classes, Retreats, Study Groups and About, plus Mini Apps and Donate
+      // while those are on.
+      await expect(start.getByRole('link')).toHaveCount(
+        7 +
+          Number(process.env.PUBLIC_MINI_APPS === 'true') +
+          Number(process.env.PUBLIC_DONATE === 'true'),
+      );
       await start.locator(`a[href="/${l.code}/dhamma-library/"]`).click();
       await expect(page).toHaveURL(new RegExp(`/${l.code}/dhamma-library/$`));
     });

@@ -31,18 +31,11 @@ interface Props {
 const { locale, title, page = 'home', path, noindex = false } = Astro.props;
 const href = (code: Locale) => (path ? `/${code}/${path}` : route(code, page));
 const canonical = new URL(href(locale), Astro.site);
-// Only built pages are listed here; add Classes, Study groups, Retreats and Teachers as they land.
+// Only built pages are listed here. Order: Dhamma Library (with Dhamma Posts), Mini Apps, Classes
+// (with Study Groups) and Donate last.
+// The mini apps are linked only once they are approved (PUBLIC_MINI_APPS, meditation-bell.md §2),
+// and Donate only while the Dāna page is on (PUBLIC_DONATE, donations.md).
 const navItems = [
-  {
-    page: 'classes',
-    icon: 'classes',
-    label: 'navClasses',
-    children: [
-      { page: 'teachers', icon: 'teachers', label: 'navTeachers' },
-      { page: 'retreats', icon: 'retreats', label: 'navRetreats' },
-    ],
-  },
-  { page: 'studyGroups', icon: 'studyGroups', label: 'navStudyGroups' },
   {
     page: 'library',
     icon: 'library',
@@ -50,15 +43,24 @@ const navItems = [
     children: [
       { page: 'studyApps', icon: 'studyApps', label: 'navStudyApps' },
       { page: 'digitalTexts', icon: 'digitalTexts', label: 'navDigitalTexts' },
+      { page: 'posts', icon: 'posts', label: 'navPosts' },
     ],
   },
-  { page: 'posts', icon: 'posts', label: 'navPosts' },
-  // The Dāna page is not in the header for now: with Mini Apps it would wrap the bar onto a second
-  // line on desktop. It stays in the footer and on About (docs/implementation-plan.md §6.2: Classes
-  // and Study Groups are planned to become mini apps, which frees the room).
-  // The mini apps are linked only once they are approved (PUBLIC_MINI_APPS, meditation-bell.md §2).
   ...(miniAppsEnabled
     ? ([{ page: 'miniApps', icon: 'miniApps', label: 'navMiniApps' }] as const)
+    : []),
+  {
+    page: 'classes',
+    icon: 'classes',
+    label: 'navClasses',
+    children: [
+      { page: 'teachers', icon: 'teachers', label: 'navTeachers' },
+      { page: 'retreats', icon: 'retreats', label: 'navRetreats' },
+      { page: 'studyGroups', icon: 'studyGroups', label: 'navStudyGroups' },
+    ],
+  },
+  ...(donateEnabled
+    ? ([{ page: 'donate', icon: 'donate', label: 'navDonate' }] as const)
     : []),
 ] as const;
 const inLibrary =
@@ -160,8 +162,7 @@ const postLanguageScript = postLanguagesHeadScript(defaultPostLanguage(locale));
             const current = (target: string) =>
               page === target
                 ? 'page'
-                : (target === 'library' && inLibrary) ||
-                    (target === 'posts' && inPosts)
+                : target === 'library' && (inLibrary || inPosts)
                   ? 'true'
                   : (target === 'miniApps' && path?.startsWith('mini-apps/')) ||
                       (target === 'classes' && path?.startsWith('classes/'))
