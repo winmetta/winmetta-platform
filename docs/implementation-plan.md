@@ -381,7 +381,7 @@ See [feedback.md](feedback.md) §9.
 
 One reviewed PR each, in this order.
 
-* [ ] **1. Docs.** This section, [book-search.md](book-search.md), the developer-guide tool setup, the tech-architecture note and the AGENTS.md pointers; `.cache/` in `.gitignore`.
+* [x] **1. Docs.** (merged, PR 67) This section, [book-search.md](book-search.md), the developer-guide tool setup, the tech-architecture note and the AGENTS.md pointers; `.cache/` in `.gitignore`.
 * [x] **2. Shared text package.** Add `packages/*` to the workspaces; move `normalize.ts`, `burmese.ts` and `search-text.ts` into `packages/search-text` and import them from `apps/web`; add `ftsTokens()` with tests. The library and posts golden tests pass unchanged.
 * [x] **3. Indexer.** `apps/book-search` with `book-search:setup` (checks Tesseract and Poppler, downloads the pinned models and verifies their hashes), `book-search:fetch` (pilot PDFs from the public CDN) and `book-search:index` (text layer, quality check, OCR, resumable JSONL), with tests for the quality check and the OCR smoke test.
 * [x] **4. Builder.** `book-search:build`: the SQLite schema, `optimize`, `VACUUM`, integrity and completeness checks, versioned file name, SHA-256 and the indexing report, with fixture tests. The golden queries run from step 5 and in the pilot.
@@ -428,7 +428,7 @@ One reviewed PR each, in this order.
 One reviewed PR each, in this order.
 
 * [ ] **1. Docs.** [meditation-bell.md](meditation-bell.md), this section, the mini apps section of [design-guide.md](design-guide.md) (§9), the planned events and questions in [analytics.md](analytics.md) §3 and §3.1, and the AGENTS.md pointer.
-* [ ] **2. Mini apps foundation.** The icons designed in Canva and exported as SVG ([meditation-bell.md](meditation-bell.md) §2.1), the registry, the listing page, `MiniAppShell.astro` (top bar, language switch, leave warning, footer with the Feedback button), the menu link, the `PUBLIC_MINI_APPS` flag, sitemap and `noindex` handling, `en`/`my` messages, unit and browser tests. The bell page is a placeholder.
+* [x] **2. Mini apps foundation.** (built 2026-11-25; the icons are working versions drawn from basic shapes, to be redone in Canva; the menu link is its own first-level item, to be confirmed.) The icons designed in Canva and exported as SVG ([meditation-bell.md](meditation-bell.md) §2.1), the registry, the listing page, `MiniAppShell.astro` (top bar, language switch, leave warning, footer with the Feedback button), the menu link, the `PUBLIC_MINI_APPS` flag, sitemap and `noindex` handling, `en`/`my` messages, unit and browser tests. The bell page is a placeholder.
 * [ ] **3. Bell logic and sounds.** `lib/meditation-bell/` (stored-state schema, timer, alarm, schedule, CSV, sound registry, formatting) with unit tests, including daylight-saving days; `scripts/make-bell-sounds.sh` and the two WinMetta sounds, once Win Metta's ownership of the recording is confirmed. No UI.
 * [ ] **4. Timer UI.** Countdown, alarm, presets, custom minutes, the start and end bell settings, Ring bell now, audio unlock, wake lock, resume after reload and the missed-bell rule; the timer's analytics events; design-guide patterns for the new controls; browser tests.
 * [ ] **5. Schedule UI.** Weekly list, add/edit/delete, On/Off with the two confirmations, alerts at the top, CSV import preview and export, the schedule's analytics events, the Settings row and the Privacy paragraphs (stored data and what is counted); browser tests at 320 px.

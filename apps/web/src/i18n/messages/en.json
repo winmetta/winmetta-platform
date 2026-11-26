@@ -385,5 +385,21 @@
   "donateZelleWhat": "Zelle® is a free way to send money between bank accounts in the USA. It is built into the mobile apps and websites of most US banks, such as Chase, Bank of America and Wells Fargo, and it needs a US bank account.",
   "donateCheckWhat": "Mail a paper check written from a US bank account to the address below.",
   "donateAbroadTitle": "Giving from outside the USA",
-  "donateAbroad": "Zelle® and checks work only with US bank accounts. If you live outside the USA and would like to give, please write to us and we will tell you how."
+  "donateAbroad": "Zelle® and checks work only with US bank accounts. If you live outside the USA and would like to give, please write to us and we will tell you how.",
+  "navMiniApps": "Mini apps",
+  "miniAppsTitle": "Mini apps",
+  "miniAppsIntro": "Small tools for practice and study. Free, no sign-in, and your data stays on this device.",
+  "miniAppsList": "Mini apps",
+  "miniAppBellName": "Meditation bell",
+  "miniAppBellDescription": "A timer, an alarm and a weekly schedule that ring a bell for your sittings.",
+  "miniAppConverterName": "Burmese text converter",
+  "miniAppConverterDescription": "Convert between Unicode, Zawgyi and Win Innwa.",
+  "miniAppComing": "Coming later",
+  "miniAppBack": "Mini apps",
+  "miniAppBackLabel": "Back to Mini apps",
+  "miniAppFeedback": "Feedback",
+  "miniAppLanguageEnglish": "English",
+  "miniAppLanguageMyanmar": "Myanmar",
+  "miniAppLeaveConfirm": "Something is still set in this mini app. Your settings are saved on this device, but a bell rings only while this page is open. Leave this page?",
+  "miniAppBellSoon": "The meditation bell is being built and will be here soon."
 }

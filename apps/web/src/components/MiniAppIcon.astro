@@ -1,0 +1,19 @@
+---
+// A mini app's icon (docs/meditation-bell.md §2.1): the rounded-square SVG from
+// src/assets/mini-apps/<icon>.svg, decorative because the tile's name is next to it.
+interface Props {
+  icon: string;
+  size?: number;
+  class?: string;
+}
+const { icon, size = 64, class: css = '' } = Astro.props;
+const files = import.meta.glob<{ src: string }>('../assets/mini-apps/*.svg', {
+  eager: true,
+  import: 'default',
+});
+const file = files[`../assets/mini-apps/${icon}.svg`];
+if (!file) throw new Error(`Mini app icon not found: ${icon}`);
+const { src } = file;
+---
+
+<img {src} width={size} height={size} alt="" class={css} />

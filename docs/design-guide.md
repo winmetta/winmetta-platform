@@ -112,7 +112,7 @@ No streaks, badges for achievement, counters that invite comparison, autoplay, p
 
 ## 9. Mini apps
 
-Mini apps are small tools under `/<locale>/mini-apps/`, the meditation bell first. The full design is in [meditation-bell.md](meditation-bell.md) §2 and §7; these are the rules every mini app follows so they feel like one family (planned 2026-11-25, not built yet).
+Mini apps are small tools under `/<locale>/mini-apps/`, the meditation bell first. The full design is in [meditation-bell.md](meditation-bell.md) §2 and §7; these are the rules every mini app follows so they feel like one family (planned 2026-11-25; the listing page and layout are built, the bell's own controls are not yet).
 
 - **Listing page:** a normal site page (header, footer, language switcher). Each mini app is a tile: its icon as a rounded square, 64 px, and its name below in the body font; a "Beta" or "Coming later" note as a `.badge`-style muted line, never a pill. A tile is one link (the whole tile), except a "Coming later" tile, which is not a link and does not look like one. Every tile comes from the registry (`lib/mini-apps.ts`), never hand-written markup.
 - **Icons:** one set, designed in Canva from basic shapes (no stock elements): a rounded square with one flat background colour from the palette and one simple symbol, no text, gradients or shadows, legible at 32 px, light and dark. Source, export and licence rules: [meditation-bell.md](meditation-bell.md) §2.1.
