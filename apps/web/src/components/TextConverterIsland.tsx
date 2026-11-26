@@ -10,14 +10,7 @@ import {
   type Converter,
   type FromChoice,
 } from '../lib/text-converter';
-import {
-  CheckIcon,
-  CloseIcon,
-  CopyIcon,
-  EditIcon,
-  RetryIcon,
-  SwapIcon,
-} from './icons';
+import { CheckIcon, CloseIcon, CopyIcon, RetryIcon, SwapIcon } from './icons';
 import type { ComponentProps, ReactNode } from 'react';
 import '../styles/mini-app.css';
 import '../styles/burmese-fonts.css';
@@ -47,27 +40,13 @@ export interface Labels {
   choose: string;
   tooLong: string;
   same: string;
-  fontZawgyi: string;
-  fontWinInnwa: string;
+  previewAs: string;
   lossy: string;
   /** Has a {chars} placeholder. */
   noteUnmapped: string;
   noteLatin: string;
   noteLooksUnicode: string;
   noteLooksZawgyi: string;
-  tabsLabel: string;
-  tabConverter: string;
-  tabEditor: string;
-  editorIntro: string;
-  editorEncoding: string;
-  editorText: string;
-  editorPlaceholder: string;
-  editorCopy: string;
-  editorCopyLabel: string;
-  editorNoteUnicode: string;
-  editorNoteZawgyi: string;
-  editorNoteWinInnwa: string;
-  editorPlain: string;
 }
 type Status = 'loading' | 'ready' | 'error';
 // Long text waits a moment after the last key, so typing stays smooth.
@@ -101,15 +80,56 @@ function MiniButton({
   );
 }
 
+/** Three equal buttons in one row that pick the font a text area shows its text in. */
+function FontChoice({
+  label,
+  value,
+  onChange,
+  labels,
+}: {
+  label: string;
+  value: Encoding;
+  onChange: (value: Encoding) => void;
+  labels: Labels;
+}) {
+  const choices: [Encoding, string][] = [
+    ['unicode', labels.unicode],
+    ['zawgyi', labels.zawgyi],
+    ['win-innwa', labels.winInnwa],
+  ];
+  return (
+    <div className="grid grid-cols-3 gap-2" role="group" aria-label={label}>
+      {choices.map(([choice, text]) => (
+        <button
+          key={choice}
+          type="button"
+          className="mini-choice mini-choice--small"
+          aria-pressed={value === choice}
+          onClick={() => onChange(choice)}
+        >
+          {text}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 type Tone = 'error' | 'notice' | 'help';
 
-function ConverterPane({ labels }: { labels: Labels }) {
+const FONT_CLASS: Record<Encoding, string> = {
+  unicode: '',
+  zawgyi: 'font-zawgyi',
+  'win-innwa': 'font-win-innwa',
+};
+
+export default function TextConverterIsland({ labels }: { labels: Labels }) {
   const [status, setStatus] = useState<Status>('loading');
   const converter = useRef<Converter | null>(null);
   const [input, setInput] = useState('');
   const [text, setText] = useState('');
   const [from, setFrom] = useState<FromChoice>('auto');
   const [to, setTo] = useState<Encoding>('unicode');
+  const [previewFont, setPreviewFont] = useState<Encoding | null>(null);
   const [copied, setCopied] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
@@ -159,17 +179,15 @@ function ConverterPane({ labels }: { labels: Labels }) {
   if (view && !view.same && (to === 'zawgyi' || to === 'win-innwa'))
     say(labels.lossy, 'help');
   for (const note of view?.notes ?? []) say(noteText(note, labels), 'help');
-  const outputFont =
-    view?.output && to === 'zawgyi'
-      ? labels.fontZawgyi
-      : view?.output && to === 'win-innwa'
-        ? labels.fontWinInnwa
-        : null;
+  // The input is shown in the font the reader picks; until they pick, the font of its encoding.
+  const inputFont =
+    previewFont ?? view?.source ?? (from === 'auto' ? 'unicode' : from);
 
   const doSwap = () => {
     const next = swap(from, to, view?.source ?? null);
     setFrom(next.from);
     setTo(next.to);
+    setPreviewFont(null);
     if (view?.output) {
       setInput(view.output);
       setText(view.output);
@@ -228,7 +246,10 @@ function ConverterPane({ labels }: { labels: Labels }) {
           'converter-from',
           labels.from,
           from,
-          (v) => setFrom(v as FromChoice),
+          (v) => {
+            setFrom(v as FromChoice);
+            setPreviewFont(null);
+          },
           true,
         )}
         <MiniButton
@@ -248,18 +269,25 @@ function ConverterPane({ labels }: { labels: Labels }) {
         )}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="grid content-start gap-2">
+      <div className="grid gap-4 md:grid-cols-2 md:grid-rows-[auto_auto_1fr_auto] md:gap-x-4 md:gap-y-2">
+        <div className="grid content-start gap-2 md:row-span-4 md:grid-rows-subgrid">
           <label className="mini-label" htmlFor="converter-input">
             {labels.input}
           </label>
+          <FontChoice
+            label={labels.previewAs}
+            value={inputFont}
+            onChange={setPreviewFont}
+            labels={labels}
+          />
           <textarea
             id="converter-input"
-            className="mini-field break-all"
+            className={`mini-field break-all ${FONT_CLASS[inputFont]}`}
             value={input}
             placeholder={labels.inputPlaceholder}
             spellCheck={false}
             autoComplete="off"
+            translate="no"
             onChange={(event) => setInput(event.target.value)}
           />
           <div className="flex items-center justify-between gap-3">
@@ -278,19 +306,19 @@ function ConverterPane({ labels }: { labels: Labels }) {
             </span>
           </div>
         </div>
-        <div className="grid content-start gap-2">
+        <div className="grid content-start gap-2 md:row-span-4 md:grid-rows-subgrid">
           <label className="mini-label" htmlFor="converter-output">
             {labels.output}
           </label>
           <textarea
             id="converter-output"
-            className="mini-field break-all"
+            className={`mini-field break-all md:row-start-3 ${FONT_CLASS[to]}`}
             value={view?.output ?? ''}
             readOnly
             translate="no"
             spellCheck={false}
           />
-          <div className="flex items-center">
+          <div className="flex items-center md:row-start-4">
             <MiniButton
               icon={copied ? <CheckIcon /> : <CopyIcon />}
               aria-label={copied ? labels.copied : labels.copyLabel}
@@ -305,7 +333,6 @@ function ConverterPane({ labels }: { labels: Labels }) {
 
       <div role="status" aria-live="polite" className="grid gap-2">
         {status === 'loading' && <p className="mini-help">{labels.loading}</p>}
-        {outputFont && <p className="mini-help">{outputFont}</p>}
         {lines.map((line) => (
           <p
             key={line.text}
@@ -320,139 +347,6 @@ function ConverterPane({ labels }: { labels: Labels }) {
             {line.text}
           </p>
         ))}
-      </div>
-    </div>
-  );
-}
-
-type EditorEncoding = 'unicode' | 'zawgyi' | 'win-innwa';
-const EDITOR_FONT: Record<EditorEncoding, string> = {
-  unicode: '',
-  zawgyi: 'font-zawgyi',
-  'win-innwa': 'font-win-innwa',
-};
-
-/** A plain-text editor that shows text in the font of its encoding. It never converts anything. */
-function EditorPane({ labels }: { labels: Labels }) {
-  const [encoding, setEncoding] = useState<EditorEncoding>('unicode');
-  const [text, setText] = useState('');
-  const [copied, setCopied] = useState(false);
-  const choices: [EditorEncoding, string][] = [
-    ['unicode', labels.unicode],
-    ['zawgyi', labels.zawgyi],
-    ['win-innwa', labels.winInnwa],
-  ];
-  const note = {
-    unicode: labels.editorNoteUnicode,
-    zawgyi: labels.editorNoteZawgyi,
-    'win-innwa': labels.editorNoteWinInnwa,
-  }[encoding];
-  const copy = () => {
-    if (!text) return;
-    void copyText(text).then((ok) => {
-      setCopied(ok);
-      if (ok) window.setTimeout(() => setCopied(false), 2000);
-    });
-  };
-  return (
-    <div className="grid gap-4">
-      <p className="mini-help">{labels.editorIntro}</p>
-      <div className="mini-panel grid gap-3">
-        <div className="mini-label" id="editor-encoding-label">
-          {labels.editorEncoding}
-        </div>
-        <div
-          className="grid grid-cols-3 gap-2"
-          role="group"
-          aria-labelledby="editor-encoding-label"
-        >
-          {choices.map(([value, label]) => (
-            <button
-              key={value}
-              type="button"
-              className="mini-choice"
-              aria-pressed={encoding === value}
-              onClick={() => setEncoding(value)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        <p className="mini-help" role="status">
-          {note}
-        </p>
-      </div>
-      <div className="grid gap-2">
-        <label className="mini-label" htmlFor="editor-text">
-          {labels.editorText}
-        </label>
-        <textarea
-          id="editor-text"
-          className={`mini-field break-all ${EDITOR_FONT[encoding]}`}
-          value={text}
-          placeholder={labels.editorPlaceholder}
-          spellCheck={false}
-          autoComplete="off"
-          translate="no"
-          maxLength={MAX_CHARS}
-          onChange={(event) => setText(event.target.value)}
-        />
-        <div className="flex items-center justify-between gap-3">
-          <MiniButton
-            icon={<CloseIcon />}
-            onClick={() => setText('')}
-            disabled={text.length === 0}
-          >
-            {labels.clear}
-          </MiniButton>
-          <span className="mini-help" aria-hidden="true">
-            {text.length.toLocaleString()} / {MAX_CHARS.toLocaleString()}
-          </span>
-          <MiniButton
-            icon={copied ? <CheckIcon /> : <CopyIcon />}
-            aria-label={copied ? labels.copied : labels.editorCopyLabel}
-            onClick={copy}
-            disabled={text.length === 0}
-          >
-            {copied ? labels.copied : labels.editorCopy}
-          </MiniButton>
-        </div>
-      </div>
-      <p className="mini-help">{labels.editorPlain}</p>
-    </div>
-  );
-}
-
-type Tab = 'converter' | 'editor';
-
-export default function TextConverterIsland({ labels }: { labels: Labels }) {
-  const [tab, setTab] = useState<Tab>('converter');
-  const tabs: [Tab, string, ReactNode][] = [
-    ['converter', labels.tabConverter, <SwapIcon key="c" />],
-    ['editor', labels.tabEditor, <EditIcon key="e" />],
-  ];
-  return (
-    <div className="grid gap-4">
-      <div className="mini-views" role="group" aria-label={labels.tabsLabel}>
-        {tabs.map(([value, label, icon]) => (
-          <button
-            key={value}
-            type="button"
-            className="mini-button"
-            aria-controls={`converter-pane-${value}`}
-            aria-pressed={tab === value}
-            onClick={() => setTab(value)}
-          >
-            {icon}
-            <span>{label}</span>
-          </button>
-        ))}
-      </div>
-      <div id="converter-pane-converter" hidden={tab !== 'converter'}>
-        <ConverterPane labels={labels} />
-      </div>
-      <div id="converter-pane-editor" hidden={tab !== 'editor'}>
-        <EditorPane labels={labels} />
       </div>
     </div>
   );

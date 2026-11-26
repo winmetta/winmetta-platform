@@ -32,7 +32,9 @@ test('Auto does not convert Pāḷi, and asks the reader to choose', async ({
   await expect(
     page.getByRole('textbox', { name: 'Result', exact: true }),
   ).not.toHaveValue('');
-  await expect(page.getByText(/Zawgyi text looks wrong/)).toBeVisible();
+  await expect(
+    page.getByRole('textbox', { name: 'Result', exact: true }),
+  ).toHaveClass(/font-zawgyi/);
 });
 
 test('converts Win Innwa, swaps and clears', async ({ page }) => {
@@ -96,73 +98,46 @@ test('is translated in Burmese', async ({ page }) => {
   await expect(page.getByLabel('ပြောင်းလဲမည့် စာသား')).toBeVisible();
 });
 
-test('the Editor tab switches panes, keeps each one’s text and shows the encoding’s font', async ({
+test('the Converter shows the input in a font the reader picks and the result in the chosen encoding’s font', async ({
   page,
 }) => {
   await open(page);
-  const converter = page.getByRole('button', { name: 'Converter' });
-  const editor = page.getByRole('button', { name: 'Editor' });
-  await expect(converter).toHaveAttribute('aria-pressed', 'true');
-  await page.getByLabel('Text to convert').fill('abc');
-  await editor.click();
-  await expect(editor).toHaveAttribute('aria-pressed', 'true');
-  const area = page.locator('#editor-text');
-  await expect(area).toBeVisible();
-  await expect(page.locator('#converter-input')).toBeHidden();
-  await expect(area).not.toHaveClass(/font-/);
-  await page.getByRole('button', { name: 'Zawgyi', exact: true }).click();
-  await expect(area).toHaveClass(/font-zawgyi/);
-  await expect(page.getByText(/Zawgyi-One font/).first()).toBeVisible();
-  // The bundled font really loads and is the one in use.
-  await area.fill('ျမန္မာစာ');
-  const loaded = await page.evaluate(async () => {
-    await document.fonts.load("16px 'Zawgyi-One'", 'ျမန္မာ');
-    return document.fonts.check("16px 'Zawgyi-One'", 'ျမန္မာ');
+  const input = page.getByLabel('Text to convert');
+  const result = page.getByRole('textbox', { name: 'Result', exact: true });
+  await input.fill('ျမန္မာစာ ေလ့လာျခင္း');
+  // Auto detects Zawgyi, so the input is shown in the Zawgyi font until the reader picks another.
+  await expect(input).toHaveClass(/font-zawgyi/);
+  const group = page.getByRole('group', {
+    name: 'Show the text in the font',
   });
-  expect(loaded).toBe(true);
-  await page.getByRole('button', { name: 'Win Innwa', exact: true }).click();
-  await expect(area).toHaveClass(/font-win-innwa/);
-  await area.fill('jrefrm');
-  expect(
-    await page.evaluate(async () => {
-      await document.fonts.load("16px 'Win Innwa'", 'jrefrm');
-      return document.fonts.check("16px 'Win Innwa'", 'jrefrm');
-    }),
-  ).toBe(true);
-  await converter.click();
-  await expect(page.locator('#converter-input')).toHaveValue('abc');
-  await expect(area).toBeHidden();
-});
-
-test('Copy all copies the Editor text exactly, and it pastes into the Converter', async ({
-  page,
-  context,
-}) => {
-  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await open(page);
-  await page.getByRole('button', { name: 'Editor' }).click();
-  const copy = page.getByRole('button', { name: 'Copy all the text' });
-  await expect(copy).toBeDisabled();
-  await page.getByRole('button', { name: 'Zawgyi', exact: true }).click();
-  const zawgyi = 'ျမန္မာစာ ေလ့လာျခင္း';
-  await page.locator('#editor-text').fill(zawgyi);
-  await copy.click();
-  await expect(page.getByRole('button', { name: 'Copied' })).toBeVisible();
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
-    zawgyi,
+  await expect(group.getByRole('button', { name: 'Zawgyi' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
   );
-  await page.getByRole('button', { name: 'Converter' }).click();
-  await page.getByLabel('Text to convert').focus();
-  await page.keyboard.press('ControlOrMeta+V');
-  await expect(page.getByLabel('Text to convert')).toHaveValue(zawgyi);
-  await expect(
-    page.getByRole('textbox', { name: 'Result', exact: true }),
-  ).toHaveValue('မြန်မာစာ လေ့လာခြင်း');
-});
-
-test('the Editor is translated in Burmese', async ({ page }) => {
-  await open(page, '/my/mini-apps/burmese-text-converter/');
-  await page.getByRole('button', { name: 'တည်းဖြတ်ရန်' }).click();
-  await expect(page.locator('#editor-text')).toBeVisible();
-  await expect(page.getByText('စာသား၏ ကုဒ်စနစ်')).toBeVisible();
+  await group.getByRole('button', { name: 'Unicode' }).click();
+  await expect(input).not.toHaveClass(/font-/);
+  await group.getByRole('button', { name: 'Win Innwa' }).click();
+  await expect(input).toHaveClass(/font-win-innwa/);
+  // Converting does not change the preview, only the result's font follows To.
+  await expect(result).not.toHaveClass(/font-/);
+  await page.locator('#converter-to').selectOption('win-innwa');
+  await expect(result).toHaveClass(/font-win-innwa/);
+  await expect(input).toHaveClass(/font-win-innwa/);
+  // Changing From goes back to following the encoding.
+  await page.locator('#converter-from').selectOption('zawgyi');
+  await expect(input).toHaveClass(/font-zawgyi/);
+  // Both bundled fonts really load and are the ones in use.
+  const loaded = await page.evaluate(async () => {
+    const checks = [
+      ["16px 'Zawgyi-One'", 'ျမန္မာ'],
+      ["16px 'Win Innwa'", 'jrefrm'],
+    ];
+    const results: boolean[] = [];
+    for (const [font, sample] of checks) {
+      await document.fonts.load(font, sample);
+      results.push(document.fonts.check(font, sample));
+    }
+    return results;
+  });
+  expect(loaded).toEqual([true, true]);
 });
