@@ -82,7 +82,7 @@ test('digital Pāḷi texts are reachable from the library in both languages', a
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'Digital Pāḷi Texts',
   );
-  await expect(page.locator('main li.card')).toHaveCount(6);
+  await expect(page.locator('main li.card')).toHaveCount(7);
   await expect(
     page.getByRole('link', {
       name: 'Burmese-script files: VRI Chaṭṭha Saṅgāyana Tipiṭaka XML',
@@ -92,7 +92,7 @@ test('digital Pāḷi texts are reachable from the library in both languages', a
     'https://github.com/VipassanaTech/tipitaka-xml/tree/main/mymr',
   );
   const sources = page.getByRole('link', { name: /^Source on GitHub: / });
-  await expect(sources).toHaveCount(5);
+  await expect(sources).toHaveCount(6);
   for (const link of await sources.all())
     await expect(link.locator('img[src*="GitHub"]')).toHaveCount(1);
   await expect(
