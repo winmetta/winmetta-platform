@@ -1,6 +1,6 @@
 # Burmese font converter (Unicode, Zawgyi, Win Innwa)
 
-**Status:** proposed 2026-11-25. The package (stage 2) was built on 2026-11-25 in `packages/myanmar-convert` ([its README](../packages/myanmar-convert/README.md)); the mini app is not built yet. Research and decisions are below; the staged plan is in [implementation-plan.md](implementation-plan.md) §5F. It is the second mini app planned in [meditation-bell.md](meditation-bell.md) (its tile shows "Coming later" until this ships).
+**Status:** proposed 2026-11-25. The package (stage 2) was built on 2026-11-25 in `packages/myanmar-convert` ([its README](../packages/myanmar-convert/README.md)); the mini app (stage 3) was built on 2026-11-25 at `/<locale>/mini-apps/burmese-text-converter/` and stays hidden until go-live (section 6). Research and decisions are below; the staged plan is in [implementation-plan.md](implementation-plan.md) §5F. It is the second mini app planned in [meditation-bell.md](meditation-bell.md) (its tile shows "Coming later" until go-live).
 
 **Why:** much Burmese text that Win Metta's community works with is not Unicode. Older Dhamma books, class handouts and newsletters were typed in **Win Innwa** (1990s–2000s desktop publishing) or **Zawgyi** (phones and the web until about 2019), and some print layouts are still made in Win Innwa. Such text shows as gibberish, cannot be searched and cannot be pasted into the site, a Dhamma Post or most modern apps. Teachers and volunteers today use ad-supported converter websites that each handle only some directions. A free converter that runs in the browser, sends nothing anywhere and handles all three encodings in every direction serves the monastic community and costs almost nothing to host.
 
@@ -117,6 +117,8 @@ Reporting both to google/myanmar-tools is a follow-up.
 ---
 
 ## 6. The mini app
+
+**Built 2026-11-25** (`apps/web/src/components/TextConverterIsland.tsx`, logic in `apps/web/src/lib/text-converter.ts`, page `apps/web/src/pages/[locale]/mini-apps/burmese-text-converter/index.astro`). It follows the list below. Decisions taken while building, to confirm at go-live (section 11): the address keeps the registry's slug `burmese-text-converter` and the name "Burmese text converter"; the page is fully translated (`en`, `my`; the Burmese is a draft for reader review); no analytics event. Until go-live the tile stays "Coming later", and the page is `noindex` and out of the sitemap whatever `PUBLIC_MINI_APPS` is. The converters load as a separate chunk when the page opens. myanmar-tools is a Node build that needs `Buffer`, so the package adds a tiny stand-in in browsers (`src/buffer-shim.ts`). Long text is shown with `word-break: break-all`, because the browser's Burmese line breaking made a 200,000-character paste freeze the page.
 
 Built on the mini apps foundation ([meditation-bell.md](meditation-bell.md) §2): registry entry, `MiniAppShell.astro`, footer Feedback button, `PUBLIC_MINI_APPS` flag.
 

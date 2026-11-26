@@ -23,6 +23,7 @@ Every conversion goes through Unicode: source → Unicode → target. One librar
 - **Win Innwa is never detected.** Its text is ASCII and Latin-1 (`jrefrm` is မြန်မာ only in the font), so the caller must say the source is Win Innwa.
 - **Zawgyi is detected with two gates** (`src/zawgyi.ts`): the detector's score and a pattern impossible in Unicode must agree. Pāḷi with stacked consonants (ဓမ္မ) scores as Zawgyi but has no such pattern, so `detect` returns `'unsure'` and nothing is converted by itself.
 - **Notes** (`ConvertResult.notes`) are codes for the page to explain: letters with no Win Innwa glyph kept as Unicode, Latin text in Win Innwa output, and a source that looks like the other encoding.
+- In a browser the package adds a small stand-in for `Buffer` (`src/buffer-shim.ts`), because myanmar-tools 1.1.3 is a Node build.
 - `@winmetta/myanmar-convert/zawgyi` exports only the Zawgyi patterns, with no dependencies, for code that must stay small (library search, Dhamma Post checks, book search).
 
 ## Known limits

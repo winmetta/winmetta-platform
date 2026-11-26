@@ -19,8 +19,10 @@ interface Props {
   title: string;
   /** Path after the locale, e.g. mini-apps/meditation-bell/. */
   path: string;
+  /** Keeps the page out of search results even when mini apps are on (an app not yet approved). */
+  noindex?: boolean;
 }
-const { locale, title, path } = Astro.props;
+const { locale, title, path, noindex = false } = Astro.props;
 const href = (code: Locale) => `/${code}/${path}`;
 const canonical = new URL(href(locale), Astro.site);
 const page = Astro.url.pathname;
@@ -31,7 +33,7 @@ const page = Astro.url.pathname;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    {(!allowIndexing || !miniAppsEnabled) && (
+    {(!allowIndexing || !miniAppsEnabled || noindex) && (
       <meta name="robots" content="noindex" />
     )}
     <title>{title} · {t(locale, 'brand')}</title>

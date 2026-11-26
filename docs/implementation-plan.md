@@ -464,8 +464,8 @@ One reviewed PR each, in this order.
 
 * [ ] **1. Docs.** [myanmar-converter.md](myanmar-converter.md), this section and the pointers in AGENTS.md, [prd.md](prd.md) and [meditation-bell.md](meditation-bell.md).
 * [x] **2. Package** (built 2026-11-25). `packages/myanmar-convert` with the four converters, routing through Unicode and the Zawgyi rules moved from `apps/web` (no change in behaviour); round-trip tests on Pāḷi and common words and a check of every library title; the knayi-myscript vs python-myanmar comparison for Win Innwa → Unicode (knayi kept, [myanmar-converter.md](myanmar-converter.md) §4); two myanmar-tools bugs worked around (§5.4). **Still open:** Win Innwa samples typed by a volunteer with the font, and a reader checking the glyph variants in the font; reporting the two bugs upstream.
-* [ ] **3. Mini app.** The registry entry, page and island, `en`/`my` messages, notices, size limit, browser tests, and any analytics event agreed in [analytics.md](analytics.md) §3 first.
-* [ ] **4. Go-live.** Burmese and Pāḷi reader review of every direction, then the tile changes from "Coming later" to Beta, with the maintainer's approval.
+* [x] **3. Mini app** (built 2026-11-25). The page at `/<locale>/mini-apps/burmese-text-converter/`, the island, `en`/`my` messages (Burmese is a draft for reader review), notices, the 200,000-character limit and browser tests (including a check that no request carries the text). No analytics event. The tile stays "Coming later" and the page `noindex` and out of the sitemap until stage 4 (`astro.config.mjs` and the `noindex` prop in the page).
+* [ ] **4. Go-live.** Burmese and Pāḷi reader review of every direction, then the tile changes from "Coming later" to Beta (registry status `beta`), the page's `noindex` and the sitemap exclusion in `astro.config.mjs` are removed, with the maintainer's approval.
 * [ ] **Later: npm.** Publishing setup and the first release ([myanmar-converter.md](myanmar-converter.md) §9), once the npm organization question is settled.
 
 ### Acceptance
