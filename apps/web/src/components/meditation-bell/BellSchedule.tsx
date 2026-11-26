@@ -10,9 +10,9 @@ import { days, weekdays, type Day } from '../../lib/meditation-bell/days';
 import {
   addBell,
   daysLikeBell,
-  daysOfBell,
   deleteBell,
   editBell,
+  unifyLikeBells,
   maxLabelLength,
   maxRings,
   nextBell,
@@ -471,7 +471,7 @@ export default function BellSchedule({
     const original = screen.kind === 'edit' ? screen.bell : undefined;
     const next = { ...draft, id: original?.id ?? bellId() };
     const result = original
-      ? editBell(week, next, selected)
+      ? editBell(unifyLikeBells(week, original), next, selected)
       : addBell(week, next, selected);
     if ('error' in result) return describeError(result.error, labels);
     if (selected.some((day) => result.week[day].length > maxCsvBellsPerDay))
@@ -497,7 +497,7 @@ export default function BellSchedule({
             rings: bell.endBell.rings,
           }
         }
-        initialDays={original ? daysOfBell(week, original.id) : [day]}
+        initialDays={original ? daysLikeBell(week, original) : [day]}
         editing={Boolean(original)}
         close={close}
         save={save}
@@ -508,11 +508,11 @@ export default function BellSchedule({
             message: labels.bellScheduleConfirmDelete ?? '',
             action: labels.bellScheduleDelete ?? '',
             confirm: () => {
-              update(deleteBell(week, original.id));
+              update(deleteBell(unifyLikeBells(week, original), original.id));
               send(
                 events.scheduleEdit(
                   'delete',
-                  daysOfBell(week, original.id).length,
+                  daysLikeBell(week, original).length,
                 ),
               );
               notify(labels.bellScheduleDeleted ?? '');

@@ -9,6 +9,7 @@ import {
   editBell,
   emptyWeek,
   nextBell,
+  unifyLikeBells,
   occurrencesBetween,
   validateBell,
   type Bell,
@@ -190,5 +191,22 @@ describe('the next bell across the week', () => {
     expect(daysLikeBell(w, bell('x', '14:22', { label: 'test' }))).toHaveLength(
       7,
     );
+  });
+});
+
+describe('look-alike bells', () => {
+  it('are edited and deleted together, as one bell on all of their days', () => {
+    // A CSV import gives each row its own id: Mon and Tue are two bells that read as one.
+    let week = added(emptyWeek(), bell('a', '06:00'), ['Mon']);
+    week = added(week, bell('b', '06:00'), ['Tue']);
+    week = added(week, bell('c', '07:00'), ['Mon']);
+    const original = week.Mon[0]!;
+    const unified = unifyLikeBells(week, original);
+    expect(daysLikeBell(unified, original)).toEqual(['Mon', 'Tue']);
+    expect(unified.Tue[0]!.id).toBe(original.id);
+    expect(unified.Mon[1]!.id).toBe('c');
+    const deleted = deleteBell(unified, original.id);
+    expect(deleted.Mon.map((b) => b.time)).toEqual(['07:00']);
+    expect(deleted.Tue).toEqual([]);
   });
 });

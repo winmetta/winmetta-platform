@@ -99,22 +99,26 @@ export function deleteBell(week: Week, id: string): Week {
   return next;
 }
 
+const alike = (a: Bell, b: Bell): boolean =>
+  a.time === b.time &&
+  a.label === b.label &&
+  a.sound === b.sound &&
+  a.rings === b.rings;
+
 /** Every day with a bell like this one (same time, label, sound and rings), so a CSV import of
  * the same bell on several days reads as one bell. */
 export const daysLikeBell = (week: Week, bell: Bell): Day[] =>
-  days.filter((day) =>
-    week[day].some(
-      (b) =>
-        b.time === bell.time &&
-        b.label === bell.label &&
-        b.sound === bell.sound &&
-        b.rings === bell.rings,
-    ),
-  );
+  days.filter((day) => week[day].some((b) => alike(b, bell)));
 
-/** The days a bell (by id) is on. */
-export const daysOfBell = (week: Week, id: string): Day[] =>
-  days.filter((day) => week[day].some((b) => b.id === id));
+/** Give every bell like `bell` its id, so editing or deleting it acts on all of its days. */
+export function unifyLikeBells(week: Week, bell: Bell): Week {
+  const next = { ...week };
+  for (const day of days)
+    next[day] = week[day].map((b) =>
+      alike(b, bell) ? { ...b, id: bell.id } : b,
+    );
+  return next;
+}
 
 /**
  * Edit a bell, possibly moving it to other days: it is removed from every day, then saved on the

@@ -242,8 +242,8 @@ To give more choice (a singing bowl, a deeper temple bell, a lighter chime), rec
 
 ### 8.4 Loading and playing
 
-- Sounds load when the user first opens the bell settings, presses Start or "Ring now", or turns the schedule on, not on page load, so opening the app downloads no audio. Only the sounds in use are loaded.
-- The app ships with the two WinMetta sounds; CC0 sounds join the list as each one is cleared, with no change to the app beyond the registry.
+- The built-in chimes are generated in the browser and download nothing. A recorded sound (when one is added) loads when the user first presses Start, Ring now or Play, or turns the schedule on, not on page load, so opening the app downloads no audio. Only the sounds in use are loaded.
+- The app ships with the three built-in chimes; the WinMetta recording (section 8.1a) and CC0 sounds join the list as each one is cleared, with no change to the app beyond the registry.
 
 ---
 
