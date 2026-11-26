@@ -1,0 +1,24 @@
+---
+// Renders a message that may contain `[label](target)` links (see i18n/inline-links.ts).
+import type { Locale } from '../i18n/locales';
+import { inlineLinks } from '../i18n/inline-links';
+interface Props {
+  locale: Locale;
+  text: string;
+}
+const { locale, text } = Astro.props;
+---
+
+{inlineLinks(locale, text).map((part) =>
+  typeof part === 'string' ? (
+    part
+  ) : (
+    <a
+      class="link"
+      href={part.href}
+      rel={part.external ? 'noopener' : undefined}
+    >
+      {part.label}
+    </a>
+  ),
+)}

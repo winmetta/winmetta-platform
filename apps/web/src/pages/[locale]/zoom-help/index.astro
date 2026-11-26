@@ -28,20 +28,17 @@ const { locale } = Astro.props;
 const text = (key: MessageKey) => t(locale, key);
 const sections = (guide as Record<string, Section[]>)[locale] ?? [];
 const more = [
-  ['Zoom app download', 'https://winmetta.org/2021/10/13/zoom-download/'],
+  ['zoomHelpMoreDownload', 'https://winmetta.org/2021/10/13/zoom-download/'],
+  ['zoomHelpMoreGuide', 'https://winmetta.org/2021/10/15/zoom-user-guide/'],
   [
-    'Zoom user guide (video)',
-    'https://winmetta.org/2021/10/15/zoom-user-guide/',
-  ],
-  [
-    'How to raise hand',
+    'zoomHelpMoreRaiseHand',
     'https://winmetta.org/2021/10/15/how-to-raise-hand-in-zoom-meeting/',
   ],
   [
-    'How to change your name',
+    'zoomHelpMoreRename',
     'https://winmetta.org/2021/10/23/zoom-how-to-change-name/',
   ],
-] as const;
+] as const satisfies readonly (readonly [MessageKey, string])[];
 ---
 
 <Shell locale={locale} title={text('zoomHelpTitle')} page="zoomHelp">
@@ -128,10 +125,10 @@ const more = [
     <section class="space-y-2">
       <p>{text('zoomHelpSource')}</p>
       <ul class="space-y-1">
-        {more.map(([label, url]) => (
+        {more.map(([key, url]) => (
           <li>
             <a class="link" href={url} rel="noopener">
-              {label}
+              {text(key)}
             </a>
           </li>
         ))}

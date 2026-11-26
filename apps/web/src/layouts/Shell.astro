@@ -8,6 +8,8 @@ import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 import NavIcon from '../components/NavIcon.astro';
 import GearIcon from '../components/GearIcon.astro';
 import Analytics from '../components/Analytics.astro';
+import BrandIcon from '../components/BrandIcon.astro';
+import { channelLinks } from '../lib/classes';
 import { locales, localeCodes, type Locale } from '../i18n/locales';
 import { pagePaths, route, type PageId } from '../i18n/routes';
 import { t } from '../i18n/messages';
@@ -35,8 +37,8 @@ const navItems = [
     icon: 'classes',
     label: 'navClasses',
     children: [
-      { page: 'teachers', label: 'navTeachers' },
-      { page: 'retreats', label: 'navRetreats' },
+      { page: 'teachers', icon: 'teachers', label: 'navTeachers' },
+      { page: 'retreats', icon: 'retreats', label: 'navRetreats' },
     ],
   },
   { page: 'studyGroups', icon: 'studyGroups', label: 'navStudyGroups' },
@@ -45,8 +47,8 @@ const navItems = [
     icon: 'library',
     label: 'navLibrary',
     children: [
-      { page: 'studyApps', label: 'navStudyApps' },
-      { page: 'digitalTexts', label: 'navDigitalTexts' },
+      { page: 'studyApps', icon: 'studyApps', label: 'navStudyApps' },
+      { page: 'digitalTexts', icon: 'digitalTexts', label: 'navDigitalTexts' },
     ],
   },
   { page: 'posts', icon: 'posts', label: 'navPosts' },
@@ -192,6 +194,7 @@ const postLanguageScript = postLanguagesHeadScript(defaultPostLanguage(locale));
                             : undefined
                         }
                       >
+                        <NavIcon name={child.icon} />
                         {t(locale, child.label)}
                       </a>
                     </li>
@@ -272,6 +275,22 @@ const postLanguageScript = postLanguagesHeadScript(defaultPostLanguage(locale));
             </a>
           )}
           <FeedbackLink locale={locale} class="footer-link" />
+          <a
+            href={channelLinks.youtube}
+            class="footer-link footer-link--brand"
+            rel="noopener"
+          >
+            <BrandIcon name="youtube" />
+            YouTube
+          </a>
+          <a
+            href={channelLinks.facebook}
+            class="footer-link footer-link--brand"
+            rel="noopener"
+          >
+            <BrandIcon name="facebook" />
+            Facebook
+          </a>
           <a href="https://winmetta.org/" class="footer-link" rel="noopener">
             winmetta.org
           </a>

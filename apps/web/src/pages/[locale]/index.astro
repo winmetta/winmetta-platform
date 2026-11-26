@@ -25,7 +25,6 @@ const paths = [
   { page: 'studyApps', title: 'studyAppsTitle', text: 'studyAppsIntro' },
   { page: 'posts', title: 'postsTitle', text: 'homePostsText' },
   { page: 'about', title: 'aboutTitle', text: 'homeAboutText' },
-  { page: 'privacy', title: 'privacyTitle', text: 'homePrivacyText' },
 ] as const;
 // The home page names recent posts in the interface language only.
 const latest = recentPosts(await loadPosts(), 3).flatMap((post) => {

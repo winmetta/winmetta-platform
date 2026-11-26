@@ -55,7 +55,7 @@ Rules that follow:
 
 ### Header and navigation
 
-- **First-level links have an icon, everywhere.** Every first-level link in the wide header bar and in the phone menu has an outline icon before its words (`NavIcon.astro`: Classes, Dhamma Study Groups, Dhamma Library, Dhamma Posts, Donate; Settings uses the gear, `GearIcon.astro`). Submenu links stay text only. A new first-level link needs an icon in `NavIcon.astro`.
+- **Every menu link has an icon, everywhere.** Every first-level and submenu link in the wide header bar and in the phone menu has an outline icon before its words (`NavIcon.astro`: Classes with Sayadaws and Retreats, Dhamma Study Groups, Dhamma Library with Dhamma Apps and Digital Texts, Dhamma Posts, Donate; Settings uses the gear, `GearIcon.astro`). A new menu or submenu link needs an icon in `NavIcon.astro`.
 - **Dropdown arrow:** a drawn chevron (a rotated corner in CSS, in the muted text colour), never a ▾ text glyph, which was too small and read as a dot. It shows on the wide bar only; the phone menu lists the submenu links open.
 - **Phone menu:** below 48 rem, with JavaScript, a Menu button (three lines and the word) shows and hides the navigation; without JavaScript the links stay visible. Settings moves into the menu as gear and word after the last first-level link, and the header gear is hidden then (without JavaScript the gear stays and the menu entry is hidden, so there is never a duplicate).
 - **Language switch and Settings gear:** the switch is its own sand pill (`.segmented`), compact at every width (40 px buttons, small text), and the gear is a separate round icon (`.header-icon`) beside it. Both sit in one plain wrapper (`.header-tools`, no background) so they always wrap to the next line together, never apart.

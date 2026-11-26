@@ -18,11 +18,11 @@ const locales = [
 
 for (const l of locales) {
   test.describe(`${l.code} pages`, () => {
-    test('Home links to the library, About and Privacy', async ({ page }) => {
+    test('Home links to the library and About', async ({ page }) => {
       await page.goto(`/${l.code}/`);
       await expect(page.locator('h1')).toHaveText(l.home);
       const start = page.locator('section[aria-labelledby="start"]');
-      await expect(start.getByRole('link')).toHaveCount(7);
+      await expect(start.getByRole('link')).toHaveCount(6);
       await start.locator(`a[href="/${l.code}/dhamma-library/"]`).click();
       await expect(page).toHaveURL(new RegExp(`/${l.code}/dhamma-library/$`));
     });
@@ -55,7 +55,7 @@ for (const l of locales) {
         .click();
       await expect(page.locator('h1')).toHaveText(l.privacy);
       await expect(
-        page.locator('main a[href^="mailto:contact@winmetta.org"]'),
+        page.locator('main a[href^="mailto:hello@winmetta.org"]'),
       ).toBeVisible();
     });
 
@@ -91,7 +91,7 @@ test('Privacy states what the site does and shows a Latin-digit date', async ({
   await expect(page.getByRole('heading', { level: 2 })).toHaveCount(
     7 + Number(feedback) + Number(ipLogging) + Number(bookSearch),
   );
-  await expect(page.locator('main')).toContainText('November 23, 2026');
+  await expect(page.locator('main')).toContainText('November 25, 2026');
   await expect(page.locator('main')).toContainText('Website analytics');
   await expect(page.locator('#privacyAnalyticsIpTitle')).toHaveCount(
     Number(ipLogging),
@@ -144,7 +144,7 @@ test('privacy page discloses that search words appear in the page address', asyn
   await page.goto('/my/privacy/');
   await expect(
     page.getByRole('heading', {
-      name: 'စာမျက်နှာလိပ်စာထဲရှိ ရှာဖွေစကားလုံးများ',
+      name: 'စာမျက်နှာလိပ်စာ (URL) ထဲရှိ ရှာဖွေစကားလုံးများ',
     }),
   ).toBeVisible();
 });

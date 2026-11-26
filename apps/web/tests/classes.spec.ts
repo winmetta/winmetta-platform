@@ -4,11 +4,11 @@ test('classes page lists live classes with join and watch links', async ({
   page,
 }) => {
   await page.goto('/en/classes/');
-  await expect(page.locator('h1')).toHaveText('Classes');
+  await expect(page.locator('h1')).toHaveText('Dhamma Classes');
   await expect(page.locator('main li.card[id]')).toHaveCount(9);
   await expect(page.locator('a[href*="zoom.us"]').first()).toBeVisible();
   await expect(
-    page.locator('a[href*="youtube.com/@WinMetta"]').first(),
+    page.locator('main a[href*="youtube.com/@WinMetta"]').first(),
   ).toBeVisible();
   await expect(
     page.getByText('Happening now:').or(page.getByText('Next class:')).first(),
@@ -22,7 +22,9 @@ test('classes page lists live classes with join and watch links', async ({
 test('study groups are Zoom only', async ({ page }) => {
   await page.goto('/en/study-groups/');
   await expect(page.locator('main li.card[id]')).toHaveCount(2);
-  await expect(page.locator('a[href*="youtube.com/@WinMetta"]')).toHaveCount(0);
+  await expect(
+    page.locator('main a[href*="youtube.com/@WinMetta"]'),
+  ).toHaveCount(0);
 });
 test('teacher page shows draft note in English and links from a class', async ({
   page,

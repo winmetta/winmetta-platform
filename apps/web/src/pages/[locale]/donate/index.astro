@@ -1,6 +1,7 @@
 ---
 // Dāna page (docs/donations.md): why to give, how to give to Win Metta, and other monasteries
 // donors give to directly. Unlinked and noindex until PUBLIC_DONATE is on.
+import InlineLinks from '../../../components/InlineLinks.astro';
 import Shell from '../../../layouts/Shell.astro';
 import CopyText from '../../../components/CopyText';
 import LinkIcon from '../../../components/LinkIcon.astro';
@@ -38,7 +39,9 @@ const copyLabels = { copy: text('donateCopy'), copied: text('donateCopied') };
 >
   <header class="space-y-4">
     <h1 class="text-3xl font-bold sm:text-4xl">{text('donateTitle')}</h1>
-    <p class="lead">{text('donateIntro')}</p>
+    <p class="lead">
+      <InlineLinks locale={locale} text={text('donateIntro')} />
+    </p>
   </header>
 
   <section class="space-y-4" aria-labelledby="supports">
@@ -49,7 +52,9 @@ const copyLabels = { copy: text('donateCopy'), copied: text('donateCopied') };
       {donationSupports.map((item) => (
         <li class="card space-y-3">
           <h3 class="text-lg font-bold">{text(item.title)}</h3>
-          <p>{text(item.body)}</p>
+          <p>
+            <InlineLinks locale={locale} text={text(item.body)} />
+          </p>
         </li>
       ))}
     </ul>

@@ -1,6 +1,7 @@
 import en from './messages/en.json';
 import my from './messages/my.json';
 import { localeCodes, type Locale } from './locales';
+import { linkTargetsOf } from './inline-links';
 export const messages = { en, my } satisfies Record<
   Locale,
   Record<keyof typeof en, string>
@@ -46,6 +47,9 @@ export function validateMessages(
       const source = (en as Record<string, string>)[key] ?? '';
       if (placeholdersOf(value) !== placeholdersOf(source))
         throw new Error(`Placeholders differ for "${key}" in ${locale}`);
+      // ...and link to the same places.
+      if (linkTargetsOf(value) !== linkTargetsOf(source))
+        throw new Error(`Link targets differ for "${key}" in ${locale}`);
     }
   }
 }

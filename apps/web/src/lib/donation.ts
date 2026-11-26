@@ -27,6 +27,11 @@ export const zelleCopyValue = (address: string): string =>
 /** What dāna pays for, in page order: a title and a body message key each. */
 export const donationSupports = [
   {
+    id: 'monastics',
+    title: 'donateSupportMonasticsTitle',
+    body: 'donateSupportMonastics',
+  },
+  {
     id: 'classes',
     title: 'donateSupportClassesTitle',
     body: 'donateSupportClasses',
@@ -40,11 +45,6 @@ export const donationSupports = [
     id: 'volunteers',
     title: 'donateSupportVolunteersTitle',
     body: 'donateSupportVolunteers',
-  },
-  {
-    id: 'monastics',
-    title: 'donateSupportMonasticsTitle',
-    body: 'donateSupportMonastics',
   },
 ] as const satisfies readonly {
   id: string;
