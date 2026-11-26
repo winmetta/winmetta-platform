@@ -4,12 +4,13 @@ name: Deploy web
 # §7 and docs/implementation-plan.md §4 step 5).
 #
 # Runs after the CI workflow succeeds on a push to main, and by hand (Run workflow) with
-# any ref, which is how you roll back: deploy an earlier commit. The job waits for a
-# reviewer on the GitHub `production` environment, and AWS access comes from GitHub's
-# OIDC token for that environment only (no stored keys).
+# any ref, which is how you roll back: deploy an earlier commit. A merge to main deploys
+# with no approval step; the merged PR's review and CI are the gate. The job uses the
+# GitHub `production` environment, which allows only the main branch, and AWS access
+# comes from GitHub's OIDC token for that environment only (no stored keys).
 #
-# One-time setup, in Settings > Environments > production: a required reviewer and these
-# variables (none is secret):
+# One-time setup, in Settings > Environments > production: deployment branches limited to
+# main, no required reviewers, and these variables (none is secret):
 #   SITE_URL                    https://app.winmetta.org
 #   PUBLIC_ALLOW_INDEXING       false until the launch gates pass, then true
 #   PUBLIC_FEEDBACK             optional; off until the feedback endpoint is verified

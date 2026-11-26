@@ -317,13 +317,13 @@ Deliberately small, for a volunteer team. Rollout by phase:
 | **PR builds** | Workflow artifact from `ci.yml` (added in Phase 2) | Per-pull-request check of the built site; no hosted preview in Phase 2. |
 | **Production** | `app.winmetta.org` (Phase 2) | Live site, open to search engines since 2026-10-23 (implementation-plan.md §4). |
 
-**Why no staging yet:** the site is static with no backend or database, so a second environment would add a bucket, certificate, role and stack without testing much, and the staging bytes could not be promoted anyway because `SITE_URL` and `PUBLIC_ALLOW_INDEXING` are baked in at build time. The safety nets are the required-reviewer approval on the `production` GitHub environment, a post-deploy smoke test against the live site, and rollback by redeploying an earlier ref. Stack parameters are per stack, so adding `staging` later is a new config file and `pulumi up`.
+**Why no staging yet:** the site is static with no backend or database, so a second environment would add a bucket, certificate, role and stack without testing much, and the staging bytes could not be promoted anyway because `SITE_URL` and `PUBLIC_ALLOW_INDEXING` are baked in at build time. The safety nets are the PR review and CI before a merge, a post-deploy smoke test against the live site, and rollback by redeploying an earlier ref. Merges deploy without a manual approval (since 2026-11-25); the `production` GitHub environment only limits deploys to `main`. Stack parameters are per stack, so adding `staging` later is a new config file and `pulumi up`.
 
 **Flow (Phase 2):**
 
 1. **PR opened** → `ci.yml` runs lint, typecheck, tests, build; the built site is uploaded as a workflow artifact (a Phase 2 addition to `ci.yml`).
-2. **Merge to `main`** → `deploy-web.yml` waits for a required reviewer to approve the `production` environment, builds with the production variables, syncs to S3, invalidates CloudFront and runs the Playwright smoke test against the live URL.
-3. **Rollback** is a manual run of the same workflow (`workflow_dispatch`) with an earlier ref. A bad deploy goes straight to production, so keep the smoke test and the approval step.
+2. **Merge to `main`** → once CI passes, `deploy-web.yml` starts with no approval step: it builds with the production variables, syncs to S3, invalidates CloudFront and runs the Playwright smoke test against the live URL.
+3. **Rollback** is a manual run of the same workflow (`workflow_dispatch`) with an earlier ref. A bad merge goes straight to production, so keep the PR review, CI and the smoke test.
 
 When the production environment variable `PUBLIC_ALLOW_INDEXING` is not `true` (it has been `true` since 2026-10-23), every page sends `noindex`. `robots.txt` stays allow-all but leaves out the sitemap: a `Disallow` would stop crawlers from fetching the pages, so they would never see the `noindex` tag. Setting it to `true` and redeploying turns indexing on. CI authenticates to AWS only through GitHub OIDC (§8), and fork pull requests get no AWS access.
 
