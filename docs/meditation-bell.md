@@ -47,7 +47,7 @@ Out of scope: accounts or sync between devices, uploading your own bell sounds, 
 - **Leaving while a bell is set:** if a timer is running or paused, or the schedule is on, following "← Mini apps" or switching language asks first, and closing the tab triggers the browser's own leave warning. Timer and schedule state are saved anyway, so coming back resumes them (section 4).
 - **Footer with a feedback button:** every mini app ends with a slim footer holding a **Feedback** button (an outline speech-bubble icon and the word, an icon-only button on narrow phones with the accessible name "Send feedback"). It opens the site's existing feedback dialog ([feedback.md](feedback.md)) with the `general` context, the mini app's name filled in as the item, and the "suggestion", "website" and "other" problem types, so reports reach the team without a new endpoint or context. It follows the site's other feedback links: shown only when `PUBLIC_FEEDBACK` is on (it is in production), and a `mailto:` message without JavaScript (`feedbackMailto` in `lib/feedback.ts`). The footer stays below the app's content and never covers it; it is the only footer content (no site links or logo).
 
-**Navigation.** The listing page needs a menu link with an icon in `NavIcon.astro`. Where it goes, and its Burmese name, are open questions (section 11): the Dhamma Library menu already has "Dhamma Apps" (`studyApps`), a list of outside study apps, and the two names must not be confused.
+**Navigation.** The listing page needs a menu link with an icon in `NavIcon.astro`. Where it goes, and its Burmese name, are open questions (section 12): the Dhamma Library menu already has "Dhamma Apps" (`studyApps`), a list of outside study apps, and the two names must not be confused.
 
 **Design rules** for the listing page and every mini app are summarized in [design-guide.md](design-guide.md) §9, so later mini apps look and behave the same.
 
@@ -194,7 +194,7 @@ The mini app's buttons and labels are **English in both locales**; only alerts, 
 
 ### 7.3 Design guide
 
-The mockup is not the final styling. In stage 3 the controls are mapped onto [design-guide.md](design-guide.md): the Timer/Schedule switch, the countdown/alarm switch and the rings choice are segmented choices; Start is the page's single primary button; Reset, Clear and Ring bell now are outline buttons; the guide reserves `.chip` for post topics, so the presets and day buttons need their own pattern (a toggle-button group). The shared mini app rules (layout, alerts at the top, day names, narrow screens) are already in [design-guide.md](design-guide.md) §9; component patterns it does not have yet (the preset grid, the day row, the countdown ring) are added there in the same PR.
+The mockup is not the final styling. In stages 4 and 5 (implementation-plan §5E) the controls are mapped onto [design-guide.md](design-guide.md): the Timer/Schedule switch, the countdown/alarm switch and the rings choice are segmented choices; Start is the page's single primary button; Reset, Clear and Ring bell now are outline buttons; the guide reserves `.chip` for post topics, so the presets and day buttons need their own pattern (a toggle-button group). The shared mini app rules (layout, alerts at the top, day names, narrow screens) are already in [design-guide.md](design-guide.md) §9; component patterns it does not have yet (the preset grid, the day row, the countdown ring) are added there in the same PR.
 
 ---
 
