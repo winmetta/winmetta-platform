@@ -37,6 +37,9 @@ test.describe('Dhamma posts', () => {
     await expect(
       page.getByRole('link', { name: 'Oldest first' }),
     ).toHaveAttribute('aria-current', 'page');
+    // The URL changes before the new page has finished loading: wait for the whole list, or a slow
+    // network (the post-deploy check on the live site) reads a half-loaded one.
+    await expect(all).toHaveCount(ids.length);
     const oldest = await all.evaluateAll((items) =>
       items.map((item) => (item as HTMLElement).dataset.id),
     );
