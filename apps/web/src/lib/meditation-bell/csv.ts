@@ -69,9 +69,11 @@ export function splitRecordsWithLines(text: string): CsvRecord[] {
   for (let i = 0; i < text.length; i++) {
     const c = text[i];
     const isBreak = c === '\n' || c === '\r';
-    if (isBreak && c === '\r' && text[i + 1] === '\n') i++;
+    const pair = c === '\r' && text[i + 1] === '\n';
     if (isBreak) line++;
-    if (quoted) {
+    if (pair) i++;
+    if (quoted && isBreak) field += pair ? '\r\n' : c;
+    else if (quoted) {
       if (c === '"' && text[i + 1] === '"') {
         field += '"';
         i++;

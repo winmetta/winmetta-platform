@@ -90,6 +90,16 @@ describe('parseCsv', () => {
   });
 });
 
+describe('quoted line breaks', () => {
+  it('keep a CRLF pair, a lone LF and a lone CR as they are', () => {
+    expect(splitRecords('a,"x\r\ny"\r\nb,"p\nq"\n"m\rn",z')).toEqual([
+      ['a', 'x\r\ny'],
+      ['b', 'p\nq'],
+      ['m\rn', 'z'],
+    ]);
+  });
+});
+
 describe('row numbers', () => {
   it('are file lines, even with blank lines and multi-line quoted labels', () => {
     const r = parseCsv(
