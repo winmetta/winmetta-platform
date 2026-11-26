@@ -414,7 +414,7 @@ One reviewed PR each, in this order.
 ### Decisions (2026-11-25)
 
 * Two modes, Timer and Schedule; a timer and the weekly schedule never run at the same time, and turning the schedule off never deletes it.
-* Mini app pages use their own layout with no site header or footer, only a "← Mini apps" link and the EN | ကခဂ language switch; the listing page is a normal page.
+* Mini app pages use their own layout with no site header or footer, only a "← Mini Apps" link and the EN | ကခဂ language switch; the listing page is a normal page.
 * Buttons and labels in English in both locales, Burmese only for alerts, notices and errors, Western digits everywhere ([meditation-bell.md](meditation-bell.md) §7).
 * Browser storage only, no backend; CSV export is the backup. Built behind `PUBLIC_MINI_APPS`.
 * Cookieless usage events for the timer and the schedule (bucketed, never labels, times or schedule contents), added to [analytics.md](analytics.md) §3 first.
@@ -536,6 +536,7 @@ Candidate directions, in no fixed order:
 * **Library content pipeline and class archive:** the repeatable upload-and-reindex workflow (outline below), a unified class archive, and full-text, OCR and transcript search. Search inside PDFs starts with book search stage 1 (§5C); its possible next stages are noted in [book-search.md](book-search.md) §12.
 * **Optional accounts and progress sync, and the first backend:** also the point to add a staging environment with integration tests (tech-architecture.md §10).
 * **Native apps, monastic content tools and more curricula.**
+* **Classes and Study Groups as mini apps:** turn the Classes and Dhamma Study Groups pages into mini apps (see [meditation-bell.md](meditation-bell.md) §2 and [design-guide.md](design-guide.md) §9), so the header menu shrinks to Dhamma Library, Dhamma Posts, Mini Apps and Donate, and Donate returns to the header (it was taken out while Mini Apps would wrap the desktop bar onto a second line). Needs its own plan: the Classes pages have detail pages, a weekly schedule and retreat archive that must keep their addresses.
 
 #### Library content pipeline (outline)
 
