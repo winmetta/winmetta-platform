@@ -72,24 +72,26 @@ const libraries = [
   wide
 >
   <MiniAppHeader slot="app-header" {locale} title={name} icon={app.icon} />
-  <p class="mini-help mt-3 mb-4">{text('converterIntro')}</p>
-  <noscript>
-    <p class="mini-panel">{text('converterNeedsJs')}</p>
-  </noscript>
-  {/* An island renders as `display: contents`: a wrapper gives it the page's vertical spacing. */}
-  <div>
-    <TextConverterIsland client:load labels={labels} />
+  <div class="mini-stack">
+    <p class="mini-help">{text('converterIntro')}</p>
+    <noscript>
+      <p class="mini-panel">{text('converterNeedsJs')}</p>
+    </noscript>
+    {/* An island renders as `display: contents`: a wrapper gives it the page's vertical spacing. */}
+    <div>
+      <TextConverterIsland client:load labels={labels} />
+    </div>
+    <p class="mini-help">
+      {text('converterBuiltWith')}{' '}
+      {libraries.map(([library, href], index) => (
+        <>
+          {index > 0 && ', '}
+          <a href={href} rel="noopener">
+            {library}
+          </a>
+        </>
+      ))}
+      . {text('converterFontsNote')}
+    </p>
   </div>
-  <p class="mini-help mt-6 pb-4">
-    {text('converterBuiltWith')}{' '}
-    {libraries.map(([library, href], index) => (
-      <>
-        {index > 0 && ', '}
-        <a href={href} rel="noopener">
-          {library}
-        </a>
-      </>
-    ))}
-    . {text('converterFontsNote')}
-  </p>
 </MiniAppShell>

@@ -14,7 +14,7 @@ test('the listing shows a tile per mini app, linking only the ones that exist', 
   const bell = page.locator('a.mini-tile');
   await expect(bell).toHaveCount(1);
   await expect(bell).toHaveAttribute('href', '/en/mini-apps/meditation-bell/');
-  await expect(bell).toContainText('Meditation bell');
+  await expect(bell).toContainText('Meditation Bell');
   await expect(page.locator('.mini-tile--coming')).toContainText(
     'Coming later',
   );
@@ -57,7 +57,7 @@ test('the bell page has its own layout, back link, language switch and canonical
   await expect(back).toBeVisible();
   await expect(back).toHaveAccessibleName('Mini Apps');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-    'Meditation bell',
+    'Meditation Bell',
   );
   await expect(page.locator('[data-mini-bar] h1 img')).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
@@ -124,7 +124,7 @@ test('the footer Feedback button opens the dialog with the mini app filled in', 
   const dialog = page.locator('[data-feedback-dialog]');
   await expect(dialog).toBeVisible();
   await expect(dialog.locator('[data-feedback-about]')).toContainText(
-    'Meditation bell',
+    'Meditation Bell',
   );
 });
 

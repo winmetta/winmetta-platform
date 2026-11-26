@@ -271,6 +271,13 @@ textarea.mini-field {
   color: var(--mini-on-accent);
 }
 
+/* Components in a mini app never touch: stack them with a gap, not with margins on each. */
+.mini-stack {
+  display: grid;
+  gap: 1.25rem;
+  padding-block: 1rem;
+}
+
 .mini-help {
   margin: 0;
   color: var(--mini-quiet);
