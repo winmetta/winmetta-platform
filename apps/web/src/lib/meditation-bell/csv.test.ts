@@ -90,6 +90,19 @@ describe('parseCsv', () => {
   });
 });
 
+describe('row numbers', () => {
+  it('are file lines, even with blank lines and multi-line quoted labels', () => {
+    const r = parseCsv(
+      'day,time,label\n\nMon,06:00,"two\nlines"\nXyz,07:00,a\n\r\nMon,99:00,b\n',
+      'winmetta-long',
+    );
+    expect(r.ok && r.skipped).toEqual([
+      { row: 5, reason: 'unknown-day' },
+      { row: 7, reason: 'invalid-time' },
+    ]);
+  });
+});
+
 describe('applyImport and round trip', () => {
   it('replace starts empty; add skips a time already set that day', () => {
     const parsed = parseCsv(sample, 'winmetta-long');

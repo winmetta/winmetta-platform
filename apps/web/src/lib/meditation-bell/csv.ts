@@ -40,25 +40,37 @@ export type CsvResult =
   | {
       ok: true;
       bells: ParsedBell[];
-      /** Row numbers count the header as row 1. */
+      /** The line of the file the row starts on, so it matches a spreadsheet (the header is line 1). */
       skipped: { row: number; reason: SkipReason }[];
     }
   | { ok: false; error: 'too-big' | 'too-many' | 'no-header' | 'empty' };
 
+/** One CSV record and the line of the file it starts on (the first line is 1). */
+export interface CsvRecord {
+  cells: string[];
+  line: number;
+}
+
 /** RFC 4180 records: quoted fields may hold commas, doubled quotes and line breaks. */
-export function splitRecords(text: string): string[][] {
-  const records: string[][] = [];
+export function splitRecordsWithLines(text: string): CsvRecord[] {
+  const records: CsvRecord[] = [];
   let field = '';
   let record: string[] = [];
   let quoted = false;
+  let line = 1;
+  let startLine = 1;
   const endRecord = () => {
     record.push(field);
     field = '';
-    if (record.some((cell) => cell.trim() !== '')) records.push(record);
+    if (record.some((cell) => cell.trim() !== ''))
+      records.push({ cells: record, line: startLine });
     record = [];
   };
   for (let i = 0; i < text.length; i++) {
     const c = text[i];
+    const isBreak = c === '\n' || c === '\r';
+    if (isBreak && c === '\r' && text[i + 1] === '\n') i++;
+    if (isBreak) line++;
     if (quoted) {
       if (c === '"' && text[i + 1] === '"') {
         field += '"';
@@ -69,14 +81,18 @@ export function splitRecords(text: string): string[][] {
     else if (c === ',') {
       record.push(field);
       field = '';
-    } else if (c === '\n' || c === '\r') {
-      if (c === '\r' && text[i + 1] === '\n') i++;
+    } else if (isBreak) {
       endRecord();
+      startLine = line;
     } else field += c;
   }
   endRecord();
   return records;
 }
+
+/** The records without their line numbers. */
+export const splitRecords = (text: string): string[][] =>
+  splitRecordsWithLines(text).map((record) => record.cells);
 
 function parseRow(
   cells: Record<string, string>,
@@ -112,8 +128,12 @@ function parseRow(
 export function parseCsv(text: string, fallbackSound: string): CsvResult {
   if (new TextEncoder().encode(text).length > maxCsvBytes)
     return { ok: false, error: 'too-big' };
-  const records = splitRecords(text.startsWith(BOM) ? text.slice(1) : text);
-  const header = records.shift()?.map((name) => name.trim().toLowerCase());
+  const records = splitRecordsWithLines(
+    text.startsWith(BOM) ? text.slice(1) : text,
+  );
+  const header = records
+    .shift()
+    ?.cells.map((name) => name.trim().toLowerCase());
   if (!header) return { ok: false, error: 'empty' };
   if (!header.includes('day') || !header.includes('time'))
     return { ok: false, error: 'no-header' };
@@ -121,8 +141,7 @@ export function parseCsv(text: string, fallbackSound: string): CsvResult {
   const bells: ParsedBell[] = [];
   const skipped: { row: number; reason: SkipReason }[] = [];
   const seen = new Set<string>();
-  records.forEach((record, index) => {
-    const row = index + 2;
+  records.forEach(({ cells: record, line: row }) => {
     const cells = Object.fromEntries(
       header.map((name, i) => [name, record[i] ?? '']),
     );
