@@ -446,6 +446,36 @@ One reviewed PR each, in this order.
 
 ---
 
+## 5F. Burmese font converter (proposed 2026-11-25)
+
+**Goal:** a shared package, `@winmetta/myanmar-convert` in `packages/myanmar-convert`, that converts between Unicode, Zawgyi and Win Innwa in every direction, and a font converter mini app that uses it, all in the browser. Design, research and open questions: [myanmar-converter.md](myanmar-converter.md). Not approved yet; it starts after the mini apps foundation (§5E stage 2).
+
+### Decisions (proposed 2026-11-25)
+
+* One library per direction, always converting through Unicode: `myanmar-tools` 1.1.3 for Zawgyi, `knayi-myscript` for Win Innwa → Unicode, our own table (ported from `trhura/python-myanmar`, MIT) for Unicode → Win Innwa.
+* Fixes live in the package's own steps with tests, never inside a library.
+* Zawgyi is detected with the existing two-gate rule; Win Innwa is always chosen by the user.
+* The Zawgyi rules move from `apps/web/src/lib/zawgyi.ts` into the package; book search and the manifest generator import them from there.
+* Publishing to npm comes later, after the mini app has been used.
+
+### Stages
+
+One reviewed PR each, in this order.
+
+* [ ] **1. Docs.** [myanmar-converter.md](myanmar-converter.md), this section and the pointers in AGENTS.md, [prd.md](prd.md) and [meditation-bell.md](meditation-bell.md).
+* [ ] **2. Package.** `packages/myanmar-convert` with the four converters, routing, normalization and the Zawgyi rules moved from `apps/web` (no change in behaviour); the quality set, golden file and round-trip tests; the knayi-myscript vs python-myanmar comparison for Win Innwa → Unicode.
+* [ ] **3. Mini app.** The registry entry, page and island, `en`/`my` messages, notices, size limit, browser tests, and any analytics event agreed in [analytics.md](analytics.md) §3 first.
+* [ ] **4. Go-live.** Burmese and Pāḷi reader review of every direction, then the tile changes from "Coming later" to Beta, with the maintainer's approval.
+* [ ] **Later: npm.** Publishing setup and the first release ([myanmar-converter.md](myanmar-converter.md) §9), once the npm organization question is settled.
+
+### Acceptance
+
+* Every sample in the quality set converts to its expected output in all six directions, and round trips through Zawgyi and Win Innwa return the original Unicode.
+* Auto leaves the Pāḷi titles that the Zawgyi detector scores high unchanged.
+* No request leaves the browser carrying the text, checked in the browser's network panel.
+
+---
+
 ## 6. Backlog (not scheduled)
 
 Phases 0–3 are done. Everything else lives here, in two groups: **open todos** left from the finished phases, and **future phases**, which are candidate directions rather than commitments. Nothing here is dated: the maintainer decides the order and scope as the work comes, and a future phase gets its own numbered section (like §5) when it starts. Product reasoning is in [prd.md](prd.md) §7; tentative technical notes are in [tech-architecture.md](tech-architecture.md) §10.
