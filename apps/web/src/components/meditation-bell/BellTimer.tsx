@@ -196,29 +196,28 @@ function SettingsPanel({
           {labels.bellRingsHelp}
         </p>
         <div
-          className="bell-ring-count"
-          role="radiogroup"
+          className="bell-choices"
+          role="group"
           aria-label={labels.bellRings}
           aria-describedby="bell-rings-help"
         >
           {Array.from({ length: maxRings }, (_, i) => i + 1).map((n) => (
-            <label key={n} className="bell-radio">
-              <input
-                type="radio"
-                name="bell-end-rings"
-                value={n}
-                checked={bell.endBell.rings === n}
-                onChange={() =>
-                  change(
-                    { endBell: { ...bell.endBell, rings: n } },
-                    'end',
-                    bell.endBell.sound,
-                    n,
-                  )
-                }
-              />
-              <span>{n}x</span>
-            </label>
+            <button
+              key={n}
+              type="button"
+              className="bell-choice"
+              aria-pressed={bell.endBell.rings === n}
+              onClick={() =>
+                change(
+                  { endBell: { ...bell.endBell, rings: n } },
+                  'end',
+                  bell.endBell.sound,
+                  n,
+                )
+              }
+            >
+              {n}x
+            </button>
           ))}
         </div>
       </div>
