@@ -6,8 +6,10 @@ interface Props {
   locale: Locale;
   /** Mini apps: "EN | ကခဂ" with the language's English name as the accessible name. */
   compact?: boolean;
+  /** Site header: the sand pill on wide screens, a globe button with a dropdown below 48 rem (with JavaScript). */
+  menu?: boolean;
 }
-const { locale, compact = false } = Astro.props;
+const { locale, compact = false, menu = false } = Astro.props;
 const short = { en: 'EN', my: 'ကခဂ' } as const;
 const longName = {
   en: 'miniAppLanguageEnglish',
@@ -15,21 +17,77 @@ const longName = {
 } as const;
 ---
 
-<nav aria-label={t(locale, 'language')} class="segmented">
-  {localeCodes.map((code) => (
-    <a
-      href={switchLocale(Astro.url, code)}
-      lang={code}
-      hreflang={code}
-      aria-current={code === locale ? 'page' : undefined}
-      data-locale={code}
-      aria-label={compact ? t(locale, longName[code]) : undefined}
-      class={compact ? 'lang-compact' : undefined}
+<div
+  class:list={['lang-switcher', { 'lang-switcher--menu': menu }]}
+  data-lang-menu={menu ? '' : undefined}
+>
+  {menu && (
+    <button
+      type="button"
+      class="lang-menu-button"
+      aria-label={t(locale, 'language')}
+      aria-expanded="false"
+      aria-controls="lang-menu-nav"
+      data-lang-button
     >
-      {compact ? short[code] : locales[code].name}
-    </a>
-  ))}
-</nav>
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        focusable="false"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
+        <circle cx="12" cy="12" r="9"></circle>
+        <ellipse cx="12" cy="12" rx="4" ry="9"></ellipse>
+        <path d="M3 12h18"></path>
+      </svg>
+    </button>
+  )}
+  <nav
+    id={menu ? 'lang-menu-nav' : undefined}
+    aria-label={t(locale, 'language')}
+    class="segmented"
+  >
+    {localeCodes.map((code) => (
+      <a
+        href={switchLocale(Astro.url, code)}
+        lang={code}
+        hreflang={code}
+        aria-current={code === locale ? 'page' : undefined}
+        data-locale={code}
+        aria-label={compact ? t(locale, longName[code]) : undefined}
+        class={compact ? 'lang-compact' : undefined}
+      >
+        {compact ? short[code] : locales[code].name}
+      </a>
+    ))}
+  </nav>
+</div>
 <script>
   import '../i18n/language-switch-links';
+
+  // Phones: the globe button shows and hides the language links.
+  const root = document.querySelector<HTMLElement>('[data-lang-menu]');
+  const button = root?.querySelector<HTMLButtonElement>('[data-lang-button]');
+  if (root && button) {
+    const set = (open: boolean) => {
+      button.setAttribute('aria-expanded', String(open));
+      root.toggleAttribute('data-open', open);
+    };
+    button.addEventListener('click', () =>
+      set(button.getAttribute('aria-expanded') !== 'true'),
+    );
+    document.addEventListener('click', (event) => {
+      if (event.target instanceof Node && !root.contains(event.target))
+        set(false);
+    });
+    root.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && root.hasAttribute('data-open')) {
+        set(false);
+        button.focus();
+      }
+    });
+  }
 </script>

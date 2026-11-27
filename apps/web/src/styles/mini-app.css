@@ -53,6 +53,14 @@
   text-align: center;
 }
 
+/* Burmese titles are wider and taller than Latin ones: smaller type, tighter gap and line height,
+   so a long title such as the text converter's stays within two short lines. */
+:lang(my) .mini-header h1 {
+  gap: 4px;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
 .mini-header h1 img {
   flex: none;
 }

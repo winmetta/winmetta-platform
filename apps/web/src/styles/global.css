@@ -275,6 +275,48 @@
   .header-tools .segmented a {
     @apply min-h-10 px-2.5 text-sm;
   }
+  /* Wide screens and no JavaScript: the pill alone. Phones with JavaScript (where the Menu button shows):
+     a globe button that opens the two languages as a dropdown, like the mini apps. */
+  .lang-switcher {
+    @apply relative inline-flex;
+  }
+  .lang-menu-button {
+    @apply hidden size-11 items-center justify-center rounded-full border-0 bg-transparent p-0 text-brand transition-colors hover:bg-sky hover:text-brand-strong;
+  }
+  .lang-menu-button svg {
+    @apply size-6;
+  }
+  @media (width < 48rem) {
+    html.js .lang-menu-button {
+      @apply inline-flex cursor-pointer;
+    }
+    /* Logo, name, Beta, Menu and the globe stay on one row on a 375 px phone, also in Burmese. */
+    html.js .site-header__inner {
+      @apply gap-x-2;
+    }
+    html.js .brand {
+      @apply gap-2 pe-1;
+    }
+    html.js .lang-switcher[data-open] .lang-menu-button {
+      @apply bg-sky;
+    }
+    html.js .lang-switcher--menu .segmented {
+      @apply absolute end-0 top-full z-50 mt-1 min-w-36 flex-col items-stretch gap-0 rounded-xl border border-stone bg-white p-1;
+      box-shadow: var(--shadow);
+    }
+    html.js .lang-switcher--menu:not([data-open]) .segmented {
+      @apply hidden;
+    }
+    html.js .lang-switcher--menu .segmented a {
+      @apply min-h-11 rounded-lg px-3 text-base;
+    }
+    html.js .lang-switcher--menu .segmented a[aria-current] {
+      @apply bg-sky shadow-none;
+    }
+    html.js .header-tools .lang-switcher--menu .segmented a {
+      @apply min-h-11 px-3 text-base;
+    }
+  }
   .header-icon {
     @apply inline-flex size-11 items-center justify-center rounded-full text-brand transition-colors hover:bg-sky hover:text-brand-strong;
   }

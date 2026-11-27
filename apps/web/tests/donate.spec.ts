@@ -1,3 +1,4 @@
+import { chooseLanguage } from './site';
 import { expect, test } from '@playwright/test';
 
 // The Dāna page (docs/donations.md). Built always; linked and indexable only with PUBLIC_DONATE.
@@ -88,7 +89,7 @@ test('Copy puts the Zelle address on the clipboard', async ({
 
 test('language switch keeps the Dāna page', async ({ page }) => {
   await page.goto('/en/donate/');
-  await page.locator('a[data-locale="my"]').click();
+  await chooseLanguage(page, 'my');
   await expect(page).toHaveURL(/\/my\/donate\/$/);
 });
 

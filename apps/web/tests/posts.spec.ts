@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { siteOrigin } from './site';
+import { siteOrigin, chooseLanguage } from './site';
 
 const post = '2026-10-11-meaning-of-vidhi-and-anuvada';
 const other = '2026-10-11-what-is-a-sekkha-person-sekkha-puggala';
@@ -110,7 +110,7 @@ test.describe('Dhamma posts', () => {
     await page.locator('[data-post-lang-toggle="en"]').click();
     await expect(page).toHaveURL(/\/tags\/kusala\/\?lang=my,zh$/);
     // The interface language switch keeps it.
-    await page.locator('a[data-locale="my"]').click();
+    await chooseLanguage(page, 'my');
     await expect(page).toHaveURL(
       /\/my\/dhamma-posts\/tags\/kusala\/\?lang=my,zh$/,
     );
@@ -176,7 +176,7 @@ test.describe('Dhamma posts', () => {
     expect(await visibleSections(page)).toEqual(['my']);
     await page.goto(`/en/dhamma-posts/${post}/`);
     expect(await visibleSections(page)).toEqual(['en']);
-    await expect(page).toHaveTitle('Meaning of Vidhi and Anuvāda · Win Metta');
+    await expect(page).toHaveTitle('Meaning of Vidhi and Anuvāda · WIN METTA');
   });
 
   test('chosen languages keep the Burmese, English, Chinese order and are remembered', async ({
@@ -421,7 +421,7 @@ test.describe('Dhamma posts', () => {
       await expect
         .poll(async () => (await resultIds(page)).length)
         .toBeGreaterThanOrEqual(5);
-      await page.locator('a[data-locale="en"]').click();
+      await chooseLanguage(page, 'en');
       await expect(page).toHaveURL(/\/en\/dhamma-posts\/\?q=%E8%B2%AA$/);
       await expect(page.getByLabel('Search posts')).toHaveValue('貪');
     });

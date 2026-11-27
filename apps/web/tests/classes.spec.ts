@@ -1,3 +1,4 @@
+import { chooseLanguage } from './site';
 import { expect, test } from '@playwright/test';
 
 test('classes page lists live classes with join and watch links', async ({
@@ -102,7 +103,7 @@ test('schedule shows one time column and lets the visitor pick a time zone', asy
     .first()
     .innerText();
   expect(myanmar).not.toBe(pacific);
-  await page.getByRole('link', { name: 'မြန်မာ', exact: true }).click();
+  await chooseLanguage(page, 'my');
   await expect(page).toHaveURL(/\/my\/classes\/\?tz=myanmar/);
   await expect(page.getByRole('combobox')).toHaveValue('myanmar');
 });
