@@ -466,6 +466,7 @@
   "bellScheduleNeedsDay": "Choose at least one day.",
   "bellScheduleLongLabel": "Use at most 40 characters for the label.",
   "bellScheduleInvalidRings": "Rings must be 1 to 6.",
+  "bellScheduleRingsHelp": "How many times the bell strikes each time it rings. Choosing a count does not play it: press Test sound to listen.",
   "bellScheduleDayLimit": "A day can have up to 100 bells.",
   "bellScheduleSaved": "Bell saved.",
   "bellScheduleDeleted": "Bell deleted.",

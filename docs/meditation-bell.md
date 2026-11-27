@@ -66,7 +66,7 @@ Out of scope: accounts or sync between devices, uploading your own bell sounds, 
 
 ## 3. Timer mode
 
-The app starts with a **Timer / Schedule** switch. In Timer, the toolbar below it has one button on the right: **Set alarm** in Countdown, **Countdown** in Alarm. Schedule omits it. Below the toolbar are the time display, presets and time field, and the timer actions. **Ring now** is a shared manual action below the active view, and under its help line, on the start side, sits the **Bells Settings** button that opens the Start button bell and Alarm bell settings (in both views, since the Alarm bell is also the default for new schedule bells).
+The app starts with a **Timer / Schedule** switch. In Timer, the toolbar below it has one button on the right: **Set alarm** in Countdown, **Countdown** in Alarm. Schedule omits it. Below the toolbar are the time display, presets and time field, and the timer actions. **Ring now** is a shared manual action below the active view, and under its help line, on the start side, sits the **Bells Settings** button that opens the Start button bell and Alarm bell settings (in both views, since the Alarm bell is also the default for new schedule bells). Ring now, its help line and Bells Settings are hidden on the schedule's Add/Edit and Import screens, which have their own Save, Cancel and Back controls. The Add/Edit form picks Rings (1x to 6x) with a full-width joined choice control and a help line, like Bells Settings.
 
 ### 3.1 Countdown
 

@@ -561,7 +561,10 @@ test('a scheduled bell rings at its wall-clock time and an older missed bell is 
   for (const time of ['19:01', '19:02']) {
     await page.getByRole('button', { name: 'Add', exact: true }).click();
     await page.getByLabel('Time', { exact: true }).fill(time);
-    await page.getByLabel('Rings', { exact: true }).selectOption('1');
+    await page
+      .getByRole('group', { name: 'Rings' })
+      .getByRole('button', { name: '1x', exact: true })
+      .click();
     await page.getByRole('button', { name: 'Save', exact: true }).click();
   }
   await page.getByRole('switch', { name: 'Weekly schedule' }).click();

@@ -257,20 +257,29 @@ function BellEditor({
           </select>
         </label>
         <div className="bell-input-row">
-          <label htmlFor="bell-schedule-rings">{labels.bellRings}</label>
-          <select
-            id="bell-schedule-rings"
-            className="bell-field"
-            aria-invalid={error?.field === 'rings'}
-            value={draft.rings}
-            onChange={(event) => update({ rings: Number(event.target.value) })}
+          <span id="bell-schedule-rings-label">{labels.bellRings}</span>
+          <p className="bell-row-help" id="bell-schedule-rings-help">
+            {labels.bellScheduleRingsHelp}
+          </p>
+          <div
+            className="bell-choices"
+            role="group"
+            aria-labelledby="bell-schedule-rings-label"
+            aria-describedby="bell-schedule-rings-help"
+            data-invalid={error?.field === 'rings' || undefined}
           >
             {Array.from({ length: maxRings }, (_, i) => i + 1).map((count) => (
-              <option key={count} value={count}>
-                {count}×
-              </option>
+              <button
+                key={count}
+                type="button"
+                className="bell-choice"
+                aria-pressed={draft.rings === count}
+                onClick={() => update({ rings: count })}
+              >
+                {count}x
+              </button>
             ))}
-          </select>
+          </div>
           {showError('rings')}
         </div>
         <button
@@ -422,6 +431,8 @@ interface Props extends ScheduleFileAction {
   setKeepAwake: (on: boolean) => void;
   switchSchedule: () => void;
   unlock: () => Promise<boolean>;
+  /** Tells the parent when the import or add/edit screen is open. */
+  onSubscreen?: (open: boolean) => void;
 }
 
 type Screen =
@@ -439,6 +450,7 @@ export default function BellSchedule({
   confirm,
   notify,
   send,
+  onSubscreen,
 }: Props) {
   const [day, setDay] = useState<Day>('Mon');
   const [screen, setScreen] = useState<Screen>({ kind: 'list' });
@@ -461,6 +473,10 @@ export default function BellSchedule({
     requestedStorage.current = true;
     void navigator.storage?.persist?.().catch(() => undefined);
   }, [week]);
+
+  useEffect(() => {
+    onSubscreen?.(screen.kind !== 'list');
+  }, [screen.kind, onSubscreen]);
 
   const close = () => setScreen({ kind: 'list' });
 
