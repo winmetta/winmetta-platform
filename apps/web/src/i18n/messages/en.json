@@ -579,5 +579,6 @@
   "converterNoteLooksUnicode": "This text already looks like Unicode. Converting it as Zawgyi may damage it.",
   "converterNoteLooksZawgyi": "This text has patterns that only Zawgyi uses. If it is Zawgyi, choose Zawgyi in From.",
   "converterBuiltWith": "Built with",
-  "converterFontsNote": "Zawgyi text is shown in the Zawgyi-One font and Win Innwa text in the Win Innwa font."
+  "converterFontsNote": "Zawgyi text is shown in the Zawgyi-One font and Win Innwa text in the Win Innwa font.",
+  "converterFontsSource": "The Zawgyi-One and Win Innwa fonts come from the dafontfree.net folder of {link}, a collection of legacy Burmese fonts that Win Metta keeps. You can find more fonts there."
 }

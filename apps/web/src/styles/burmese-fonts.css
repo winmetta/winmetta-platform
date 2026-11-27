@@ -4,7 +4,7 @@
    patched so Zawgyi marks display correctly. Win Innwa is served the same way (all its glyphs). */
 @font-face {
   font-family: 'Zawgyi-One';
-  src: url('/fonts/zawgyi-one.woff2?v=4') format('woff2');
+  src: url('/fonts/zawgyi-one.woff2?v=5') format('woff2');
   font-display: swap;
 }
 

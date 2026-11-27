@@ -99,6 +99,21 @@ test('counts what is used without sending the text', async ({ page }) => {
   expect(all).not.toMatch(/[က-႟]/u);
 });
 
+test('credits the font source and links to the legacy fonts collection', async ({
+  page,
+}) => {
+  await open(page);
+  await expect(
+    page.getByText(/come from the dafontfree.net folder/),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'myanmar-burmese-legacy-fonts' }),
+  ).toHaveAttribute(
+    'href',
+    'https://github.com/winmetta/myanmar-burmese-legacy-fonts',
+  );
+});
+
 test('refuses text over the size limit', async ({ page }) => {
   await open(page);
   // Setting the value directly: typing 200,001 characters one by one would take minutes.

@@ -65,6 +65,11 @@ const libraries = [
   ['knayi-myscript', 'https://github.com/greenlikeorange/knayi-myscript'],
   ['python-myanmar', 'https://github.com/trhura/python-myanmar'],
 ] as const;
+const fontsRepo = 'https://github.com/winmetta/myanmar-burmese-legacy-fonts';
+// The message has a {link} placeholder where the repository's name goes.
+const [fontsBefore = '', fontsAfter = ''] = text('converterFontsSource').split(
+  '{link}',
+);
 ---
 
 <MiniAppShell
@@ -94,6 +99,13 @@ const libraries = [
         </>
       ))}
       . {text('converterFontsNote')}
+    </p>
+    <p class="mini-help">
+      {fontsBefore}
+      <a href={fontsRepo} rel="noopener">
+        myanmar-burmese-legacy-fonts
+      </a>
+      {fontsAfter}
     </p>
   </div>
 </MiniAppShell>

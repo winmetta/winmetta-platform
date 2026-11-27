@@ -1,4 +1,5 @@
-# Rebuilds apps/web/public/fonts/zawgyi-one.woff2 from the supplied Zawgyi-One.ttf
+# Rebuilds apps/web/public/fonts/zawgyi-one.woff2 from Zawgyi-One.ttf, a copy of
+# dafontfree.net/zawgyione20071204.ttf in winmetta/myanmar-burmese-legacy-fonts
 # (docs/myanmar-converter.md §6, "Making zawgyi-one.woff2"). Run it in an empty folder:
 #
 #   cp /path/to/Zawgyi-One.ttf . && uvx --with brotli --from fonttools pyftsubset Zawgyi-One.ttf \
