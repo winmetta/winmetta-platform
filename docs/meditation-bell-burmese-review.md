@@ -214,6 +214,7 @@ Not bell-specific, and written in earlier pull requests. Included so every `mini
 | Key | Where shown | English | Burmese (current) | Type | Written in | Review |
 | --- | --- | --- | --- | --- | --- | --- |
 | `miniAppsTitle` | Page title and header link | Mini Apps | အက်ပ်ငယ်များ | Translated | Earlier PR |  |
+| `miniAppsPageTitle` | Title and heading of the Mini Apps listing page (the home page and menu keep `miniAppsTitle`) | Mini Apps | အက်ပ်ငယ်များ (Mini Apps) |
 | `miniAppsIntro` | Introduction under the title | Small tools for practice and study. Free, no sign-in, and your data stays on this device. | ကျင့်စဉ်နှင့် လေ့လာမှုအတွက် ကိရိယာငယ်များ။ အခမဲ့ဖြစ်ပြီး အကောင့်ဝင်ရန် မလိုပါ။ သင့်အချက်အလက်များသည် ဤစက်ထဲတွင်သာ ရှိနေပါမည်။ | Translated | Earlier PR |  |
 | `miniAppsList` | Screen-reader label of the list | Mini Apps | အက်ပ်ငယ်များ | Translated | Earlier PR |  |
 | `miniAppBellName` | Name on the bell card | Meditation Bell | တရားထိုင်ခေါင်းလောင်း | Translated | Earlier PR |  |

@@ -22,7 +22,9 @@
   line-height: 1.8;
 }
 
-.font-win-innwa {
+/* Win Innwa's letters are drawn small, so the text is larger than the other fonts' (17px). */
+textarea.font-win-innwa {
   font-family: 'Win Innwa', sans-serif;
-  line-height: 1.8;
+  font-size: 1.5rem;
+  line-height: 1.6;
 }

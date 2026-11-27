@@ -288,13 +288,13 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
     onChange: (value: string) => void,
     auto: boolean,
   ) => (
-    <div>
+    <div className="mini-picker">
       <label className="mini-label" htmlFor={id}>
         {label}
       </label>
       <select
         id={id}
-        className="mini-field"
+        className="mini-field mini-field--small"
         value={value}
         onChange={(event) => onChange(event.target.value)}
       >
@@ -333,7 +333,7 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
           },
           true,
         )}
-        <div className="flex items-center justify-center sm:h-11">
+        <div className="flex items-center justify-center sm:h-9">
           <MiniButton
             small
             icon={

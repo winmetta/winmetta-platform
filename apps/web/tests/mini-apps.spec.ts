@@ -30,7 +30,7 @@ test('the listing shows a tile per mini app, each linking to its page', async ({
 test('the listing is fully translated in Burmese', async ({ page }) => {
   await page.goto('/my/mini-apps/');
   await expect(page.locator('html')).toHaveAttribute('lang', 'my');
-  await expect(page.locator('h1')).toHaveText('အက်ပ်ငယ်များ');
+  await expect(page.locator('h1')).toHaveText('အက်ပ်ငယ်များ (Mini Apps)');
 });
 
 test('the menu links the listing only when mini apps are on', async ({

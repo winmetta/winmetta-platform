@@ -104,7 +104,7 @@ test('digital Pāḷi texts are reachable from the library in both languages', a
   await page.locator('a[data-locale="my"]').click();
   await expect(page).toHaveURL(/\/my\/dhamma-library\/digital-texts\/$/);
   await expect(
-    page.getByRole('heading', { name: 'ယူနီကုဒ် ပါဠိစာပေများ' }),
+    page.getByRole('heading', { name: 'Digital စာပေများ' }),
   ).toBeVisible();
 });
 

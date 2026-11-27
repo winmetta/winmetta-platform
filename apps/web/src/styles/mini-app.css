@@ -258,6 +258,16 @@ select.mini-field {
   background-size: 20px 20px;
 }
 
+/* A compact dropdown (the From and To choices): 36px tall, smaller text. */
+select.mini-field.mini-field--small {
+  min-height: 36px;
+  padding-inline-start: 10px;
+  padding-inline-end: 34px;
+  background-position: right 10px center;
+  background-size: 16px;
+  font-size: 0.9375rem;
+}
+
 /* An app with two boxes side by side (the converter) uses a wider column on a desktop screen; on a
    phone it is the same narrow column as every mini app. */
 @media (min-width: 900px) {
@@ -278,6 +288,35 @@ textarea.mini-field {
   display: block;
   margin-bottom: 4px;
   font-weight: 650;
+}
+
+/* A labelled dropdown. On a phone the label sits before the dropdown on one line; from 640px up
+   it sits above it. The labels share one width so the dropdowns line up. */
+.mini-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mini-picker .mini-label {
+  width: 3.5rem;
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.mini-picker select {
+  flex: 1;
+}
+
+@media (min-width: 640px) {
+  .mini-picker {
+    display: block;
+  }
+
+  .mini-picker .mini-label {
+    width: auto;
+    margin-bottom: 4px;
+  }
 }
 
 /* The one main action of an app: filled with the accent. */
