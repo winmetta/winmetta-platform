@@ -178,4 +178,6 @@ See prd.md §4.7 for full reasoning. Summary: learner-level analytics and cross-
 | Dāna page, donation data rules and the receipt plan | [docs/donations.md](docs/donations.md) |
 | Mini apps and the meditation bell: listing page, mini app layout, timer, schedule, CSV, language rule | [docs/meditation-bell.md](docs/meditation-bell.md) |
 | Burmese font converter (package and Beta mini app): Unicode, Zawgyi and Win Innwa package and mini app, library research, npm publishing, the bundled legacy fonts | [docs/myanmar-converter.md](docs/myanmar-converter.md) |
+| Burmese typing (proposed, not built): the generic `@winmetta/myanmar-input` package, input methods, Win Innwa dead keys, the site-wide typing setting | [docs/myanmar-input.md](docs/myanmar-input.md) |
+| Pāḷi Dictionary mini app (proposed, not built): screens, mock lookup contract, CDN or API lookup, data licences, events | [docs/pali-dictionary.md](docs/pali-dictionary.md) |
 | Internal org information and the operations runbook: people and roles, access, dashboard logins, alert routing, org decisions, deploy and rollback steps (private repo; access on request) | `winmetta-platform-private` repo, start at its `AGENTS.md`; [docs/runbook.md](docs/runbook.md) here is a pointer |
