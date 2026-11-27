@@ -190,8 +190,8 @@ test('the sound preview unlocks a restored schedule and sound edits retain check
     'true',
   );
   await page
-    .getByRole('radiogroup', { name: 'Rings' })
-    .getByRole('radio', { name: '2x' })
+    .getByRole('group', { name: 'Rings' })
+    .getByRole('button', { name: '2x', exact: true })
     .click();
   const saved = await page.evaluate(
     (key) => JSON.parse(localStorage.getItem(key)!),

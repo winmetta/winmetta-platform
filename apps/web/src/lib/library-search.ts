@@ -14,7 +14,14 @@ import type { LibraryFile } from './schemas.ts';
 /** The fields search and result cards need; the browser downloads only these. */
 export type SearchRecord = Pick<
   LibraryFile,
-  'id' | 'key' | 'title' | 'titleNote' | 'tags' | 'language' | 'sizeBytes'
+  | 'id'
+  | 'key'
+  | 'title'
+  | 'titleNote'
+  | 'tags'
+  | 'language'
+  | 'sizeBytes'
+  | 'pages'
 > & { appId?: string };
 
 interface Doc {

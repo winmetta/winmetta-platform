@@ -98,6 +98,13 @@ export function recordFromObject(object: S3Object, id: string): LibraryFile {
     lastModified: new Date(object.LastModified).toISOString(),
   };
 }
+/** The record with its PDF page count placed after `sizeBytes`, so the manifest key order stays fixed. */
+export function withPages(record: LibraryFile, pages: number): LibraryFile {
+  const entries = Object.entries(record).filter(([name]) => name !== 'pages');
+  const at = entries.findIndex(([name]) => name === 'sizeBytes') + 1;
+  entries.splice(at, 0, ['pages', pages]);
+  return Object.fromEntries(entries) as LibraryFile;
+}
 /** Identity used to detect the same file stored under differently spelled folders. */
 export const duplicateIdentity = (record: LibraryFile): string =>
   [

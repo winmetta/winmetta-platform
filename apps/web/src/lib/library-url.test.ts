@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   formatCount,
+  formatPages,
   formatSize,
   isSingular,
   readState,
@@ -37,15 +38,24 @@ describe('formatSize', () => {
     expect(formatSize(15631937, 'my-MM').length).toBeGreaterThan(0);
   });
 });
+describe('formatPages', () => {
+  const en = { one: '{count} page', other: '{count} pages' };
+  const my = { one: '{count} မျက်နှာ', other: '{count} မျက်နှာ' };
+  it('picks one or other and uses the interface digits', () => {
+    expect(formatPages(1, 'en-US', en)).toBe('1 page');
+    expect(formatPages(1012, 'en-US', en)).toBe('1,012 pages');
+    expect(formatPages(427, 'my-MM', my)).toBe('၄၂၇ မျက်နှာ');
+  });
+});
 describe('formatCount', () => {
   it('uses Latin digits in English and Burmese digits in Burmese', () => {
     expect(formatCount(1012, 'en-US')).toBe('1,012');
     expect(formatCount(12, 'my-MM')).toBe('၁၂');
     expect(formatCount(1012, 'my-MM')).toBe('၁,၀၁၂');
   });
-  it('writes file sizes with the same digits', () => {
+  it('writes file sizes with Latin digits in both languages', () => {
     expect(formatSize(11800000, 'en-US')).toMatch(/^11\.8/);
-    expect(formatSize(11800000, 'my-MM')).toMatch(/^၁၁\.၈/);
+    expect(formatSize(11800000, 'my-MM')).toMatch(/^11\.8/);
   });
 });
 describe('isSingular', () => {

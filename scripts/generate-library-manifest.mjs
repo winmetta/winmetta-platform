@@ -13,6 +13,7 @@ import {
   duplicateIdentity,
   fileUrl,
   recordFromObject,
+  withPages,
 } from '../apps/web/src/lib/library-index.ts';
 import {
   folderEntrySchema,
@@ -43,6 +44,17 @@ const listing = JSON.parse(
 );
 const objects = listing.Contents ?? [];
 const overrides = JSON.parse(readFileSync(new URL('overrides.json', dir)));
+// Page counts need the PDF itself (`pdfinfo`), which this listing does not read. Keep the count of
+// every book whose size is unchanged; `npm run library:pages` adds counts for new or changed books.
+const manifestFile = new URL('manifest.json', dir);
+const previousPages = new Map(
+  (existsSync(manifestFile)
+    ? JSON.parse(readFileSync(manifestFile, 'utf8'))
+    : []
+  )
+    .filter((r) => r.pages)
+    .map((r) => [r.id, r]),
+);
 
 const skipped = { empty: 0, notPdf: [] };
 const zawgyi = { converted: [], suspicious: [], ambiguous: [], tags: [] };
@@ -90,7 +102,14 @@ for (const object of objects) {
     if (tags) record.tags = [...new Set([...record.tags, ...tags])];
   }
   fileUrl('https://example.invalid', record.key); // throws if the key does not round-trip
-  records.push(libraryFileSchema.parse(record));
+  const before = previousPages.get(id);
+  records.push(
+    libraryFileSchema.parse(
+      before && before.sizeBytes === record.sizeBytes
+        ? withPages(record, before.pages)
+        : record,
+    ),
+  );
 }
 
 // The same file stored under differently spelled folders is indexed once, keeping
@@ -164,6 +183,12 @@ console.error(
     ` (${skipped.empty} empty, ${skipped.notPdf.length} non-PDF, ${duplicates.length} duplicates)`,
 );
 for (const key of skipped.notPdf) console.error(`non-PDF: ${key}`);
+const unpaged = kept.filter((r) => !r.pages);
+console.error(
+  `Page counts: ${kept.length - unpaged.length} kept, ${unpaged.length} missing` +
+    (unpaged.length ? ' (run npm run library:pages)' : ''),
+);
+for (const r of unpaged) console.error(`no-page-count: ${r.key}`);
 for (const [dropped, keptKey] of duplicates)
   console.error(`duplicate: ${dropped}\n   kept: ${keptKey}`);
 zawgyi.suspicious = zawgyi.suspicious.filter((key) => !overrides[key]); // already corrected by a person

@@ -228,6 +228,8 @@ export const libraryFileSchema = z.object({
   tagPath: z.array(text),
   language,
   sizeBytes: z.number().int().nonnegative(),
+  // Physical PDF page count (pdfinfo). Optional: a new book has none until it is counted.
+  pages: z.number().int().positive().optional(),
   format: z.literal('pdf'),
   lastModified: z.iso.datetime(),
 });

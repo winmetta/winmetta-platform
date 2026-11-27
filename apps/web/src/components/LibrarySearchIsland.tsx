@@ -10,6 +10,7 @@ import { fileUrl, languageOf } from '../lib/library-index';
 import { normalizeSearch } from '@winmetta/search-text';
 import {
   formatCount,
+  formatPages,
   formatSize,
   readState,
   writeState,
@@ -42,6 +43,8 @@ export interface Labels {
   removeFolder: string;
   download: string;
   viewApp: string;
+  pagesOne: string;
+  pagesOther: string;
   locale: Locale;
   showMore: string;
 }
@@ -133,6 +136,14 @@ function Card({
             <FileIcon />
             {formatSize(record.sizeBytes, formatLocale)}
           </span>
+          {record.pages ? (
+            <span className="badge" data-file-pages>
+              {formatPages(record.pages, formatLocale, {
+                one: labels.pagesOne,
+                other: labels.pagesOther,
+              })}
+            </span>
+          ) : null}
         </p>
         <FeedbackCardLink
           locale={labels.locale}

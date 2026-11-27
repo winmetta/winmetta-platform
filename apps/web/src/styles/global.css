@@ -510,6 +510,15 @@
   :lang(my) .badge svg {
     translate: 0 0.5em;
   }
+  /* A file size is Latin digits in both languages (formatSize), so it uses the Latin font and the
+     Latin symbol offset even inside Burmese pages. Keep this after the :lang(my) rules above. */
+  .badge[data-file-size] {
+    font-family: system-ui, sans-serif;
+  }
+  .badge[data-file-size] .link-icon,
+  .badge[data-file-size] svg {
+    translate: 0 0.2em;
+  }
   /* Read-only information (a count, a size, a state, a page number): plain muted text with a
      symbol where it helps. No pill, no frame, no pointer, no hover, so it cannot be mistaken
      for a button (docs/design-guide.md §1). */

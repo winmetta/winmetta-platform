@@ -84,7 +84,7 @@ Rules that follow:
 - Payment details a donor must notice first (the Zelle blocks on the Dāna page) use `.zelle-panel`: sky background with a brand edge, no hover, since it is information and not a control; the value to type or copy is `.zelle-address`.
 - Colors come from the tokens in `global.css`; no new hex values. `--grey` (#959897) is never used for text or control borders (it fails contrast). Information is never carried by color alone.
 - Set `lang` on text whose language differs from the interface (titles, snippets, tags), so screen readers and Burmese line-height rules apply.
-- Numbers follow the interface language: Burmese digits in Burmese (၁၂ အုပ်, ၉.၅ MB), Latin digits in English (`formatCount`, `formatSize`; never `toString()` or a raw number in a message). A counted thing uses its counter after the number (books are `အုပ်`, not `စာအုပ်`). Dates, times and class schedules keep the Latin digits they were decided to have.
+- Numbers follow the interface language: Burmese digits in Burmese (၁၂ အုပ်), Latin digits in English (`formatCount`; never `toString()` or a raw number in a message). File sizes keep Latin digits in both languages (`formatSize`: 9.5 MB, decided 2026-11-26). A counted thing uses its counter after the number (books are `အုပ်`, not `စာအုပ်`). Dates, times and class schedules keep the Latin digits they were decided to have.
 
 ## 4. Words and translations
 

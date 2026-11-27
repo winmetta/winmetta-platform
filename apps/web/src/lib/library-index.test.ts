@@ -6,6 +6,7 @@ import {
   partsFromKey,
   recordFromObject,
   titleFromFilename,
+  withPages,
 } from './library-index';
 import { libraryFileSchema } from './schemas';
 describe('partsFromKey', () => {
@@ -160,5 +161,26 @@ describe('compareLibraryOrder', () => {
       '၂။ က/a.pdf',
       '၁၀။ ခ/c.pdf',
     ]);
+  });
+});
+describe('withPages', () => {
+  const record = recordFromObject(
+    { Key: 'A/b.pdf', Size: 10, LastModified: '2023-01-01T00:00:00Z' },
+    'abc',
+  );
+  it('puts the count right after sizeBytes and validates', () => {
+    const paged = withPages(record, 7);
+    expect(Object.keys(paged).slice(-4)).toEqual([
+      'sizeBytes',
+      'pages',
+      'format',
+      'lastModified',
+    ]);
+    expect(libraryFileSchema.parse(paged).pages).toBe(7);
+  });
+  it('replaces an existing count without duplicating it', () => {
+    const again = withPages(withPages(record, 7), 9);
+    expect(again.pages).toBe(9);
+    expect(Object.keys(again).filter((k) => k === 'pages')).toHaveLength(1);
   });
 });

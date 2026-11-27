@@ -221,8 +221,8 @@ test('the bell settings panel saves a choice, plays it and shows a notice', asyn
     .getByRole('button', { name: 'Bells Settings', exact: true })
     .click();
   await page
-    .getByRole('radiogroup', { name: 'Rings' })
-    .getByRole('radio', { name: /2x$/ })
+    .getByRole('group', { name: 'Rings' })
+    .getByRole('button', { name: '2x', exact: true })
     .click();
   await expect(page.locator('.bell-notice')).toBeVisible();
   await page.reload();
@@ -231,9 +231,9 @@ test('the bell settings panel saves a choice, plays it and shows a notice', asyn
     .click();
   await expect(
     page
-      .getByRole('radiogroup', { name: 'Rings' })
-      .getByRole('radio', { name: /2x$/ }),
-  ).toBeChecked();
+      .getByRole('group', { name: 'Rings' })
+      .getByRole('button', { name: '2x', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true');
   await page.locator('#bell-start-sound').selectOption('off');
   await page.reload();
   await page

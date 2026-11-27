@@ -339,7 +339,12 @@ test('in Burmese, counts use Burmese digits and the counter အုပ်', async
   const size = (
     await page.locator('[data-file-size]').first().innerText()
   ).trim();
-  expect(size).toMatch(/^[၀-၉.,]+ (kB|MB|GB)$/);
+  // File sizes keep Latin digits in Burmese too; the page count uses Burmese digits.
+  expect(size).toMatch(/^[0-9.,]+ (kB|MB|GB)$/);
+  const pages = (
+    await page.locator('[data-file-pages]').first().innerText()
+  ).trim();
+  expect(pages).toMatch(/^[၀-၉,]+ မျက်နှာ$/);
   // English keeps Latin digits.
   await page.goto('/en/dhamma-library/folders/f005/');
   expect(
