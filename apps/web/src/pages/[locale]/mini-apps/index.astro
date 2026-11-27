@@ -37,13 +37,9 @@ const { locale } = Astro.props;
         <>
           <MiniAppIcon icon={app.icon} size={64} />
           <span class="font-semibold">{t(locale, app.name)}</span>
-          <span class="badge">
-            {app.status === 'coming'
-              ? t(locale, 'miniAppComing')
-              : app.status === 'beta'
-                ? t(locale, 'betaLabel')
-                : ''}
-          </span>
+          {app.status === 'coming' && (
+            <span class="badge">{t(locale, 'miniAppComing')}</span>
+          )}
         </>
       );
       return (
