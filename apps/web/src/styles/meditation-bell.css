@@ -824,7 +824,7 @@ select.bell-field {
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr);
   grid-column: 1 / -1;
-  width: fit-content;
+  width: 100%;
   max-width: 100%;
   overflow: hidden;
   border: 1px solid var(--bell-control-line);

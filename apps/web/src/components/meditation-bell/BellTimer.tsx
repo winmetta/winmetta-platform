@@ -526,6 +526,7 @@ function BellTimerSession({
   const [notices, setNotices] = useState<Notice[]>([]);
   const [panel, setPanel] = useState(false);
   const [view, setView] = useState<'timer' | 'schedule'>('timer');
+  const [subscreen, setSubscreen] = useState(false);
   const [audioReady, setAudioReady] = useState(audioIsUnlocked);
   const [soundPromptShut, setSoundPromptShut] = useState(false);
   const [confirmation, setConfirmation] = useState<ScheduleConfirmation>();
@@ -1157,46 +1158,53 @@ function BellTimerSession({
             notify,
             send,
           }}
+          onSubscreen={setSubscreen}
           update={updateWeek}
           confirm={ask}
         />
       </section>
 
-      <button
-        type="button"
-        className="bell-button bell-button--ring-now"
-        onClick={ringNow}
-        disabled={Boolean(confirmation)}
-      >
-        {playing?.role === 'now' ? <StopIcon /> : <BellIcon />}
-        {playing?.role === 'now' ? labels.bellStop : labels.bellRingNow}
-        {playing?.role === 'now' && <PlayProgress seconds={playing.seconds} />}
-      </button>
-      <p className="bell-help">{labels.bellHelp}</p>
-      <div className="bell-settings">
-        {panel && (
-          <SettingsPanel
-            labels={labels}
-            soundNames={soundNames}
-            bell={bell}
-            change={change}
-            preview={preview}
-            stop={stop}
-            playing={playing}
-          />
-        )}
-        <button
-          type="button"
-          className="bell-button"
-          aria-expanded={panel}
-          aria-controls={panel ? 'bell-panel' : undefined}
-          onClick={() => setPanel((p) => !p)}
-        >
-          <BellIcon />
-          <span>{labels.bellBells}</span>
-          <ChevronIcon />
-        </button>
-      </div>
+      {!(view === 'schedule' && subscreen) && (
+        <>
+          <button
+            type="button"
+            className="bell-button bell-button--ring-now"
+            onClick={ringNow}
+            disabled={Boolean(confirmation)}
+          >
+            {playing?.role === 'now' ? <StopIcon /> : <BellIcon />}
+            {playing?.role === 'now' ? labels.bellStop : labels.bellRingNow}
+            {playing?.role === 'now' && (
+              <PlayProgress seconds={playing.seconds} />
+            )}
+          </button>
+          <p className="bell-help">{labels.bellHelp}</p>
+          <div className="bell-settings">
+            {panel && (
+              <SettingsPanel
+                labels={labels}
+                soundNames={soundNames}
+                bell={bell}
+                change={change}
+                preview={preview}
+                stop={stop}
+                playing={playing}
+              />
+            )}
+            <button
+              type="button"
+              className="bell-button"
+              aria-expanded={panel}
+              aria-controls={panel ? 'bell-panel' : undefined}
+              onClick={() => setPanel((p) => !p)}
+            >
+              <BellIcon />
+              <span>{labels.bellBells}</span>
+              <ChevronIcon />
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
