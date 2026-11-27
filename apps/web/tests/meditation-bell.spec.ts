@@ -330,9 +330,21 @@ test('no request leaves the browser except the page itself', async ({
   await page.getByRole('button', { name: '5 min', exact: true }).click();
   await page.getByRole('button', { name: 'Start', exact: true }).click();
   await page.getByRole('button', { name: 'Ring now', exact: true }).click();
-  expect(outside.filter((u) => !u.includes('analytics.example.test'))).toEqual(
-    [],
+  // The page's own analytics host (the live site has the tracker on) is expected; its events
+  // carry no bell data (docs/analytics.md). Anything else would be a leak.
+  const tracker = await page.evaluate(
+    () =>
+      document.querySelector<HTMLScriptElement>('script[data-host-url]')
+        ?.dataset.hostUrl ?? null,
   );
+  const trackerHost = tracker ? new URL(tracker).hostname : null;
+  expect(
+    outside.filter(
+      (u) =>
+        !u.includes('analytics.example.test') &&
+        new URL(u).hostname !== trackerHost,
+    ),
+  ).toEqual([]);
 });
 
 test('the bell controls fit at 320 px and leave space above Ring now', async ({
