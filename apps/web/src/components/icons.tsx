@@ -61,6 +61,15 @@ export const MoreIcon = () => (
     <path d="m6 9 6 6 6-6" />
   </Svg>
 );
+/** Two opposite vertical arrows: swap two choices that are stacked. */
+export const SwapVerticalIcon = () => (
+  <Svg>
+    <path d="m8 7 4-4 4 4" />
+    <path d="M12 3v14" />
+    <path d="m16 17-4 4-4-4" />
+    <path d="M12 7v14" />
+  </Svg>
+);
 /** Two opposite arrows: swap two choices. */
 export const SwapIcon = () => (
   <Svg>

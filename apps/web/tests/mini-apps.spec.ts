@@ -4,20 +4,25 @@ import { expect, test } from '@playwright/test';
 const enabled = process.env.PUBLIC_MINI_APPS === 'true';
 const feedback = process.env.PUBLIC_FEEDBACK === 'true';
 
-test('the listing shows a tile per mini app, linking only the ones that exist', async ({
+test('the listing shows a tile per mini app, each linking to its page', async ({
   page,
 }) => {
   await page.goto('/en/mini-apps/');
   await expect(page.locator('h1')).toHaveText('Mini Apps');
   const tiles = page.locator('ul.mini-grid > li');
   await expect(tiles).toHaveCount(2);
-  const bell = page.locator('a.mini-tile');
-  await expect(bell).toHaveCount(1);
-  await expect(bell).toHaveAttribute('href', '/en/mini-apps/meditation-bell/');
-  await expect(bell).toContainText('Meditation bell');
-  await expect(page.locator('.mini-tile--coming')).toContainText(
-    'Coming later',
+  const links = page.locator('a.mini-tile');
+  await expect(links).toHaveCount(2);
+  await expect(links.nth(0)).toHaveAttribute(
+    'href',
+    '/en/mini-apps/meditation-bell/',
   );
+  await expect(links.nth(0)).toContainText('Meditation Bell');
+  await expect(links.nth(1)).toHaveAttribute(
+    'href',
+    '/en/mini-apps/burmese-text-converter/',
+  );
+  await expect(links.nth(1)).toContainText('Burmese Text Converter');
   // Normal site page: it keeps the header and footer.
   await expect(page.locator('.site-header')).toBeVisible();
 });
@@ -25,7 +30,7 @@ test('the listing shows a tile per mini app, linking only the ones that exist', 
 test('the listing is fully translated in Burmese', async ({ page }) => {
   await page.goto('/my/mini-apps/');
   await expect(page.locator('html')).toHaveAttribute('lang', 'my');
-  await expect(page.locator('h1')).toHaveText('အက်ပ်ငယ်များ');
+  await expect(page.locator('h1')).toHaveText('အက်ပ်ငယ်များ (Mini Apps)');
 });
 
 test('the menu links the listing only when mini apps are on', async ({
@@ -38,7 +43,11 @@ test('the menu links the listing only when mini apps are on', async ({
 });
 
 test('noindex until mini apps are on', async ({ page }) => {
-  for (const path of ['/en/mini-apps/', '/en/mini-apps/meditation-bell/']) {
+  for (const path of [
+    '/en/mini-apps/',
+    '/en/mini-apps/meditation-bell/',
+    '/en/mini-apps/burmese-text-converter/',
+  ]) {
     await page.goto(path);
     const robots = page.locator('meta[name="robots"]');
     if (enabled && process.env.PUBLIC_ALLOW_INDEXING === 'true')
@@ -57,7 +66,7 @@ test('the bell page has its own layout, back link, language switch and canonical
   await expect(back).toBeVisible();
   await expect(back).toHaveAccessibleName('Mini Apps');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-    'Meditation bell',
+    'Meditation Bell',
   );
   await expect(page.locator('[data-mini-bar] h1 img')).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
@@ -124,7 +133,7 @@ test('the footer Feedback button opens the dialog with the mini app filled in', 
   const dialog = page.locator('[data-feedback-dialog]');
   await expect(dialog).toBeVisible();
   await expect(dialog.locator('[data-feedback-about]')).toContainText(
-    'Meditation bell',
+    'Meditation Bell',
   );
 });
 

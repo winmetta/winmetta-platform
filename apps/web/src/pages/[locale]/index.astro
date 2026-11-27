@@ -99,13 +99,9 @@ const latest = recentPosts(await loadPosts(), 3).flatMap((post) => {
             <>
               <MiniAppIcon icon={app.icon} size={64} />
               <span class="font-semibold">{text(app.name)}</span>
-              <span class="badge">
-                {app.status === 'coming'
-                  ? text('miniAppComing')
-                  : app.status === 'beta'
-                    ? text('betaLabel')
-                    : ''}
-              </span>
+              {app.status === 'coming' && (
+                <span class="badge">{text('miniAppComing')}</span>
+              )}
             </>
           );
           return (

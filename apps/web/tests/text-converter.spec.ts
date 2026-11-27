@@ -32,7 +32,9 @@ test('Auto does not convert Pāḷi, and asks the reader to choose', async ({
   await expect(
     page.getByRole('textbox', { name: 'Result', exact: true }),
   ).not.toHaveValue('');
-  await expect(page.getByText(/Zawgyi text looks wrong/)).toBeVisible();
+  await expect(
+    page.getByRole('textbox', { name: 'Result', exact: true }),
+  ).toHaveClass(/font-zawgyi/);
 });
 
 test('converts Win Innwa, swaps and clears', async ({ page }) => {
@@ -54,6 +56,62 @@ test('converts Win Innwa, swaps and clears', async ({ page }) => {
   await expect(
     page.getByRole('textbox', { name: 'Result', exact: true }),
   ).toHaveValue('');
+});
+
+test('the input has its own Copy, and Clear looks destructive', async ({
+  page,
+}) => {
+  await open(page);
+  const copy = page.getByRole('button', { name: 'Copy what you typed' });
+  const clear = page.getByRole('button', { name: 'Clear' });
+  await expect(copy).toBeDisabled();
+  await expect(clear).toBeDisabled();
+  await expect(clear).toHaveClass(/mini-button--danger/);
+  await expect(copy).not.toHaveClass(/mini-button--danger/);
+  await page.getByLabel('Text to convert').fill('abc');
+  await expect(copy).toBeEnabled();
+  await expect(clear).toBeEnabled();
+});
+
+test('counts what is used without sending the text', async ({ page }) => {
+  await page.addInitScript(() => {
+    const sent: { name: string; data: unknown }[] = [];
+    (window as unknown as Record<string, unknown>).sentEvents = sent;
+    (window as unknown as Record<string, unknown>).umami = {
+      track: (name: string, data: unknown) => sent.push({ name, data }),
+    };
+  });
+  await open(page);
+  await page.getByLabel('Text to convert').fill('ျမန္မာစာ ေလ့လာျခင္း');
+  await expect(
+    page.getByRole('textbox', { name: 'Result', exact: true }),
+  ).not.toHaveValue('');
+  await page.getByRole('button', { name: 'Swap' }).click();
+  await page.getByRole('button', { name: 'Clear' }).click();
+  const sent = await page.evaluate(
+    () => (window as unknown as { sentEvents: unknown[] }).sentEvents,
+  );
+  const names = sent.map((e) => (e as { name: string }).name);
+  expect(names).toContain('converter_convert');
+  expect(names).toContain('converter_swap');
+  expect(names).toContain('converter_clear');
+  const all = JSON.stringify(sent);
+  expect(all).not.toMatch(/[က-႟]/u);
+});
+
+test('credits the font source and links to the legacy fonts collection', async ({
+  page,
+}) => {
+  await open(page);
+  await expect(
+    page.getByText(/come from the dafontfree.net folder/),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'myanmar-burmese-legacy-fonts' }),
+  ).toHaveAttribute(
+    'href',
+    'https://github.com/winmetta/myanmar-burmese-legacy-fonts',
+  );
 });
 
 test('refuses text over the size limit', async ({ page }) => {
@@ -96,12 +154,66 @@ test('is translated in Burmese', async ({ page }) => {
   await expect(page.getByLabel('ပြောင်းလဲမည့် စာသား')).toBeVisible();
 });
 
-test('stays noindex until go-live, even when mini apps are on', async ({
+test('the Converter shows the input in a font the reader picks and the result in the chosen encoding’s font', async ({
   page,
 }) => {
   await open(page);
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
-    'content',
-    /noindex/,
+  const input = page.getByLabel('Text to convert');
+  const result = page.getByRole('textbox', { name: 'Result', exact: true });
+  await input.fill('ျမန္မာစာ ေလ့လာျခင္း');
+  // Auto detects Zawgyi, so the input is shown in the Zawgyi font until the reader picks another.
+  await expect(input).toHaveClass(/font-zawgyi/);
+  await expect(
+    page.getByText('Shown in Unicode font: Noto Sans Myanmar'),
+  ).toHaveCount(1);
+  const font = page.getByRole('group', { name: 'Show the text in the font' });
+  await expect(page.getByText('Shown in Zawgyi-One')).toHaveCount(1);
+  await expect(font.getByRole('button', { name: 'Zawgyi' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
   );
+  await font.getByRole('button', { name: 'Unicode' }).click();
+  await expect(input).not.toHaveClass(/font-/);
+  await font.getByRole('button', { name: 'Win Innwa' }).click();
+  await expect(input).toHaveClass(/font-win-innwa/);
+  await expect(page.getByText('Shown in Win Innwa')).toBeVisible();
+  // Converting does not change the preview, only the result's font follows To.
+  await expect(result).not.toHaveClass(/font-/);
+  await page.locator('#converter-to').selectOption('win-innwa');
+  await expect(result).toHaveClass(/font-win-innwa/);
+  await expect(page.getByText('Shown in Win Innwa')).toHaveCount(2);
+  await expect(input).toHaveClass(/font-win-innwa/);
+  // Changing From goes back to following the encoding.
+  await page.locator('#converter-from').selectOption('zawgyi');
+  await expect(input).toHaveClass(/font-zawgyi/);
+  // Both bundled fonts really load and are the ones in use.
+  const loaded = await page.evaluate(async () => {
+    const checks: [string, string][] = [
+      ["16px 'Zawgyi-One'", 'ျမန္မာ'],
+      ["16px 'Win Innwa'", 'jrefrm'],
+    ];
+    const results: boolean[] = [];
+    for (const [font, sample] of checks) {
+      await document.fonts.load(font, sample);
+      results.push(document.fonts.check(font, sample));
+    }
+    return results;
+  });
+  expect(loaded).toEqual([true, true]);
+});
+
+test('the input placeholder is written in the encoding of the shown font', async ({
+  page,
+}) => {
+  await open(page, '/my/mini-apps/burmese-text-converter/');
+  const input = page.locator('#converter-input');
+  // Unicode: ေ comes after its consonant. Zawgyi: ေ is written before it.
+  await expect(input).toHaveAttribute('placeholder', /နေရာ/);
+  await page
+    .getByRole('group', { name: /ဖောင့်/ })
+    .getByRole('button')
+    .nth(1)
+    .click();
+  await expect(input).toHaveAttribute('placeholder', /ေနရာ/);
+  await expect(input).toHaveAttribute('placeholder', /\u106B/);
 });

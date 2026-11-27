@@ -214,11 +214,12 @@ Not bell-specific, and written in earlier pull requests. Included so every `mini
 | Key | Where shown | English | Burmese (current) | Type | Written in | Review |
 | --- | --- | --- | --- | --- | --- | --- |
 | `miniAppsTitle` | Page title and header link | Mini Apps | အက်ပ်ငယ်များ | Translated | Earlier PR |  |
+| `miniAppsPageTitle` | Title and heading of the Mini Apps listing page (the home page and menu keep `miniAppsTitle`) | Mini Apps | အက်ပ်ငယ်များ (Mini Apps) |
 | `miniAppsIntro` | Introduction under the title | Small tools for practice and study. Free, no sign-in, and your data stays on this device. | ကျင့်စဉ်နှင့် လေ့လာမှုအတွက် ကိရိယာငယ်များ။ အခမဲ့ဖြစ်ပြီး အကောင့်ဝင်ရန် မလိုပါ။ သင့်အချက်အလက်များသည် ဤစက်ထဲတွင်သာ ရှိနေပါမည်။ | Translated | Earlier PR |  |
 | `miniAppsList` | Screen-reader label of the list | Mini Apps | အက်ပ်ငယ်များ | Translated | Earlier PR |  |
-| `miniAppBellName` | Name on the bell card | Meditation bell | တရားထိုင်ခေါင်းလောင်း | Translated | Earlier PR |  |
+| `miniAppBellName` | Name on the bell card | Meditation Bell | တရားထိုင်ခေါင်းလောင်း | Translated | Earlier PR |  |
 | `miniAppBellDescription` | Text on the bell card | A timer, an alarm and a weekly schedule that ring a bell for your sittings. | ထိုင်ချိန်များအတွက် ခေါင်းလောင်းတီးပေးသော အချိန်ကိုက်နာရီ၊ နှိုးစက်နှင့် အပတ်စဉ် အချိန်ဇယား။ | Translated | Earlier PR |  |
-| `miniAppConverterName` | Name on the Burmese text converter card | Burmese text converter | မြန်မာစာ ပြောင်းလဲကိရိယာ | Translated | Earlier PR |  |
+| `miniAppConverterName` | Name on the Burmese text converter card | Burmese Text Converter | မြန်မာစာ ပြောင်းလဲကိရိယာ | Translated | Earlier PR |  |
 | `miniAppConverterDescription` | Text on the converter card | Convert between Unicode, Zawgyi and Win Innwa. | ယူနီကုဒ်၊ ဇော်ဂျီနှင့် ဝင်းအင်းဝ စာလုံးများကြား ပြောင်းလဲပေးသည်။ | Translated | Earlier PR |  |
 | `miniAppComing` | Label on a card that is not ready | Coming later | နောက်ပိုင်းတွင် ထည့်သွင်းမည် | Translated | Earlier PR |  |
 ## Questions about words and style

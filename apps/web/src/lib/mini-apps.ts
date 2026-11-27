@@ -38,7 +38,7 @@ export const miniApps: readonly MiniApp[] = [
     icon: 'burmese-text-converter',
     name: 'miniAppConverterName',
     description: 'miniAppConverterDescription',
-    status: 'coming',
+    status: 'beta',
   },
 ];
 

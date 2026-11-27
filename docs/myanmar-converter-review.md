@@ -15,13 +15,13 @@ Known limits that are not errors: Win Innwa types wa (ဝ) and zero (၀) with t
 
 | Key | English | Burmese (draft) |
 | --- | --- | --- |
-| `converterIntro` | Convert Burmese text between Unicode, Zawgyi and Win Innwa. Your text stays in this browser: it is not sent anywhere or stored. | မြန်မာစာကို ယူနီကုဒ်၊ ဇော်ဂျီနှင့် ဝင်းအင်းဝ တို့ကြား ပြောင်းလဲပေးပါသည်။ သင့်စာသားသည် ဤဘရောက်ဇာထဲတွင်သာ ရှိပြီး မည်သည့်နေရာသို့မျှ မပို့ပါ၊ မသိမ်းဆည်းပါ။ |
+| `converterIntro` | Convert Burmese text between Unicode, Zawgyi and Win Innwa. Your text stays in this browser: it is not sent anywhere or stored. | မြန်မာစာကို Unicode၊ Zawgyi နှင့် Win Innwa တို့ကြား ပြောင်းလဲပေးပါသည်။ သင့်စာသားသည် ဤဘရောက်ဇာထဲတွင်သာ ရှိပြီး မည်သည့်နေရာသို့မျှ မပို့ပါ၊ မသိမ်းဆည်းပါ။ |
 | `converterFrom` | From | မှ |
 | `converterTo` | To | သို့ |
-| `converterAuto` | Auto (Unicode or Zawgyi) | အလိုအလျောက် (ယူနီကုဒ် သို့မဟုတ် ဇော်ဂျီ) |
-| `converterUnicode` | Unicode | ယူနီကုဒ် |
-| `converterZawgyi` | Zawgyi | ဇော်ဂျီ |
-| `converterWinInnwa` | Win Innwa | ဝင်းအင်းဝ |
+| `converterAuto` | Auto (Unicode or Zawgyi) | Auto (Unicode or Zawgyi) |
+| `converterUnicode` | Unicode | Unicode |
+| `converterZawgyi` | Zawgyi | Zawgyi |
+| `converterWinInnwa` | Win Innwa | Win Innwa |
 | `converterSwap` | Swap | အပြန်အလှန်ပြောင်းရန် |
 | `converterSwapLabel` | Swap From and To, and use the result as the text | မှ နှင့် သို့ ကို အပြန်အလှန်ပြောင်းပြီး ရလဒ်ကို စာသားအဖြစ် အသုံးပြုရန် |
 | `converterInput` | Text to convert | ပြောင်းလဲမည့် စာသား |
@@ -29,27 +29,32 @@ Known limits that are not errors: Win Innwa types wa (ဝ) and zero (၀) with t
 | `converterOutput` | Result | ရလဒ် |
 | `converterCopy` | Copy | ကူးယူရန် |
 | `converterCopyLabel` | Copy the result | ရလဒ်ကို ကူးယူရန် |
+| `converterCopyInputLabel` | Copy what you typed | ရိုက်ထည့်ထားသော စာသားကို ကူးယူရန် |
+| `privacyConverterAnalytics` (Privacy page) | When analytics is enabled, we count Burmese Text Converter feature use, such as that text was converted, copied or cleared, and which encodings and fonts were chosen. Text length is grouped into ranges. Analytics never receives the text you type or paste, the result, or what the converter found about your text. | အသုံးပြုမှု စာရင်းကောက်ယူခြင်းကို ဖွင့်ထားပါက မြန်မာစာပြောင်းလဲကိရိယာ၏ အသုံးပြုမှု၊ ဥပမာ စာသားကို ပြောင်းလဲခြင်း၊ ကူးယူခြင်း သို့မဟုတ် ဖျက်ခြင်းနှင့် ရွေးချယ်ထားသော စာလုံးကုဒ်များနှင့် ဖောင့်များကို ရေတွက်ပါသည်။ စာသားအရှည်ကို အပိုင်းအခြားများအဖြစ် စုစည်းပါသည်။ သင်ရိုက်ထည့်သော သို့မဟုတ် ကူးထည့်သော စာသား၊ ရလဒ်၊ သို့မဟုတ် ကိရိယာက သင့်စာသားအကြောင်း ရှာဖွေတွေ့ရှိသည့်အချက်ကို စာရင်းကောက်ယူမှုသို့ မပို့ပါ။ |
 | `converterCopied` | Copied | ကူးယူပြီး |
 | `converterClear` | Clear | ဖျက်ရန် |
-| `converterLoading` | Loading the converter… | ပြောင်းလဲကိရိယာကို ဖွင့်နေပါသည်… |
-| `converterLoadError` | The converter could not be loaded. Check your connection and try again. | ပြောင်းလဲကိရိယာကို မဖွင့်နိုင်ပါ။ အင်တာနက်ချိတ်ဆက်မှုကို စစ်ပြီး ထပ်ကြိုးစားပါ။ |
+| `converterLoading` | Loading the converter… | ပြောင်းလဲကိရိယာကို စတင်နေပါသည်… |
+| `converterLoadError` | The converter could not be loaded. Check your connection and try again. | ပြောင်းလဲကိရိယာကို စတင်၍ မရပါ။ အင်တာနက်ချိတ်ဆက်မှုကို စစ်ပြီး ထပ်ကြိုးစားပါ။ |
 | `converterRetry` | Try again | ထပ်ကြိုးစားရန် |
 | `converterNeedsJs` | The converter needs JavaScript to run in your browser. | ပြောင်းလဲကိရိယာကို သင့်ဘရောက်ဇာတွင် လုပ်ဆောင်ရန် JavaScript လိုအပ်ပါသည်။ |
-| `converterFoundUnicode` | Looks like Unicode. | ယူနီကုဒ်နှင့် တူပါသည်။ |
-| `converterFoundZawgyi` | Looks like Zawgyi. | ဇော်ဂျီနှင့် တူပါသည်။ |
+| `converterFoundUnicode` | Looks like Unicode. | Unicode နှင့် တူပါသည်။ |
+| `converterFoundZawgyi` | Looks like Zawgyi. | Zawgyi နှင့် တူပါသည်။ |
 | `converterNoBurmese` | No Burmese letters were found, so the text is shown as it is. | မြန်မာစာလုံး မတွေ့ပါ၊ ထို့ကြောင့် စာသားကို မူလအတိုင်း ပြထားပါသည်။ |
-| `converterChoose` | Cannot tell whether this is Unicode or Zawgyi (Pāḷi words with stacked letters look like both). Choose what it is in From to convert it. | ဤစာသားသည် ယူနီကုဒ်လော ဇော်ဂျီလော မခွဲခြားနိုင်ပါ (ထပ်ဆင့်အက္ခရာပါသော ပါဠိစကားလုံးများသည် နှစ်မျိုးလုံးနှင့် တူနေတတ်ပါသည်)။ ပြောင်းလဲရန် "မှ" တွင် မည်သည့်စာလုံးအမျိုးအစား ဖြစ်ကြောင်း ရွေးပါ။ |
+| `converterChoose` | Cannot tell whether this is Unicode or Zawgyi (Pāḷi words with stacked letters look like both). Choose what it is in From to convert it. | ဤစာသားသည် Unicode လော Zawgyi လော မခွဲခြားနိုင်ပါ (ပါဠိစာလုံးဆင့်များသည် နှစ်မျိုးလုံးနှင့် တူနေတတ်ပါသည်)။ ပြောင်းလဲရန် "မှ" တွင် မည်သည့်စာလုံးအမျိုးအစား ဖြစ်ကြောင်း ရွေးပါ။ |
 | `converterTooLong` | This text is too long. Convert up to 200,000 characters at a time. | ဤစာသားသည် ရှည်လွန်းပါသည်။ တစ်ကြိမ်လျှင် စာလုံး ၂၀၀,၀၀၀ အထိ ပြောင်းလဲနိုင်ပါသည်။ |
 | `converterSame` | From and To are the same, so the text was not changed. | "မှ" နှင့် "သို့" တူနေသောကြောင့် စာသားကို မပြောင်းလဲပါ။ |
-| `converterFontZawgyi` | Zawgyi text looks wrong on this page. Paste it into a document that uses the Zawgyi-One font. | ဇော်ဂျီစာသားသည် ဤစာမျက်နှာတွင် မှားယွင်း၍ ပေါ်နေပါမည်။ ဇော်ဂျီ-ဝမ်း (Zawgyi-One) ဖောင့်သုံးသော စာရွက်စာတမ်းထဲသို့ ကူးထည့်ပါ။ |
-| `converterFontWinInnwa` | Win Innwa text looks wrong on this page. Paste it into a document that uses the Win Innwa font. | ဝင်းအင်းဝစာသားသည် ဤစာမျက်နှာတွင် မှားယွင်း၍ ပေါ်နေပါမည်။ ဝင်းအင်းဝ (Win Innwa) ဖောင့်သုံးသော စာရွက်စာတမ်းထဲသို့ ကူးထည့်ပါ။ |
-| `converterLossy` | Zawgyi and Win Innwa cannot show every Unicode text exactly. Check the result before you use it. | ဇော်ဂျီနှင့် ဝင်းအင်းဝသည် ယူနီကုဒ်စာသားတိုင်းကို တိကျစွာ မဖော်ပြနိုင်ပါ။ အသုံးမပြုမီ ရလဒ်ကို စစ်ဆေးပါ။ |
-| `converterNoteUnmapped` | These letters have no Win Innwa glyph and were kept as Unicode: {chars} | ဤစာလုံးများအတွက် ဝင်းအင်းဝ ဂလစ်ဖ် မရှိသဖြင့် ယူနီကုဒ်အတိုင်း ထားခဲ့ပါသည်- {chars} |
-| `converterNoteLatin` | A Win Innwa font draws Latin letters and symbols as Burmese, so they will look wrong in the result. | ဝင်းအင်းဝဖောင့်သည် အင်္ဂလိပ်အက္ခရာနှင့် သင်္ကေတများကို မြန်မာစာလုံးအဖြစ် ပြသောကြောင့် ရလဒ်တွင် မှားယွင်း၍ ပေါ်ပါမည်။ |
-| `converterNoteLooksUnicode` | This text already looks like Unicode. Converting it as Zawgyi may damage it. | ဤစာသားသည် ယူနီကုဒ်နှင့် တူနေပြီးသား ဖြစ်ပါသည်။ ဇော်ဂျီအဖြစ် ပြောင်းလျှင် ပျက်စီးနိုင်ပါသည်။ |
-| `converterNoteLooksZawgyi` | This text has patterns that only Zawgyi uses. If it is Zawgyi, choose Zawgyi in From. | ဤစာသားတွင် ဇော်ဂျီသာ သုံးသော ပုံစံများ ပါနေပါသည်။ ဇော်ဂျီဖြစ်ပါက "မှ" တွင် ဇော်ဂျီကို ရွေးပါ။ |
+| `converterPreviewAs` | Show the text in the font | စာသားကို ပြသမည့် ဖောင့် |
+| `converterFontLabel` | Font | ဖောင့် |
+| `converterShownIn` | Shown in {font} (the font is Zawgyi-One or Win Innwa) | {font} ဖောင့်ဖြင့် ပြထားပါသည် |
+| `converterShownInUnicode` | Shown in Unicode font: {font} (the font is Noto Sans Myanmar) | Unicode ဖောင့်ဖြင့် ပြထားပါသည်: {font} |
+| `converterLossy` | Zawgyi and Win Innwa cannot show every Unicode text exactly. Check the result before you use it. | Zawgyi နှင့် Win Innwa သည် Unicode စာသားတိုင်းကို တိကျစွာ မဖော်ပြနိုင်ပါ။ အသုံးမပြုမီ ရလဒ်ကို စစ်ဆေးပါ။ |
+| `converterNoteUnmapped` | These letters have no Win Innwa glyph and were kept as Unicode: {chars} | ဤစာလုံးများအတွက် Win Innwa စာလုံးပုံစံ မရှိသဖြင့် Unicode အတိုင်း ထားခဲ့ပါသည်: {chars} |
+| `converterNoteLatin` | A Win Innwa font draws Latin letters and symbols as Burmese, so they will look wrong in the result. | Win Innwa ဖောင့်သည် အင်္ဂလိပ်(Latin)အက္ခရာနှင့် သင်္ကေတများကို မြန်မာစာလုံးအဖြစ် ပြသောကြောင့် ရလဒ်တွင် မှားယွင်း၍ ပေါ်ပါမည်။ |
+| `converterNoteLooksUnicode` | This text already looks like Unicode. Converting it as Zawgyi may damage it. | ဤစာသားသည် Unicode နှင့် တူနေပြီးသား ဖြစ်ပါသည်။ Zawgyi အဖြစ် ပြောင်းလျှင် ပျက်စီးနိုင်ပါသည်။ |
+| `converterNoteLooksZawgyi` | This text has patterns that only Zawgyi uses. If it is Zawgyi, choose Zawgyi in From. | ဤစာသားတွင် Zawgyi သာ သုံးသော ပုံစံများ ပါနေပါသည်။ Zawgyi ဖြစ်ပါက "မှ" တွင် Zawgyi ကို ရွေးပါ။ |
 | `converterBuiltWith` | Built with | အသုံးပြုထားသည်များ |
-| `converterFontsNote` | The Zawgyi and Win Innwa fonts are not included. | ဇော်ဂျီနှင့် ဝင်းအင်းဝ ဖောင့်များကို ထည့်သွင်းမထားပါ။ |
+| `converterFontsNote` | Zawgyi text is shown in the Zawgyi-One font and Win Innwa text in the Win Innwa font. | Zawgyi စာသားကို Zawgyi-One ဖောင့်ဖြင့်လည်းကောင်း၊ Win Innwa စာသားကို Win Innwa ဖောင့်ဖြင့်လည်းကောင်း ပြပါသည်။ |
+| `converterFontsSource` | The Zawgyi-One and Win Innwa fonts come from the dafontfree.net folder of {link}, a collection of legacy Burmese fonts that Win Metta keeps. You can find more fonts there. | Zawgyi-One နှင့် Win Innwa ဖောင့်များကို Win Metta ထိန်းသိမ်းထားသော ရှေးမြန်မာဖောင့်စုစည်းမှု {link} ၏ dafontfree.net ဖိုလ်ဒါမှ ရယူထားပါသည်။ ထိုနေရာတွင် အခြားဖောင့်များကိုလည်း ရှာဖွေနိုင်ပါသည်။ |
 
 ## Part B: conversions
 

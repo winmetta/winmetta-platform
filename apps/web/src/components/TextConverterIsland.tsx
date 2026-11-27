@@ -10,9 +10,19 @@ import {
   type Converter,
   type FromChoice,
 } from '../lib/text-converter';
-import { CheckIcon, CloseIcon, CopyIcon, RetryIcon, SwapIcon } from './icons';
+import { send, useConverterEvents } from './use-converter-events';
+import * as events from '../lib/text-converter-events';
+import {
+  CheckIcon,
+  CloseIcon,
+  CopyIcon,
+  RetryIcon,
+  SwapIcon,
+  SwapVerticalIcon,
+} from './icons';
 import type { ComponentProps, ReactNode } from 'react';
 import '../styles/mini-app.css';
+import '../styles/burmese-fonts.css';
 
 export interface Labels {
   from: string;
@@ -28,6 +38,7 @@ export interface Labels {
   output: string;
   copy: string;
   copyLabel: string;
+  copyInputLabel: string;
   copied: string;
   clear: string;
   loading: string;
@@ -39,8 +50,12 @@ export interface Labels {
   choose: string;
   tooLong: string;
   same: string;
-  fontZawgyi: string;
-  fontWinInnwa: string;
+  previewAs: string;
+  fontLabel: string;
+  /** Has a {font} placeholder. */
+  shownIn: string;
+  /** Has a {font} placeholder. */
+  shownInUnicode: string;
   lossy: string;
   /** Has a {chars} placeholder. */
   noteUnmapped: string;
@@ -69,18 +84,98 @@ function noteText(note: ConvertNote, labels: Labels): string {
 /** The mini apps' outlined 44px button with an icon before its words (docs/design-guide.md §9). */
 function MiniButton({
   icon,
+  small,
+  danger,
   children,
   ...props
-}: Omit<ComponentProps<'button'>, 'className' | 'type'> & { icon: ReactNode }) {
+}: Omit<ComponentProps<'button'>, 'className' | 'type'> & {
+  icon: ReactNode;
+  small?: boolean;
+  /** A destructive action (clear, delete): red, so it does not look like the harmless ones. */
+  danger?: boolean;
+}) {
   return (
-    <button type="button" className="mini-button" {...props}>
+    <button
+      type="button"
+      className={[
+        'mini-button',
+        small && 'mini-button--small',
+        danger && 'mini-button--danger',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      {...props}
+    >
       {icon}
       <span>{children}</span>
     </button>
   );
 }
 
+/** The font a text area shows its text in: three joined buttons (the text itself never changes). */
+function FontChoice({
+  id,
+  label,
+  value,
+  onChange,
+  labels,
+}: {
+  id: string;
+  label: string;
+  value: Encoding;
+  onChange: (value: Encoding) => void;
+  labels: Labels;
+}) {
+  const choices: [Encoding, string][] = [
+    ['unicode', labels.unicode],
+    ['zawgyi', labels.zawgyi],
+    ['win-innwa', labels.winInnwa],
+  ];
+  return (
+    <div className="flex items-center gap-3">
+      <span className="mini-help shrink-0" id={id}>
+        {labels.fontLabel}
+      </span>
+      <div
+        className="mini-choices"
+        role="group"
+        aria-label={label}
+        aria-describedby={id}
+      >
+        {choices.map(([choice, text]) => (
+          <button
+            key={choice}
+            type="button"
+            className="mini-choice"
+            aria-pressed={value === choice}
+            onClick={() => onChange(choice)}
+          >
+            {text}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 type Tone = 'error' | 'notice' | 'help';
+
+const FONT_NAME: Record<Encoding, string> = {
+  unicode: 'Noto Sans Myanmar',
+  zawgyi: 'Zawgyi-One',
+  'win-innwa': 'Win Innwa',
+};
+
+function shownIn(labels: Labels, encoding: Encoding): string {
+  const text = encoding === 'unicode' ? labels.shownInUnicode : labels.shownIn;
+  return text.replace('{font}', FONT_NAME[encoding]);
+}
+
+const FONT_CLASS: Record<Encoding, string> = {
+  unicode: '',
+  zawgyi: 'font-zawgyi',
+  'win-innwa': 'font-win-innwa',
+};
 
 export default function TextConverterIsland({ labels }: { labels: Labels }) {
   const [status, setStatus] = useState<Status>('loading');
@@ -89,7 +184,9 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
   const [text, setText] = useState('');
   const [from, setFrom] = useState<FromChoice>('auto');
   const [to, setTo] = useState<Encoding>('unicode');
+  const [previewFont, setPreviewFont] = useState<Encoding | null>(null);
   const [copied, setCopied] = useState(false);
+  const [copiedInput, setCopiedInput] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
@@ -101,7 +198,11 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
         converter.current = { convert, detect };
         setStatus('ready');
       },
-      () => live && setStatus('error'),
+      () => {
+        if (!live) return;
+        setStatus('error');
+        send(events.loadError());
+      },
     );
     return () => {
       live = false;
@@ -124,6 +225,8 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
     [status, text, from, to],
   );
 
+  useConverterEvents(view, from, to, text.length);
+
   const lines: { text: string; tone: Tone }[] = [];
   const say = (text: string, tone: Tone) => lines.push({ text, tone });
   if (view?.issue === 'too-long') say(labels.tooLong, 'error');
@@ -138,17 +241,23 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
   if (view && !view.same && (to === 'zawgyi' || to === 'win-innwa'))
     say(labels.lossy, 'help');
   for (const note of view?.notes ?? []) say(noteText(note, labels), 'help');
-  const outputFont =
-    view?.output && to === 'zawgyi'
-      ? labels.fontZawgyi
-      : view?.output && to === 'win-innwa'
-        ? labels.fontWinInnwa
-        : null;
+  // The input is shown in the font the reader picks; until they pick, the font of its encoding.
+  const inputFont =
+    previewFont ?? view?.source ?? (from === 'auto' ? 'unicode' : from);
+
+  // The placeholder is written in the encoding of the font, so it reads correctly in that font.
+  const placeholder =
+    status === 'ready' && converter.current && inputFont !== 'unicode'
+      ? converter.current.convert(labels.inputPlaceholder, 'unicode', inputFont)
+          .text
+      : labels.inputPlaceholder;
 
   const doSwap = () => {
+    send(events.swap());
     const next = swap(from, to, view?.source ?? null);
     setFrom(next.from);
     setTo(next.to);
+    setPreviewFont(null);
     if (view?.output) {
       setInput(view.output);
       setText(view.output);
@@ -156,9 +265,19 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
   };
   const copy = () => {
     if (!view?.output) return;
+    send(events.copy('result', from, to, text.length));
     void copyText(view.output).then((ok) => {
       setCopied(ok);
       if (ok) window.setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const copyInput = () => {
+    if (!input) return;
+    send(events.copy('input', from, to, input.length));
+    void copyText(input).then((ok) => {
+      setCopiedInput(ok);
+      if (ok) window.setTimeout(() => setCopiedInput(false), 2000);
     });
   };
 
@@ -169,13 +288,13 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
     onChange: (value: string) => void,
     auto: boolean,
   ) => (
-    <div>
+    <div className="mini-picker">
       <label className="mini-label" htmlFor={id}>
         {label}
       </label>
       <select
         id={id}
-        className="mini-field"
+        className="mini-field mini-field--small"
         value={value}
         onChange={(event) => onChange(event.target.value)}
       >
@@ -207,44 +326,87 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
           'converter-from',
           labels.from,
           from,
-          (v) => setFrom(v as FromChoice),
+          (v) => {
+            send(events.encodingChange('from', v as FromChoice));
+            setFrom(v as FromChoice);
+            setPreviewFont(null);
+          },
           true,
         )}
-        <MiniButton
-          icon={<SwapIcon />}
-          aria-label={labels.swapLabel}
-          onClick={doSwap}
-          disabled={status !== 'ready'}
-        >
-          {labels.swap}
-        </MiniButton>
+        <div className="flex items-center justify-center sm:h-9">
+          <MiniButton
+            small
+            icon={
+              <>
+                <span className="inline-flex sm:hidden" aria-hidden="true">
+                  <SwapVerticalIcon />
+                </span>
+                <span className="hidden sm:inline-flex" aria-hidden="true">
+                  <SwapIcon />
+                </span>
+              </>
+            }
+            aria-label={labels.swapLabel}
+            onClick={doSwap}
+            disabled={status !== 'ready'}
+          >
+            {labels.swap}
+          </MiniButton>
+        </div>
         {picker(
           'converter-to',
           labels.to,
           to,
-          (v) => setTo(v as Encoding),
+          (v) => {
+            send(events.encodingChange('to', v as FromChoice));
+            setTo(v as Encoding);
+          },
           false,
         )}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="grid content-start gap-2">
+      <div className="grid gap-4 md:grid-cols-2 md:grid-rows-[auto_auto_1fr_auto_auto] md:gap-x-4 md:gap-y-2">
+        <div className="grid content-start gap-2 md:row-span-5 md:grid-rows-subgrid">
           <label className="mini-label" htmlFor="converter-input">
             {labels.input}
           </label>
+          <FontChoice
+            id="converter-preview-font"
+            label={labels.previewAs}
+            value={inputFont}
+            onChange={(font) => {
+              send(events.fontChange(font));
+              setPreviewFont(font);
+            }}
+            labels={labels}
+          />
           <textarea
             id="converter-input"
-            className="mini-field break-all"
+            className={`mini-field break-all ${FONT_CLASS[inputFont]}`}
             value={input}
-            placeholder={labels.inputPlaceholder}
+            placeholder={placeholder}
             spellCheck={false}
             autoComplete="off"
+            translate="no"
             onChange={(event) => setInput(event.target.value)}
           />
-          <div className="flex items-center justify-between gap-3">
+          <p className="mini-help">{shownIn(labels, inputFont)}</p>
+          <div className="flex items-center gap-2">
             <MiniButton
+              small
+              icon={copiedInput ? <CheckIcon /> : <CopyIcon />}
+              aria-label={copiedInput ? labels.copied : labels.copyInputLabel}
+              onClick={copyInput}
+              disabled={input.length === 0}
+            >
+              {copiedInput ? labels.copied : labels.copy}
+            </MiniButton>
+            <MiniButton
+              small
+              danger
               icon={<CloseIcon />}
               onClick={() => {
+                send(events.clear());
                 setInput('');
                 setText('');
               }}
@@ -252,25 +414,30 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
             >
               {labels.clear}
             </MiniButton>
-            <span className="mini-help" aria-hidden="true">
+            <span className="mini-help ms-auto" aria-hidden="true">
               {input.length.toLocaleString()} / {MAX_CHARS.toLocaleString()}
             </span>
           </div>
         </div>
-        <div className="grid content-start gap-2">
-          <label className="mini-label" htmlFor="converter-output">
+        <div className="grid content-start gap-2 md:row-span-5 md:grid-rows-subgrid">
+          <label
+            className="mini-label md:self-center"
+            htmlFor="converter-output"
+          >
             {labels.output}
           </label>
           <textarea
             id="converter-output"
-            className="mini-field break-all"
+            className={`mini-field break-all md:row-start-3 ${FONT_CLASS[to]}`}
             value={view?.output ?? ''}
             readOnly
             translate="no"
             spellCheck={false}
           />
-          <div className="flex items-center">
+          <p className="mini-help md:row-start-4">{shownIn(labels, to)}</p>
+          <div className="flex items-center md:row-start-5">
             <MiniButton
+              small
               icon={copied ? <CheckIcon /> : <CopyIcon />}
               aria-label={copied ? labels.copied : labels.copyLabel}
               onClick={copy}
@@ -284,7 +451,6 @@ export default function TextConverterIsland({ labels }: { labels: Labels }) {
 
       <div role="status" aria-live="polite" className="grid gap-2">
         {status === 'loading' && <p className="mini-help">{labels.loading}</p>}
-        {outputFont && <p className="mini-help">{outputFont}</p>}
         {lines.map((line) => (
           <p
             key={line.text}
