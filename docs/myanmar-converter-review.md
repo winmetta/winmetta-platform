@@ -30,7 +30,7 @@ Known limits that are not errors: Win Innwa types wa (ဝ) and zero (၀) with t
 | `converterCopy` | Copy | ကူးယူရန် |
 | `converterCopyLabel` | Copy the result | ရလဒ်ကို ကူးယူရန် |
 | `converterCopyInputLabel` | Copy what you typed | ရိုက်ထည့်ထားသော စာသားကို ကူးယူရန် |
-| `privacyConverterAnalytics` (Privacy page) | When analytics is enabled, we count Burmese Text Converter feature use … (see `en.json`) | (see `my.json`) |
+| `privacyConverterAnalytics` (Privacy page) | When analytics is enabled, we count Burmese Text Converter feature use, such as that text was converted, copied or cleared, and which encodings and fonts were chosen. Text length is grouped into ranges. Analytics never receives the text you type or paste, the result, or what the converter found about your text. | အသုံးပြုမှု စာရင်းကောက်ယူခြင်းကို ဖွင့်ထားပါက မြန်မာစာပြောင်းလဲကိရိယာ၏ အသုံးပြုမှု၊ ဥပမာ စာသားကို ပြောင်းလဲခြင်း၊ ကူးယူခြင်း သို့မဟုတ် ဖျက်ခြင်းနှင့် ရွေးချယ်ထားသော စာလုံးကုဒ်များနှင့် ဖောင့်များကို ရေတွက်ပါသည်။ စာသားအရှည်ကို အပိုင်းအခြားများအဖြစ် စုစည်းပါသည်။ သင်ရိုက်ထည့်သော သို့မဟုတ် ကူးထည့်သော စာသား၊ ရလဒ်၊ သို့မဟုတ် ကိရိယာက သင့်စာသားအကြောင်း ရှာဖွေတွေ့ရှိသည့်အချက်ကို စာရင်းကောက်ယူမှုသို့ မပို့ပါ။ |
 | `converterCopied` | Copied | ကူးယူပြီး |
 | `converterClear` | Clear | ဖျက်ရန် |
 | `converterLoading` | Loading the converter… | ပြောင်းလဲကိရိယာကို ဖွင့်နေပါသည်… |
@@ -54,6 +54,7 @@ Known limits that are not errors: Win Innwa types wa (ဝ) and zero (၀) with t
 | `converterNoteLooksZawgyi` | This text has patterns that only Zawgyi uses. If it is Zawgyi, choose Zawgyi in From. | ဤစာသားတွင် ဇော်ဂျီသာ သုံးသော ပုံစံများ ပါနေပါသည်။ ဇော်ဂျီဖြစ်ပါက "မှ" တွင် ဇော်ဂျီကို ရွေးပါ။ |
 | `converterBuiltWith` | Built with | အသုံးပြုထားသည်များ |
 | `converterFontsNote` | Zawgyi text is shown in the Zawgyi-One font and Win Innwa text in the Win Innwa font. | ဇော်ဂျီစာသားကို ဇော်ဂျီဝမ်းဖောင့်ဖြင့်လည်းကောင်း၊ ဝင်းအင်းဝစာသားကို ဝင်းအင်းဝဖောင့်ဖြင့်လည်းကောင်း ပြပါသည်။ |
+| `converterFontsSource` | The Zawgyi-One and Win Innwa fonts come from the dafontfree.net folder of {link}, a collection of legacy Burmese fonts that Win Metta keeps. You can find more fonts there. | ဇော်ဂျီဝမ်းနှင့် ဝင်းအင်းဝ ဖောင့်များကို Win Metta ထိန်းသိမ်းထားသော ရှေးမြန်မာဖောင့်စုစည်းမှု {link} ၏ dafontfree.net ဖိုလ်ဒါမှ ရယူထားပါသည်။ ထိုနေရာတွင် အခြားဖောင့်များကိုလည်း ရှာဖွေနိုင်ပါသည်။ |
 
 ## Part B: conversions
 
