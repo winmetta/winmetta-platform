@@ -5,6 +5,7 @@ import BookSearchIsland from '../../../components/BookSearchIsland';
 import { bookSearchEnabled } from '../../../lib/book-search';
 import { locales, localeCodes, type Locale } from '../../../i18n/locales';
 import { t } from '../../../i18n/messages';
+import { route } from '../../../i18n/routes';
 import { libraryData } from '../../../lib/library-data';
 import { libraryCdnBase } from '../../../lib/site';
 import FolderTree from '../../../components/FolderTree.astro';
@@ -37,6 +38,8 @@ const labels = {
   removeFolder: text('removeFolder'),
   download: text('download'),
   viewApp: text('studyAppsView'),
+  pagesOne: text('bookPagesOne'),
+  pagesOther: text('bookPagesOther'),
   showMore: text('showMore'),
 };
 const bookSearchLabels = {
@@ -65,12 +68,15 @@ const bookSearchLabels = {
   <header class="space-y-4">
     <h1 class="text-3xl font-bold sm:text-4xl">{text('libraryTitle')}</h1>
     <p class="lead">{text('libraryIntro')}</p>
-    <p class="flex flex-wrap gap-x-6 gap-y-2">
+    <p class="flex flex-col gap-2">
       <a class="link" href={`/${locale}/dhamma-library/apps/`}>
         {text('studyAppsLink')} →
       </a>
       <a class="link" href={`/${locale}/dhamma-library/digital-texts/`}>
         {text('digitalTextsLink')} →
+      </a>
+      <a class="link" href={route(locale, 'posts')}>
+        {text('libraryPostsLink')} →
       </a>
     </p>
   </header>

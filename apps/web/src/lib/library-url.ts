@@ -36,7 +36,18 @@ export const formatCount = (value: number, formatLocale: string): string =>
     numberingSystem: numberingSystemOf(formatLocale),
   }).format(value);
 
-/** File size in the interface language's digits, decimal units (1 MB = 1,000,000 bytes). */
+/** "427 pages" / "၄၂၇ မျက်နှာ": the count in the interface language's digits in a one/other template. */
+export const formatPages = (
+  pages: number,
+  formatLocale: string,
+  templates: { one: string; other: string },
+): string =>
+  (isSingular(pages, formatLocale) ? templates.one : templates.other).replace(
+    '{count}',
+    formatCount(pages, formatLocale),
+  );
+
+/** File size in Latin digits in every language, decimal units (1 MB = 1,000,000 bytes). */
 export function formatSize(bytes: number, formatLocale: string): string {
   const [unit, divisor] =
     bytes >= 1e9
@@ -48,7 +59,7 @@ export function formatSize(bytes: number, formatLocale: string): string {
     style: 'unit',
     unit,
     unitDisplay: 'short',
-    numberingSystem: numberingSystemOf(formatLocale),
+    numberingSystem: 'latn',
     maximumFractionDigits: unit === 'kilobyte' ? 0 : 1,
   }).format(bytes / divisor);
 }

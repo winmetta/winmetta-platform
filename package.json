@@ -21,6 +21,7 @@
     "test": "turbo run test",
     "test:smoke": "npm run test:smoke --workspace @winmetta/web",
     "library:manifest": "node scripts/generate-library-manifest.mjs",
+    "library:pages": "node scripts/add-library-pages.mjs",
     "book-search:setup": "node apps/book-search/src/cli.ts setup",
     "book-search:fetch": "node apps/book-search/src/cli.ts fetch",
     "book-search:index": "node apps/book-search/src/cli.ts index",

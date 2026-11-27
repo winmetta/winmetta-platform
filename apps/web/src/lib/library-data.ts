@@ -14,6 +14,7 @@ const records: SearchRecord[] = files.map((file) => ({
   tags: file.tags,
   language: file.language,
   sizeBytes: file.sizeBytes,
+  ...(file.pages ? { pages: file.pages } : {}),
 }));
 records.push(
   ...Object.values(studyApps).map((app) => ({

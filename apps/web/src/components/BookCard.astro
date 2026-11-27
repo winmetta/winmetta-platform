@@ -3,7 +3,7 @@ import FeedbackLink from './FeedbackLink.astro';
 import LinkIcon from './LinkIcon.astro';
 import type { LibraryFile } from '../lib/schemas';
 import { fileUrl } from '../lib/library-index';
-import { formatSize } from '../lib/library-url';
+import { formatPages, formatSize } from '../lib/library-url';
 import { t } from '../i18n/messages';
 import { locales, type Locale } from '../i18n/locales';
 import { libraryCdnBase } from '../lib/site';
@@ -43,6 +43,14 @@ const { record, locale, from = 'other' } = Astro.props;
         <LinkIcon name="file" />
         {formatSize(record.sizeBytes, locales[locale].formatLocale)}
       </span>
+      {record.pages && (
+        <span class="badge" data-file-pages>
+          {formatPages(record.pages, locales[locale].formatLocale, {
+            one: t(locale, 'bookPagesOne'),
+            other: t(locale, 'bookPagesOther'),
+          })}
+        </span>
+      )}
     </p>
     <FeedbackLink
       locale={locale}
