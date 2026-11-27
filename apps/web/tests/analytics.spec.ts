@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { siteOrigin } from './site';
+import { siteOrigin, chooseLanguage } from './site';
 
 // Run the enabled tests against a build with PUBLIC_ANALYTICS=true and a website ID.
 // The default build tests that the tracker is absent. The post-deploy check skips that assertion.
@@ -144,7 +144,7 @@ test.describe('tracker on (ANALYTICS_BUILD=true)', () => {
   test('a language switch reports only from and to', async ({ page }) => {
     await page.goto('/en/');
     await stayOnPage(page, 'a[data-locale]');
-    await page.locator('a[data-locale="my"]').click();
+    await chooseLanguage(page, 'my');
     await expect
       .poll(() => events(page))
       .toContainEqual({

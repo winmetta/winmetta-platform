@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { siteOrigin } from './site';
+import { siteOrigin, chooseLanguage } from './site';
 test('locale routes, layout and local Burmese font', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
@@ -20,7 +20,7 @@ test('locale routes, layout and local Burmese font', async ({ page }) => {
         .some((entry) => entry.name.includes('.woff2')),
     ),
   ).toBe(true);
-  await page.locator('a[data-locale="en"]').click();
+  await chooseLanguage(page, 'en');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.locator('h1')).toHaveText(
     'Learn the Dhamma with Win Metta',
@@ -53,7 +53,7 @@ test('switching preserves query/hash when preference storage is blocked', async 
     }),
   );
   await page.goto('/en/?q=sample&type=book#main');
-  await page.getByRole('link', { name: 'မြန်မာ', exact: true }).click();
+  await chooseLanguage(page, 'my');
   await expect(page).toHaveURL(/\/my\/\?q=sample&type=book#main$/);
   await expect(page.locator('html')).toHaveAttribute('lang', 'my');
 });
@@ -64,7 +64,7 @@ test('explicit locale wins over stored preference and narrow screens reflow', as
   await page.goto('/en/');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await page.setViewportSize({ width: 320, height: 700 });
-  await page.getByRole('link', { name: 'မြန်မာ', exact: true }).click();
+  await chooseLanguage(page, 'my');
   // Measure the Burmese page, not the page being left.
   await expect(page).toHaveURL(/\/my\/$/);
   await expect(page.locator('html')).toHaveAttribute('lang', 'my');
@@ -85,12 +85,12 @@ test('language switch uses the URL at activation time, not at page load', async 
     history.replaceState(null, '', '/en/?q=second&type=book');
     location.hash = 'main';
   });
-  await page.getByRole('link', { name: 'မြန်မာ', exact: true }).click();
+  await chooseLanguage(page, 'my');
   await expect(page).toHaveURL(/\/my\/\?q=second&type=book#main$/);
   await page.evaluate(() => {
     history.replaceState(null, '', '/my/?q=third#results');
   });
-  await page.locator('a[data-locale="en"]').click();
+  await chooseLanguage(page, 'en');
   await expect(page).toHaveURL(/\/en\/\?q=third#results$/);
 });
 
@@ -128,8 +128,8 @@ test('root opens the saved language and Settings resets it', async ({
   await page.goto('/');
   await expect(page).toHaveURL(/\/$/);
   await page.goto('/en/');
-  await page.getByRole('link', { name: 'မြန်မာ', exact: true }).click();
-  await page.getByRole('link', { name: 'English', exact: true }).click();
+  await chooseLanguage(page, 'my');
+  await chooseLanguage(page, 'en');
   await expect(page).toHaveURL(/\/en\/$/);
   await page.goto('/?utm=x');
   await expect(page).toHaveURL(/\/en\/\?utm=x$/);

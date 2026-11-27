@@ -1,3 +1,4 @@
+import { chooseLanguage } from './site';
 import { expect, test, type Page } from '@playwright/test';
 
 const book = 'ဓမ္မပဒ';
@@ -53,7 +54,7 @@ test('study apps are reachable from the library in both languages', async ({
     await expect(link).toBeVisible();
     await expect(link.locator('svg, img')).toHaveCount(1);
   }
-  await page.locator('a[data-locale="my"]').click();
+  await chooseLanguage(page, 'my');
   await expect(page).toHaveURL(/\/my\/dhamma-library\/apps\/$/);
   await page.waitForLoadState('load');
   await expect(
@@ -101,7 +102,7 @@ test('digital Pāḷi texts are reachable from the library in both languages', a
       includeHidden: true,
     }),
   ).toHaveAttribute('href', '/en/dhamma-library/digital-texts/');
-  await page.locator('a[data-locale="my"]').click();
+  await chooseLanguage(page, 'my');
   await expect(page).toHaveURL(/\/my\/dhamma-library\/digital-texts\/$/);
   await expect(
     page.getByRole('heading', { name: 'Digital စာပေများ' }),
@@ -219,7 +220,7 @@ test('empty results explain what to do', async ({ page }) => {
 test('language switch keeps the query', async ({ page }) => {
   await page.goto('/my/dhamma-library/?q=' + encodeURIComponent(book));
   await expect(page.locator('h3', { hasText: book }).first()).toBeVisible();
-  await page.locator('a[data-locale="en"]').click();
+  await chooseLanguage(page, 'en');
   await expect(page).toHaveURL(/\/en\/dhamma-library\/\?q=%E1%80%93/);
   await expect(search(page)).toHaveValue(book);
   await expect(page.locator('h3', { hasText: book }).first()).toBeVisible();

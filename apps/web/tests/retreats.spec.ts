@@ -1,3 +1,4 @@
+import { chooseLanguage } from './site';
 import { expect, test } from '@playwright/test';
 
 test('retreats page says none is scheduled and lists the archive', async ({
@@ -15,7 +16,7 @@ test('archive search and filters keep their state across a language switch', asy
   await expect(page.locator('main li.card-link')).toHaveCount(1);
   await page.getByLabel('Year').selectOption('2024');
   await expect(page).toHaveURL(/q=kovida&year=2024/);
-  await page.getByRole('link', { name: 'မြန်မာ', exact: true }).click();
+  await chooseLanguage(page, 'my');
   await expect(page).toHaveURL(/\/my\/classes\/retreats\/\?q=kovida&year=2024/);
   await expect(page.locator('main li.card-link')).toHaveCount(1);
   await page.goto('/en/classes/retreats/?days=3');

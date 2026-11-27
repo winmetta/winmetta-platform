@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { siteOrigin } from './site';
+import { siteOrigin, chooseLanguage } from './site';
 
 const locales = [
   {
@@ -129,7 +129,7 @@ test('language switch keeps the page and canonical URLs are per page', async ({
     'href',
     `${siteOrigin}/my/privacy/`,
   );
-  await page.locator('a[data-locale="my"]').click();
+  await chooseLanguage(page, 'my');
   await expect(page).toHaveURL(/\/my\/privacy\/$/);
   await expect(page.locator('html')).toHaveAttribute('lang', 'my');
 });

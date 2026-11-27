@@ -1,3 +1,4 @@
+import { chooseLanguage } from './site';
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 
@@ -78,7 +79,7 @@ test('breadcrumbs lead back up the tree', async ({ page }) => {
 
 test('switching language keeps the folder and page', async ({ page }) => {
   await page.goto(`/en/dhamma-library/folders/${bigFolder}/2/`);
-  await page.locator('a[data-locale="my"]').click();
+  await chooseLanguage(page, 'my');
   await expect(page).toHaveURL(
     new RegExp(`/my/dhamma-library/folders/${bigFolder}/2/$`),
   );
