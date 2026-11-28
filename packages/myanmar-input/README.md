@@ -18,7 +18,7 @@ result.notes; // codes such as { code: 'unsure' }
 - **Key engine:** `createKeyEngine('win-innwa').handle(event, textBeforeCaret)` returns `insert` (with how many characters before the caret to replace), `arm`, `cancel` or `pass`. It is pure; the DOM adapter will act on it.
 - **Tray data:** `keyGroups(method)` lists the Pāḷi keys (stacked consonants, extra letters, ligatures, kinzi, punctuation) with the text to insert for that method.
 - **DOM adapter** (`@winmetta/myanmar-input/dom`): `attachInput(field, { method, stackKey })` wires the key engine and paste handling to an `<input>` or `<textarea>` and returns `{ update, detach }`; `insertAtCaret(field, text, replace)` is what the keys tray calls. It acts only inside its own `keydown` or `paste`, never between `compositionstart` and `compositionend`, and tells the page with a normal `input` event. In Win Innwa, pasted Unicode Burmese becomes glyph codes and pasted Latin-1 glyph codes are kept. Dead keys need real key events, so they work on desktop keyboards; a virtual keyboard's `Unidentified` keys pass through.
-- **Interim canonicalizer:** `src/interim.ts` is a port of the Python syllable orderer, checked against `src/interim.vectors.json`. It is deleted when `@winmetta/pali-text` ships a replacement (design doc section 7); `resolve.ts` is the only importer.
+- **Interim canonicalizer:** `src/interim.ts` is a port of the Python syllable orderer, checked against `src/interim.vectors.json`. It is deleted when `@winmetta/pali-text` ships a replacement (design doc section 7); `canonical.ts` is the only importer, and `canonicalize` is exported from there for apps (the Pāḷi Dictionary's key uses it).
 
 ## Constraints
 

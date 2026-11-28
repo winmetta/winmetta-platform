@@ -1,3 +1,5 @@
+export { canonicalize } from './canonical.ts';
+export type { Canonicalized } from './canonical.ts';
 export { detectAuto, LONG_TEXT_LETTERS } from './auto.ts';
 export type { AutoVerdict } from './auto.ts';
 export { fontFor } from './fonts.ts';

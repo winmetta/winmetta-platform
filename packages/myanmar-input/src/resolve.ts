@@ -1,6 +1,6 @@
 import { convert, winInnwaToUnicode } from '@winmetta/myanmar-convert';
 import { detectAuto } from './auto.ts';
-import { canonicalize } from './interim.ts';
+import { canonicalize } from './canonical.ts';
 import type {
   Fix,
   InputMethod,
