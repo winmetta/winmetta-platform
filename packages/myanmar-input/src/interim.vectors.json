@@ -1,0 +1,210 @@
+[
+  {
+    "input": "ဓမ္မ",
+    "canonical": "ဓမ္မ"
+  },
+  {
+    "input": "ဓမမ",
+    "canonical": "ဓမမ"
+  },
+  {
+    "input": "ပဉှ",
+    "canonical": "ပဉှ"
+  },
+  {
+    "input": "ပဉဟ",
+    "canonical": "ပဉဟ"
+  },
+  {
+    "input": "သင်္ဃ",
+    "canonical": "သင်္ဃ"
+  },
+  {
+    "input": "သံဃ",
+    "canonical": "သံဃ"
+  },
+  {
+    "input": "သဿတ",
+    "canonical": "သဿတ"
+  },
+  {
+    "input": "သသသတ",
+    "canonical": "သသသတ"
+  },
+  {
+    "input": "ဉာဏ",
+    "canonical": "ဉာဏ"
+  },
+  {
+    "input": "ဥာဏ",
+    "canonical": "ဉာဏ"
+  },
+  {
+    "input": "ဥာဏ်မျက်စိ",
+    "canonical": "ဉာဏ်မျက်စိ"
+  },
+  {
+    "input": "ဉာဏ်မျက်စိ",
+    "canonical": "ဉာဏ်မျက်စိ"
+  },
+  {
+    "input": "ဣနြ္ဒိယ",
+    "canonical": "ဣန္ဒြိယ"
+  },
+  {
+    "input": "ပိနဲ္န",
+    "canonical": "ပိန္နဲ"
+  },
+  {
+    "input": "မင်္ဂလာ",
+    "canonical": "မင်္ဂလာ"
+  },
+  {
+    "input": "ပဥှာ",
+    "canonical": "ပဉှာ"
+  },
+  {
+    "input": "သံယောဇဥ်",
+    "canonical": "သံယောဇဉ်"
+  },
+  {
+    "input": "ကြောင်း",
+    "canonical": "ကြောင်း"
+  },
+  {
+    "input": "ဗုဒ္ဓ",
+    "canonical": "ဗုဒ္ဓ"
+  },
+  {
+    "input": "ဒုက္ခ",
+    "canonical": "ဒုက္ခ"
+  },
+  {
+    "input": "ဘိက္ခု",
+    "canonical": "ဘိက္ခု"
+  },
+  {
+    "input": "သတ္တ",
+    "canonical": "သတ္တ"
+  },
+  {
+    "input": "ကျွန်ုပ်",
+    "canonical": "ကျွနု်ပ်"
+  },
+  {
+    "input": "ပြဿနာ",
+    "canonical": "ပြဿနာ"
+  },
+  {
+    "input": "ကေ့်",
+    "canonical": "ကေ့်"
+  },
+  {
+    "input": "ကန့်",
+    "canonical": "ကန့်"
+  },
+  {
+    "input": "ကိုး",
+    "canonical": "ကိုး"
+  },
+  {
+    "input": "ကုိ",
+    "canonical": "ကို"
+  },
+  {
+    "input": "ကိိ",
+    "canonical": "ကိ"
+  },
+  {
+    "input": "ကော်",
+    "canonical": "ကော်"
+  },
+  {
+    "input": "ကော်",
+    "canonical": "ကော်"
+  },
+  {
+    "input": "မြန်မာ",
+    "canonical": "မြန်မာ"
+  },
+  {
+    "input": "သာ္တ",
+    "canonical": "သ္တာ"
+  },
+  {
+    "input": "ဓမာ္မ",
+    "canonical": "ဓမ္မာ"
+  },
+  {
+    "input": "သူ္တ",
+    "canonical": "သ္တူ"
+  },
+  {
+    "input": "ဥပါဒါန်",
+    "canonical": "ဥပါဒါန်"
+  },
+  {
+    "input": "ဉပေက္ခာ",
+    "canonical": "ဉပေက္ခာ"
+  },
+  {
+    "input": "ဦး",
+    "canonical": "ဦး"
+  },
+  {
+    "input": "ပဉ္စ",
+    "canonical": "ပဉ္စ"
+  },
+  {
+    "input": "ဘာသာ",
+    "canonical": "ဘာသာ"
+  },
+  {
+    "input": "ကျွန်တော်",
+    "canonical": "ကျွန်တော်"
+  },
+  {
+    "input": "ရှိ့",
+    "canonical": "ရှိ့"
+  },
+  {
+    "input": "ကြီး",
+    "canonical": "ကြီး"
+  },
+  {
+    "input": "ကြေး",
+    "canonical": "ကြေး"
+  },
+  {
+    "input": "ကျေွ",
+    "canonical": "ကျွေ"
+  },
+  {
+    "input": "ခွေှ",
+    "canonical": "ခွှေ"
+  },
+  {
+    "input": "မျှ",
+    "canonical": "မျှ"
+  },
+  {
+    "input": "မှု",
+    "canonical": "မှု"
+  },
+  {
+    "input": "ထိုင်",
+    "canonical": "ထိုင်"
+  },
+  {
+    "input": "ဟိုင်း",
+    "canonical": "ဟိုင်း"
+  },
+  {
+    "input": "ဝါး",
+    "canonical": "ဝါး"
+  },
+  {
+    "input": "ဝါါ",
+    "canonical": "ဝါ"
+  }
+]

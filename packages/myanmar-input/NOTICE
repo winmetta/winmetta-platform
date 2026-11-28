@@ -1,0 +1,18 @@
+@winmetta/myanmar-input
+Copyright (c) Win Metta. MIT License (see LICENSE at the repository root).
+
+This package uses or draws on the following work.
+
+1. @winmetta/myanmar-convert (dependency; Zawgyi detection and conversion, Win Innwa <-> Unicode).
+
+2. pndaza/myanmar-unicode-keyboard-layout, source/wininnwa/WinInnwa.kmn (2018, third party).
+   https://github.com/pndaza/myanmar-unicode-keyboard-layout
+   The repository carries no licence file, so no code is copied. Only the key sequences for the Win Innwa
+   dead key (Shift+F then a consonant key; the ligature and kinzi sequences) are used: they are facts
+   about which key gives which glyph, read on 2026-11-27 and compared with the converter's glyph table
+   (src/keys.ts, src/keys.test.ts). Not yet confirmed against the original Win Innwa driver or by a native
+   Win Innwa typist (docs/myanmar-input.md section 11).
+
+3. winmetta/pali-myanmar-dictionaries, canonicalize_myanmar_syllables (src/pali_myanmar_dicts/normalize.py).
+   Same organization. src/interim.ts is a TypeScript port of the syllable orderer, and
+   src/interim.vectors.json holds outputs of the Python function.
