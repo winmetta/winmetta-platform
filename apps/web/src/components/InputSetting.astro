@@ -1,0 +1,152 @@
+---
+// The site-wide Burmese typing setting (docs/myanmar-input.md §6): two rows for /<locale>/settings/.
+// Hidden until mini apps are on, like the bell data row, because only the shared field uses it.
+import { t } from '../i18n/messages';
+import type { Locale } from '../i18n/locales';
+import { miniAppsEnabled } from '../lib/mini-apps';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const methods = [
+  ['auto', t(locale, 'inputMethodAuto')],
+  ['unicode', t(locale, 'inputMethodUnicode')],
+  ['win-innwa', t(locale, 'inputMethodWinInnwa')],
+] as const;
+---
+
+<div
+  class="settings-row"
+  data-input-method-row
+  data-saved-message={t(locale, 'settingsSaved')}
+  data-blocked-message={t(locale, 'settingsNoStorage')}
+  hidden={!miniAppsEnabled}
+>
+  <div class="settings-text">
+    <h2 id="settings-input-title">{t(locale, 'settingsInputTitle')}</h2>
+    <p>{t(locale, 'settingsInputHelp')}</p>
+  </div>
+  <div class="settings-action">
+    <div
+      class="segmented settings-choice"
+      role="group"
+      aria-labelledby="settings-input-title"
+    >
+      {methods.map(([value, label]) => (
+        <button
+          type="button"
+          value={value}
+          aria-pressed="false"
+          data-input-method
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+    <span role="status" class="settings-done" data-input-status></span>
+  </div>
+</div>
+<div class="settings-row" data-input-stack-row hidden={!miniAppsEnabled}>
+  <div class="settings-text">
+    <h2 id="settings-input-stack-title">
+      {t(locale, 'settingsInputStackTitle')}
+    </h2>
+    <p>{t(locale, 'settingsInputStackHelp')}</p>
+    <p data-input-stack-note hidden>
+      {t(locale, 'settingsInputStackNeedsWinInnwa')}
+    </p>
+  </div>
+  <div class="settings-action">
+    <div
+      class="segmented settings-choice"
+      role="group"
+      aria-labelledby="settings-input-stack-title"
+    >
+      <button type="button" value="true" aria-pressed="true" data-input-stack>
+        {t(locale, 'settingsOn')}
+      </button>
+      <button type="button" value="false" aria-pressed="false" data-input-stack>
+        {t(locale, 'settingsOff')}
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import {
+    readInputSetting,
+    subscribeInputSetting,
+    writeInputSetting,
+  } from '../lib/input-method';
+  import { track } from '../lib/analytics';
+  import * as events from '../lib/myanmar-input-events';
+  import type { InputMethod } from '@winmetta/myanmar-input';
+
+  const methodRow = document.querySelector<HTMLElement>(
+    '[data-input-method-row]',
+  );
+  const stackRow = document.querySelector<HTMLElement>(
+    '[data-input-stack-row]',
+  );
+  if (methodRow && stackRow) {
+    const methodButtons = methodRow.querySelectorAll<HTMLButtonElement>(
+      '[data-input-method]',
+    );
+    const stackButtons =
+      stackRow.querySelectorAll<HTMLButtonElement>('[data-input-stack]');
+    const status = methodRow.querySelector<HTMLElement>('[data-input-status]')!;
+    const note = stackRow.querySelector<HTMLElement>(
+      '[data-input-stack-note]',
+    )!;
+    const send = (event: events.InputEvent) => track(event.name, event.data);
+
+    const show = () => {
+      const setting = readInputSetting();
+      methodButtons.forEach((button) =>
+        button.setAttribute(
+          'aria-pressed',
+          String(button.value === setting.method),
+        ),
+      );
+      // The switch keeps its saved value while Win Innwa is not chosen, but cannot be changed.
+      const enabled = setting.method === 'win-innwa';
+      stackButtons.forEach((button) => {
+        button.setAttribute(
+          'aria-pressed',
+          String((button.value === 'true') === setting.stackKey),
+        );
+        button.disabled = !enabled;
+        button.setAttribute('aria-disabled', String(!enabled));
+      });
+      note.hidden = enabled;
+    };
+    show();
+    subscribeInputSetting(show);
+
+    methodButtons.forEach((button) =>
+      button.addEventListener('click', () => {
+        const method = button.value as InputMethod;
+        if (readInputSetting().method === method) return;
+        send(events.methodChange(method, 'settings'));
+        const ok = writeInputSetting({ method });
+        status.textContent =
+          (ok
+            ? methodRow.dataset.savedMessage
+            : methodRow.dataset.blockedMessage) ?? '';
+      }),
+    );
+    stackButtons.forEach((button) =>
+      button.addEventListener('click', () => {
+        const on = button.value === 'true';
+        if (readInputSetting().stackKey === on) return;
+        send(events.stackKeyChange(on));
+        const ok = writeInputSetting({ stackKey: on });
+        status.textContent =
+          (ok
+            ? methodRow.dataset.savedMessage
+            : methodRow.dataset.blockedMessage) ?? '';
+      }),
+    );
+  }
+</script>

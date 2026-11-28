@@ -1,6 +1,6 @@
 # Burmese typing (`@winmetta/myanmar-input`)
 
-**Status:** proposed 2026-11-27. Stages 1 and 2 (the core package and the DOM adapter, section 8) are built; the shared field, the Settings rows and the analytics are not. This is the design for a generic input package and its shared field, decided in conversation on 2026-11-27 while designing the Pāḷi Dictionary mini app ([pali-dictionary.md](pali-dictionary.md)). It is not specific to dictionary search: any place that lets a person type Burmese, or Pāḷi in Burmese script, should be able to use it. It is the input-side sibling of [myanmar-converter.md](myanmar-converter.md) and builds on `@winmetta/myanmar-convert`.
+**Status:** proposed 2026-11-27. Stages 1 to 3 (the core package, the DOM adapter, the shared field, the Settings rows, the events and the Privacy text, section 8) are built; no mini app uses the field yet. This is the design for a generic input package and its shared field, decided in conversation on 2026-11-27 while designing the Pāḷi Dictionary mini app ([pali-dictionary.md](pali-dictionary.md)). It is not specific to dictionary search: any place that lets a person type Burmese, or Pāḷi in Burmese script, should be able to use it. It is the input-side sibling of [myanmar-converter.md](myanmar-converter.md) and builds on `@winmetta/myanmar-convert`.
 
 **Why:** people type Burmese in several ways: a Myanmar Unicode keyboard, a Zawgyi keyboard (older phones), or an English keyboard with a Win Innwa font, where each key is a glyph (`jrefrm` shows as မြန်မာ only in the font). Site text is Unicode-only ([tech-architecture.md](tech-architecture.md) §5), and library search lists "Zawgyi-typed search queries" as an unscheduled improvement (§10). One package that turns what was typed into clean Unicode, and says what it did, lets every Burmese field on the site accept all of these without each app re-solving detection, key order and Pāḷi stacking.
 
@@ -156,7 +156,7 @@ The Python dictionary tooling has a canonical syllable orderer (`canonicalize_my
 
 1. **Core package (built 2026-11-27, `packages/myanmar-input`):** methods, `resolveInput`, Auto rules, `switchMethod`, key engine and key data, `interim.ts` with its vectors. Unit tests (section 9). No UI.
 2. **DOM adapter** and a browser test of the dead key, paste and composition (built 2026-11-27: `src/dom.ts`, `tests/dom.spec.ts`, run in CI after the smoke tests).
-3. **Shared field** and the **Settings rows**, events and Privacy paragraph (section 10), used first by the Pāḷi Dictionary mini app ([pali-dictionary.md](pali-dictionary.md)).
+3. **Shared field** and the **Settings rows**, events and Privacy paragraph (section 10) (built 2026-11-27: `apps/web/src/components/ui/MyanmarInputField.tsx`, `components/InputSetting.astro`, `lib/input-method.ts`, `lib/myanmar-input-events.ts`, `lib/myanmar-input-view.ts`; the Settings rows show only when `PUBLIC_MINI_APPS` is on), used first by the Pāḷi Dictionary mini app ([pali-dictionary.md](pali-dictionary.md)).
 4. **Swap the canonicalizer** for `pali-text` and delete `interim.ts` (section 7).
 5. **Adopt elsewhere,** each its own change and, for search, a Burmese-speaker review of the golden queries. Candidates, not checked: library, book and post search (tech-architecture.md §10 "Zawgyi-typed search queries"; the 0.9 threshold needs the same review), and other Burmese free-text fields such as the feedback form and typed answers in LLB practice. The Burmese Text Converter keeps its own From choice.
 
@@ -179,7 +179,7 @@ Per `AGENTS.md` ("New mini apps"), no typed text ever reaches the tracker. Event
 - `input_keys_use`: `app` (the mini app's registry id), `kind` (`stack`, `letter`, `ligature`, `kinzi`);
 - `input_auto_fix`: `app`, `fix` (a fixed code from the package's `Fix` and `Note` lists), once per lookup or submit when Auto changed something or could not tell.
 
-The shared field sends these, so every app that uses it counts them the same way, and an app adds only its own events (for the Pāḷi Dictionary, [pali-dictionary.md](pali-dictionary.md) §9). The Privacy page gets a sentence in both languages: the typing choice is saved on this device only. Still to do: the Privacy page text and the code.
+The shared field sends these, so every app that uses it counts them the same way, and an app adds only its own events (for the Pāḷi Dictionary, [pali-dictionary.md](pali-dictionary.md) §9). The Privacy page gets a sentence in both languages: the typing choice is saved on this device only.  The Privacy page has the sentence in both languages (`privacyInputAnalytics`, Burmese flagged for review).
 
 ## 11. Open questions
 
