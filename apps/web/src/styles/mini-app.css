@@ -438,3 +438,44 @@ textarea.mini-field {
     background: color-mix(in srgb, var(--mini-selected) 45%, var(--mini-tile));
   }
 }
+
+/* The Pāḷi keys tray of the shared Burmese field (docs/myanmar-input.md §4): a disclosure with rows
+   of small keys that type Burmese letters into the box. */
+.mini-keys > summary {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  color: var(--mini-accent);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.mini-keys-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mini-key {
+  min-width: 44px;
+  min-height: 44px;
+  padding-inline: 8px;
+  border: 1px solid var(--mini-control-line);
+  border-radius: 11px;
+  background: var(--mini-tile);
+  color: var(--mini-ink);
+  font-size: 1.125rem;
+  cursor: pointer;
+}
+
+.mini-key:focus-visible {
+  outline: 3px solid var(--mini-accent);
+  outline-offset: -3px;
+}
+
+@media (hover: hover) {
+  .mini-key:hover {
+    background: color-mix(in srgb, var(--mini-selected) 45%, var(--mini-tile));
+  }
+}

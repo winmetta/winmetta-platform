@@ -1,5 +1,6 @@
 ---
 import BellDataSetting from '../../../components/meditation-bell/BellDataSetting.astro';
+import InputSetting from '../../../components/InputSetting.astro';
 import GearIcon from '../../../components/GearIcon.astro';
 import Shell from '../../../layouts/Shell.astro';
 import { locales, localeCodes, type Locale } from '../../../i18n/locales';
@@ -41,6 +42,7 @@ const text = (key: Parameters<typeof t>[1]) => t(locale, key);
           class="segmented settings-choice"
           role="group"
           aria-labelledby="settingsLanguageTitle"
+          data-language-choice
         >
           <button type="button" value="" aria-pressed="true">
             {text('settingsLanguageAsk')}
@@ -64,6 +66,7 @@ const text = (key: Parameters<typeof t>[1]) => t(locale, key);
           <span role="status" class="settings-done" data-reset-status></span>
         </div>
       </div>
+      <InputSetting {locale} />
       <BellDataSetting {locale} />
     </div>
     <p role="status" class="settings-done" data-status></p>
@@ -75,6 +78,11 @@ const text = (key: Parameters<typeof t>[1]) => t(locale, key);
 <script>
   import { isLocale } from '../../../i18n/locales';
   import {
+    clearInputSetting,
+    inputKey,
+    subscribeInputSetting,
+  } from '../../../lib/input-method';
+  import {
     readLocalePreference,
     saveLocalePreference,
     clearLocalePreference,
@@ -82,7 +90,7 @@ const text = (key: Parameters<typeof t>[1]) => t(locale, key);
   const root = document.querySelector<HTMLElement>('[data-settings]');
   if (root) {
     const choices = root.querySelectorAll<HTMLButtonElement>(
-      '.settings-choice button',
+      '[data-language-choice] button',
     );
     const status = root.querySelector<HTMLElement>('[data-status]')!;
     const resetStatus = root.querySelector<HTMLElement>('[data-reset-status]')!;
@@ -95,7 +103,8 @@ const text = (key: Parameters<typeof t>[1]) => t(locale, key);
       try {
         return (
           readLocalePreference() !== undefined ||
-          localStorage.getItem(postsKey) !== null
+          localStorage.getItem(postsKey) !== null ||
+          localStorage.getItem(inputKey) !== null
         );
       } catch {
         return false;
@@ -109,6 +118,8 @@ const text = (key: Parameters<typeof t>[1]) => t(locale, key);
       );
     show(readLocalePreference() ?? '');
     sync();
+    // A typing row changed or was reset: the Reset button follows what is saved.
+    subscribeInputSetting(sync);
     choices.forEach((button) =>
       button.addEventListener('click', () => {
         const value = button.value;
@@ -130,6 +141,7 @@ const text = (key: Parameters<typeof t>[1]) => t(locale, key);
       } catch {
         ok = false;
       }
+      if (!clearInputSetting()) ok = false;
       show('');
       status.textContent = '';
       resetStatus.textContent = message(ok ? 'done' : 'blocked');
