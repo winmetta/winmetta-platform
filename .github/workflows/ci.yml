@@ -133,6 +133,8 @@ jobs:
         run: npx playwright install-deps chromium
         working-directory: apps/web
       - run: npm run test:smoke
+      - name: Test the Burmese input adapter in a browser
+        run: npm run test:browser --workspace @winmetta/myanmar-input
       # The browser tests stub Umami on a reserved domain and use a synthetic website ID.
       - name: Build and test with feedback and analytics enabled
         run: |
