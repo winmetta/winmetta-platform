@@ -1,6 +1,6 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src"],
+  "include": ["src", "tests", "playwright.config.ts", "vitest.config.ts"],
   "compilerOptions": {
     "target": "ES2023",
     "module": "ESNext",

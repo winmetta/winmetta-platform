@@ -1,6 +1,6 @@
 # `@winmetta/myanmar-input`
 
-Turns what a person typed in a Burmese field into clean Unicode, and says what it did. Private workspace package; design in [docs/myanmar-input.md](../../docs/myanmar-input.md). Stage 1 (core, no DOM, no UI) is built. The DOM adapter (`./dom`), the shared React field and the Settings rows are stages 2 and 3.
+Turns what a person typed in a Burmese field into clean Unicode, and says what it did. Private workspace package; design in [docs/myanmar-input.md](../../docs/myanmar-input.md). Stages 1 (core) and 2 (the DOM adapter, `./dom`) are built. The shared React field and the Settings rows are stage 3.
 
 ```ts
 import { resolveInput, switchMethod, createKeyEngine, keyGroups, fontFor } from '@winmetta/myanmar-input';
@@ -17,6 +17,7 @@ result.notes; // codes such as { code: 'unsure' }
 - **Nothing typed leaves the browser:** the package makes no requests and stores nothing.
 - **Key engine:** `createKeyEngine('win-innwa').handle(event, textBeforeCaret)` returns `insert` (with how many characters before the caret to replace), `arm`, `cancel` or `pass`. It is pure; the DOM adapter will act on it.
 - **Tray data:** `keyGroups(method)` lists the Pāḷi keys (stacked consonants, extra letters, ligatures, kinzi, punctuation) with the text to insert for that method.
+- **DOM adapter** (`@winmetta/myanmar-input/dom`): `attachInput(field, { method, stackKey })` wires the key engine and paste handling to an `<input>` or `<textarea>` and returns `{ update, detach }`; `insertAtCaret(field, text, replace)` is what the keys tray calls. It acts only inside its own `keydown` or `paste`, never between `compositionstart` and `compositionend`, and tells the page with a normal `input` event. In Win Innwa, pasted Unicode Burmese becomes glyph codes and pasted Latin-1 glyph codes are kept. Dead keys need real key events, so they work on desktop keyboards; a virtual keyboard's `Unidentified` keys pass through.
 - **Interim canonicalizer:** `src/interim.ts` is a port of the Python syllable orderer, checked against `src/interim.vectors.json`. It is deleted when `@winmetta/pali-text` ships a replacement (design doc section 7); `resolve.ts` is the only importer.
 
 ## Constraints
@@ -35,4 +36,7 @@ result.notes; // codes such as { code: 'unsure' }
 ```bash
 npm test --workspace @winmetta/myanmar-input
 npm run typecheck --workspace @winmetta/myanmar-input
+npm run test:browser --workspace @winmetta/myanmar-input
 ```
+
+`test:browser` bundles the adapter with Vite, loads it into a blank Chromium page with Playwright (dead key, ligatures, kinzi, selection, paste, composition) and needs `npx playwright install chromium` once.
